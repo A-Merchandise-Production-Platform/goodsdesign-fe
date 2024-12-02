@@ -1,6 +1,6 @@
 export interface ApiResponse<T> {
-  isSuccess: boolean
-  data: T | null
-  message: string
-  timestamp: Date
+  isSuccess: boolean;
+  data: T;
+  message: string;
+  timestamp: Date;
 }

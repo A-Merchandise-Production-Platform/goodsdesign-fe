@@ -12,18 +12,18 @@
 //         "updatedAt": "2024-11-28T01:30:22.143Z"
 
 export interface User {
-  id: string
-  displayName: string
-  handle: string
-  email: string
-  bio: string | null
-  avatarUrl: string | null
-  verified: boolean
-  role: RoleEnum
-  isBanned: boolean
-  isDeleted: boolean
-  createdAt: Date
-  updatedAt: Date
+  id: string;
+  displayName: string;
+  handle: string;
+  email: string;
+  bio: string | null;
+  avatarUrl: string | null;
+  verified: boolean;
+  role: RoleEnum;
+  isBanned: boolean;
+  isDeleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export enum RoleEnum {

@@ -1,14 +1,16 @@
-'use client'
+'use client';
 
-import AuthenMenu from '@/components/shared/AuthenMenu'
-import { cn } from '@/lib/utils'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+import AuthenMenu from '@/components/shared/authen-menu';
+import { cn } from '@/lib/utils';
+import AuthProvider from '@/providers/auth-provider';
 
 type MenuItem = {
-  title: string
-  href: string
-}
+  title: string;
+  href: string;
+};
 
 const menuItems: MenuItem[] = [
   { title: 'Home', href: '/' },
@@ -16,10 +18,10 @@ const menuItems: MenuItem[] = [
   { title: 'Contact', href: '/contact' },
   { title: 'Login', href: '/login' },
   { title: 'Register', href: '/register' },
-]
+];
 
 export default function Header() {
-  const pathname = usePathname()
+  const pathname = usePathname();
   return (
     <section className="fixed left-0 right-0 top-0 flex h-14 w-full items-center justify-center border-b py-2 backdrop-blur-md">
       <header className="container flex h-full items-center gap-6">
@@ -27,12 +29,12 @@ export default function Header() {
           <h1 className="select-none text-2xl font-semibold">DevTalk</h1>
           <nav>
             <ul className="flex items-center gap-4">
-              {menuItems.map((item) => (
+              {menuItems.map(item => (
                 <li
                   key={item.title}
                   className={cn(
                     'text-muted-foreground hover:text-primary',
-                    pathname === item.href && 'text-primary'
+                    pathname === item.href && 'text-primary',
                   )}
                 >
                   <Link href={item.href}>{item.title}</Link>
@@ -41,8 +43,10 @@ export default function Header() {
             </ul>
           </nav>
         </div>
-        <AuthenMenu />
+        <AuthProvider>
+          <AuthenMenu />
+        </AuthProvider>
       </header>
     </section>
-  )
+  );
 }

@@ -1,11 +1,16 @@
-'use client'
-import { useState } from 'react'
-import { toast } from 'sonner'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+'use client';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import * as z from 'zod';
+
+import { authApi } from '@/api/auth';
+import { RegisterResponse } from '@/api/types/auth';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -14,14 +19,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/ui/password-input'
-import { authApi } from '@/api/auth'
-import { useMutation } from '@tanstack/react-query'
-import { RegisterResponse } from '@/api/types/auth'
-import { useRouter } from 'next/navigation'
-import { AxiosError } from 'axios'
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 
 const formSchema = z
   .object({
@@ -35,30 +35,30 @@ const formSchema = z
       .string({ message: 'Confirm password is required' })
       .min(8, { message: 'Confirm password must be at least 8 characters' }),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine(data => data.password === data.confirmPassword, {
     message: 'Confirm passwords do not match',
-  })
+  });
 
 export default function RegisterForm() {
-  const router = useRouter()
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-  })
+  });
 
   const mutation = useMutation({
     mutationFn: authApi.register,
     onError: (error: AxiosError<RegisterResponse>) => {
-      toast.error(error.response?.data.message)
+      toast.error(error.response?.data.message);
     },
     onSuccess: () => {
-      toast.success('Account created successfully')
-      router.push('/login')
+      toast.success('Account created successfully');
+      router.push('/login');
     },
-  })
+  });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    mutation.mutate(values)
+    mutation.mutate(values);
   }
 
   return (
@@ -135,5 +135,5 @@ export default function RegisterForm() {
         </Button>
       </form>
     </Form>
-  )
+  );
 }

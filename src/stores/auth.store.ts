@@ -1,35 +1,62 @@
-import { User } from '@/types/user'
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+
+import { authApi } from '@/api/auth';
+import { User } from '@/types/user';
 
 interface AuthStoreState {
-  isAuth: boolean
-  user: User | null
-  accessToken: string | null
-  refreshToken: string | null
+  isAuth: boolean;
+  user: User | undefined;
+  accessToken: string | undefined;
+  refreshToken: string | undefined;
+  login: (accessToken: string, refreshToken: string) => Promise<void>;
+  logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 export const defaultState: AuthStoreState = {
   isAuth: false,
-  user: null,
-  accessToken: null,
-  refreshToken: null,
-}
+  user: undefined,
+  accessToken: undefined,
+  refreshToken: undefined,
+  login: async () => {},
+  logout: () => {},
+  refreshUser: async () => {},
+};
 
 export const useAuthStore = create<AuthStoreState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...defaultState,
-      login: (user: User, accessToken: string, refreshToken: string) => {
-        set({ isAuth: true, user, accessToken, refreshToken })
+      login: async (accessToken: string, refreshToken: string) => {
+        set({ accessToken, refreshToken });
+        if (accessToken && refreshToken) {
+          authApi.getMe().then(response => {
+            set({ isAuth: true, user: response.data });
+          });
+        }
       },
       logout: () => {
-        set(defaultState)
+        set(defaultState);
+      },
+      refreshUser: async () => {
+        const state = get();
+        if (state.accessToken && state.refreshToken) {
+          authApi
+            .getMe()
+            .then(response => {
+              set({ isAuth: true, user: response.data });
+            })
+            .catch(() => {
+              console.log('Failed to refresh user');
+              set(defaultState);
+            });
+        }
       },
     }),
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
-    }
-  )
-)
+    },
+  ),
+);
