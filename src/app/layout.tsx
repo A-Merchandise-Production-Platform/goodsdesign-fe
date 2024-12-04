@@ -6,6 +6,7 @@ import localFont from 'next/font/local';
 import Footer from '@/components/shared/footer';
 import Header from '@/components/shared/header';
 import { Toaster } from '@/components/ui/sonner';
+import AuthProvider from '@/providers/auth-provider';
 import QueryClientProvider from '@/providers/query-client-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 
@@ -33,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} z-0 antialiased`}
       >
         <ThemeProvider
           attribute="class"
@@ -42,7 +43,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Header />
-          <QueryClientProvider>{children}</QueryClientProvider>
+          <QueryClientProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </QueryClientProvider>
           <Footer />
           <Toaster richColors />
         </ThemeProvider>

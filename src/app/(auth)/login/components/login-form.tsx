@@ -1,9 +1,13 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
+import { authApi } from '@/api/auth';
+import { LoginResponse } from '@/api/types/auth';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -17,6 +21,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/stores/auth.store';
 
 const formSchema = z.object({
   email: z.string(),
@@ -24,12 +29,27 @@ const formSchema = z.object({
 });
 
 export default function LoginForm() {
+  const { login } = useAuthStore();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+  const mutation = useMutation({
+    mutationFn: authApi.login,
+    onError: (error: AxiosError<LoginResponse>) => {
+      toast.error(error.response?.data.message);
+    },
+    onSuccess: data => {
+      toast.success('Logged in successfully');
+      login(data.data.accessToken, data.data.refreshToken);
+    },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    mutation.mutate(values);
   }
 
   return (
@@ -77,16 +97,8 @@ export default function LoginForm() {
           )}
         />
 
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full" isLoading={mutation.isLoading}>
           Login
-        </Button>
-
-        <Button
-          onClick={() => {
-            toast.success('Hello World');
-          }}
-        >
-          Toast
         </Button>
       </form>
     </Form>

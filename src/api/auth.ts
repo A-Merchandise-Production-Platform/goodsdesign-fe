@@ -29,7 +29,7 @@ export namespace authApi {
   }
 
   export async function getMe(): Promise<GetMeResponse> {
-    const response = await axiosInstance.get<GetMeResponse>('/auth/get-me');
+    const response = await axiosInstance.get<GetMeResponse>('/user/me');
 
     return response.data;
   }

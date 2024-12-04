@@ -1,32 +1,19 @@
-//         "id": "0e2763ac-e4a7-438a-832b-7e0ece12d241",
-//         "displayName": "Admin",
-//         "handle": "@admin",
-//         "email": "admin@example.com",
-//         "bio": null,
-//         "avatarUrl": null,
-//         "verified": false,
-//         "role": "USER",
-//         "isBanned": false,
-//         "isDeleted": false,
-//         "createdAt": "2024-11-28T01:30:22.143Z",
-//         "updatedAt": "2024-11-28T01:30:22.143Z"
+//         "id": "13a6a8c8-3a23-4b49-8718-f357315f496c",
+//         "email": "admin@gmail.com",
+//         "userName": "admin",
+//         "phoneNumber": null,
+//         "gender": true,
+//         "dateOfBirth": "1990-01-01T00:00:00Z",
+//         "imageUrl": "https://example.com/admin.jpg",
+//         "role": "customer"
 
 export interface User {
   id: string;
-  displayName: string;
-  handle: string;
+  userName: string;
   email: string;
-  bio: string | null;
-  avatarUrl: string | null;
-  verified: boolean;
-  role: RoleEnum;
-  isBanned: boolean;
-  isDeleted: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export enum RoleEnum {
-  USER = 'USER',
-  ADMIN = 'ADMIN',
+  phoneNumber: string | null;
+  gender: boolean;
+  dateOfBirth: Date;
+  role: string;
+  imageUrl: string;
 }

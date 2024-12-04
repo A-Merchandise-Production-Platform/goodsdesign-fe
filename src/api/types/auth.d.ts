@@ -6,7 +6,7 @@ export interface RegisterPayload {
   confirmPassword: string;
 }
 
-export interface RegisterResponse extends ApiResponse<User> {}
+export interface RegisterResponse extends ApiResponse<null> {}
 
 export interface Tokens {
   accessToken: string;

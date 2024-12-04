@@ -8,7 +8,7 @@ export default function Footer() {
         <p className="select-none text-xs text-muted-foreground">
           &copy; 2024{' '}
           <Link href="/" className="underline">
-            DevTalk
+            GoodsDesign
           </Link>
         </p>
       </footer>

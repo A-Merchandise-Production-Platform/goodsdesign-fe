@@ -28,12 +28,15 @@ const formSchema = z
     email: z
       .string({ message: 'Email is required' })
       .email({ message: 'Invalid email address' }),
-    password: z.string({ message: 'Password is required' }).min(8, {
-      message: 'Password must be at least 8 characters',
+    password: z.string({ message: 'Password is required' }).min(6, {
+      message: 'Password must be at least 6 characters',
+    }),
+    userName: z.string({ message: 'Username is required' }).min(3, {
+      message: 'Username must be at least 3 characters',
     }),
     confirmPassword: z
       .string({ message: 'Confirm password is required' })
-      .min(8, { message: 'Confirm password must be at least 8 characters' }),
+      .min(6, { message: 'Confirm password must be at least 6 characters' }),
   })
   .refine(data => data.password === data.confirmPassword, {
     message: 'Confirm passwords do not match',
@@ -44,6 +47,12 @@ export default function RegisterForm() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      userName: '',
+      confirmPassword: '',
+    },
   });
 
   const mutation = useMutation({
@@ -82,6 +91,27 @@ export default function RegisterForm() {
               ) : (
                 <FormDescription>
                   This will be your email to access the system
+                </FormDescription>
+              )}
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="userName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex-1">User Name</FormLabel>
+              <FormControl>
+                <Input placeholder=" Nguyen Van A" {...field} />
+              </FormControl>
+
+              {form.formState.errors.email ? (
+                <FormMessage />
+              ) : (
+                <FormDescription>
+                  This will be your user name in the system
                 </FormDescription>
               )}
             </FormItem>
@@ -130,7 +160,7 @@ export default function RegisterForm() {
           />
         </div>
 
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full" isLoading={mutation.isLoading}>
           Register
         </Button>
       </form>
