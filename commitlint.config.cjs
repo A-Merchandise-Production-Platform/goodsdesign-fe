@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 const config = {
   extends: ['@commitlint/config-conventional'],
   rules: {

@@ -5,5 +5,5 @@ export const metadata: Metadata = {
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <main className="container mx-auto mt-14">{children}</main>;
+  return children;
 }
