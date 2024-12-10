@@ -2,11 +2,11 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { authApi } from '@/api/auth';
-import { User } from '@/types/user';
+import { AuthUser } from '@/types/user';
 
 interface AuthStoreState {
   isAuth: boolean;
-  user: User | undefined;
+  user: AuthUser | undefined;
   accessToken: string | undefined;
   refreshToken: string | undefined;
   login: (accessToken: string, refreshToken: string) => Promise<void>;

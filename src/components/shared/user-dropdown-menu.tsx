@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuthStore } from '@/stores/auth.store';
-import { User as UserType } from '@/types/user';
+import { AuthUser as UserType } from '@/types/user';
 
 interface UserDropdownMenuProps {
   user: UserType;

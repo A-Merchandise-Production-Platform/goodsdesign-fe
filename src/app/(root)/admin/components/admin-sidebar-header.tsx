@@ -24,9 +24,9 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { User } from '@/types/user';
+import { AuthUser } from '@/types/user';
 
-export function AdminSidebarHeader({ user }: { user: User }) {
+export function AdminSidebarHeader({ user }: { user: AuthUser }) {
   const { isMobile } = useSidebar();
 
   return (
