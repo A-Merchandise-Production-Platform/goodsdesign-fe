@@ -33,9 +33,9 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="rounded border">
+    <div className="rounded border bg-muted/10">
       <Table>
-        <TableHeader className="">
+        <TableHeader className="bg-accent">
           {table.getHeaderGroups().map(headerGroup => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header, index) => {
@@ -65,6 +65,7 @@ export function DataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
+                className="cursor-pointer"
               >
                 {row.getVisibleCells().map((cell, index) => (
                   <TableCell

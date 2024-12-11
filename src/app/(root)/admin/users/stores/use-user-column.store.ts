@@ -1,6 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 import { User } from '@/api/types/user';
 import { userColumns } from '@/app/(root)/admin/users/components/columns';

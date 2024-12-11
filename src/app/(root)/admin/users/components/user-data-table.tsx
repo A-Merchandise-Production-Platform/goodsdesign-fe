@@ -21,6 +21,7 @@ export default function UserDataTable() {
         count: true,
         top: 10,
         skip: 0,
+        expand: ['role'],
       }),
   });
 

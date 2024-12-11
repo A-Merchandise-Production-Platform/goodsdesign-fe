@@ -13,6 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 
 export const userColumns: ColumnDef<User>[] = [
   {
@@ -22,7 +23,7 @@ export const userColumns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       const user = row.original;
       return (
-        <Avatar>
+        <Avatar className="size-">
           <AvatarImage src={user.imageUrl} alt={user.userName} />
           <AvatarFallback>
             {user.userName.slice(0, 2).toUpperCase()}
@@ -41,7 +42,9 @@ export const userColumns: ColumnDef<User>[] = [
     header: 'Email',
     accessorKey: 'email',
     cell: ({ row }) => (
-      <div className="text-sm text-muted-foreground">{row.original.email}</div>
+      <div className="line-clamp-1 truncate text-sm text-muted-foreground">
+        {row.original.email}
+      </div>
     ),
   },
   {
@@ -58,8 +61,13 @@ export const userColumns: ColumnDef<User>[] = [
     id: 'dateOfBirth',
     header: 'Date of Birth',
     accessorKey: 'dateOfBirth',
-    cell: ({ row }) =>
-      format(new Date(row.original.dateOfBirth), 'dd MMM yyyy'),
+    cell: ({ row }) => {
+      return (
+        <p className="line-clamp-1 truncate">
+          {format(new Date(row.original.dateOfBirth), 'dd MMM yyyy')}
+        </p>
+      );
+    },
   },
   {
     id: 'status',
@@ -81,12 +89,17 @@ export const userColumns: ColumnDef<User>[] = [
     id: 'emailConfirmed',
     header: 'Email Confirmed',
     accessorKey: 'emailConfirmed',
-    cell: ({ row }) =>
-      row.original.emailConfirmed ? (
-        <Check className="text-green-500" />
-      ) : (
-        <X className="text-red-500" />
-      ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex w-16 justify-center">
+          {row.original.emailConfirmed ? (
+            <Check className="text-green-500" />
+          ) : (
+            <X className="text-red-500" />
+          )}
+        </div>
+      );
+    },
   },
   {
     id: 'phoneNumber',
@@ -114,7 +127,12 @@ export const userColumns: ColumnDef<User>[] = [
         <Tooltip>
           <TooltipTrigger>
             <Badge
-              variant={row.original.lockoutEnabled ? 'destructive' : 'outline'}
+              // variant={row.original.lockoutEnabled ? 'destructive' : 'outline'}
+              className={cn(
+                row.original.lockoutEnabled
+                  ? 'bg-green-200 text-green-800 hover:bg-green-300'
+                  : 'bg-red-200 text-red-800 hover:bg-red-300',
+              )}
             >
               {row.original.lockoutEnabled ? 'Enabled' : 'Disabled'}
             </Badge>
@@ -132,16 +150,26 @@ export const userColumns: ColumnDef<User>[] = [
     id: 'createdAt',
     header: 'Created At',
     accessorKey: 'createdAt',
-    cell: ({ row }) =>
-      format(new Date(row.original.createdAt), 'dd MMM yyyy HH:mm'),
+    cell: ({ row }) => {
+      return (
+        <p className="line-clamp-1 truncate">
+          {format(new Date(row.original.createdAt), 'dd MMM yyyy HH:mm')}
+        </p>
+      );
+    },
   },
   {
     id: 'updatedAt',
     header: 'Updated At',
     accessorKey: 'updatedAt',
-    cell: ({ row }) =>
-      row.original.updatedAt
-        ? format(new Date(row.original.updatedAt), 'dd MMM yyyy HH:mm')
-        : 'N/A',
+    cell: ({ row }) => {
+      return (
+        <p className="line-clamp-1 truncate">
+          {row.original.updatedAt
+            ? format(new Date(row.original.updatedAt), 'dd MMM yyyy HH:mm')
+            : 'N/A'}
+        </p>
+      );
+    },
   },
 ];
