@@ -1,31 +1,27 @@
-import { QueryKey, useQuery } from '@tanstack/react-query';
 import { Filter, Search } from 'lucide-react';
-import React from 'react';
 
-import { UserApi } from '@/api/user';
 import { ColumnSelector } from '@/app/(root)/admin/users/components/column-selector';
 import { userColumns } from '@/app/(root)/admin/users/components/columns';
 import { DataTable } from '@/app/(root)/admin/users/components/data-table';
+import { TablePagination } from '@/app/(root)/admin/users/components/table-pagination';
+import useUser from '@/app/(root)/admin/users/hooks/use-user';
 import { useColumnStore } from '@/app/(root)/admin/users/stores/use-user-column.store';
 import { DataTableSkeleton } from '@/components/shared/data-table-skeleton';
 import { Button } from '@/components/ui/button';
 
-const queryKey = ['users'] as QueryKey;
-
 export default function UserDataTable() {
   const { visibleColumns } = useColumnStore();
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['users'],
-    queryFn: () =>
-      UserApi.getUsers({
-        count: true,
-        top: 10,
-        skip: 0,
-        expand: ['role'],
-      }),
-  });
+  const {
+    data,
+    isLoading,
+    error,
+    currentPage,
+    pageSize,
+    totalPages,
+    goToPage,
+    changePageSize,
+  } = useUser();
 
-  if (isLoading) return <DataTableSkeleton columnCount={userColumns.length} />;
   if (error) return <div>Can not load data</div>;
 
   return (
@@ -43,7 +39,19 @@ export default function UserDataTable() {
         </div>
         <ColumnSelector />
       </div>
-      <DataTable columns={visibleColumns} data={data?.value || []} />
+      <DataTable
+        columns={visibleColumns}
+        data={data?.value || []}
+        isLoading={isLoading}
+      />
+
+      <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        onPageChange={goToPage}
+        onPageSizeChange={changePageSize}
+      />
     </div>
   );
 }

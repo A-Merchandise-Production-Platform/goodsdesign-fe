@@ -7,6 +7,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -20,11 +21,14 @@ import { cn } from '@/lib/utils';
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  isLoading?: boolean;
+  rowCount?: number;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isLoading = false,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -59,35 +63,60 @@ export function DataTable<TData, TValue>({
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map(row => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && 'selected'}
-                className="cursor-pointer"
-              >
-                {row.getVisibleCells().map((cell, index) => (
-                  <TableCell
-                    key={cell.id}
-                    className={cn(
-                      index === 0 && 'rounded-l',
-                      index === row.getVisibleCells().length - 1 && 'rounded-r',
-                    )}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
+        {isLoading ? (
+          <TableBody>
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
+              {columns.map((column, index) => (
+                <TableCell
+                  key={column.id}
+                  className={cn(
+                    index === 0 && 'rounded-l',
+                    index === columns.length - 1 && 'rounded-r',
+                  )}
+                >
+                  <Skeleton className="h-10 w-full" />
+                </TableCell>
+              ))}
             </TableRow>
-          )}
-        </TableBody>
+          </TableBody>
+        ) : (
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map(row => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className="cursor-pointer"
+                >
+                  {row.getVisibleCells().map((cell, index) => (
+                    <TableCell
+                      key={cell.id}
+                      className={cn(
+                        index === 0 && 'rounded-l',
+                        index === row.getVisibleCells().length - 1 &&
+                          'rounded-r',
+                      )}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        )}
       </Table>
     </div>
   );
