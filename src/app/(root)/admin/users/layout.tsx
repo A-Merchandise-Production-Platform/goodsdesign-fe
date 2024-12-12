@@ -1,9 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Login',
+  title: 'Users',
+  description: 'Manage users',
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return children;
+  return <section>{children}</section>;
 }

@@ -3,3 +3,9 @@ export interface ApiResponse<T> {
   data: T;
   message: string;
 }
+
+export interface ODataResponse<T> {
+  '@odata.context': string;
+  '@odata.count'?: number;
+  value: T[];
+}

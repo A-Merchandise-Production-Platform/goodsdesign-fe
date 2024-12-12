@@ -56,6 +56,8 @@ axiosInstance.interceptors.response.use(
         });
         throw error;
       }
+    } else {
+      throw error;
     }
   },
 );

@@ -11,7 +11,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN NODE_ENV=development npm ci --force
+RUN npm ci --force
 
 # Rebuild the source code only when needed
 FROM base AS builder

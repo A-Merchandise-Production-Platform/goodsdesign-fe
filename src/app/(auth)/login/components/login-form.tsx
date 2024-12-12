@@ -2,6 +2,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -30,6 +31,7 @@ const formSchema = z.object({
 
 export default function LoginForm() {
   const { login } = useAuthStore();
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,6 +47,7 @@ export default function LoginForm() {
     onSuccess: data => {
       toast.success('Logged in successfully');
       login(data.data.accessToken, data.data.refreshToken);
+      router.push('/');
     },
   });
 

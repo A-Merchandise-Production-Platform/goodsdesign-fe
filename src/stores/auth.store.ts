@@ -2,11 +2,11 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { authApi } from '@/api/auth';
-import { User } from '@/types/user';
+import { AuthUser } from '@/types/user';
 
 interface AuthStoreState {
   isAuth: boolean;
-  user: User | undefined;
+  user: AuthUser | undefined;
   accessToken: string | undefined;
   refreshToken: string | undefined;
   login: (accessToken: string, refreshToken: string) => Promise<void>;
@@ -37,7 +37,12 @@ export const useAuthStore = create<AuthStoreState>()(
         }
       },
       logout: () => {
-        set(defaultState);
+        set({
+          isAuth: false,
+          user: undefined,
+          accessToken: undefined,
+          refreshToken: undefined,
+        });
       },
       refreshUser: async () => {
         const state = get();
@@ -49,7 +54,12 @@ export const useAuthStore = create<AuthStoreState>()(
             })
             .catch(() => {
               console.log('Failed to refresh user');
-              set(defaultState);
+              set({
+                isAuth: false,
+                user: undefined,
+                accessToken: undefined,
+                refreshToken: undefined,
+              });
             });
         }
       },
@@ -57,6 +67,12 @@ export const useAuthStore = create<AuthStoreState>()(
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
+      partialize: state => ({
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
+        user: state.user,
+        isAuth: !!state.accessToken && !!state.refreshToken,
+      }),
     },
   ),
 );

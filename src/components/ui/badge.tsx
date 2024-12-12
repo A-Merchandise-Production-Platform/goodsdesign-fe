@@ -13,8 +13,20 @@ const badgeVariants = cva(
         secondary:
           'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
         destructive:
-          'border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80',
+          'border-transparent bg-red-200 text-red-800 shadow hover:bg-red-300',
         outline: 'text-foreground',
+        success:
+          'border-transparent bg-green-200 text-green-800 hover:bg-green-300',
+        admin:
+          'border-transparent bg-purple-200 text-purple-800 hover:bg-purple-300',
+        manager:
+          'border-transparent bg-blue-200 text-blue-800 hover:bg-blue-300',
+        staff:
+          'border-transparent bg-yellow-200 text-yellow-800 hover:bg-yellow-300',
+        factoryOwner:
+          'border-transparent bg-orange-200 text-orange-800 hover:bg-orange-300',
+        customer:
+          'border-transparent bg-pink-200 text-pink-800 hover:bg-pink-300',
       },
     },
     defaultVariants: {
