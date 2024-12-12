@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-nested-ternary */
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
@@ -48,16 +49,6 @@ export const userColumns: ColumnDef<User>[] = [
     ),
   },
   {
-    id: 'gender',
-    header: 'Gender',
-    accessorKey: 'gender',
-    cell: ({ row }) => (
-      <Badge variant={row.original.gender ? 'default' : 'secondary'}>
-        {row.original.gender ? 'Male' : 'Female'}
-      </Badge>
-    ),
-  },
-  {
     id: 'dateOfBirth',
     header: 'Date of Birth',
     accessorKey: 'dateOfBirth',
@@ -69,21 +60,32 @@ export const userColumns: ColumnDef<User>[] = [
       );
     },
   },
-  {
-    id: 'status',
-    header: 'Status',
-    accessorKey: 'isActive',
-    cell: ({ row }) => (
-      <Badge variant={row.original.isActive ? 'default' : 'destructive'}>
-        {row.original.isActive ? 'Active' : 'Inactive'}
-      </Badge>
-    ),
-  },
+
   {
     id: 'role',
     header: 'Role',
     accessorKey: 'role.name',
-    cell: ({ row }) => row.original.role?.name || 'N/A',
+    cell: ({ row }) => {
+      return (
+        <Badge
+          variant={
+            row.original.role?.name === 'admin'
+              ? 'admin'
+              : row.original.role?.name === 'manager'
+                ? 'manager'
+                : row.original.role?.name === 'staff'
+                  ? 'staff'
+                  : row.original.role?.name === 'factoryOwner'
+                    ? 'factoryOwner'
+                    : row.original.role?.name === 'customer'
+                      ? 'customer'
+                      : 'default'
+          }
+        >
+          {row.original.role?.name.toUpperCase() || 'N/A'}
+        </Badge>
+      );
+    },
   },
   {
     id: 'emailConfirmed',
@@ -91,7 +93,7 @@ export const userColumns: ColumnDef<User>[] = [
     accessorKey: 'emailConfirmed',
     cell: ({ row }) => {
       return (
-        <div className="flex w-16 justify-center">
+        <div>
           {row.original.emailConfirmed ? (
             <Check className="text-green-500" />
           ) : (
@@ -144,6 +146,16 @@ export const userColumns: ColumnDef<User>[] = [
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
+    ),
+  },
+  {
+    id: 'status',
+    header: 'Status',
+    accessorKey: 'isActive',
+    cell: ({ row }) => (
+      <Badge variant={row.original.isActive ? 'success' : 'destructive'}>
+        {row.original.isActive ? 'Active' : 'Inactive'}
+      </Badge>
     ),
   },
   {

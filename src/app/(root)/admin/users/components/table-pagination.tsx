@@ -14,6 +14,7 @@ interface TablePaginationProps {
   currentPage: number;
   totalPages: number;
   pageSize: number;
+  count: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
 }
@@ -22,6 +23,7 @@ export function TablePagination({
   currentPage,
   totalPages,
   pageSize,
+  count = 0,
   onPageChange,
   onPageSizeChange,
 }: TablePaginationProps) {
@@ -50,6 +52,7 @@ export function TablePagination({
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
+      <div className="text-sm text-muted-foreground">Found {count} users</div>
       <div className="flex items-center space-x-2">
         <span className="text-sm text-muted-foreground">Rows per page</span>
         <Select

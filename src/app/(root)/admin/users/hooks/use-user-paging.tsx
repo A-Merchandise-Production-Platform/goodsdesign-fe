@@ -1,36 +1,24 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { UserApi } from '@/api/user';
 import { useFilterStore } from '@/app/(root)/admin/users/stores/use-filter.store';
 
-// Constants for pagination limits
 const MIN_PAGE_SIZE = 1;
 const MAX_PAGE_SIZE = 100;
 const MIN_PAGE = 1;
 
-export default function useUser() {
-  // State management
-  const { query, setQuery } = useFilterStore();
-  const [count, setCount] = useState(0);
+export function useUserPaging(totalItems: number) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const { query, setQuery } = useFilterStore();
 
-  // Next.js routing hooks
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Data fetching
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['users', query],
-    queryFn: () => UserApi.getUsers(query),
-  });
-
-  // Synchronize URL params with state
+  //Get the page size and page number from the URL
   useEffect(() => {
     const urlPageSize = Number(searchParams.get('PageSize')) || pageSize;
     const urlPageNumber = Number(searchParams.get('PageNumber')) || currentPage;
@@ -43,24 +31,9 @@ export default function useUser() {
 
     setPageSize(validatedPageSize);
     setCurrentPage(validatedPageNumber);
+  }, [searchParams]);
 
-    const newSkip = (validatedPageNumber - 1) * validatedPageSize;
-    setQuery({ ...query, top: validatedPageSize, skip: newSkip });
-  }, [searchParams, setQuery]);
-
-  // Trigger refetch when query changes
-  useEffect(() => {
-    refetch();
-  }, [query, refetch]);
-
-  // Update total count when data changes
-  useEffect(() => {
-    if (data) {
-      setCount(data['@odata.count'] || 0);
-    }
-  }, [data, setCount]);
-
-  // Update URL when pagination state changes
+  //Update the URL when the page size or page number changes
   useEffect(() => {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.set('PageSize', pageSize.toString());
@@ -68,18 +41,16 @@ export default function useUser() {
     router.push(`?${newSearchParams.toString()}`, { scroll: false });
   }, [pageSize, currentPage, router, searchParams]);
 
-  // Calculate total pages
-  const totalPages = Math.max(1, Math.ceil(count / pageSize));
+  //Calculate the total number of pages
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
 
-  // Pagination control: Go to specific page
+  //Go to a specific page
   const goToPage = (page: number) => {
     const validatedPage = Math.max(MIN_PAGE, Math.min(page, totalPages));
     setCurrentPage(validatedPage);
-    const newSkip = (validatedPage - 1) * pageSize;
-    setQuery({ ...query, skip: newSkip });
   };
 
-  // Pagination control: Change page size
+  //Change the page size
   const changePageSize = (newPageSize: number) => {
     const validatedPageSize = Math.max(
       MIN_PAGE_SIZE,
@@ -87,16 +58,15 @@ export default function useUser() {
     );
     setPageSize(validatedPageSize);
     setCurrentPage(1);
-    setQuery({ ...query, top: validatedPageSize, skip: 0 });
   };
 
-  // Return values and functions for component use
+  //Update the query when the page size or page number changes
+  useEffect(() => {
+    const newSkip = (currentPage - 1) * pageSize;
+    setQuery({ ...query, top: pageSize, skip: newSkip });
+  }, [currentPage, pageSize, setQuery]);
+
   return {
-    data,
-    isLoading,
-    error,
-    setQuery,
-    count,
     currentPage,
     pageSize,
     totalPages,
