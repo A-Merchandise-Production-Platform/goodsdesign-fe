@@ -16,6 +16,13 @@ export const axiosInstance = axios.create({
   },
 });
 
+export const axiosFormDataInstance = axios.create({
+  baseURL: baseUrl,
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  },
+});
+
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
     const accessToken = useAuthStore.getState().accessToken;
