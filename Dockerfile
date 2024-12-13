@@ -1,5 +1,5 @@
-# Stage 1: Install dependencies and build the Next.js app
-FROM node:18-alpine AS build
+# Use Node.js 20 alpine as the base image
+FROM node:20-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -13,7 +13,10 @@ COPY package.json yarn.lock ./
 # Install dependencies using Yarn
 RUN yarn install --frozen-lockfile
 
-# Copy all project files into the container
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Disable Next.js telemetry during the build (optional)
