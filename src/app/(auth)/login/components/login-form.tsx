@@ -100,7 +100,7 @@ export default function LoginForm() {
           )}
         />
 
-        <Button type="submit" className="w-full" isLoading={mutation.isLoading}>
+        <Button type="submit" className="w-full" isLoading={mutation.isPending}>
           Login
         </Button>
       </form>
