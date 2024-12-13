@@ -115,8 +115,6 @@ export default function CategoryManagement() {
 
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-bold">Category Management</h1>
-
       <div className="mb-4 flex justify-end">
         <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <DialogTrigger asChild>

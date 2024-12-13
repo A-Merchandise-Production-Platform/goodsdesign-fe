@@ -116,8 +116,6 @@ export default function AreaManagement() {
 
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-bold">Area Management</h1>
-
       <div className="mb-4 flex justify-end">
         <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <DialogTrigger asChild>
