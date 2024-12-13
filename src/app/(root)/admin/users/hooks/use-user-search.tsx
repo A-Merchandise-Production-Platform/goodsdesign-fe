@@ -22,11 +22,13 @@ export function useUserSearch() {
     const newSearchParams = new URLSearchParams(searchParams);
     if (debouncedSearchTerm) {
       newSearchParams.set('Search', debouncedSearchTerm);
+      newSearchParams.set('PageNumber', '1');
     } else {
       newSearchParams.delete('Search');
     }
     router.push(`?${newSearchParams.toString()}`, { scroll: false });
     setQuery({
+      ...query,
       filter: debouncedSearchTerm
         ? {
             or: [
