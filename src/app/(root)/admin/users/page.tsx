@@ -1,9 +1,7 @@
 'use client';
 
-import { UserApi } from '@/api/user';
 import { DynamicAdminHeader } from '@/app/(root)/admin/components/dynamic-admin-header';
 import UserDataTable from '@/app/(root)/admin/users/components/user-data-table';
-import { Button } from '@/components/ui/button';
 
 export default function Page() {
   return (
@@ -11,10 +9,11 @@ export default function Page() {
       <DynamicAdminHeader
         breadcrumbs={[
           { href: '/admin', label: 'Dashboard' },
-          { label: 'Users management' },
+          { label: 'Users' },
         ]}
       />
       <div className="p-4">
+        <h1 className="text-2xl font-bold mb-4">User Management</h1>
         <UserDataTable />
       </div>
     </div>
