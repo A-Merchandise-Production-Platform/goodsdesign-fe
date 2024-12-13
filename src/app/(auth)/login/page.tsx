@@ -1,4 +1,6 @@
-import LoginForm from '@/app/(auth)/login/components/LoginForm'
+import Link from 'next/link';
+
+import LoginForm from '@/app/(auth)/login/components/login-form';
 import {
   Card,
   CardContent,
@@ -6,8 +8,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import Link from 'next/link'
+} from '@/components/ui/card';
 export default function Page() {
   return (
     <div className="pt-10">
@@ -29,5 +30,5 @@ export default function Page() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }

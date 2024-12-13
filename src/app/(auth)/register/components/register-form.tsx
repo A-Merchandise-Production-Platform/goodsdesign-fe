@@ -1,11 +1,16 @@
-'use client'
-import { useState } from 'react'
-import { toast } from 'sonner'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+'use client';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import * as z from 'zod';
+
+import { authApi } from '@/api/auth';
+import { RegisterResponse } from '@/api/types/auth';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -14,51 +19,55 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/ui/password-input'
-import { authApi } from '@/api/auth'
-import { useMutation } from '@tanstack/react-query'
-import { RegisterResponse } from '@/api/types/auth'
-import { useRouter } from 'next/navigation'
-import { AxiosError } from 'axios'
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 
 const formSchema = z
   .object({
     email: z
       .string({ message: 'Email is required' })
       .email({ message: 'Invalid email address' }),
-    password: z.string({ message: 'Password is required' }).min(8, {
-      message: 'Password must be at least 8 characters',
+    password: z.string({ message: 'Password is required' }).min(6, {
+      message: 'Password must be at least 6 characters',
+    }),
+    userName: z.string({ message: 'Username is required' }).min(3, {
+      message: 'Username must be at least 3 characters',
     }),
     confirmPassword: z
       .string({ message: 'Confirm password is required' })
-      .min(8, { message: 'Confirm password must be at least 8 characters' }),
+      .min(6, { message: 'Confirm password must be at least 6 characters' }),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine(data => data.password === data.confirmPassword, {
     message: 'Confirm passwords do not match',
-  })
+  });
 
 export default function RegisterForm() {
-  const router = useRouter()
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-  })
+    defaultValues: {
+      email: '',
+      password: '',
+      userName: '',
+      confirmPassword: '',
+    },
+  });
 
   const mutation = useMutation({
     mutationFn: authApi.register,
     onError: (error: AxiosError<RegisterResponse>) => {
-      toast.error(error.response?.data.message)
+      toast.error(error.response?.data.message);
     },
     onSuccess: () => {
-      toast.success('Account created successfully')
-      router.push('/login')
+      toast.success('Account created successfully');
+      router.push('/login');
     },
-  })
+  });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    mutation.mutate(values)
+    mutation.mutate(values);
   }
 
   return (
@@ -82,6 +91,27 @@ export default function RegisterForm() {
               ) : (
                 <FormDescription>
                   This will be your email to access the system
+                </FormDescription>
+              )}
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="userName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex-1">User Name</FormLabel>
+              <FormControl>
+                <Input placeholder=" Nguyen Van A" {...field} />
+              </FormControl>
+
+              {form.formState.errors.email ? (
+                <FormMessage />
+              ) : (
+                <FormDescription>
+                  This will be your user name in the system
                 </FormDescription>
               )}
             </FormItem>
@@ -130,10 +160,10 @@ export default function RegisterForm() {
           />
         </div>
 
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full" isLoading={mutation.isLoading}>
           Register
         </Button>
       </form>
     </Form>
-  )
+  );
 }

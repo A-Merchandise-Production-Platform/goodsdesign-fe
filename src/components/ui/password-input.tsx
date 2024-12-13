@@ -1,21 +1,21 @@
-'use client'
+'use client';
 
-import * as React from 'react'
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import * as React from 'react';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
-import { Button } from '@/components/ui/button'
-import { Input, type InputProps } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button';
+import { Input, type InputProps } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 interface PasswordInputProps extends Omit<InputProps, 'type'> {}
 
 const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
   ({ className, ...props }, ref) => {
-    const [showPassword, setShowPassword] = React.useState(false)
+    const [showPassword, setShowPassword] = React.useState(false);
 
-    const isControlled = props.value !== undefined
-    const inputValue = isControlled ? props.value : undefined
-    const disabled = (isControlled && inputValue === '') || props.disabled
+    const isControlled = props.value !== undefined;
+    const inputValue = isControlled ? props.value : undefined;
+    const disabled = (isControlled && inputValue === '') || props.disabled;
 
     return (
       <div className="relative">
@@ -31,7 +31,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
           variant="ghost"
           size="sm"
           className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-          onClick={() => setShowPassword((prev) => !prev)}
+          onClick={() => setShowPassword(prev => !prev)}
           disabled={disabled}
         >
           {showPassword && !disabled ? (
@@ -54,9 +54,9 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
           }
         `}</style>
       </div>
-    )
-  }
-)
-PasswordInput.displayName = 'PasswordInput'
+    );
+  },
+);
+PasswordInput.displayName = 'PasswordInput';
 
-export { PasswordInput }
+export { PasswordInput };

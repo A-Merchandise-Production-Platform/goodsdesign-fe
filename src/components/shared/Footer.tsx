@@ -1,5 +1,5 @@
-import Link from 'next/link'
-import React from 'react'
+import Link from 'next/link';
+import React from 'react';
 
 export default function Footer() {
   return (
@@ -8,10 +8,10 @@ export default function Footer() {
         <p className="select-none text-xs text-muted-foreground">
           &copy; 2024{' '}
           <Link href="/" className="underline">
-            DevTalk
+            GoodsDesign
           </Link>
         </p>
       </footer>
     </section>
-  )
+  );
 }
