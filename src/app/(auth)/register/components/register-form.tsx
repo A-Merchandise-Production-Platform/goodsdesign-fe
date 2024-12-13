@@ -160,7 +160,7 @@ export default function RegisterForm() {
           />
         </div>
 
-        <Button type="submit" className="w-full" isLoading={mutation.isLoading}>
+        <Button type="submit" className="w-full" isLoading={mutation.isPending}>
           Register
         </Button>
       </form>
