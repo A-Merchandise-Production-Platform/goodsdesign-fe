@@ -14,7 +14,6 @@ export default function UserDataTable() {
   const { data, isLoading, error } = useUser();
   const { currentPage, pageSize, totalPages, goToPage, changePageSize } =
     useUserPaging(data?.['@odata.count'] || 0);
-
   if (error) return <div>Can not load data</div>;
 
   return (
