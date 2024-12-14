@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import { categoryApi } from '@/api/category';
+import { CategoryApi } from '@/api/category';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -46,10 +46,14 @@ export default function CategoryManagement() {
   const [editingCategory, setEditingCategory] = useState<Category>();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  // Fetch all categories
+  // Fetch categories with OData options
   const fetchCategories = async () => {
     setLoading(true);
-    const response = await categoryApi.getAll();
+    const options = {
+      filter: { isDeleted: false },
+      select: ['id', 'name', 'description', 'imageUrl', 'isDeleted'],
+    };
+    const response = await CategoryApi.getAll(options);
     if (response.isSuccess) {
       setCategories(response.data);
     } else {
@@ -64,7 +68,7 @@ export default function CategoryManagement() {
 
   const addCategory = async () => {
     if (newCategory.name && newCategory.description && newCategory.imageUrl) {
-      const response = await categoryApi.create(newCategory);
+      const response = await CategoryApi.create(newCategory);
       if (response.isSuccess && response.data) {
         setCategories([...categories, response.data]);
         setNewCategory({
@@ -85,7 +89,7 @@ export default function CategoryManagement() {
 
   const updateCategory = async () => {
     if (editingCategory) {
-      const response = await categoryApi.update(
+      const response = await CategoryApi.update(
         editingCategory.id,
         editingCategory,
       );
@@ -104,7 +108,7 @@ export default function CategoryManagement() {
   };
 
   const deleteCategory = async (id: string) => {
-    const response = await categoryApi.deleteById(id);
+    const response = await CategoryApi.deleteById(id);
     if (response.isSuccess) {
       setCategories(categories.filter(cat => cat.id !== id));
       toast.success('Category deleted successfully!');
@@ -194,7 +198,7 @@ export default function CategoryManagement() {
             {categories.map(cat => (
               <TableRow key={cat.id}>
                 <TableCell>
-                  <img
+                  <Image
                     src={cat.imageUrl}
                     alt={cat.name}
                     width={50}

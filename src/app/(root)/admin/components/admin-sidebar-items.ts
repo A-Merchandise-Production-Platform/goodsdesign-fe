@@ -1,4 +1,4 @@
-import { Home,  LayoutDashboard, Package, Users } from 'lucide-react';
+import { Boxes, Home,  LayoutDashboard, Package, Users } from 'lucide-react';
 
 import { SidebarItem } from '@/types/sidebar';
 
@@ -18,12 +18,17 @@ export const adminSidebarItems: SidebarItem[] = [
       {
         title: 'Areas',
         url: '/admin/areas',
-        icon: Package,
+        icon: Boxes,
       },
       {
         title: 'Categories',
         url: '/admin/categories',
         icon: LayoutDashboard,
+      },
+      {
+        title: 'Products',
+        url: '/admin/products',
+        icon: Package,
       },
     ],
   },
