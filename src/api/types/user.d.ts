@@ -17,14 +17,14 @@ export interface User {
   lockoutEnabled: boolean;
   accessFailedCount: number;
   gender: boolean;
-  dateOfBirth: string;
+  dateOfBirth: Date | null;
   imageUrl: string;
   isActive: boolean;
   isDeleted: boolean;
   address: string;
-  createdAt: string;
+  createdAt: Date;
   createdBy: string | null;
-  updatedAt: string | null;
+  updatedAt: Date | null;
   updatedBy: string | null;
   roleId: string;
   role?: Role;

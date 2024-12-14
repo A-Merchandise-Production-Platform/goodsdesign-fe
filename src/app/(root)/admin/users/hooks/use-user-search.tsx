@@ -16,7 +16,7 @@ export function useUserSearch() {
     searchParams.get('Search') || '',
   );
 
-  const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
 
   useEffect(() => {
     const newSearchParams = new URLSearchParams(searchParams);

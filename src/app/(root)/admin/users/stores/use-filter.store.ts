@@ -30,6 +30,7 @@ export const useFilterStore = create<UseFilterState>(set => ({
       'createdAt',
       'updatedAt',
     ],
+    orderBy: [['createdAt', 'desc']],
   },
   setQuery: query => set(state => ({ query: { ...state.query, ...query } })),
 }));

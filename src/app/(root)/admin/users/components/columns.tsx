@@ -55,7 +55,9 @@ export const userColumns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       return (
         <p className="line-clamp-1 truncate">
-          {format(new Date(row.original.dateOfBirth), 'dd MMM yyyy')}
+          {row.original?.dateOfBirth
+            ? format(new Date(row.original.dateOfBirth), 'dd MMM yyyy')
+            : 'N/A'}
         </p>
       );
     },
