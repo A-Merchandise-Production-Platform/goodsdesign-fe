@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import { areaApi } from '@/api/area';
+import { AreaApi } from '@/api/area';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -47,10 +47,14 @@ export default function AreaManagement() {
   });
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  // Fetch all areas
+  // Fetch all areas with OData
   const fetchAreas = async () => {
     setLoading(true);
-    const response = await areaApi.getAll();
+    const options = {
+      filter: { isDeleted: false },
+      select: ['id', 'name', 'position', 'code', 'isDeleted'],
+    };
+    const response = await AreaApi.getAll(options);
     if (response.isSuccess) {
       setAreas(response.data);
     } else {
@@ -63,13 +67,9 @@ export default function AreaManagement() {
     fetchAreas();
   }, []);
 
-  useEffect(() => {
-    fetchAreas();
-  }, []);
-
   const addArea = async () => {
     if (newArea.name && newArea.position && newArea.code) {
-      const response = await areaApi.create(newArea);
+      const response = await AreaApi.create(newArea);
       if (response.isSuccess && response.data) {
         setAreas([...areas, response.data]);
         setNewArea({ name: '', position: '', code: '', isDeleted: false });
@@ -85,7 +85,7 @@ export default function AreaManagement() {
 
   const updateArea = async () => {
     if (editingArea) {
-      const response = await areaApi.update(editingArea.id, editingArea);
+      const response = await AreaApi.update(editingArea.id, editingArea);
       if (response.isSuccess && response.data) {
         setAreas(
           areas.map(area =>
@@ -101,7 +101,7 @@ export default function AreaManagement() {
   };
 
   const deleteArea = async (id: string) => {
-    const response = await areaApi.deleteById(id);
+    const response = await AreaApi.deleteById(id);
     if (response.isSuccess) {
       setAreas(areas.filter(area => area.id !== id));
       toast.success('Area deleted successfully!');

@@ -1,32 +1,23 @@
+import buildQuery, { QueryOptions } from 'odata-query';
+
 import { axiosInstance } from '@/api';
 import { Area } from '@/types/area';
 
 import { ApiResponse } from './types';
-import { CreateAreaPayload, UpdateAreaPayload } from './types/area';
 
-export namespace areaApi {
-  export let loading = false;
-
-  // OData
-  export async function getAll(): Promise<ApiResponse<Area[]>> {
+export namespace AreaApi {
+  export async function getAll(
+    options: Partial<QueryOptions<Area>>,
+  ): Promise<ApiResponse<Area[]>> {
     try {
-      loading = true;
-      const axiosResponse = await axiosInstance.get(
-        '/areas?$select=id,name,position,code,isDeleted&$filter=isDeleted eq false',
-      );
-
-      if (axiosResponse.status >= 200 && axiosResponse.status < 300) {
-        return {
-          isSuccess: true,
-          message: 'Areas fetched successfully',
-          data: axiosResponse.data.value || [],
-        };
-      }
+      const query = buildQuery(options);
+      const axiosResponse = await axiosInstance.get(`/areas${query}`);
+      const data = axiosResponse.data;
 
       return {
-        isSuccess: false,
-        message: 'Failed to fetch areas',
-        data: [],
+        isSuccess: true,
+        message: 'Areas fetched successfully',
+        data: data.value || [],
       };
     } catch (error: any) {
       return {
@@ -37,108 +28,43 @@ export namespace areaApi {
           'Failed to fetch areas',
         data: [],
       };
-    } finally {
-      loading = false;
     }
   }
 
-  // export async function getAll(): Promise<ApiResponse<Area[]>> {
-  //   try {
-  //     const axiosResponse = await axiosInstance.get<ApiResponse<Area[]>>(
-  //       '/areas?$select=id,name,position,code,isDeleted&$filter=isDeleted eq false',
-  //     );
-  //     const response = axiosResponse.data;
-
-  //     if (response.isSuccess) {
-  //       return {
-  //         isSuccess: true,
-  //         message: response.message,
-  //         data: response.data,
-  //       };
-  //     }
-
-  //     return {
-  //       isSuccess: false,
-  //       message: response.message,
-  //       data: [],
-  //     };
-  //   } catch (error: any) {
-  //     return {
-  //       isSuccess: false,
-  //       message: error?.message || 'An unexpected error occurred.',
-  //       data: [],
-  //     };
-  //   }
-  // }
-
   export async function create(
-    payload: CreateAreaPayload,
+    payload: Partial<Area>,
   ): Promise<ApiResponse<Area | undefined>> {
     try {
-      loading = true;
       const axiosResponse = await axiosInstance.post<ApiResponse<Area>>(
         '/areas',
         payload,
       );
-      const response = axiosResponse.data;
-
-      if (response.isSuccess) {
-        return {
-          isSuccess: true,
-          message: response.message,
-          data: response.data,
-        };
-      }
-
-      return {
-        isSuccess: false,
-        message: response.message,
-        data: undefined,
-      };
+      return axiosResponse.data;
     } catch (error: any) {
       return {
         isSuccess: false,
         message: error?.message || 'An unexpected error occurred.',
         data: undefined,
       };
-    } finally {
-      loading = false;
     }
   }
 
   export async function update(
     id: string,
-    payload: UpdateAreaPayload,
+    payload: Partial<Area>,
   ): Promise<ApiResponse<Area | undefined>> {
     try {
-      loading = true;
       const axiosResponse = await axiosInstance.put<ApiResponse<Area>>(
         `/areas/${id}`,
         payload,
       );
-      const response = axiosResponse.data;
-
-      if (response.isSuccess) {
-        return {
-          isSuccess: true,
-          message: response.message,
-          data: response.data,
-        };
-      }
-
-      return {
-        isSuccess: false,
-        message: response.message,
-        data: undefined,
-      };
+      return axiosResponse.data;
     } catch (error: any) {
       return {
         isSuccess: false,
         message: error?.message || 'An unexpected error occurred.',
         data: undefined,
       };
-    } finally {
-      loading = false;
     }
   }
 
@@ -146,33 +72,16 @@ export namespace areaApi {
     id: string,
   ): Promise<ApiResponse<undefined>> {
     try {
-      loading = true;
       const axiosResponse = await axiosInstance.delete<ApiResponse<undefined>>(
         `/areas/${id}`,
       );
-      const response = axiosResponse.data;
-
-      if (response.isSuccess) {
-        return {
-          isSuccess: true,
-          message: response.message,
-          data: undefined,
-        };
-      }
-
-      return {
-        isSuccess: false,
-        message: response.message,
-        data: undefined,
-      };
+      return axiosResponse.data;
     } catch (error: any) {
       return {
         isSuccess: false,
         message: error?.message || 'An unexpected error occurred.',
         data: undefined,
       };
-    } finally {
-      loading = false;
     }
   }
 }

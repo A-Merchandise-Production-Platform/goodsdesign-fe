@@ -1,22 +1,22 @@
 import buildQuery, { QueryOptions } from 'odata-query';
 
 import { axiosInstance } from '@/api';
-import { Category } from '@/types/category';
+import { Product } from '@/types/product';
 
 import { ApiResponse } from './types';
 
-export namespace CategoryApi {
+export namespace ProductApi {
   export async function getAll(
-    options: Partial<QueryOptions<Category>>,
-  ): Promise<ApiResponse<Category[]>> {
+    options: Partial<QueryOptions<Product>> = {},
+  ): Promise<ApiResponse<Product[]>> {
     try {
       const query = buildQuery(options);
-      const axiosResponse = await axiosInstance.get(`/categories${query}`);
+      const axiosResponse = await axiosInstance.get(`/products${query}`);
       const data = axiosResponse.data;
 
       return {
         isSuccess: true,
-        message: 'Categories fetched successfully',
+        message: 'Products fetched successfully',
         data: data.value || [],
       };
     } catch (error: any) {
@@ -25,25 +25,25 @@ export namespace CategoryApi {
         message:
           error.response?.statusText ||
           error.message ||
-          'Failed to fetch categories',
+          'Failed to fetch products',
         data: [],
       };
     }
   }
 
   export async function create(
-    payload: Partial<Category>,
-  ): Promise<ApiResponse<Category | undefined>> {
+    payload: Partial<Product>,
+  ): Promise<ApiResponse<Product | undefined>> {
     try {
-      const axiosResponse = await axiosInstance.post<ApiResponse<Category>>(
-        '/categories',
+      const axiosResponse = await axiosInstance.post<ApiResponse<Product>>(
+        '/products',
         payload,
       );
       return axiosResponse.data;
     } catch (error: any) {
       return {
         isSuccess: false,
-        message: error?.message || 'An unexpected error occurred.',
+        message: error?.message || 'Failed to create product',
         data: undefined,
       };
     }
@@ -51,18 +51,18 @@ export namespace CategoryApi {
 
   export async function update(
     id: string,
-    payload: Partial<Category>,
-  ): Promise<ApiResponse<Category | undefined>> {
+    payload: Partial<Product>,
+  ): Promise<ApiResponse<Product | undefined>> {
     try {
-      const axiosResponse = await axiosInstance.put<ApiResponse<Category>>(
-        `/categories/${id}`,
+      const axiosResponse = await axiosInstance.put<ApiResponse<Product>>(
+        `/products/${id}`,
         payload,
       );
       return axiosResponse.data;
     } catch (error: any) {
       return {
         isSuccess: false,
-        message: error?.message || 'An unexpected error occurred.',
+        message: error?.message || 'Failed to update product',
         data: undefined,
       };
     }
@@ -73,13 +73,13 @@ export namespace CategoryApi {
   ): Promise<ApiResponse<undefined>> {
     try {
       const axiosResponse = await axiosInstance.delete<ApiResponse<undefined>>(
-        `/categories/${id}`,
+        `/products/${id}`,
       );
       return axiosResponse.data;
     } catch (error: any) {
       return {
         isSuccess: false,
-        message: error?.message || 'An unexpected error occurred.',
+        message: error?.message || 'Failed to delete product',
         data: undefined,
       };
     }
