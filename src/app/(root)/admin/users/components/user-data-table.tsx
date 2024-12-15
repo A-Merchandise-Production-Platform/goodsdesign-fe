@@ -2,6 +2,7 @@ import { Filter } from 'lucide-react';
 
 import { ColumnSelector } from '@/app/(root)/admin/users/components/column-selector';
 import { DataTable } from '@/app/(root)/admin/users/components/data-table';
+import FilterButton from '@/app/(root)/admin/users/components/filter-button';
 import SearchInput from '@/app/(root)/admin/users/components/search-input';
 import { TablePagination } from '@/app/(root)/admin/users/components/table-pagination';
 import { useUser } from '@/app/(root)/admin/users/hooks/use-user';
@@ -21,10 +22,7 @@ export default function UserDataTable() {
       <div className="flex items-center justify-between">
         <div className="flex space-x-2">
           <SearchInput />
-          <Button variant="outline">
-            <Filter className="mr-2 h-4 w-4" />
-            Filter
-          </Button>
+          <FilterButton />
         </div>
         <ColumnSelector />
       </div>
