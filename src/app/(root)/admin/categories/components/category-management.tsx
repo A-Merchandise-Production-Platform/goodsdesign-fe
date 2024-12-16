@@ -32,7 +32,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Category } from '@/types/category';
-import { handleImageUpload } from '@/utils/handle-image-upload';
+import { handleImageUpload } from '@/utils/handle-upload';
 
 import CategoryManagementSkeleton from './category-management-skeleton';
 
