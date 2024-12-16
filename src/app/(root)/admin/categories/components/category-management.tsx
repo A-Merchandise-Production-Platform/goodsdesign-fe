@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { CategoryApi } from '@/api/category';
-import { UploadApi } from '@/api/upload';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,

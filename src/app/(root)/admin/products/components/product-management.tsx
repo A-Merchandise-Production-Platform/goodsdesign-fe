@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import { CategoryApi } from '@/api/category';
 import { ProductApi } from '@/api/product';
 import { CreateProductPayload } from '@/api/types/product';
-import { UploadApi } from '@/api/upload';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -44,6 +43,7 @@ import { Category } from '@/types/category';
 import { Product } from '@/types/product';
 import { handle3DModelUpload, handleImageUpload } from '@/utils/handle-upload';
 
+import ModelViewer from './3d-model-viewer';
 import ProductManagementSkeleton from './product-management-skeleton';
 
 export default function ProductManagement() {
@@ -449,7 +449,7 @@ export default function ProductManagement() {
                 <Input
                   id="edit-model3D"
                   type="file"
-                  accept=".gltf"
+                  accept=".gltf,.glb"
                   className="col-span-3"
                 />
               </div>
@@ -465,13 +465,9 @@ export default function ProductManagement() {
             <DialogTitle>3D Model Viewer</DialogTitle>
           </DialogHeader>
           {currentModel3DUrl ? (
-            <iframe
-              src={currentModel3DUrl}
-              title="3D Model Viewer"
-              width="100%"
-              height="500px"
-              className="rounded-lg border"
-            />
+            // <ModelViewer modelUrl={currentModel3DUrl} />
+            // <ModelViewer modelUrl="https://github.com/KhronosGroup/glTF-Sample-Models/raw/main/2.0/Duck/glTF-Binary/Duck.glb" />
+            <ModelViewer modelUrl="/models/cube.glb" />
           ) : (
             <p>No 3D model available</p>
           )}

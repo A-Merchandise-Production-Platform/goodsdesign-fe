@@ -11,7 +11,7 @@ export namespace UploadApi {
     );
     return response.data;
   }
-  
+
   export async function upload3DModel(file: File) {
     const formData = new FormData();
     formData.append('file', file);
