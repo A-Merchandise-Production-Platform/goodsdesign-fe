@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { CategoryApi } from '@/api/category';
 import { ProductApi } from '@/api/product';
 import { CreateProductPayload } from '@/api/types/product';
+import { UploadApi } from '@/api/upload';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -59,6 +60,12 @@ export default function ProductManagement() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [is3DModalOpen, setIs3DModalOpen] = useState(false);
   const [currentModel3DUrl, setCurrentModel3DUrl] = useState<string>();
+  const allowedFileTypes = new Set([
+    'image/jpeg',
+    'image/png',
+    'image/jpg',
+    'image/bmp',
+  ]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -104,20 +111,43 @@ export default function ProductManagement() {
 
   const addProduct = async () => {
     if (newProduct.name && newProduct.description && newProduct.categoryId) {
-      const response = await ProductApi.create(newProduct);
-      if (response.isSuccess && response.data) {
-        setProducts([...products, response.data]);
-        setNewProduct({
-          name: '',
-          description: '',
-          categoryId: '',
-          imageUrl: '',
-          model3DUrl: '',
-        });
-        setIsAddModalOpen(false);
-        toast.success('Product added successfully!');
-      } else {
-        toast.error(response.message || 'Failed to add product');
+      try {
+        // Get the selected file
+        const file = (document.querySelector('#image') as HTMLInputElement)
+          .files?.[0];
+        if (!file) {
+          toast.error('Please select an image to upload.');
+          return;
+        }
+
+        // Validate file type
+        if (!allowedFileTypes.has(file.type)) {
+          toast.error('Only JPG, JPEG, PNG, and BMP file types are allowed.');
+          return;
+        }
+
+        // Upload image and get file URL
+        const uploadResponse = await UploadApi.uploadImage(file);
+        newProduct.imageUrl = uploadResponse.fileUrl;
+
+        // Create product with uploaded image URL
+        const response = await ProductApi.create(newProduct);
+        if (response.isSuccess && response.data) {
+          setProducts([...products, response.data]);
+          setNewProduct({
+            name: '',
+            description: '',
+            categoryId: '',
+            imageUrl: '',
+            model3DUrl: '',
+          });
+          setIsAddModalOpen(false);
+          toast.success('Product added successfully!');
+        } else {
+          toast.error(response.message || 'Failed to add product');
+        }
+      } catch {
+        toast.error('Image upload failed. Please try again.');
       }
     } else {
       toast.error(
@@ -128,20 +158,40 @@ export default function ProductManagement() {
 
   const updateProduct = async () => {
     if (editingProduct) {
-      const response = await ProductApi.update(
-        editingProduct.id,
-        editingProduct,
-      );
-      if (response.isSuccess && response.data) {
-        setProducts(
-          products.map(production =>
-            production.id === editingProduct.id ? response.data! : production,
-          ),
+      try {
+        // Get the selected file
+        const file = (document.querySelector('#edit-image') as HTMLInputElement)
+          .files?.[0];
+        if (file) {
+          // Validate file type
+          if (!allowedFileTypes.has(file.type)) {
+            toast.error('Only JPG, JPEG, PNG, and BMP file types are allowed.');
+            return;
+          }
+
+          // Upload image and get file URL
+          const uploadResponse = await UploadApi.uploadImage(file);
+          editingProduct.imageUrl = uploadResponse.fileUrl;
+        }
+
+        // Update product
+        const response = await ProductApi.update(
+          editingProduct.id,
+          editingProduct,
         );
-        setEditingProduct(undefined);
-        toast.success('Product updated successfully!');
-      } else {
-        toast.error(response.message || 'Failed to update product');
+        if (response.isSuccess && response.data) {
+          setProducts(
+            products.map(production =>
+              production.id === editingProduct.id ? response.data! : production,
+            ),
+          );
+          setEditingProduct(undefined);
+          toast.success('Product updated successfully!');
+        } else {
+          toast.error(response.message || 'Failed to update product');
+        }
+      } catch {
+        toast.error('Image upload failed. Please try again.');
       }
     }
   };
@@ -231,18 +281,13 @@ export default function ProductManagement() {
                 </Select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="imageUrl" className="text-right">
-                  Image URL
+                <Label htmlFor="image" className="text-right">
+                  Image
                 </Label>
                 <Input
-                  id="imageUrl"
-                  value={newProduct.imageUrl}
-                  onChange={event =>
-                    setNewProduct({
-                      ...newProduct,
-                      imageUrl: event.target.value,
-                    })
-                  }
+                  id="image"
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.bmp"
                   className="col-span-3"
                 />
               </div>
@@ -394,18 +439,13 @@ export default function ProductManagement() {
                 </Select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-imageUrl" className="text-right">
-                  Image URL
+                <Label htmlFor="edit-image" className="text-right">
+                  Image
                 </Label>
                 <Input
-                  id="edit-imageUrl"
-                  value={editingProduct.imageUrl}
-                  onChange={event =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      imageUrl: event.target.value,
-                    })
-                  }
+                  id="edit-image"
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.bmp"
                   className="col-span-3"
                 />
               </div>
