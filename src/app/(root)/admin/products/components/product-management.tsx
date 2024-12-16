@@ -42,7 +42,7 @@ import {
 } from '@/components/ui/table';
 import { Category } from '@/types/category';
 import { Product } from '@/types/product';
-import { handleImageUpload } from '@/utils/handle-image-upload';
+import { handle3DModelUpload, handleImageUpload } from '@/utils/handle-upload';
 
 import ProductManagementSkeleton from './product-management-skeleton';
 
@@ -107,16 +107,22 @@ export default function ProductManagement() {
   const addProduct = async () => {
     if (newProduct.name && newProduct.description && newProduct.categoryId) {
       try {
-        const file = (document.querySelector('#image') as HTMLInputElement)
+        // Handle image upload if selected
+        const imageFile = (document.querySelector('#image') as HTMLInputElement)
           .files?.[0];
-        if (!file) {
-          toast.error('Please select an image to upload.');
-          return;
+        if (imageFile) {
+          newProduct.imageUrl = await handleImageUpload(imageFile);
         }
 
-        const fileUrl = await handleImageUpload(file);
-        newProduct.imageUrl = fileUrl;
+        // Handle 3D model upload if selected
+        const modelFile = (
+          document.querySelector('#model3D') as HTMLInputElement
+        ).files?.[0];
+        if (modelFile) {
+          newProduct.model3DUrl = await handle3DModelUpload(modelFile);
+        }
 
+        // Create product with uploaded URLs
         const response = await ProductApi.create(newProduct);
         if (response.isSuccess && response.data) {
           setProducts([...products, response.data]);
@@ -133,7 +139,9 @@ export default function ProductManagement() {
           toast.error(response.message || 'Failed to add product');
         }
       } catch (error: any) {
-        toast.error(error.message || 'Image upload failed. Please try again.');
+        toast.error(
+          error.message || 'Failed to upload files. Please try again.',
+        );
       }
     } else {
       toast.error(
@@ -145,13 +153,23 @@ export default function ProductManagement() {
   const updateProduct = async () => {
     if (editingProduct) {
       try {
-        const file = (document.querySelector('#edit-image') as HTMLInputElement)
-          .files?.[0];
-        if (file) {
-          const fileUrl = await handleImageUpload(file);
-          editingProduct.imageUrl = fileUrl;
+        // Handle image upload if selected
+        const imageFile = (
+          document.querySelector('#edit-image') as HTMLInputElement
+        ).files?.[0];
+        if (imageFile) {
+          editingProduct.imageUrl = await handleImageUpload(imageFile);
         }
 
+        // Handle 3D model upload if selected
+        const modelFile = (
+          document.querySelector('#edit-model3D') as HTMLInputElement
+        ).files?.[0];
+        if (modelFile) {
+          editingProduct.model3DUrl = await handle3DModelUpload(modelFile);
+        }
+
+        // Update product with uploaded URLs
         const response = await ProductApi.update(
           editingProduct.id,
           editingProduct,
@@ -168,7 +186,9 @@ export default function ProductManagement() {
           toast.error(response.message || 'Failed to update product');
         }
       } catch (error: any) {
-        toast.error(error.message || 'Image upload failed. Please try again.');
+        toast.error(
+          error.message || 'Failed to upload files. Please try again.',
+        );
       }
     }
   };
@@ -269,18 +289,13 @@ export default function ProductManagement() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="model3DUrl" className="text-right">
-                  3D Model URL
+                <Label htmlFor="model3D" className="text-right">
+                  3D Model
                 </Label>
                 <Input
-                  id="model3DUrl"
-                  value={newProduct.model3DUrl}
-                  onChange={event =>
-                    setNewProduct({
-                      ...newProduct,
-                      model3DUrl: event.target.value,
-                    })
-                  }
+                  id="model3D"
+                  type="file"
+                  accept=".gltf"
                   className="col-span-3"
                 />
               </div>
@@ -338,6 +353,7 @@ export default function ProductManagement() {
                         <Pencil className="mr-2 h-4 w-4" /> Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem
+                        className="text-red-400 focus:text-red-500"
                         onClick={() => deleteProduct(product.id)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" /> Delete
@@ -427,18 +443,13 @@ export default function ProductManagement() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-model3DUrl" className="text-right">
-                  3D Model URL
+                <Label htmlFor="edit-model3D" className="text-right">
+                  3D Model
                 </Label>
                 <Input
-                  id="edit-model3DUrl"
-                  value={editingProduct.model3DUrl}
-                  onChange={event =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      model3DUrl: event.target.value,
-                    })
-                  }
+                  id="edit-model3D"
+                  type="file"
+                  accept=".gltf"
                   className="col-span-3"
                 />
               </div>
