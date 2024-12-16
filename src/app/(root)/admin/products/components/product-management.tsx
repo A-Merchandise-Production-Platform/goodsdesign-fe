@@ -449,7 +449,7 @@ export default function ProductManagement() {
                 <Input
                   id="edit-model3D"
                   type="file"
-                  accept=".gltf"
+                  accept=".gltf,.glb"
                   className="col-span-3"
                 />
               </div>

@@ -17,10 +17,10 @@ export const handleImageUpload = async (file: File): Promise<string> => {
 };
 
 export const handle3DModelUpload = async (file: File): Promise<string> => {
-  const allowedFileTypes = new Set(['model/gltf+json', '.gltf']);
+  const allowedFileTypes = new Set(['model/gltf+json', '.gltf', '.glb']);
 
-  if (!allowedFileTypes.has(file.type) && !file.name.endsWith('.gltf')) {
-    throw new Error('Only GLTF files (.gltf) are allowed.');
+  if (!allowedFileTypes.has(file.type)) {
+    throw new Error('Only GLTF, GLB file types are allowed.');
   }
 
   const uploadResponse = await UploadApi.upload3DModel(file);
