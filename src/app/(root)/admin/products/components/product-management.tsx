@@ -42,6 +42,7 @@ import {
 } from '@/components/ui/table';
 import { Category } from '@/types/category';
 import { Product } from '@/types/product';
+import { handleImageUpload } from '@/utils/handle-image-upload';
 
 import ProductManagementSkeleton from './product-management-skeleton';
 
@@ -60,12 +61,6 @@ export default function ProductManagement() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [is3DModalOpen, setIs3DModalOpen] = useState(false);
   const [currentModel3DUrl, setCurrentModel3DUrl] = useState<string>();
-  const allowedFileTypes = new Set([
-    'image/jpeg',
-    'image/png',
-    'image/jpg',
-    'image/bmp',
-  ]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -112,7 +107,6 @@ export default function ProductManagement() {
   const addProduct = async () => {
     if (newProduct.name && newProduct.description && newProduct.categoryId) {
       try {
-        // Get the selected file
         const file = (document.querySelector('#image') as HTMLInputElement)
           .files?.[0];
         if (!file) {
@@ -120,17 +114,9 @@ export default function ProductManagement() {
           return;
         }
 
-        // Validate file type
-        if (!allowedFileTypes.has(file.type)) {
-          toast.error('Only JPG, JPEG, PNG, and BMP file types are allowed.');
-          return;
-        }
+        const fileUrl = await handleImageUpload(file);
+        newProduct.imageUrl = fileUrl;
 
-        // Upload image and get file URL
-        const uploadResponse = await UploadApi.uploadImage(file);
-        newProduct.imageUrl = uploadResponse.fileUrl;
-
-        // Create product with uploaded image URL
         const response = await ProductApi.create(newProduct);
         if (response.isSuccess && response.data) {
           setProducts([...products, response.data]);
@@ -146,8 +132,8 @@ export default function ProductManagement() {
         } else {
           toast.error(response.message || 'Failed to add product');
         }
-      } catch {
-        toast.error('Image upload failed. Please try again.');
+      } catch (error: any) {
+        toast.error(error.message || 'Image upload failed. Please try again.');
       }
     } else {
       toast.error(
@@ -159,22 +145,13 @@ export default function ProductManagement() {
   const updateProduct = async () => {
     if (editingProduct) {
       try {
-        // Get the selected file
         const file = (document.querySelector('#edit-image') as HTMLInputElement)
           .files?.[0];
         if (file) {
-          // Validate file type
-          if (!allowedFileTypes.has(file.type)) {
-            toast.error('Only JPG, JPEG, PNG, and BMP file types are allowed.');
-            return;
-          }
-
-          // Upload image and get file URL
-          const uploadResponse = await UploadApi.uploadImage(file);
-          editingProduct.imageUrl = uploadResponse.fileUrl;
+          const fileUrl = await handleImageUpload(file);
+          editingProduct.imageUrl = fileUrl;
         }
 
-        // Update product
         const response = await ProductApi.update(
           editingProduct.id,
           editingProduct,
@@ -190,8 +167,8 @@ export default function ProductManagement() {
         } else {
           toast.error(response.message || 'Failed to update product');
         }
-      } catch {
-        toast.error('Image upload failed. Please try again.');
+      } catch (error: any) {
+        toast.error(error.message || 'Image upload failed. Please try again.');
       }
     }
   };

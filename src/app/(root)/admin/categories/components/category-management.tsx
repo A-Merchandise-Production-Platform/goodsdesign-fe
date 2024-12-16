@@ -32,6 +32,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Category } from '@/types/category';
+import { handleImageUpload } from '@/utils/handle-image-upload';
 
 import CategoryManagementSkeleton from './category-management-skeleton';
 
@@ -76,7 +77,6 @@ export default function CategoryManagement() {
   const addCategory = async () => {
     if (newCategory.name && newCategory.description) {
       try {
-        // Get the selected file
         const file = (document.querySelector('#image') as HTMLInputElement)
           .files?.[0];
         if (!file) {
@@ -84,17 +84,9 @@ export default function CategoryManagement() {
           return;
         }
 
-        // Validate file type
-        if (!allowedFileTypes.has(file.type)) {
-          toast.error('Only JPG, JPEG, PNG, and BMP file types are allowed.');
-          return;
-        }
+        const fileUrl = await handleImageUpload(file);
+        newCategory.imageUrl = fileUrl;
 
-        // Upload image and get file URL
-        const uploadResponse = await UploadApi.uploadImage(file);
-        newCategory.imageUrl = uploadResponse.fileUrl;
-
-        // Create category with uploaded image URL
         const response = await CategoryApi.create(newCategory);
         if (response.isSuccess && response.data) {
           setCategories([...categories, response.data]);
@@ -109,8 +101,8 @@ export default function CategoryManagement() {
         } else {
           toast.error(response.message || 'Failed to add category');
         }
-      } catch {
-        toast.error('Image upload failed. Please try again.');
+      } catch (error: any) {
+        toast.error(error.message || 'Image upload failed. Please try again.');
       }
     } else {
       toast.error('Please fill out all fields before adding a category.');
@@ -120,22 +112,14 @@ export default function CategoryManagement() {
   const updateCategory = async () => {
     if (editingCategory) {
       try {
-        // Get the selected file
         const file = (document.querySelector('#edit-image') as HTMLInputElement)
           .files?.[0];
         if (file) {
-          // Validate file type
-          if (!allowedFileTypes.has(file.type)) {
-            toast.error('Only JPG, JPEG, PNG, and BMP file types are allowed.');
-            return;
-          }
-
-          // Upload image and get file URL
-          const uploadResponse = await UploadApi.uploadImage(file);
-          editingCategory.imageUrl = uploadResponse.fileUrl;
+          // Use the handleImageUpload utility
+          const fileUrl = await handleImageUpload(file);
+          editingCategory.imageUrl = fileUrl;
         }
 
-        // Update category
         const response = await CategoryApi.update(
           editingCategory.id,
           editingCategory,
@@ -151,8 +135,8 @@ export default function CategoryManagement() {
         } else {
           toast.error(response.message || 'Failed to update category');
         }
-      } catch {
-        toast.error('Image upload failed. Please try again.');
+      } catch (error: any) {
+        toast.error(error.message || 'Image upload failed. Please try again.');
       }
     }
   };
