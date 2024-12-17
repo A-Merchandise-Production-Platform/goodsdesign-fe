@@ -5,3 +5,7 @@
 export interface UploadImageResponse {
   fileUrl: string;
 }
+
+export interface Upload3DModelResponse {
+  fileUrl: string;
+}

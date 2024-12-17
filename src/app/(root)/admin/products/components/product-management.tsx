@@ -41,7 +41,9 @@ import {
 } from '@/components/ui/table';
 import { Category } from '@/types/category';
 import { Product } from '@/types/product';
+import { handle3DModelUpload, handleImageUpload } from '@/utils/handle-upload';
 
+import ModelViewer from './3d-model-viewer';
 import ProductManagementSkeleton from './product-management-skeleton';
 
 export default function ProductManagement() {
@@ -104,20 +106,42 @@ export default function ProductManagement() {
 
   const addProduct = async () => {
     if (newProduct.name && newProduct.description && newProduct.categoryId) {
-      const response = await ProductApi.create(newProduct);
-      if (response.isSuccess && response.data) {
-        setProducts([...products, response.data]);
-        setNewProduct({
-          name: '',
-          description: '',
-          categoryId: '',
-          imageUrl: '',
-          model3DUrl: '',
-        });
-        setIsAddModalOpen(false);
-        toast.success('Product added successfully!');
-      } else {
-        toast.error(response.message || 'Failed to add product');
+      try {
+        // Handle image upload if selected
+        const imageFile = (document.querySelector('#image') as HTMLInputElement)
+          .files?.[0];
+        if (imageFile) {
+          newProduct.imageUrl = await handleImageUpload(imageFile);
+        }
+
+        // Handle 3D model upload if selected
+        const modelFile = (
+          document.querySelector('#model3D') as HTMLInputElement
+        ).files?.[0];
+        if (modelFile) {
+          newProduct.model3DUrl = await handle3DModelUpload(modelFile);
+        }
+
+        // Create product with uploaded URLs
+        const response = await ProductApi.create(newProduct);
+        if (response.isSuccess && response.data) {
+          setProducts([...products, response.data]);
+          setNewProduct({
+            name: '',
+            description: '',
+            categoryId: '',
+            imageUrl: '',
+            model3DUrl: '',
+          });
+          setIsAddModalOpen(false);
+          toast.success('Product added successfully!');
+        } else {
+          toast.error(response.message || 'Failed to add product');
+        }
+      } catch (error: any) {
+        toast.error(
+          error.message || 'Failed to upload files. Please try again.',
+        );
       }
     } else {
       toast.error(
@@ -128,20 +152,43 @@ export default function ProductManagement() {
 
   const updateProduct = async () => {
     if (editingProduct) {
-      const response = await ProductApi.update(
-        editingProduct.id,
-        editingProduct,
-      );
-      if (response.isSuccess && response.data) {
-        setProducts(
-          products.map(production =>
-            production.id === editingProduct.id ? response.data! : production,
-          ),
+      try {
+        // Handle image upload if selected
+        const imageFile = (
+          document.querySelector('#edit-image') as HTMLInputElement
+        ).files?.[0];
+        if (imageFile) {
+          editingProduct.imageUrl = await handleImageUpload(imageFile);
+        }
+
+        // Handle 3D model upload if selected
+        const modelFile = (
+          document.querySelector('#edit-model3D') as HTMLInputElement
+        ).files?.[0];
+        if (modelFile) {
+          editingProduct.model3DUrl = await handle3DModelUpload(modelFile);
+        }
+
+        // Update product with uploaded URLs
+        const response = await ProductApi.update(
+          editingProduct.id,
+          editingProduct,
         );
-        setEditingProduct(undefined);
-        toast.success('Product updated successfully!');
-      } else {
-        toast.error(response.message || 'Failed to update product');
+        if (response.isSuccess && response.data) {
+          setProducts(
+            products.map(production =>
+              production.id === editingProduct.id ? response.data! : production,
+            ),
+          );
+          setEditingProduct(undefined);
+          toast.success('Product updated successfully!');
+        } else {
+          toast.error(response.message || 'Failed to update product');
+        }
+      } catch (error: any) {
+        toast.error(
+          error.message || 'Failed to upload files. Please try again.',
+        );
       }
     }
   };
@@ -231,34 +278,24 @@ export default function ProductManagement() {
                 </Select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="imageUrl" className="text-right">
-                  Image URL
+                <Label htmlFor="image" className="text-right">
+                  Image
                 </Label>
                 <Input
-                  id="imageUrl"
-                  value={newProduct.imageUrl}
-                  onChange={event =>
-                    setNewProduct({
-                      ...newProduct,
-                      imageUrl: event.target.value,
-                    })
-                  }
+                  id="image"
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.bmp"
                   className="col-span-3"
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="model3DUrl" className="text-right">
-                  3D Model URL
+                <Label htmlFor="model3D" className="text-right">
+                  3D Model
                 </Label>
                 <Input
-                  id="model3DUrl"
-                  value={newProduct.model3DUrl}
-                  onChange={event =>
-                    setNewProduct({
-                      ...newProduct,
-                      model3DUrl: event.target.value,
-                    })
-                  }
+                  id="model3D"
+                  type="file"
+                  accept=".gltf"
                   className="col-span-3"
                 />
               </div>
@@ -316,6 +353,7 @@ export default function ProductManagement() {
                         <Pencil className="mr-2 h-4 w-4" /> Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem
+                        className="text-red-400 focus:text-red-500"
                         onClick={() => deleteProduct(product.id)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" /> Delete
@@ -394,34 +432,24 @@ export default function ProductManagement() {
                 </Select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-imageUrl" className="text-right">
-                  Image URL
+                <Label htmlFor="edit-image" className="text-right">
+                  Image
                 </Label>
                 <Input
-                  id="edit-imageUrl"
-                  value={editingProduct.imageUrl}
-                  onChange={event =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      imageUrl: event.target.value,
-                    })
-                  }
+                  id="edit-image"
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.bmp"
                   className="col-span-3"
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-model3DUrl" className="text-right">
-                  3D Model URL
+                <Label htmlFor="edit-model3D" className="text-right">
+                  3D Model
                 </Label>
                 <Input
-                  id="edit-model3DUrl"
-                  value={editingProduct.model3DUrl}
-                  onChange={event =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      model3DUrl: event.target.value,
-                    })
-                  }
+                  id="edit-model3D"
+                  type="file"
+                  accept=".gltf,.glb"
                   className="col-span-3"
                 />
               </div>
@@ -437,13 +465,9 @@ export default function ProductManagement() {
             <DialogTitle>3D Model Viewer</DialogTitle>
           </DialogHeader>
           {currentModel3DUrl ? (
-            <iframe
-              src={currentModel3DUrl}
-              title="3D Model Viewer"
-              width="100%"
-              height="500px"
-              className="rounded-lg border"
-            />
+            // <ModelViewer modelUrl={currentModel3DUrl} />
+            // <ModelViewer modelUrl="https://github.com/KhronosGroup/glTF-Sample-Models/raw/main/2.0/Duck/glTF-Binary/Duck.glb" />
+            <ModelViewer modelUrl="/models/cube.glb" />
           ) : (
             <p>No 3D model available</p>
           )}

@@ -31,6 +31,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Category } from '@/types/category';
+import { handleImageUpload } from '@/utils/handle-upload';
 
 import CategoryManagementSkeleton from './category-management-skeleton';
 
@@ -44,6 +45,12 @@ export default function CategoryManagement() {
     isDeleted: false,
   });
   const [editingCategory, setEditingCategory] = useState<Category>();
+  const allowedFileTypes = new Set([
+    'image/jpeg',
+    'image/png',
+    'image/jpg',
+    'image/bmp',
+  ]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Fetch categories with OData options
@@ -67,20 +74,34 @@ export default function CategoryManagement() {
   }, []);
 
   const addCategory = async () => {
-    if (newCategory.name && newCategory.description && newCategory.imageUrl) {
-      const response = await CategoryApi.create(newCategory);
-      if (response.isSuccess && response.data) {
-        setCategories([...categories, response.data]);
-        setNewCategory({
-          name: '',
-          description: '',
-          imageUrl: '',
-          isDeleted: false,
-        });
-        setIsAddModalOpen(false);
-        toast.success('Category added successfully!');
-      } else {
-        toast.error(response.message || 'Failed to add category');
+    if (newCategory.name && newCategory.description) {
+      try {
+        const file = (document.querySelector('#image') as HTMLInputElement)
+          .files?.[0];
+        if (!file) {
+          toast.error('Please select an image to upload.');
+          return;
+        }
+
+        const fileUrl = await handleImageUpload(file);
+        newCategory.imageUrl = fileUrl;
+
+        const response = await CategoryApi.create(newCategory);
+        if (response.isSuccess && response.data) {
+          setCategories([...categories, response.data]);
+          setNewCategory({
+            name: '',
+            description: '',
+            imageUrl: '',
+            isDeleted: false,
+          });
+          setIsAddModalOpen(false);
+          toast.success('Category added successfully!');
+        } else {
+          toast.error(response.message || 'Failed to add category');
+        }
+      } catch (error: any) {
+        toast.error(error.message || 'Image upload failed. Please try again.');
       }
     } else {
       toast.error('Please fill out all fields before adding a category.');
@@ -89,20 +110,32 @@ export default function CategoryManagement() {
 
   const updateCategory = async () => {
     if (editingCategory) {
-      const response = await CategoryApi.update(
-        editingCategory.id,
-        editingCategory,
-      );
-      if (response.isSuccess && response.data) {
-        setCategories(
-          categories.map(cat =>
-            cat.id === editingCategory.id ? response.data! : cat,
-          ),
+      try {
+        const file = (document.querySelector('#edit-image') as HTMLInputElement)
+          .files?.[0];
+        if (file) {
+          // Use the handleImageUpload utility
+          const fileUrl = await handleImageUpload(file);
+          editingCategory.imageUrl = fileUrl;
+        }
+
+        const response = await CategoryApi.update(
+          editingCategory.id,
+          editingCategory,
         );
-        setEditingCategory(undefined);
-        toast.success('Category updated successfully!');
-      } else {
-        toast.error(response.message || 'Failed to update category');
+        if (response.isSuccess && response.data) {
+          setCategories(
+            categories.map(cat =>
+              cat.id === editingCategory.id ? response.data! : cat,
+            ),
+          );
+          setEditingCategory(undefined);
+          toast.success('Category updated successfully!');
+        } else {
+          toast.error(response.message || 'Failed to update category');
+        }
+      } catch (error: any) {
+        toast.error(error.message || 'Image upload failed. Please try again.');
       }
     }
   };
@@ -161,18 +194,13 @@ export default function CategoryManagement() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="imageUrl" className="text-right">
-                  Image URL
+                <Label htmlFor="image" className="text-right">
+                  Image
                 </Label>
                 <Input
-                  id="imageUrl"
-                  value={newCategory.imageUrl}
-                  onChange={event =>
-                    setNewCategory({
-                      ...newCategory,
-                      imageUrl: event.target.value,
-                    })
-                  }
+                  id="image"
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.bmp"
                   className="col-span-3"
                 />
               </div>
@@ -278,18 +306,13 @@ export default function CategoryManagement() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-imageUrl" className="text-right">
-                  Image URL
+                <Label htmlFor="edit-image" className="text-right">
+                  Image
                 </Label>
                 <Input
-                  id="edit-imageUrl"
-                  value={editingCategory.imageUrl}
-                  onChange={event =>
-                    setEditingCategory({
-                      ...editingCategory,
-                      imageUrl: event.target.value,
-                    })
-                  }
+                  id="edit-image"
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.bmp"
                   className="col-span-3"
                 />
               </div>
