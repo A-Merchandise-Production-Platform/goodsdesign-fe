@@ -3,11 +3,18 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { Check, X } from 'lucide-react';
+import { Check, Edit, MoreHorizontal, Trash2, X } from 'lucide-react';
 
 import { User } from '@/api/types/user';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Tooltip,
   TooltipContent,
@@ -90,37 +97,10 @@ export const userColumns: ColumnDef<User>[] = [
     },
   },
   {
-    id: 'emailConfirmed',
-    header: 'Email Confirmed',
-    accessorKey: 'emailConfirmed',
-    cell: ({ row }) => {
-      return (
-        <div>
-          {row.original.emailConfirmed ? (
-            <Check className="text-green-500" />
-          ) : (
-            <X className="text-red-500" />
-          )}
-        </div>
-      );
-    },
-  },
-  {
     id: 'phoneNumber',
     header: 'Phone',
     accessorKey: 'phoneNumber',
     cell: ({ row }) => row.original.phoneNumber || 'N/A',
-  },
-  {
-    id: 'twoFactorEnabled',
-    header: 'Two Factor',
-    accessorKey: 'twoFactorEnabled',
-    cell: ({ row }) =>
-      row.original.twoFactorEnabled ? (
-        <Check className="text-green-500" />
-      ) : (
-        <X className="text-red-500" />
-      ),
   },
   {
     id: 'lockout',
@@ -183,6 +163,44 @@ export const userColumns: ColumnDef<User>[] = [
             ? format(new Date(row.original.updatedAt), 'dd MMM yyyy HH:mm')
             : 'N/A'}
         </p>
+      );
+    },
+  },
+  {
+    id: 'actions',
+    header: 'Actions',
+    accessorKey: 'actions',
+    cell: ({ row }) => {
+      return (
+        <div className="flex justify-start">
+          <DropdownMenu>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <span className="sr-only">Open menu</span>
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>More options</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem className="cursor-pointer">
+                <Edit className="mr-2 h-4 w-4" />
+                <span>Edit</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer text-red-600">
+                <Trash2 className="mr-2 h-4 w-4" />
+                <span>Delete</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       );
     },
   },

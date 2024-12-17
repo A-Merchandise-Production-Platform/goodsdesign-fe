@@ -64,15 +64,15 @@ export default function ImageInput({
   return (
     <>
       <Card
-        className={`mx-auto w-full max-w-md ${isRound ? 'overflow-hidden rounded-full' : ''}`}
+        className={`mx-auto w-full ${isRound ? 'overflow-hidden rounded-full' : ''}`}
       >
         <CardContent className="p-2">
           <div
             {...getRootProps()}
             className={`relative ${isRound ? 'aspect-square' : ratio === '16:9' ? 'aspect-video' : 'aspect-square'} border-2 border-dashed transition-colors ${
               isDragActive
-                ? 'border-primary bg-primary/10'
-                : 'border-gray-300 hover:border-primary'
+                ? 'border-muted-foreground bg-primary/10'
+                : 'border-muted hover:border-muted-foreground'
             } ${isRound ? 'rounded-full' : 'rounded-lg'}`}
           >
             <input {...getInputProps()} />
@@ -145,7 +145,7 @@ export default function ImageInput({
               />
             )}
           </div>
-          <div className="my-4 flex items-center gap-4">
+          <div className="flex items-center gap-4">
             <span className="w-16 text-right">Zoom:</span>
             <Slider
               value={[zoom]}
@@ -156,7 +156,7 @@ export default function ImageInput({
             />
             <span>{zoom.toFixed(1)}x</span>
           </div>
-          <div className="my-4 flex items-center gap-4">
+          <div className="flex items-center gap-4">
             <span className="w-16 text-right">Rotate:</span>
             <Slider
               value={[rotation]}

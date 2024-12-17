@@ -1,39 +1,10 @@
 'use client';
 
-import {
-  AudioWaveform,
-  Book,
-  BookOpen,
-  Bot,
-  Calendar,
-  ChevronDown,
-  ChevronRight,
-  Code,
-  Cog,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Inbox,
-  Layers,
-  PieChart,
-  Search,
-  Settings,
-  Settings2,
-  SquareTerminal,
-  Users,
-} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import * as React from 'react';
 
 import { AdminSidebarHeader } from '@/app/(root)/admin/components/admin-sidebar-header';
 import { adminSidebarItems } from '@/app/(root)/admin/components/admin-sidebar-items';
-import Home from '@/app/(root)/page';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -44,9 +15,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarRail,
 } from '@/components/ui/sidebar';
 import { useAuthStore } from '@/stores/auth.store';

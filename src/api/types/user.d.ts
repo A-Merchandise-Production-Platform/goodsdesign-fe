@@ -37,3 +37,13 @@ export interface Role {
   concurrencyStamp: string;
   users?: string[];
 }
+
+export interface CreateUserDto {
+  email: string;
+  password: string;
+  userName: string;
+  phoneNumber?: string;
+  gender?: boolean;
+  dateOfBirth?: Date;
+  imageUrl?: string;
+}

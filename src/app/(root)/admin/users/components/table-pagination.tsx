@@ -52,7 +52,7 @@ export function TablePagination({
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
-      <div className="text-sm text-muted-foreground">Found {count} users</div>
+      <div className="text-sm text-muted-foreground">Found {count} user(s)</div>
       <div className="flex items-center space-x-2">
         <span className="text-sm text-muted-foreground">Rows per page</span>
         <Select
