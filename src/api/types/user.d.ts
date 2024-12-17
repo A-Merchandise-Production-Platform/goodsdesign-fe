@@ -46,4 +46,5 @@ export interface CreateUserDto {
   gender?: boolean;
   dateOfBirth?: Date;
   imageUrl?: string;
+  role?: string;
 }

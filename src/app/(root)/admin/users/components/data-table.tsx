@@ -23,12 +23,14 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   isLoading?: boolean;
   rowCount?: number;
+  error?: any;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   isLoading = false,
+  error,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -115,6 +117,16 @@ export function DataTable<TData, TValue>({
                 </TableCell>
               </TableRow>
             )}
+          </TableBody>
+        )}
+
+        {error && (
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={columns.length} className="text-red-500">
+                Could not load data.
+              </TableCell>
+            </TableRow>
           </TableBody>
         )}
       </Table>

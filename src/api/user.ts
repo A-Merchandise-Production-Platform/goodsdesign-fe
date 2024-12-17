@@ -16,7 +16,7 @@ export namespace UserApi {
 
   export async function create(payload: CreateUserDto) {
     const response = await axiosInstance.post<ApiResponse<User>>(
-      '/users',
+      `/users?role=${payload.role?.toUpperCase() || 'CUSTOMER'}`,
       payload,
     );
     return response.data;

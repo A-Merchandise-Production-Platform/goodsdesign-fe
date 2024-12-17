@@ -55,13 +55,16 @@ const roles: RoleSelectProps[] = [
   { label: 'Manager', value: 'manager' },
   { label: 'Staff', value: 'staff' },
   { label: 'Customer', value: 'customer' },
-  { label: 'Factory Owner', value: 'factoryOwner' },
 ];
 
 interface CreateUserFormProps {
   onClose: (isOpen: boolean) => void;
+  refresh: () => void;
 }
-export default function CreateUserForm({ onClose }: CreateUserFormProps) {
+export default function CreateUserForm({
+  onClose,
+  refresh,
+}: CreateUserFormProps) {
   const [image, setImage] = useState<File | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const form = useForm<CreateUserSchema>({
@@ -81,6 +84,9 @@ export default function CreateUserForm({ onClose }: CreateUserFormProps) {
     onSuccess: () => {
       console.log('User created successfully');
       toast.success('User created successfully');
+      form.reset();
+      onClose(false);
+      refresh();
     },
     onError: (error: AxiosError<ApiResponse<null>>) => {
       toast.error(`Failed to create user: ${error.response?.data.message}`);
@@ -248,7 +254,7 @@ export default function CreateUserForm({ onClose }: CreateUserFormProps) {
                 name="dateOfBirth"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel htmlFor="datetime">Date time</FormLabel>
+                    <FormLabel htmlFor="datetime">Date of birth</FormLabel>
                     <FormControl>
                       <DateTimePicker
                         value={field.value}

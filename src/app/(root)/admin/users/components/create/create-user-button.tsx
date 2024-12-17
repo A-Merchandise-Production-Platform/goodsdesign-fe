@@ -12,7 +12,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-export default function CreateUserButton() {
+interface CreateUserButtonProps {
+  refresh: () => void;
+}
+
+export default function CreateUserButton({ refresh }: CreateUserButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
@@ -34,7 +38,7 @@ export default function CreateUserButton() {
               Fill in the form below to create a new user
             </DialogDescription>
           </DialogHeader>
-          <CreateUserForm onClose={setIsOpen} />
+          <CreateUserForm onClose={setIsOpen} refresh={refresh} />
         </DialogContent>
       </Dialog>
     </>

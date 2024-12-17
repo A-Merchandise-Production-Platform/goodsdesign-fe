@@ -23,5 +23,6 @@ export function useUser() {
     data,
     isLoading,
     error,
+    refetch,
   };
 }

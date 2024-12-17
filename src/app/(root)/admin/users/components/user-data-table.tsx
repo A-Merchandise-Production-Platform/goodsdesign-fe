@@ -12,11 +12,9 @@ import { useColumnStore } from '@/app/(root)/admin/users/stores/use-user-column.
 
 export default function UserDataTable() {
   const { visibleColumns } = useColumnStore();
-  const { data, isLoading, error } = useUser();
+  const { data, isLoading, error, refetch } = useUser();
   const { currentPage, pageSize, totalPages, goToPage, changePageSize } =
     useUserPaging(data?.['@odata.count'] || 0);
-
-  if (error) return <div>Can not load data</div>;
 
   return (
     <div className="flex space-x-4">
@@ -28,7 +26,7 @@ export default function UserDataTable() {
           </div>
 
           <div className="flex gap-2">
-            <CreateUserButton />
+            <CreateUserButton refresh={refetch} />
             <ColumnSelector />
           </div>
         </div>
@@ -37,6 +35,7 @@ export default function UserDataTable() {
             columns={visibleColumns}
             data={data?.value || []}
             isLoading={isLoading}
+            error={error}
           />
 
           <TablePagination
