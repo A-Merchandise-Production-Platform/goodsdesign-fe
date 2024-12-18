@@ -3,7 +3,16 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { Check, Edit, MoreHorizontal, Trash2, X } from 'lucide-react';
+import {
+  Check,
+  Copy,
+  CopyIcon,
+  Edit,
+  MoreHorizontal,
+  Trash2,
+  X,
+} from 'lucide-react';
+import { toast } from 'sonner';
 
 import { User } from '@/api/types/user';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -24,6 +33,44 @@ import {
 import { cn } from '@/lib/utils';
 
 export const userColumns: ColumnDef<User>[] = [
+  {
+    id: 'id',
+    header: 'ID',
+    accessorKey: 'id',
+    cell: ({ row }) => {
+      const copyToClipboard = () => {
+        navigator.clipboard
+          .writeText(row.original.id)
+          .then(() => {
+            toast.info('ID copied to clipboard');
+          })
+          .catch(error => {
+            console.error('Failed to copy:', error);
+            toast.error('Failed to copy ID');
+          });
+      };
+
+      return (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger className="flex items-center gap-2 text-left text-muted-foreground transition-colors hover:text-primary">
+              <Button
+                variant={'ghost'}
+                className="p-0"
+                onClick={copyToClipboard}
+              >
+                <CopyIcon className="h-4 w-4" />
+              </Button>
+              <p className="line-clamp-1 min-w-32">{row.original.id}</p>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{row.original.id}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    },
+  },
   {
     id: 'avatar',
     header: 'Avatar',

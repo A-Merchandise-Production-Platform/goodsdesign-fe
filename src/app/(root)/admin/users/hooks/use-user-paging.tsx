@@ -4,7 +4,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { useFilterStore } from '@/app/(root)/admin/users/stores/use-filter.store';
+import { useUserFilterStore } from '@/app/(root)/admin/users/stores/use-user-filter.store';
 
 const MIN_PAGE_SIZE = 1;
 const MAX_PAGE_SIZE = 100;
@@ -13,7 +13,7 @@ const MIN_PAGE = 1;
 export function useUserPaging(totalItems: number) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const { query, setQuery } = useFilterStore();
+  const { query, setQuery } = useUserFilterStore();
 
   const searchParams = useSearchParams();
   const router = useRouter();

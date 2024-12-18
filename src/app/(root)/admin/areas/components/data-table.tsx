@@ -49,7 +49,6 @@ export function DataTable<TData, TValue>({
                   <TableHead
                     key={header.id}
                     className={cn(
-                      'tabular-nums',
                       index === 0 && 'rounded-l',
                       index === headerGroup.headers.length - 1 && 'rounded-r',
                     )}
@@ -95,7 +94,6 @@ export function DataTable<TData, TValue>({
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        'tabular-nums',
                         index === 0 && 'rounded-l',
                         index === row.getVisibleCells().length - 1 &&
                           'rounded-r',

@@ -5,10 +5,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 import { UserApi } from '@/api/user';
-import { useFilterStore } from '@/app/(root)/admin/users/stores/use-filter.store';
+import { useUserFilterStore } from '@/app/(root)/admin/users/stores/use-user-filter.store';
 
 export function useUser() {
-  const { query } = useFilterStore();
+  const { query } = useUserFilterStore();
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['users', query],

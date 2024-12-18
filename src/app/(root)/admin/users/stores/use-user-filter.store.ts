@@ -8,7 +8,7 @@ interface UseFilterState {
   setQuery: (query: Partial<QueryOptions<User>>) => void;
 }
 
-export const useFilterStore = create<UseFilterState>(set => ({
+export const useUserFilterStore = create<UseFilterState>(set => ({
   query: {
     count: true,
     top: 10,

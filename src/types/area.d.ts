@@ -4,4 +4,7 @@ export interface Area {
   position: string;
   code: string;
   isDeleted: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  deletedAt?: Date;
 }
