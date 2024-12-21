@@ -1,5 +1,7 @@
 'use client';
 
+import { Route } from 'next';
+import Link from 'next/link';
 import React from 'react';
 
 import {
@@ -16,7 +18,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface DynamicAdminHeaderProps {
   breadcrumbs: {
-    href?: string;
+    href?: Route;
     label: string;
   }[];
 }
@@ -38,8 +40,8 @@ export function DynamicAdminHeader({ breadcrumbs }: DynamicAdminHeaderProps) {
                   {index === breadcrumbs.length - 1 ? (
                     <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
                   ) : (
-                    <BreadcrumbLink href={crumb.href}>
-                      {crumb.label}
+                    <BreadcrumbLink asChild>
+                      <Link href={crumb.href!}>{crumb.label}</Link>
                     </BreadcrumbLink>
                   )}
                 </BreadcrumbItem>

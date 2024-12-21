@@ -12,6 +12,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
+import Link from 'next/link';
 import { toast } from 'sonner';
 
 import { User } from '@/api/types/user';
@@ -61,7 +62,12 @@ export const userColumns: ColumnDef<User>[] = [
               >
                 <CopyIcon className="h-4 w-4" />
               </Button>
-              <p className="line-clamp-1 min-w-32">{row.original.id}</p>
+              <Link
+                className="line-clamp-1 min-w-32"
+                href={`/admin/users/${row.original.id}`}
+              >
+                {row.original.id}
+              </Link>
             </TooltipTrigger>
             <TooltipContent>
               <p>{row.original.id}</p>
