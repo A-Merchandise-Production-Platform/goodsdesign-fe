@@ -42,6 +42,7 @@ export default function LoginForm() {
   const mutation = useMutation({
     mutationFn: authApi.login,
     onError: (error: AxiosError<LoginResponse>) => {
+      console.error(error);
       toast.error(error.response?.data.message);
     },
     onSuccess: data => {
