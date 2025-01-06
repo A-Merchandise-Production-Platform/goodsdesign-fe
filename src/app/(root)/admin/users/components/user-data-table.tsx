@@ -1,7 +1,7 @@
 'use client';
+import dynamic from 'next/dynamic';
 
 import { ColumnSelector } from '@/app/(root)/admin/users/components/column-selector';
-import CreateUserButton from '@/app/(root)/admin/users/components/create/create-user-button';
 import { DataTable } from '@/app/(root)/admin/users/components/data-table';
 import FilterButton from '@/app/(root)/admin/users/components/filter-button';
 import SearchInput from '@/app/(root)/admin/users/components/search-input';
@@ -9,6 +9,10 @@ import { TablePagination } from '@/app/(root)/admin/users/components/table-pagin
 import { useUser } from '@/app/(root)/admin/users/hooks/use-user';
 import { useUserPaging } from '@/app/(root)/admin/users/hooks/use-user-paging';
 import { useColumnStore } from '@/app/(root)/admin/users/stores/use-user-column.store';
+
+const CreateUserButton = dynamic(
+  () => import('@/app/(root)/admin/users/components/create/create-user-button'),
+);
 
 export default function UserDataTable() {
   const { visibleColumns } = useColumnStore();

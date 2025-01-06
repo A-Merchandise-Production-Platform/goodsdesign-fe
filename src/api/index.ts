@@ -7,7 +7,8 @@ import axios, {
 import { authApi } from '@/api/auth';
 import { useAuthStore } from '@/stores/auth.store';
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+const baseUrl = process.env.API_URL;
+console.log('API_URL:', process.env.API_URL);
 
 export const axiosInstance = axios.create({
   baseURL: baseUrl,
@@ -53,6 +54,8 @@ axiosInstance.interceptors.response.use(
             refreshToken: response.data.refreshToken,
           });
           return axiosInstance(originalRequest);
+        } else {
+          throw error;
         }
       } catch (error) {
         useAuthStore.setState({

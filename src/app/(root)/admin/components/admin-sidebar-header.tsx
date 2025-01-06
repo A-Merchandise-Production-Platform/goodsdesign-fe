@@ -24,10 +24,12 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { useAuthStore } from '@/stores/auth.store';
 import { AuthUser } from '@/types/user';
 
 export function AdminSidebarHeader({ user }: { user: AuthUser }) {
   const { isMobile } = useSidebar();
+  const { logout } = useAuthStore();
 
   return (
     <SidebarMenu>
@@ -96,7 +98,7 @@ export function AdminSidebarHeader({ user }: { user: AuthUser }) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={logout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

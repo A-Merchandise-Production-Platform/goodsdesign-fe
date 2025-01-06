@@ -1,5 +1,6 @@
 'use client';
 
+import { Route } from 'next';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -8,13 +9,11 @@ import { cn } from '@/lib/utils';
 
 type MenuItem = {
   title: string;
-  href: string;
+  href: Route;
 };
 
 const menuItems: MenuItem[] = [
   { title: 'Home', href: '/' },
-  { title: 'About', href: '/about' },
-  { title: 'Contact', href: '/contact' },
   { title: 'Login', href: '/login' },
   { title: 'Register', href: '/register' },
 ];

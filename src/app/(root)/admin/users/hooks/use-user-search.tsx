@@ -5,12 +5,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
-import { useFilterStore } from '@/app/(root)/admin/users/stores/use-filter.store';
+import { useUserFilterStore } from '@/app/(root)/admin/users/stores/use-user-filter.store';
 
 export function useUserSearch() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { query, setQuery } = useFilterStore();
+  const { query, setQuery } = useUserFilterStore();
 
   const [searchTerm, setSearchTerm] = useState(
     searchParams.get('Search') || '',

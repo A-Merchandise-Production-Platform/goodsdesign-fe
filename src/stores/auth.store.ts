@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation';
+import { toast } from 'sonner';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -36,13 +38,15 @@ export const useAuthStore = create<AuthStoreState>()(
           });
         }
       },
-      logout: () => {
+      logout: async () => {
+        await authApi.logout();
         set({
           isAuth: false,
           user: undefined,
           accessToken: undefined,
           refreshToken: undefined,
         });
+        toast.success('Logged out successfully');
       },
       refreshUser: async () => {
         const state = get();

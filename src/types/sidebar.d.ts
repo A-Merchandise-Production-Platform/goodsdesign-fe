@@ -1,3 +1,6 @@
+import { UrlObject } from 'node:url';
+
+import { Route } from 'next';
 import { ReactNode } from 'react';
 
 export interface SidebarItem {
@@ -7,7 +10,7 @@ export interface SidebarItem {
 
 export interface SidebarSubItem {
   title: string;
-  url: string;
+  url: Route;
   icon?: ForwardRefExoticComponent<
     Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>
   >;
