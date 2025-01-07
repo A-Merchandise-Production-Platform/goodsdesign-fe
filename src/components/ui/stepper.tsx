@@ -18,8 +18,9 @@ interface StepperProps {
 }
 
 export function Stepper({ steps, currentStep, onStepClick }: StepperProps) {
-  const progressValue = ((currentStep + 1) / steps.length) * 100;
-  console.log(progressValue);
+  // Calculate progress to the middle of the current step
+  const progressValue = ((currentStep + 0.5) / steps.length) * 100;
+
   return (
     <nav aria-label="Registration progress" className="relative z-0">
       <ol role="list" className="flex items-center justify-between">
