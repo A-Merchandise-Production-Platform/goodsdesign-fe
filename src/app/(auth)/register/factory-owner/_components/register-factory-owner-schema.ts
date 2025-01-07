@@ -2,22 +2,15 @@ import { z } from 'zod';
 
 const RegisterFOSchema = z
   .object({
-    // Step 1: Account Setup
     email: z.string().email('Invalid email address.'),
     password: z.string().min(8, 'Password must be at least 8 characters long.'),
     confirmPassword: z
       .string()
       .min(8, 'Password must be at least 8 characters long.'),
-
-    // Step 2: User and Factory Details
     userName: z.string().min(1, 'Username is required.'),
     phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits.'),
     factoryName: z.string().min(1, 'Factory name is required.'),
     factoryAddress: z.string().min(1, 'Factory address is required.'),
-
-    // Step 3: Contract and Product Details
-    contractName: z.string().min(1, 'Contract name is required.'),
-    contractPaperUrl: z.string().url('Invalid URL for contract paper.'),
     selectedProducts: z
       .array(
         z.object({
@@ -48,7 +41,5 @@ export const initialRegisterFOValues: RegisterFOType = {
   phoneNumber: '',
   factoryName: '',
   factoryAddress: '',
-  contractName: '',
-  contractPaperUrl: '',
   selectedProducts: [],
 };

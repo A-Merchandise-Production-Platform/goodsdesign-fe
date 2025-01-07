@@ -9,7 +9,7 @@ import {
 export default function Page() {
   return (
     <div className="pt-10">
-      <Card className="mx-auto max-w-4xl">
+      <Card className="mx-auto max-w-5xl">
         <CardHeader>
           <CardTitle className="text-2xl">Register Factory Owner</CardTitle>
           <CardDescription>
