@@ -47,7 +47,7 @@ export default function AccountForm() {
               <Input placeholder="Nguyen Van A" {...field} />
             </FormControl>
 
-            {formState.errors.email ? (
+            {formState.errors.userName ? (
               <FormMessage />
             ) : (
               <FormDescription>This is the name in the system.</FormDescription>
@@ -57,7 +57,7 @@ export default function AccountForm() {
       />
       <FormField
         control={control}
-        name="userName"
+        name="phoneNumber"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Phone number</FormLabel>
@@ -69,7 +69,7 @@ export default function AccountForm() {
               />
             </FormControl>
 
-            {formState.errors.email ? (
+            {formState.errors.phoneNumber ? (
               <FormMessage />
             ) : (
               <FormDescription>This is the name in the system.</FormDescription>
