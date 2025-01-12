@@ -78,10 +78,10 @@ export default function ProductManagement() {
       expand: ['category'],
     };
     const response = await ProductApi.getAll(options);
-    if (response.isSuccess) {
-      setProducts(response.data);
+    if (true) {
+      setProducts(response.value);
     } else {
-      toast.error(response.message || 'Failed to fetch products');
+      toast.error('Failed to fetch products');
     }
     setLoading(false);
   };
