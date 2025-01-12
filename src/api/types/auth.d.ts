@@ -21,3 +21,24 @@ export interface LoginPayload {
 export interface LoginResponse extends ApiResponse<Tokens> {}
 
 export interface GetMeResponse extends ApiResponse<User> {}
+
+export interface RegisterFOPayload {
+  email: string;
+  password: string;
+  userName: string;
+  phoneNumber: string;
+  factoryName: string;
+  factoryContactPerson: string;
+  factoryContactPhone: string;
+  factoryAddress: string;
+  contractName: string;
+  contractPaperUrl: string;
+  selectedProducts: SelectedProduct[];
+}
+
+interface SelectedProduct {
+  productId: string;
+  productionCapacity: number;
+}
+
+export interface RegisterFOResponse extends ApiResponse<null> {}

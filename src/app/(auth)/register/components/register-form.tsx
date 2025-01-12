@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
-import { authApi } from '@/api/auth';
+import { AuthApi } from '@/api/auth';
 import { RegisterResponse } from '@/api/types/auth';
 import { Button } from '@/components/ui/button';
 import {
@@ -56,7 +56,7 @@ export default function RegisterForm() {
   });
 
   const mutation = useMutation({
-    mutationFn: authApi.register,
+    mutationFn: AuthApi.register,
     onError: (error: AxiosError<RegisterResponse>) => {
       toast.error(error.response?.data.message);
     },

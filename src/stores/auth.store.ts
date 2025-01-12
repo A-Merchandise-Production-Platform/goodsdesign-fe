@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { authApi } from '@/api/auth';
+import { AuthApi } from '@/api/auth';
 import { AuthUser } from '@/types/user';
 
 interface AuthStoreState {
@@ -33,13 +33,13 @@ export const useAuthStore = create<AuthStoreState>()(
       login: async (accessToken: string, refreshToken: string) => {
         set({ accessToken, refreshToken });
         if (accessToken && refreshToken) {
-          authApi.getMe().then(response => {
+          AuthApi.getMe().then(response => {
             set({ isAuth: true, user: response.data });
           });
         }
       },
       logout: async () => {
-        await authApi.logout();
+        await AuthApi.logout();
         set({
           isAuth: false,
           user: undefined,
@@ -51,8 +51,7 @@ export const useAuthStore = create<AuthStoreState>()(
       refreshUser: async () => {
         const state = get();
         if (state.accessToken && state.refreshToken) {
-          authApi
-            .getMe()
+          AuthApi.getMe()
             .then(response => {
               set({ isAuth: true, user: response.data });
             })

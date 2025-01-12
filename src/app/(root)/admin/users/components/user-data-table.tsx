@@ -26,7 +26,7 @@ export default function UserDataTable() {
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
             <SearchInput />
-            <FilterButton />
+            {/* <FilterButton /> */}
           </div>
 
           <div className="flex gap-2">

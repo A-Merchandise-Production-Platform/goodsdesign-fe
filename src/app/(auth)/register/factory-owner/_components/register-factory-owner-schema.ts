@@ -18,15 +18,18 @@ const RegisterFOSchema = z
           productionCapacity: z
             .number()
             .min(0, 'Production capacity must be non-negative.'),
-          estimatedProductionTimwe: z
-            .number()
-            .min(0, 'Estimated production time must be non-negative.'),
         }),
       )
       .min(1, 'At least one product must be selected.'),
+    agree: z.boolean(),
   })
   .refine(data => data.password === data.confirmPassword, {
     message: 'Passwords do not match.',
+    path: ['confirmPassword'],
+  })
+  .refine(data => data.agree, {
+    message: 'You must agree to the terms and conditions.',
+    path: ['agree'],
   });
 
 export default RegisterFOSchema;
@@ -42,4 +45,5 @@ export const initialRegisterFOValues: RegisterFOType = {
   factoryName: '',
   factoryAddress: '',
   selectedProducts: [],
+  agree: false,
 };

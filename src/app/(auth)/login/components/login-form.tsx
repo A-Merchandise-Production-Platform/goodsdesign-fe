@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
-import { authApi } from '@/api/auth';
+import { AuthApi } from '@/api/auth';
 import { LoginResponse } from '@/api/types/auth';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,7 +40,7 @@ export default function LoginForm() {
     },
   });
   const mutation = useMutation({
-    mutationFn: authApi.login,
+    mutationFn: AuthApi.login,
     onError: (error: AxiosError<LoginResponse>) => {
       console.error(error);
       toast.error(error.response?.data.message);

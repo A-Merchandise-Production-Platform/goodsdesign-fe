@@ -4,7 +4,7 @@ import axios, {
   InternalAxiosRequestConfig,
 } from 'axios';
 
-import { authApi } from '@/api/auth';
+import { AuthApi } from '@/api/auth';
 import { useAuthStore } from '@/stores/auth.store';
 
 const baseUrl = process.env.API_URL;
@@ -47,7 +47,7 @@ axiosInstance.interceptors.response.use(
       try {
         const { refreshToken } = useAuthStore.getState();
         if (refreshToken) {
-          const response = await authApi.refreshToken(refreshToken);
+          const response = await AuthApi.refreshToken(refreshToken);
 
           useAuthStore.setState({
             accessToken: response.data.accessToken,

@@ -1,6 +1,6 @@
 import { useFormContext } from 'react-hook-form';
 
-import CategorySelect from '@/app/(auth)/register/factory-owner/_components/category-select';
+import ProductSelect from '@/app/(auth)/register/factory-owner/_components/product-select';
 import { RegisterFOType } from '@/app/(auth)/register/factory-owner/_components/register-factory-owner-schema';
 import {
   FormControl,
@@ -14,7 +14,6 @@ import { Input } from '@/components/ui/input';
 
 export default function FactoryForm() {
   const { control, formState } = useFormContext<RegisterFOType>();
-
   return (
     <div className="space-y-6 rounded-lg border p-4">
       <FormField
@@ -30,7 +29,9 @@ export default function FactoryForm() {
             {formState.errors.factoryName ? (
               <FormMessage />
             ) : (
-              <FormDescription>This is name or your factory.</FormDescription>
+              <FormDescription>
+                This is the name of your factory.
+              </FormDescription>
             )}
           </FormItem>
         )}
@@ -49,13 +50,32 @@ export default function FactoryForm() {
               <FormMessage />
             ) : (
               <FormDescription>
-                This is address or your factory.
+                This is the address of your factory.
               </FormDescription>
             )}
           </FormItem>
         )}
       />
-      <CategorySelect />
+      <FormField
+        control={control}
+        name="selectedProducts"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Products</FormLabel>
+            <FormControl>
+              <ProductSelect onSelect={field.onChange} value={field.value} />
+            </FormControl>
+
+            {formState.errors.selectedProducts ? (
+              <FormMessage />
+            ) : (
+              <FormDescription>
+                These are the products that your factory will produce.
+              </FormDescription>
+            )}
+          </FormItem>
+        )}
+      />
     </div>
   );
 }

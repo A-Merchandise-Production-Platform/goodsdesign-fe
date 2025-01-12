@@ -3,11 +3,12 @@ import {
   GetMeResponse,
   LoginPayload,
   LoginResponse,
+  RegisterFOPayload,
   RegisterPayload,
   RegisterResponse,
 } from '@/api/types/auth';
 
-export namespace authApi {
+export namespace AuthApi {
   export async function register(
     payload: RegisterPayload,
   ): Promise<RegisterResponse> {
@@ -49,5 +50,13 @@ export namespace authApi {
 
   export async function logout(): Promise<void> {
     await axiosInstance.post('/auth/logout');
+  }
+
+  export async function registerFactoryOwner(payload: RegisterFOPayload) {
+    const response = await axiosInstance.post<RegisterFOPayload>(
+      '/auth/register-factory-owner',
+      payload,
+    );
+    return response.data;
   }
 }
