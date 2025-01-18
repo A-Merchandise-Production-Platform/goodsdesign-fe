@@ -20,6 +20,14 @@ const buttonVariants = cva(
           'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
+        'outline-info':
+          'border border-blue-500 text-blue-800 bg-blue-200 shadow-sm hover:bg-blue-300 dark:bg-blue-800 dark:border-blue-500 dark:text-blue-200 dark:hover:bg-blue-700 dark:hover:text-blue-100',
+        'outline-success':
+          ' border border-green-500 text-green-800 bg-green-200 shadow-sm hover:bg-green-300 dark:bg-green-800 dark:border-green-500 dark:text-green-200 dark:hover:bg-green-700 dark:hover:text-green-100',
+        'outline-warning':
+          '  border border-yellow-500 text-yellow-800 bg-yellow-200 shadow-sm hover:bg-yellow-300 dark:bg-yellow-800 dark:border-yellow-500 dark:text-yellow-200 dark:hover:bg-yellow-700 dark:hover:text-yellow-100',
+        'outline-danger':
+          ' border border-red-500 text-red-800 bg-red-200 shadow-sm hover:bg-red-300 dark:bg-red-800 dark:border-red-500 dark:text-red-200 dark:hover:bg-red-700 dark:hover:text-red-100',
       },
       size: {
         default: 'h-9 px-4 py-2',

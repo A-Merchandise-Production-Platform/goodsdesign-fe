@@ -1,4 +1,5 @@
 'use client';
+import { RefreshCwIcon } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 import { ColumnSelector } from '@/app/(root)/admin/users/components/column-selector';
@@ -9,6 +10,8 @@ import { TablePagination } from '@/app/(root)/admin/users/components/table-pagin
 import { useUser } from '@/app/(root)/admin/users/hooks/use-user';
 import { useUserPaging } from '@/app/(root)/admin/users/hooks/use-user-paging';
 import { useColumnStore } from '@/app/(root)/admin/users/stores/use-user-column.store';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const CreateUserButton = dynamic(
   () => import('@/app/(root)/admin/users/components/create/create-user-button'),
@@ -30,6 +33,15 @@ export default function UserDataTable() {
           </div>
 
           <div className="flex gap-2">
+            <Button
+              variant={'outline'}
+              onClick={() => refetch()}
+              className="border-dashed"
+            >
+              <RefreshCwIcon
+                className={cn('h-5 w-5', isLoading && 'animate-spin')}
+              />
+            </Button>
             <CreateUserButton refresh={refetch} />
             <ColumnSelector />
           </div>

@@ -14,6 +14,11 @@ export namespace UserApi {
     return response.data;
   }
 
+  export async function getUserById(id: string) {
+    const response = await axiosInstance.get<User>(`/users/${id}?$expand=role`);
+    return response.data;
+  }
+
   export async function create(payload: CreateUserDto) {
     const response = await axiosInstance.post<ApiResponse<User>>(
       `/users?role=${payload.role?.toUpperCase() || 'CUSTOMER'}`,
