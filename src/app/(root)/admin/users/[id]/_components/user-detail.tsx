@@ -19,8 +19,6 @@ export default function UserDetail({ id }: UserDetailProps) {
     queryFn: () => UserApi.getUserById(id),
   });
 
-  console.log(data);
-
   if (!data && isError) {
     return <div>Error...</div>;
   }

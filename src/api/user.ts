@@ -26,4 +26,11 @@ export namespace UserApi {
     );
     return response.data;
   }
+
+  export async function deleteUser(id: string) {
+    const response = await axiosInstance.delete<ApiResponse<null>>(
+      `/users/${id}`,
+    );
+    return response.data;
+  }
 }

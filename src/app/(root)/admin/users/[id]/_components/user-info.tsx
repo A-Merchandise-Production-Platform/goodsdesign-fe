@@ -16,6 +16,7 @@ import {
 import React from 'react';
 
 import { User } from '@/api/types/user';
+import DeleteUserButton from '@/app/(root)/admin/users/[id]/_components/delete-user-button';
 import EditUserButton from '@/app/(root)/admin/users/[id]/_components/edit-user-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -132,11 +133,8 @@ export default function UserInfo({ user }: UserInfoProps) {
         <Separator className="my-4" />
         <div className="flex w-full items-center justify-end">
           <div className="flex items-center gap-4">
-            <Button variant={'outline-danger'} className="" onClick={() => {}}>
-              <TrashIcon size={16} />
-              Delete User
-            </Button>
-            {user.isActive ? (
+            <DeleteUserButton id={user.id} userName={user.userName} />
+            {/* {user.isActive ? (
               <Button
                 variant={'outline-warning'}
                 className=""
@@ -154,7 +152,7 @@ export default function UserInfo({ user }: UserInfoProps) {
                 <CheckCheck size={16} />
                 Active User
               </Button>
-            )}
+            )} */}
             <EditUserButton />
           </div>
         </div>

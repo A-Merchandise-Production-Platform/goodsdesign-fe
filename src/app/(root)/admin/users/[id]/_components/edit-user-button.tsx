@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 
 export default function EditUserButton() {
   return (
-    <Button variant={'outline-info'}>
+    <Button variant={'outline'}>
       <PenBoxIcon size={16} />
       Edit
     </Button>
