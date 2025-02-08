@@ -13,7 +13,7 @@ export default function Page() {
           { label: 'Users' },
         ]}
       />
-      <ScrollArea className="flex-grow">
+      <ScrollArea className="grow">
         <div className="p-4">
           <h1 className="mb-4 text-2xl font-bold">User Management</h1>
           <UserDataTable />

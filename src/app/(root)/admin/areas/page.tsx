@@ -13,7 +13,7 @@ export default function AreasPage() {
           { label: 'Areas' },
         ]}
       />
-      <ScrollArea className="flex-grow">
+      <ScrollArea className="grow">
         <div className="p-4">
           <h1 className="mb-4 text-2xl font-bold">Area Management</h1>
           <AreaDataTable />

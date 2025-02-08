@@ -23,7 +23,7 @@ export default function page({
           { label: 'User Detail' },
         ]}
       />
-      <ScrollArea className="flex-grow">
+      <ScrollArea className="grow">
         <div className="space-y-4 p-4">
           <GoBackButton />
           <h1 className="text-2xl font-bold">User Detail</h1>
