@@ -6,17 +6,17 @@ interface ModelViewerProps {
   modelUrl: string;
 }
 
-function Model({ modelUrl }: ModelViewerProps) {
-  const { scene } = useGLTF(modelUrl);
-  return <primitive object={scene} scale={1} />;
-}
+// function Model({ modelUrl }: ModelViewerProps) {
+//   const { scene } = useGLTF(modelUrl);
+//   return <primitive object={scene} scale={1} />;
+// }
 
 export default function ModelViewer({ modelUrl }: ModelViewerProps) {
   const [hasError, setHasError] = useState(false);
 
   return (
     <div className="h-[500px] w-full">
-      <Canvas>
+      {/* <Canvas>
         <ambientLight intensity={0.5} />
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
         <pointLight position={[-10, -10, -10]} />
@@ -39,7 +39,7 @@ export default function ModelViewer({ modelUrl }: ModelViewerProps) {
 
         <Environment preset="sunset" />
         <OrbitControls />
-      </Canvas>
+      </Canvas> */}
     </div>
   );
 }
