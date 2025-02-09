@@ -31,6 +31,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useEffect, useState } from 'react';
+import { useDebounce } from '@/hooks/use-debounce';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -55,16 +57,20 @@ export function UserDataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const table = useUserTable(data as User[], pageCount, onSortingChange);
 
+  const [searchValue, setSearchValue] = useState('');
+  const debouncedSearchValue = useDebounce(searchValue, 500);
+
+  useEffect(() => {
+    onGlobalFilterChange(debouncedSearchValue);
+  }, [debouncedSearchValue, onGlobalFilterChange]);
+
   return (
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-          onChange={event => {
-            table.getColumn('email')?.setFilterValue(event.target.value);
-            onGlobalFilterChange(event.target.value);
-          }}
+          placeholder="Search users..."
+          value={searchValue}
+          onChange={event => setSearchValue(event.target.value)}
           className="max-w-sm"
         />
 
@@ -123,7 +129,7 @@ export function UserDataTable<TData, TValue>({
                   Loading...
                 </TableCell>
               </TableRow>
-            ) : (table.getRowModel().rows?.length ? (
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map(row => (
                 <TableRow
                   key={row.id}
@@ -148,7 +154,7 @@ export function UserDataTable<TData, TValue>({
                   No results.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </div>
