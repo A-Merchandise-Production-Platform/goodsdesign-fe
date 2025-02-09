@@ -39,7 +39,7 @@ export namespace AuthApi {
     refreshToken: string,
   ): Promise<LoginResponse> {
     const response = await axiosInstance.post<LoginResponse>(
-      '/auth/refresh-tokens',
+      '/auth/refresh-token',
       {
         refreshToken,
       },

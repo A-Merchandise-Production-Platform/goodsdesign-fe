@@ -45,4 +45,18 @@ function Badge({ className, variant, ...props }: BadgeProps) {
   );
 }
 
+export type BadgeVariant =
+  | 'default'
+  | 'secondary'
+  | 'destructive'
+  | 'outline'
+  | 'success'
+  | 'admin'
+  | 'manager'
+  | 'staff'
+  | 'factoryOwner'
+  | 'customer'
+  | null
+  | undefined;
+
 export { Badge, badgeVariants };
