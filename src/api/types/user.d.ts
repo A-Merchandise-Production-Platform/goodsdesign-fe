@@ -1,5 +1,3 @@
-import { ODataQuery } from 'odata-query';
-
 export interface User {
   id: string;
   userName: string;

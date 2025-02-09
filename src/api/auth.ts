@@ -30,7 +30,7 @@ export namespace AuthApi {
   }
 
   export async function getMe(): Promise<GetMeResponse> {
-    const response = await axiosInstance.get<GetMeResponse>('/user/me');
+    const response = await axiosInstance.get<GetMeResponse>('/me');
 
     return response.data;
   }

@@ -54,14 +54,10 @@ export const userColumns: ColumnDef<User>[] = [
       return (
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger className="flex items-center gap-2 text-left text-muted-foreground transition-colors hover:text-primary">
-              <Button
-                variant={'ghost'}
-                className="p-0"
-                onClick={copyToClipboard}
-              >
+            <TooltipTrigger className="text-muted-foreground hover:text-primary flex items-center gap-2 text-left transition-colors">
+              <p className="p-0" onClick={copyToClipboard}>
                 <CopyIcon className="h-4 w-4" />
-              </Button>
+              </p>
               <Link
                 className="line-clamp-1 min-w-32"
                 href={`/admin/users/${row.original.id}`}
@@ -103,7 +99,7 @@ export const userColumns: ColumnDef<User>[] = [
     header: 'Email',
     accessorKey: 'email',
     cell: ({ row }) => (
-      <div className="line-clamp-1 truncate text-sm text-muted-foreground">
+      <div className="text-muted-foreground line-clamp-1 truncate text-sm">
         {row.original.email}
       </div>
     ),
