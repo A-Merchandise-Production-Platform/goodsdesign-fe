@@ -9,9 +9,18 @@ export function useUsersQuery(
   searchTerm: string,
   sortField: string | undefined,
   sortOrder: 'asc' | 'desc' | undefined,
+  roles: string[],
 ) {
   return useQuery({
-    queryKey: ['users', page, pageSize, searchTerm, sortField, sortOrder],
+    queryKey: [
+      'users',
+      page,
+      pageSize,
+      searchTerm,
+      sortField,
+      sortOrder,
+      roles,
+    ],
     queryFn: () =>
       UserApi.getUsers({
         count: true,
@@ -37,9 +46,16 @@ export function useUsersQuery(
         orderBy: sortField
           ? [[sortField as keyof User, sortOrder ?? 'asc']]
           : [['createdAt', 'desc']],
-        filter: searchTerm
-          ? `contains(email, '${searchTerm}') or contains(userName, '${searchTerm}')`
-          : undefined,
+        filter: [
+          ...(searchTerm
+            ? [
+                `contains(email, '${searchTerm}') or contains(userName, '${searchTerm}')`,
+              ]
+            : []),
+          ...(roles.length > 0
+            ? [`role/name in (${roles.map(role => `'${role}'`).join(',')})`]
+            : []),
+        ].join(' and '),
       }),
   });
 }

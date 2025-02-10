@@ -5,6 +5,7 @@ import {
   flexRender,
   SortingState,
 } from '@tanstack/react-table';
+import { useEffect, useState } from 'react';
 
 import type { User } from '@/api/types/user';
 import { useUserTable } from '@/app/(root)/admin/users/_hooks/use-user-table';
@@ -31,8 +32,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useEffect, useState } from 'react';
 import { useDebounce } from '@/hooks/use-debounce';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Filter } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -43,7 +51,10 @@ interface DataTableProps<TData, TValue> {
   onGlobalFilterChange: (value: string) => void;
   totalUsers: number;
   onSortingChange: (sorting: SortingState) => void;
+  onRolesChange: (roles: string[]) => void;
 }
+
+const ROLES = ['admin', 'manager', 'staff', 'factoryOwner', 'customer'];
 
 export function UserDataTable<TData, TValue>({
   columns,
@@ -54,8 +65,10 @@ export function UserDataTable<TData, TValue>({
   onGlobalFilterChange,
   totalUsers,
   onSortingChange,
+  onRolesChange,
 }: DataTableProps<TData, TValue>) {
   const table = useUserTable(data as User[], pageCount, onSortingChange);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>(ROLES);
 
   const [searchValue, setSearchValue] = useState('');
   const debouncedSearchValue = useDebounce(searchValue, 500);
@@ -63,6 +76,16 @@ export function UserDataTable<TData, TValue>({
   useEffect(() => {
     onGlobalFilterChange(debouncedSearchValue);
   }, [debouncedSearchValue, onGlobalFilterChange]);
+
+  useEffect(() => {
+    onRolesChange(selectedRoles);
+  }, [selectedRoles, onRolesChange]);
+
+  const handleRoleToggle = (role: string) => {
+    setSelectedRoles(prev =>
+      prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role],
+    );
+  };
 
   return (
     <div>
@@ -73,6 +96,36 @@ export function UserDataTable<TData, TValue>({
           onChange={event => setSearchValue(event.target.value)}
           className="max-w-sm"
         />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="ml-2">
+              <Filter className="mr-2 h-4 w-4" />
+              Filter
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80" align={'start'}>
+            <div className="grid gap-4">
+              <div className="space-y-2">
+                <h4 className="leading-none font-medium">Roles</h4>
+                <p className="text-muted-foreground text-sm">
+                  Select the roles you want to filter by.
+                </p>
+              </div>
+              <div className="grid gap-2">
+                {ROLES.map(role => (
+                  <div key={role} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={role}
+                      checked={selectedRoles.includes(role)}
+                      onCheckedChange={() => handleRoleToggle(role)}
+                    />
+                    <Label htmlFor={role}>{role}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

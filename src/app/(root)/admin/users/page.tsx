@@ -14,6 +14,13 @@ export default function Page() {
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([
+    'admin',
+    'manager',
+    'staff',
+    'factoryOwner',
+    'customer',
+  ]);
 
   const { data, isLoading } = useUsersQuery(
     page,
@@ -21,6 +28,7 @@ export default function Page() {
     searchTerm,
     sorting.length > 0 ? sorting[0].id : undefined,
     sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
+    selectedRoles,
   );
 
   const handlePaginationChange = (newPage: number, newPageSize: number) => {
@@ -35,6 +43,11 @@ export default function Page() {
 
   const handleSortingChange = (newSorting: SortingState) => {
     setSorting(newSorting);
+    setPage(1);
+  };
+
+  const handleRolesChange = (roles: string[]) => {
+    setSelectedRoles(roles);
     setPage(1);
   };
 
@@ -57,6 +70,7 @@ export default function Page() {
             onPaginationChange={handlePaginationChange}
             onGlobalFilterChange={handleGlobalFilterChange}
             onSortingChange={handleSortingChange}
+            onRolesChange={handleRolesChange}
             totalUsers={data?.['@odata.count'] ?? 0}
           />
         </div>
