@@ -84,7 +84,9 @@ export function UserDataTable<TData, TValue>({
 
   const handleRoleToggle = useCallback((role: string) => {
     setSelectedRoles(previous =>
-      previous.includes(role) ? previous.filter(r => r !== role) : [...previous, role],
+      previous.includes(role)
+        ? previous.filter(r => r !== role)
+        : [...previous, role],
     );
   }, []);
 
@@ -184,7 +186,7 @@ export function UserDataTable<TData, TValue>({
                   Loading...
                 </TableCell>
               </TableRow>
-            ) : (table.getRowModel().rows?.length ? (
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map(row => (
                 <TableRow
                   key={row.id}
@@ -209,7 +211,7 @@ export function UserDataTable<TData, TValue>({
                   No results.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </div>

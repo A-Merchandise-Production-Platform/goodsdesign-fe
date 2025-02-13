@@ -34,7 +34,7 @@ export const columns: ColumnDef<Area>[] = [
       return (
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger className="flex items-center gap-2 text-left text-muted-foreground transition-colors hover:text-primary">
+            <TooltipTrigger className="text-muted-foreground hover:text-primary flex items-center gap-2 text-left transition-colors">
               <Button
                 variant={'ghost'}
                 className="p-0"
