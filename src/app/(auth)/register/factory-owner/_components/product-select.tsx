@@ -100,7 +100,7 @@ export default function ProductSelect({ onSelect, value }: ProductSelectProps) {
             Add Product
           </Button>
         </DialogTrigger>
-        <DialogContent hideCloseButton>
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Select Product for your factory</DialogTitle>
             <DialogDescription>
@@ -124,7 +124,7 @@ export default function ProductSelect({ onSelect, value }: ProductSelectProps) {
                   className="aspect-square w-full rounded object-cover"
                 />
               ) : (
-                <div className="aspect-square w-full rounded bg-muted"></div>
+                <div className="bg-muted aspect-square w-full rounded"></div>
               )}
             </div>
             <div className="mt-4 flex gap-4">
@@ -204,7 +204,7 @@ export default function ProductSelect({ onSelect, value }: ProductSelectProps) {
         {selectedProducts.map(item => (
           <div
             key={item.productId}
-            className="flex items-center justify-between rounded-md border bg-background pl-2 text-sm"
+            className="bg-background flex items-center justify-between rounded-md border pl-2 text-sm"
           >
             <span>
               {products.find(p => p.id === item.productId)?.name} -{' '}

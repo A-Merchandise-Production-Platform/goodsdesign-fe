@@ -12,7 +12,7 @@ import {
 export default function Page() {
   return (
     <div className="pt-10">
-      <Card className="mx-auto max-w-lg">
+      <Card className="bg-background mx-auto max-w-lg border-none shadow-none">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>Login to access the system</CardDescription>
@@ -21,7 +21,7 @@ export default function Page() {
           <LoginForm />
         </CardContent>
         <CardFooter className="text-sm">
-          <span className="mr-2 text-sm text-muted-foreground">
+          <span className="text-muted-foreground mr-2 text-sm">
             Dont have an account?{' '}
           </span>
           <Link href="/register" className="text-blue-500">
