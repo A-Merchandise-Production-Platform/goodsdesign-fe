@@ -1,7 +1,7 @@
 'use client';
 
 import { SortingState } from '@tanstack/react-table';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { DynamicAdminHeader } from '@/app/(root)/admin/components/dynamic-admin-header';
 import { userColumns } from '@/app/(root)/admin/users/_components/columns';
@@ -9,18 +9,14 @@ import { UserDataTable } from '@/app/(root)/admin/users/_components/user-data-ta
 import { useUsersQuery } from '@/app/(root)/admin/users/_hooks/use-users-query';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
+const INITIAL_ROLES = ['admin', 'manager', 'staff', 'factoryOwner', 'customer'];
+
 export default function Page() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [selectedRoles, setSelectedRoles] = useState<string[]>([
-    'admin',
-    'manager',
-    'staff',
-    'factoryOwner',
-    'customer',
-  ]);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>(INITIAL_ROLES);
 
   const { data, isLoading } = useUsersQuery(
     page,
@@ -31,25 +27,28 @@ export default function Page() {
     selectedRoles,
   );
 
-  const handlePaginationChange = (newPage: number, newPageSize: number) => {
-    setPage(newPage);
-    setPageSize(newPageSize);
-  };
+  const handlePaginationChange = useCallback(
+    (newPage: number, newPageSize: number) => {
+      setPage(newPage);
+      setPageSize(newPageSize);
+    },
+    [],
+  );
 
-  const handleGlobalFilterChange = (value: string) => {
+  const handleGlobalFilterChange = useCallback((value: string) => {
     setSearchTerm(value);
     setPage(1);
-  };
+  }, []);
 
-  const handleSortingChange = (newSorting: SortingState) => {
+  const handleSortingChange = useCallback((newSorting: SortingState) => {
     setSorting(newSorting);
     setPage(1);
-  };
+  }, []);
 
-  const handleRolesChange = (roles: string[]) => {
+  const handleRolesChange = useCallback((roles: string[]) => {
     setSelectedRoles(roles);
     setPage(1);
-  };
+  }, []);
 
   return (
     <div className="flex h-screen flex-col">

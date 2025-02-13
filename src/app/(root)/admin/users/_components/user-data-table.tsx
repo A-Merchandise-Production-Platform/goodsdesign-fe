@@ -5,11 +5,14 @@ import {
   flexRender,
   SortingState,
 } from '@tanstack/react-table';
-import { useEffect, useState } from 'react';
+import { Filter } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { User } from '@/api/types/user';
+import CreateUserDialog from '@/app/(root)/admin/users/_components/create-user-dialog';
 import { useUserTable } from '@/app/(root)/admin/users/_hooks/use-user-table';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -17,6 +20,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -33,14 +42,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useDebounce } from '@/hooks/use-debounce';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Filter } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -81,11 +82,11 @@ export function UserDataTable<TData, TValue>({
     onRolesChange(selectedRoles);
   }, [selectedRoles, onRolesChange]);
 
-  const handleRoleToggle = (role: string) => {
-    setSelectedRoles(prev =>
-      prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role],
+  const handleRoleToggle = useCallback((role: string) => {
+    setSelectedRoles(previous =>
+      previous.includes(role) ? previous.filter(r => r !== role) : [...previous, role],
     );
-  };
+  }, []);
 
   return (
     <div>
@@ -127,6 +128,7 @@ export function UserDataTable<TData, TValue>({
           </PopoverContent>
         </Popover>
 
+        <CreateUserDialog />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -182,7 +184,7 @@ export function UserDataTable<TData, TValue>({
                   Loading...
                 </TableCell>
               </TableRow>
-            ) : table.getRowModel().rows?.length ? (
+            ) : (table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map(row => (
                 <TableRow
                   key={row.id}
@@ -207,7 +209,7 @@ export function UserDataTable<TData, TValue>({
                   No results.
                 </TableCell>
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
       </div>
