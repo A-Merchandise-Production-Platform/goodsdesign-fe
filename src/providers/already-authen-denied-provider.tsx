@@ -19,7 +19,7 @@ export default function AlreadyAuthenProvider({
 
   if (isAuth) {
     return (
-      <div className="fixed bottom-0 left-0 right-0 top-0 z-0 flex w-full items-center justify-center">
+      <div className="fixed top-0 right-0 bottom-0 left-0 z-0 flex w-full items-center justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -28,10 +28,10 @@ export default function AlreadyAuthenProvider({
           <Card className="w-full max-w-md overflow-hidden border-none bg-transparent shadow-none">
             <CardContent className="p-6">
               <div className="flex flex-col items-center">
-                <h1 className="select-none text-9xl font-bold text-primary/50">
+                <h1 className="text-primary/50 text-9xl font-bold select-none">
                   403
                 </h1>
-                <h1 className="mt-2 text-center text-lg text-primary/50">
+                <h1 className="text-primary/50 mt-2 text-center text-lg">
                   You are already Authenticated
                 </h1>
 

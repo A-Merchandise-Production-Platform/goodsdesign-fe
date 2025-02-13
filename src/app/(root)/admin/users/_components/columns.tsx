@@ -37,11 +37,11 @@ const SortableHeader = ({ column, title }: { column: any; title: string }) => {
       {title}
       {column.getIsSorted() === 'asc' ? (
         <ArrowUp className="ml-2 h-4 w-4" />
-      ) : (column.getIsSorted() === 'desc' ? (
+      ) : column.getIsSorted() === 'desc' ? (
         <ArrowDown className="ml-2 h-4 w-4" />
       ) : (
         <ArrowUpDown className="ml-2 h-4 w-4" />
-      ))}
+      )}
     </Button>
   );
 };

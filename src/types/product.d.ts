@@ -10,4 +10,3 @@ export interface Product {
   category: Category;
   isDeleted: boolean;
 }
-

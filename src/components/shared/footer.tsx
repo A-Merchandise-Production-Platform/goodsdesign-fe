@@ -3,9 +3,9 @@ import React from 'react';
 
 export default function Footer() {
   return (
-    <section className="fixed bottom-0 left-0 right-0 h-6 w-screen border-t p-1 backdrop-blur-md">
+    <section className="fixed right-0 bottom-0 left-0 h-6 w-screen border-t p-1 backdrop-blur-md">
       <footer className="flex h-full w-full items-center justify-center">
-        <p className="select-none text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-xs select-none">
           &copy; 2024{' '}
           <Link href="/" className="underline">
             GoodsDesign

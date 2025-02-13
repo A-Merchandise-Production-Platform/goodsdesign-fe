@@ -18,14 +18,14 @@ export function DataTableSkeleton({
   rowCount = 5,
 }: DataTableSkeletonProps) {
   return (
-    <div className="rounded-md border border-border">
+    <div className="border-border rounded-md border">
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-muted/50">
             {Array.from({ length: columnCount }).map((_, index) => (
               <TableHead
                 key={index}
-                className="border-b border-r border-border transition-colors last:border-r-0 hover:bg-muted/50"
+                className="border-border hover:bg-muted/50 border-r border-b transition-colors last:border-r-0"
               >
                 <Skeleton className="h-6 w-full" />
               </TableHead>
@@ -38,7 +38,7 @@ export function DataTableSkeleton({
               {Array.from({ length: columnCount }).map((_, cellIndex) => (
                 <TableCell
                   key={cellIndex}
-                  className="border-r border-border last:border-r-0"
+                  className="border-border border-r last:border-r-0"
                 >
                   <Skeleton className="h-6 w-full" />
                 </TableCell>
