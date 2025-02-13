@@ -9,7 +9,7 @@ import {
 export default function Page() {
   return (
     <div className="pt-10">
-      <Card className="mx-auto max-w-5xl">
+      <Card className="bg-background mx-auto max-w-5xl border-none shadow-none">
         <CardHeader>
           <CardTitle className="text-2xl">Register Factory Owner</CardTitle>
           <CardDescription>
