@@ -93,68 +93,74 @@ export function UserDataTable<TData, TValue>({
   return (
     <div>
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Search users..."
-          value={searchValue}
-          onChange={event => setSearchValue(event.target.value)}
-          className="max-w-sm"
-        />
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="ml-2">
-              <Filter className="mr-2 h-4 w-4" />
-              Filter
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80" align={'start'}>
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <h4 className="leading-none font-medium">Roles</h4>
-                <p className="text-muted-foreground text-sm">
-                  Select the roles you want to filter by.
-                </p>
+        <div className="flex flex-1 items-center gap-2">
+          <Input
+            placeholder="Search users..."
+            value={searchValue}
+            onChange={event => setSearchValue(event.target.value)}
+            className="max-w-sm"
+          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                <Filter className="mr-2 h-4 w-4" />
+                Filter
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80" align={'start'}>
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <h4 className="leading-none font-medium">Roles</h4>
+                  <p className="text-muted-foreground text-sm">
+                    Select the roles you want to filter by.
+                  </p>
+                </div>
+                <div className="grid gap-2">
+                  {ROLES.map(role => (
+                    <div key={role} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={role}
+                        checked={selectedRoles.includes(role)}
+                        onCheckedChange={() => handleRoleToggle(role)}
+                      />
+                      <Label htmlFor={role}>{role}</Label>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="grid gap-2">
-                {ROLES.map(role => (
-                  <div key={role} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={role}
-                      checked={selectedRoles.includes(role)}
-                      onCheckedChange={() => handleRoleToggle(role)}
-                    />
-                    <Label htmlFor={role}>{role}</Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
+            </PopoverContent>
+          </Popover>
+        </div>
 
-        <CreateUserDialog />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter(column => column.getCanHide())
-              .map(column => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={value => column.toggleVisibility(!!value)}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-2">
+          <CreateUserDialog />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter(column => column.getCanHide())
+                .map(column => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={value =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>

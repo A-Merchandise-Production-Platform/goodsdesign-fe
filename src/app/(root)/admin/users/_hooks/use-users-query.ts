@@ -57,5 +57,6 @@ export function useUsersQuery(
             : []),
         ].join(' and '),
       }),
+    enabled: !!page && !!pageSize,
   });
 }

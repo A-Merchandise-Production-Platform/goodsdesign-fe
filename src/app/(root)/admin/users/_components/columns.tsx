@@ -32,13 +32,13 @@ const SortableHeader = ({ column, title }: { column: any; title: string }) => {
     <Button
       variant="ghost"
       onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      className="p-0"
+      type="button"
     >
       {title}
       {column.getIsSorted() === 'asc' ? (
-        <ArrowUp className="ml-2 h-4 w-4" />
-      ) : column.getIsSorted() === 'desc' ? (
         <ArrowDown className="ml-2 h-4 w-4" />
+      ) : column.getIsSorted() === 'desc' ? (
+        <ArrowUp className="ml-2 h-4 w-4" />
       ) : (
         <ArrowUpDown className="ml-2 h-4 w-4" />
       )}

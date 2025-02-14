@@ -79,7 +79,7 @@ export default function CreateUserDialog() {
     <div>
       <Dialog>
         <DialogTrigger asChild>
-          <Button>
+          <Button type="button" variant={'outline'} className="border-dashed">
             <PlusCircleIcon className="mr-2" />
             Create User
           </Button>
@@ -176,7 +176,7 @@ export default function CreateUserDialog() {
                           <Button
                             variant={'outline'}
                             className={cn(
-                              'w-[240px] pl-3 text-left font-normal',
+                              'pl-3 text-left font-normal',
                               !field.value && 'text-muted-foreground',
                             )}
                           >
@@ -244,7 +244,9 @@ export default function CreateUserDialog() {
                   </FormItem>
                 )}
               />
-              <Button type="submit">Submit</Button>
+              <Button type="submit" className="w-full">
+                Submit
+              </Button>
             </form>
           </Form>
         </DialogContent>
