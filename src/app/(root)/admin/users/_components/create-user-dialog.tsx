@@ -42,15 +42,22 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { ROLES } from '@/constant/role';
+import { useMutation } from '@tanstack/react-query';
+import { UserApi } from '@/api/user';
+import { toast } from 'sonner';
+import { useUsersQuery } from '@/app/(root)/admin/users/_hooks/use-users-query';
+import { AxiosError } from 'axios';
+import { ApiResponse } from '@/api/types';
+import { User } from '@/api/types/user';
 
 const createUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
-  userName: z.string(),
-  phoneNumber: z.string(),
+  userName: z.string().min(3),
+  phoneNumber: z.string().min(10),
   dateOfBirth: z.date(),
-  imageUrl: z.string().url(),
-  role: z.string(),
+  role: z.string().min(3, 'Please select a role'),
 });
 
 export default function CreateUserDialog() {
@@ -64,27 +71,42 @@ export default function CreateUserDialog() {
       userName: '',
       phoneNumber: '',
       dateOfBirth: new Date(),
-      imageUrl: '',
       role: '',
     },
   });
 
   const onSubmit = (payload: z.infer<typeof createUserSchema>) => {
-    console.log(payload);
+    mutation.mutateAsync(payload);
   };
+
+  const mutation = useMutation({
+    mutationFn: UserApi.create,
+    onSuccess: () => {
+      toast.success('User created successfully');
+      setIsDialogOpen(false);
+    },
+    onError: (error: AxiosError<ApiResponse<null>>) => {
+      toast.error(error.response?.data.message || 'Failed to create user');
+    },
+  });
 
   const [date, setDate] = React.useState<Date>();
 
   return (
     <div>
-      <Dialog>
+      <Dialog open={isDialogOpen}>
         <DialogTrigger asChild>
-          <Button type="button" variant={'outline'} className="border-dashed">
+          <Button
+            type="button"
+            variant={'outline'}
+            className="border-dashed"
+            onClick={() => setIsDialogOpen(true)}
+          >
             <PlusCircleIcon className="mr-2" />
             Create User
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent hideCloseButton>
           <DialogHeader>
             <DialogTitle>Create User</DialogTitle>
             <DialogDescription>
@@ -107,10 +129,14 @@ export default function CreateUserDialog() {
                         placeholder="youremail@example.com"
                         type="email"
                         {...field}
+                        disabled={mutation.isPending}
                       />
                     </FormControl>
-                    <FormDescription>This is the user email</FormDescription>
-                    <FormMessage />
+                    {form.formState.errors.email ? (
+                      <FormMessage />
+                    ) : (
+                      <FormDescription>This is the user email</FormDescription>
+                    )}
                   </FormItem>
                 )}
               />
@@ -122,10 +148,18 @@ export default function CreateUserDialog() {
                   <FormItem>
                     <FormLabel>User Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="userName" type="text" {...field} />
+                      <Input
+                        placeholder="userName"
+                        type="text"
+                        {...field}
+                        disabled={mutation.isPending}
+                      />
                     </FormControl>
-                    <FormDescription>This is the user name</FormDescription>
-                    <FormMessage />
+                    {form.formState.errors.userName ? (
+                      <FormMessage />
+                    ) : (
+                      <FormDescription>This is the user name</FormDescription>
+                    )}
                   </FormItem>
                 )}
               />
@@ -141,10 +175,16 @@ export default function CreateUserDialog() {
                         placeholder="Placeholder"
                         {...field}
                         defaultCountry="VN"
+                        disabled={mutation.isPending}
                       />
                     </FormControl>
-                    <FormDescription>Enter your phone number.</FormDescription>
-                    <FormMessage />
+                    {form.formState.errors.phoneNumber ? (
+                      <FormMessage />
+                    ) : (
+                      <FormDescription>
+                        Enter your phone number.
+                      </FormDescription>
+                    )}
                   </FormItem>
                 )}
               />
@@ -156,10 +196,19 @@ export default function CreateUserDialog() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <PasswordInput placeholder="Password" {...field} />
+                      <PasswordInput
+                        placeholder="Password"
+                        {...field}
+                        disabled={mutation.isPending}
+                      />
                     </FormControl>
-                    <FormDescription>Enter user password.</FormDescription>
-                    <FormMessage />
+                    {form.formState.errors.password ? (
+                      <FormMessage />
+                    ) : (
+                      <FormDescription>
+                        Password must be at least 6 characters long.
+                      </FormDescription>
+                    )}
                   </FormItem>
                 )}
               />
@@ -179,6 +228,7 @@ export default function CreateUserDialog() {
                               'pl-3 text-left font-normal',
                               !field.value && 'text-muted-foreground',
                             )}
+                            disabled={mutation.isPending}
                           >
                             {field.value ? (
                               format(field.value, 'PPP')
@@ -204,10 +254,13 @@ export default function CreateUserDialog() {
                         />
                       </PopoverContent>
                     </Popover>
-                    <FormDescription>
-                      Your date of birth is used to calculate your age.
-                    </FormDescription>
-                    <FormMessage />
+                    {form.formState.errors.dateOfBirth ? (
+                      <FormMessage />
+                    ) : (
+                      <FormDescription>
+                        Enter user date of birth.
+                      </FormDescription>
+                    )}
                   </FormItem>
                 )}
               />
@@ -221,6 +274,7 @@ export default function CreateUserDialog() {
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      disabled={mutation.isPending}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -228,25 +282,48 @@ export default function CreateUserDialog() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="m@example.com">
-                          m@example.com
-                        </SelectItem>
-                        <SelectItem value="m@google.com">
-                          m@google.com
-                        </SelectItem>
-                        <SelectItem value="m@support.com">
-                          m@support.com
-                        </SelectItem>
+                        {ROLES.map(role => (
+                          <SelectItem
+                            key={role.value}
+                            value={role.value.toUpperCase()}
+                          >
+                            {role.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
-                    <FormDescription>Choose user role</FormDescription>
-                    <FormMessage />
+                    {form.formState.errors.role ? (
+                      <FormMessage />
+                    ) : (
+                      <FormDescription>
+                        Select a role for the user.
+                      </FormDescription>
+                    )}
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
-                Submit
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  className="w-1/2"
+                  onClick={() => {
+                    setIsDialogOpen(false);
+                    form.reset();
+                  }}
+                  variant={'secondary'}
+                  disabled={mutation.isPending}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="w-1/2"
+                  disabled={mutation.isPending}
+                  isLoading={mutation.isPending}
+                >
+                  Submit
+                </Button>
+              </div>
             </form>
           </Form>
         </DialogContent>
