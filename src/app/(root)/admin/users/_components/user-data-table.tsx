@@ -49,7 +49,7 @@ interface DataTableProps<TData, TValue> {
   pageCount: number;
   isLoading: boolean;
   onPaginationChange: (pageIndex: number, pageSize: number) => void;
-  onGlobalFilterChange: (value: string) => void;
+  onSearchChange: (value: string) => void;
   totalUsers: number;
   onSortingChange: (sorting: SortingState) => void;
   onRolesChange: (roles: string[]) => void;
@@ -63,7 +63,7 @@ export function UserDataTable<TData, TValue>({
   pageCount,
   isLoading,
   onPaginationChange,
-  onGlobalFilterChange,
+  onSearchChange,
   totalUsers,
   onSortingChange,
   onRolesChange,
@@ -75,8 +75,8 @@ export function UserDataTable<TData, TValue>({
   const debouncedSearchValue = useDebounce(searchValue, 500);
 
   useEffect(() => {
-    onGlobalFilterChange(debouncedSearchValue);
-  }, [debouncedSearchValue, onGlobalFilterChange]);
+    onSearchChange(debouncedSearchValue);
+  }, [debouncedSearchValue, onSearchChange]);
 
   useEffect(() => {
     onRolesChange(selectedRoles);

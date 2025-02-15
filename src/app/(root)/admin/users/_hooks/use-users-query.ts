@@ -2,16 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 
 import { User } from '@/api/types/user';
 import { UserApi } from '@/api/user';
+import { useUserStore } from '@/app/(root)/admin/users/_hooks/use-user-store';
 
-export function useUsersQuery(
-  page: number,
-  pageSize: number,
-  searchTerm: string,
-  sortField: string | undefined,
-  sortOrder: 'asc' | 'desc' | undefined,
-  roles: string[],
-) {
-  return useQuery({
+export function useUsersQuery() {
+  const { page, pageSize, searchTerm, sortField, sortOrder, roles } =
+    useUserStore();
+  const { data, isLoading, isFetching, isError, refetch } = useQuery({
     queryKey: [
       'users',
       page,
@@ -58,5 +54,15 @@ export function useUsersQuery(
         ].join(' and '),
       }),
     enabled: !!page && !!pageSize,
+    placeholderData: prev => prev,
+    staleTime: 300000, // 5 minutes
   });
+
+  return {
+    data,
+    pageCount: Math.ceil((data?.['@odata.count'] ?? 0) / pageSize),
+    isLoading: isLoading || isFetching,
+    isError,
+    refetch,
+  };
 }
