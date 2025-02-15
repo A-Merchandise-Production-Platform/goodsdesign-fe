@@ -1,6 +1,7 @@
-import { User } from '@/api/types/user';
 import { SortingState } from '@tanstack/react-table';
 import { create } from 'zustand';
+
+import { User } from '@/api/types/user';
 
 const INITIAL_ROLES = ['admin', 'manager', 'staff', 'factoryOwner', 'customer'];
 

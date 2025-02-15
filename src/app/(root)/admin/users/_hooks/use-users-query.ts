@@ -54,8 +54,8 @@ export function useUsersQuery() {
         ].join(' and '),
       }),
     enabled: !!page && !!pageSize,
-    placeholderData: prev => prev,
-    staleTime: 300000, // 5 minutes
+    placeholderData: previous => previous,
+    staleTime: 300_000, // 5 minutes
   });
 
   return {

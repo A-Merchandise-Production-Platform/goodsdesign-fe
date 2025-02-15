@@ -6,9 +6,9 @@ import { useCallback, useState } from 'react';
 import { DynamicAdminHeader } from '@/app/(root)/admin/components/dynamic-admin-header';
 import { userColumns } from '@/app/(root)/admin/users/_components/columns';
 import { UserDataTable } from '@/app/(root)/admin/users/_components/user-data-table';
+import { useUserStore } from '@/app/(root)/admin/users/_hooks/use-user-store';
 import { useUsersQuery } from '@/app/(root)/admin/users/_hooks/use-users-query';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useUserStore } from '@/app/(root)/admin/users/_hooks/use-user-store';
 
 const INITIAL_ROLES = ['admin', 'manager', 'staff', 'factoryOwner', 'customer'];
 
