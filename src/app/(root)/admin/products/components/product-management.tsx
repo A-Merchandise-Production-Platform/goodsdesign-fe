@@ -43,7 +43,7 @@ import { Category } from '@/types/category';
 import { Product } from '@/types/product';
 import { handle3DModelUpload, handleImageUpload } from '@/utils/handle-upload';
 
-import ModelViewer from './3d-model-viewer';
+import ModelViewer from '../../../../../components/3d-model-viewer';
 import ProductManagementSkeleton from './product-management-skeleton';
 
 export default function ProductManagement() {
