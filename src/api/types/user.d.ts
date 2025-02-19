@@ -46,3 +46,5 @@ export interface CreateUserDto {
   imageUrl?: string;
   role?: string;
 }
+
+export type UpdateUserDto = Partial<CreateUserDto>;

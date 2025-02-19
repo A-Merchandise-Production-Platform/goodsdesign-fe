@@ -1,7 +1,6 @@
 'use client';
 
 import { DynamicAdminHeader } from '@/app/(root)/admin/components/dynamic-admin-header';
-import { userColumns } from '@/app/(root)/admin/users/_components/columns';
 import { UserDataTable } from '@/app/(root)/admin/users/_components/user-data-table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -17,7 +16,7 @@ export default function Page() {
       <ScrollArea className="grow">
         <div className="p-4">
           <h1 className="mb-4 text-2xl font-bold">User Management</h1>
-          <UserDataTable columns={userColumns} />
+          <UserDataTable />
         </div>
       </ScrollArea>
     </div>

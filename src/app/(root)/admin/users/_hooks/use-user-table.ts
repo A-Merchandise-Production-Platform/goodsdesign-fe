@@ -15,7 +15,7 @@ import {
 import { useState } from 'react';
 
 import type { User } from '@/api/types/user';
-import { userColumns } from '@/app/(root)/admin/users/_components/columns';
+import { getUserColumns } from '@/app/(root)/admin/users/_components/columns';
 
 export function useUserTable(
   data: User[],
@@ -26,6 +26,8 @@ export function useUserTable(
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
+
+  const userColumns = getUserColumns({ refetch: () => {} });
 
   const table = useReactTable({
     data,

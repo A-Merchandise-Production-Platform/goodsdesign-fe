@@ -287,14 +287,16 @@ export default function CreateUserDialog({ refetch }: CreateUserDialogProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {ROLES.map(role => (
-                          <SelectItem
-                            key={role.value}
-                            value={role.value.toUpperCase()}
-                          >
-                            {role.label}
-                          </SelectItem>
-                        ))}
+                        {ROLES.filter(role => role.value !== 'admin').map(
+                          role => (
+                            <SelectItem
+                              key={role.value}
+                              value={role.value.toUpperCase()}
+                            >
+                              {role.label}
+                            </SelectItem>
+                          ),
+                        )}
                       </SelectContent>
                     </Select>
                     {form.formState.errors.role ? (
