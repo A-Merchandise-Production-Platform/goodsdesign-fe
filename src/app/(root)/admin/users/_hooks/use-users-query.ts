@@ -1,28 +1,47 @@
-import { useQuery } from '@tanstack/react-query';
+'use client';
 
-import { User } from '@/api/types/user';
+import type { SortingState } from '@tanstack/react-table';
+import { useCallback, useEffect, useState } from 'react';
+
+import { ODataResponse } from '@/api/types';
+import type { User } from '@/api/types/user';
 import { UserApi } from '@/api/user';
+import { useDebounce } from '@/hooks/use-debounce';
 
-export function useUsersQuery(
-  page: number,
-  pageSize: number,
-  searchTerm: string,
-  sortField: string | undefined,
-  sortOrder: 'asc' | 'desc' | undefined,
-  roles: string[],
-) {
-  return useQuery({
-    queryKey: [
-      'users',
-      page,
-      pageSize,
-      searchTerm,
-      sortField,
-      sortOrder,
-      roles,
-    ],
-    queryFn: () =>
-      UserApi.getUsers({
+const INITIAL_ROLES = ['admin', 'manager', 'staff', 'factoryOwner', 'customer'];
+
+export function useUsersQuery() {
+  // State Management
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>(INITIAL_ROLES);
+  const [sortField, setSortField] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [data, setData] = useState<ODataResponse<User> | undefined>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | undefined>();
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  useEffect(() => {
+    if (sorting.length > 0) {
+      const newSortField = sorting[0].id;
+      const newSortOrder = sorting[0].desc ? 'desc' : 'asc';
+      if (newSortField !== sortField || newSortOrder !== sortOrder) {
+        setSortField(newSortField);
+        setSortOrder(newSortOrder);
+        setPage(1);
+      }
+    }
+  }, [sorting, sortField, sortOrder]);
+
+  const fetchUsers = useCallback(async () => {
+    setIsLoading(true);
+    setError(undefined);
+    try {
+      const result = await UserApi.getUsers({
         count: true,
         top: pageSize,
         skip: (page - 1) * pageSize,
@@ -43,20 +62,79 @@ export function useUsersQuery(
           'createdAt',
           'updatedAt',
         ],
-        orderBy: sortField
-          ? [[sortField as keyof User, sortOrder ?? 'asc']]
-          : [['createdAt', 'desc']],
+        orderBy: [[sortField as keyof User, sortOrder]],
         filter: [
-          ...(searchTerm
+          ...(debouncedSearchTerm
             ? [
-                `contains(email, '${searchTerm}') or contains(userName, '${searchTerm}')`,
+                `contains(email, '${debouncedSearchTerm}') or contains(userName, '${debouncedSearchTerm}')`,
               ]
             : []),
-          ...(roles.length > 0
-            ? [`role/name in (${roles.map(role => `'${role}'`).join(',')})`]
+          ...(selectedRoles.length > 0
+            ? [
+                `role/name in (${selectedRoles.map(role => `'${role}'`).join(',')})`,
+              ]
             : []),
         ].join(' and '),
-      }),
-    enabled: !!page && !!pageSize,
-  });
+      });
+      setData(result);
+    } catch (error_) {
+      setError(
+        error_ instanceof Error
+          ? error_
+          : new Error('An error occurred while fetching users'),
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    page,
+    pageSize,
+    debouncedSearchTerm,
+    sortField,
+    sortOrder,
+    selectedRoles,
+  ]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  const handlePaginationChange = useCallback(
+    (newPage: number, newPageSize: number) => {
+      setPage(newPage);
+      setPageSize(newPageSize);
+    },
+    [],
+  );
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchTerm(value);
+    setPage(1);
+  }, []);
+
+  const handleRoleToggle = useCallback((role: string) => {
+    setSelectedRoles(previousRoles =>
+      previousRoles.includes(role)
+        ? previousRoles.filter(r => r !== role)
+        : [...previousRoles, role],
+    );
+    setPage(1);
+  }, []);
+
+  return {
+    data: data?.value ?? [],
+    totalUsers: data?.['@odata.count'] ?? 0,
+    isLoading,
+    error,
+    refetch: fetchUsers,
+    handlePaginationChange,
+    handleSearchChange,
+    handleRoleToggle,
+    selectedRoles,
+    searchTerm,
+    sorting,
+    setSorting,
+    pageSize,
+    page,
+  };
 }

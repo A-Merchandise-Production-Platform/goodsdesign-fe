@@ -1,16 +1,12 @@
 'use client';
 
-import {
-  type ColumnDef,
-  flexRender,
-  SortingState,
-} from '@tanstack/react-table';
+import { type ColumnDef, flexRender } from '@tanstack/react-table';
 import { Filter } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
 
-import type { User } from '@/api/types/user';
 import CreateUserDialog from '@/app/(root)/admin/users/_components/create-user-dialog';
+import { TableSkeleton } from '@/app/(root)/admin/users/_components/table-skeleton';
 import { useUserTable } from '@/app/(root)/admin/users/_hooks/use-user-table';
+import { useUsersQuery } from '@/app/(root)/admin/users/_hooks/use-users-query';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -41,63 +37,45 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useDebounce } from '@/hooks/use-debounce';
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  pageCount: number;
-  isLoading: boolean;
-  onPaginationChange: (pageIndex: number, pageSize: number) => void;
-  onGlobalFilterChange: (value: string) => void;
-  totalUsers: number;
-  onSortingChange: (sorting: SortingState) => void;
-  onRolesChange: (roles: string[]) => void;
-}
-
-const ROLES = ['admin', 'manager', 'staff', 'factoryOwner', 'customer'];
+const INITIAL_ROLES = ['admin', 'manager', 'staff', 'factoryOwner', 'customer'];
 
 export function UserDataTable<TData, TValue>({
   columns,
-  data,
-  pageCount,
-  isLoading,
-  onPaginationChange,
-  onGlobalFilterChange,
-  totalUsers,
-  onSortingChange,
-  onRolesChange,
-}: DataTableProps<TData, TValue>) {
-  const table = useUserTable(data as User[], pageCount, onSortingChange);
-  const [selectedRoles, setSelectedRoles] = useState<string[]>(ROLES);
+}: {
+  columns: ColumnDef<TData, TValue>[];
+}) {
+  const {
+    data,
+    totalUsers,
+    isLoading,
+    refetch,
+    handlePaginationChange,
+    handleRoleToggle,
+    handleSearchChange,
+    searchTerm,
+    selectedRoles,
+    sorting,
+    setSorting,
+    page,
+    pageSize,
+  } = useUsersQuery();
 
-  const [searchValue, setSearchValue] = useState('');
-  const debouncedSearchValue = useDebounce(searchValue, 500);
-
-  useEffect(() => {
-    onGlobalFilterChange(debouncedSearchValue);
-  }, [debouncedSearchValue, onGlobalFilterChange]);
-
-  useEffect(() => {
-    onRolesChange(selectedRoles);
-  }, [selectedRoles, onRolesChange]);
-
-  const handleRoleToggle = useCallback((role: string) => {
-    setSelectedRoles(previous =>
-      previous.includes(role)
-        ? previous.filter(r => r !== role)
-        : [...previous, role],
-    );
-  }, []);
+  const table = useUserTable(
+    data ?? [],
+    Math.ceil(totalUsers / pageSize),
+    setSorting,
+  );
 
   return (
     <div>
+      {/* Search and Filters */}
       <div className="flex items-center py-4">
         <div className="flex flex-1 items-center gap-2">
           <Input
             placeholder="Search users..."
-            value={searchValue}
-            onChange={event => setSearchValue(event.target.value)}
+            value={searchTerm}
+            onChange={event => handleSearchChange(event.target.value)}
             className="max-w-sm"
           />
           <Popover>
@@ -116,7 +94,7 @@ export function UserDataTable<TData, TValue>({
                   </p>
                 </div>
                 <div className="grid gap-2">
-                  {ROLES.map(role => (
+                  {INITIAL_ROLES.map(role => (
                     <div key={role} className="flex items-center space-x-2">
                       <Checkbox
                         id={role}
@@ -133,7 +111,7 @@ export function UserDataTable<TData, TValue>({
         </div>
 
         <div className="flex items-center gap-2">
-          <CreateUserDialog />
+          <CreateUserDialog refetch={refetch} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
@@ -144,60 +122,46 @@ export function UserDataTable<TData, TValue>({
               {table
                 .getAllColumns()
                 .filter(column => column.getCanHide())
-                .map(column => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={value =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
+                .map(column => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={value => column.toggleVisibility(!!value)}
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
+
+      {/* Table */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? undefined
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map(header => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? undefined
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  Loading...
-                </TableCell>
-              </TableRow>
-            ) : table.getRowModel().rows?.length ? (
+              <TableSkeleton columns={columns.length} />
+            ) : data.length > 0 ? (
               table.getRowModel().rows.map(row => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map(cell => (
                     <TableCell key={cell.id}>
                       {flexRender(
@@ -221,6 +185,8 @@ export function UserDataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination */}
       <div className="flex items-center justify-between space-x-2 py-4">
         <div className="text-muted-foreground flex-1 text-sm">
           {table.getFilteredSelectedRowModel().rows.length} of{' '}
@@ -232,22 +198,18 @@ export function UserDataTable<TData, TValue>({
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Rows per page</p>
           <Select
-            value={`${table.getState().pagination.pageSize}`}
+            value={`${pageSize}`}
             onValueChange={value => {
-              table.setPageSize(Number(value));
-              onPaginationChange(
-                table.getState().pagination.pageIndex + 1,
-                Number(value),
-              );
+              handlePaginationChange(page, Number(value));
             }}
           >
             <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
+              <SelectValue placeholder={pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 20, 30, 40, 50].map(pageSize => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
-                  {pageSize}
+              {[10, 20, 30, 40, 50].map(size => (
+                <SelectItem key={size} value={`${size}`}>
+                  {size}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -257,28 +219,16 @@ export function UserDataTable<TData, TValue>({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              table.previousPage();
-              onPaginationChange(
-                table.getState().pagination.pageIndex,
-                table.getState().pagination.pageSize,
-              );
-            }}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => handlePaginationChange(page - 1, pageSize)}
+            disabled={page === 1}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              table.nextPage();
-              onPaginationChange(
-                table.getState().pagination.pageIndex + 2,
-                table.getState().pagination.pageSize,
-              );
-            }}
-            disabled={!table.getCanNextPage()}
+            onClick={() => handlePaginationChange(page + 1, pageSize)}
+            disabled={page * pageSize >= totalUsers}
           >
             Next
           </Button>

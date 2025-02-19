@@ -30,9 +30,10 @@ import {
 const SortableHeader = ({ column, title }: { column: any; title: string }) => {
   return (
     <Button
-      variant="ghost"
+      variant="link"
       onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       type="button"
+      className="!p-0"
     >
       {title}
       {column.getIsSorted() === 'asc' ? (

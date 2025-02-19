@@ -19,7 +19,7 @@ export default function ModelViewer({ modelUrl }: ModelViewerProps) {
     setIsClient(true);
   }, []);
 
-  if (!isClient) return undefined;
+  if (!isClient) return;
 
   return (
     <div className="h-full w-full">
