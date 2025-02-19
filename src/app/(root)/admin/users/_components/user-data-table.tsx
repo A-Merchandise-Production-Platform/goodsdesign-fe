@@ -1,7 +1,7 @@
 'use client';
 
 import { type ColumnDef, flexRender } from '@tanstack/react-table';
-import { Filter } from 'lucide-react';
+import { Filter, RefreshCcwIcon, RefreshCwIcon } from 'lucide-react';
 
 import CreateUserDialog from '@/app/(root)/admin/users/_components/create-user-dialog';
 import { TableSkeleton } from '@/app/(root)/admin/users/_components/table-skeleton';
@@ -37,14 +37,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
+import { getUserColumns } from '@/app/(root)/admin/users/_components/columns';
 
 const INITIAL_ROLES = ['admin', 'manager', 'staff', 'factoryOwner', 'customer'];
 
-export function UserDataTable<TData, TValue>({
-  columns,
-}: {
-  columns: ColumnDef<TData, TValue>[];
-}) {
+export function UserDataTable() {
   const {
     data,
     totalUsers,
@@ -60,6 +58,8 @@ export function UserDataTable<TData, TValue>({
     page,
     pageSize,
   } = useUsersQuery();
+
+  const columns = getUserColumns({ refetch });
 
   const table = useUserTable(
     data ?? [],
@@ -111,6 +111,16 @@ export function UserDataTable<TData, TValue>({
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            className={cn('flex items-center')}
+            onClick={refetch}
+            type="button"
+            variant={'outline'}
+          >
+            <RefreshCwIcon
+              className={cn(isLoading && 'animate-spin', 'h-4 w-4')}
+            />
+          </Button>
           <CreateUserDialog refetch={refetch} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

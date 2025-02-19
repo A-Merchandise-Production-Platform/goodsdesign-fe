@@ -1,5 +1,4 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import cn from 'classnames';
 import { format } from 'date-fns';
 import {
   ArrowDown,
@@ -7,11 +6,10 @@ import {
   ArrowUpDown,
   Edit,
   MoreHorizontal,
-  Trash2,
 } from 'lucide-react';
 
 import type { User } from '@/api/types/user';
-import { Badge, BadgeVariant } from '@/components/ui/badge';
+import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -26,6 +24,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { DeleteButton } from '@/app/(root)/admin/users/_components/delete-user-button';
+
+type UserColumnsProps = {
+  refetch: () => void;
+};
 
 const SortableHeader = ({ column, title }: { column: any; title: string }) => {
   return (
@@ -47,7 +50,9 @@ const SortableHeader = ({ column, title }: { column: any; title: string }) => {
   );
 };
 
-export const userColumns: ColumnDef<User>[] = [
+export const getUserColumns = ({
+  refetch,
+}: UserColumnsProps): ColumnDef<User>[] => [
   {
     id: 'select',
     header: ({ table }) => (
@@ -119,7 +124,6 @@ export const userColumns: ColumnDef<User>[] = [
     accessorKey: 'phoneNumber',
     cell: ({ row }) => row.original.phoneNumber || 'N/A',
   },
-
   {
     id: 'status',
     header: 'Status',
@@ -189,9 +193,8 @@ export const userColumns: ColumnDef<User>[] = [
                 <Edit className="mr-2 h-4 w-4" />
                 <span>Edit</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer text-red-600">
-                <Trash2 className="mr-2 h-4 w-4" />
-                <span>Delete</span>
+              <DropdownMenuItem className="cursor-pointer text-red-600" asChild>
+                <DeleteButton id={row.original.id} refetch={refetch} />
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -64,6 +64,7 @@ export function useUsersQuery() {
         ],
         orderBy: [[sortField as keyof User, sortOrder]],
         filter: [
+          'isActive eq true',
           ...(debouncedSearchTerm
             ? [
                 `contains(email, '${debouncedSearchTerm}') or contains(userName, '${debouncedSearchTerm}')`,
