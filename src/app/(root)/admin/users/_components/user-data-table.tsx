@@ -3,7 +3,8 @@
 import { type ColumnDef, flexRender } from '@tanstack/react-table';
 import { Filter, RefreshCcwIcon, RefreshCwIcon } from 'lucide-react';
 
-import CreateUserDialog from '@/app/(root)/admin/users/_components/create-user-dialog';
+import { getUserColumns } from '@/app/(root)/admin/users/_components/columns';
+import CreateUserDialog from '@/app/(root)/admin/users/_components/create-user-button';
 import { TableSkeleton } from '@/app/(root)/admin/users/_components/table-skeleton';
 import { useUserTable } from '@/app/(root)/admin/users/_hooks/use-user-table';
 import { useUsersQuery } from '@/app/(root)/admin/users/_hooks/use-users-query';
@@ -38,7 +39,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import { getUserColumns } from '@/app/(root)/admin/users/_components/columns';
 
 const INITIAL_ROLES = ['admin', 'manager', 'staff', 'factoryOwner', 'customer'];
 

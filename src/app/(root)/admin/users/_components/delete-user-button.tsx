@@ -1,7 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
+import { UserApi } from '@/api/user';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,16 +16,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { toast } from 'sonner';
-import { useMutation } from '@tanstack/react-query';
-import { UserApi } from '@/api/user';
 
-interface DeleteButtonProps {
+interface DeleteUserButtonProps {
   id: string;
   refetch: () => void;
 }
 
-export function DeleteButton({ id, refetch }: DeleteButtonProps) {
+export function DeleteUserButton({ id, refetch }: DeleteUserButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const mutation = useMutation({
