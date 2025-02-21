@@ -110,7 +110,7 @@ function TShirtTemplate({ view }: { view: string }) {
 }
 
 function handleUploadClick() {
-  const input = document.getElementById('image-upload') as HTMLInputElement;
+  const input = document.querySelector('#image-upload') as HTMLInputElement;
   input?.click();
 }
 
