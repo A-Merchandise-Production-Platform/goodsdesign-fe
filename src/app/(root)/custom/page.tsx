@@ -1,85 +1,121 @@
 'use client';
-
-import * as React from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Environment, OrbitControls } from '@react-three/drei';
 import {
-  Redo2,
-  Undo2,
-  ShirtIcon as TShirt,
-  Upload,
-  Type,
   BookMarked,
-  Smile,
-  Wand2,
+  Redo2,
   Shapes,
-  Save,
+  ShirtIcon as TShirt,
+  Smile,
+  Type,
+  Undo2,
+  Upload,
+  Wand2,
 } from 'lucide-react';
+import * as React from 'react';
 
+import ModelViewer from '@/components/3d-model-viewer';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from '@/components/ui/resizable';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import FabricCanvas from './_components/fabric-canvas';
-import * as fabric from 'fabric';
+
+import DesignCanvas from './_components/design-canvas';
+
+function TShirtTemplate({ view }: { view: string }) {
+  const printArea = {
+    front: { x: 100, y: 80, width: 140, height: 160 },
+    back: { x: 100, y: 80, width: 140, height: 160 },
+    'left-sleeve': { x: 40, y: 40, width: 60, height: 60 },
+    'right-sleeve': { x: 40, y: 40, width: 60, height: 60 },
+  };
+
+  const area = printArea[view as keyof typeof printArea];
+
+  return (
+    <svg viewBox="0 0 340 400" className="absolute h-full w-full">
+      {/* Front View */}
+      {view === 'front' && (
+        <>
+          <path
+            d="M70,50 C70,50 100,20 170,20 C240,20 270,50 270,50 L320,100 L290,140 L270,120 L270,380 L70,380 L70,120 L50,140 L20,100 L70,50"
+            fill="white"
+            stroke="black"
+            strokeWidth="2"
+          />
+          {/* Collar */}
+          <path
+            d="M140,20 C140,20 170,25 200,20 C180,35 160,35 140,20"
+            fill="none"
+            stroke="black"
+            strokeWidth="2"
+          />
+        </>
+      )}
+
+      {/* Back View */}
+      {view === 'back' && (
+        <>
+          <path
+            d="M70,50 C70,50 100,20 170,20 C240,20 270,50 270,50 L320,100 L290,140 L270,120 L270,380 L70,380 L70,120 L50,140 L20,100 L70,50"
+            fill="white"
+            stroke="black"
+            strokeWidth="2"
+          />
+          {/* Back Collar */}
+          <path
+            d="M140,20 C140,20 170,15 200,20"
+            fill="none"
+            stroke="black"
+            strokeWidth="2"
+          />
+        </>
+      )}
+
+      {/* Sleeve Views */}
+      {(view === 'left-sleeve' || view === 'right-sleeve') && (
+        <path
+          d="M50,50 L200,50 L180,200 L70,200 Z"
+          fill="white"
+          stroke="black"
+          strokeWidth="2"
+        />
+      )}
+
+      {/* Print Area */}
+      <rect
+        x={area.x}
+        y={area.y}
+        width={area.width}
+        height={area.height}
+        fill="none"
+        stroke="#666"
+        strokeWidth="2"
+        strokeDasharray="5,5"
+      />
+
+      {/* Safe Print Area Text */}
+      <text
+        x={area.x + area.width / 2}
+        y={area.y + area.height / 2}
+        textAnchor="middle"
+        fill="#666"
+        fontSize="12"
+      >
+        Safe Print Area
+      </text>
+    </svg>
+  );
+}
+
+function handleUploadClick() {
+  const input = document.getElementById('image-upload') as HTMLInputElement;
+  input?.click();
+}
 
 export default function ProductDesigner() {
   const [view, setView] = React.useState('front');
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const [fabricCanvas, setFabricCanvas] = React.useState<fabric.Canvas | null>(
-    null,
-  );
-
-const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-  const file = event.target.files?.[0];
-  if (file && fabricCanvas) {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = e => {
-      let imageUrl = e.target?.result as string;
-      let imageElement = document.createElement('img');
-      imageElement.src = imageUrl;
-
-      // Ensure the image is fully loaded before adding to the canvas
-      imageElement.onload = function () {
-        const imgInstance = new fabric.Image(imageElement, {
-          scaleX: 1,
-          scaleY: 1,
-          selectable: true,
-        });
-
-        const printArea = {
-          front: { x: 100, y: 80, width: 140, height: 160 },
-          back: { x: 100, y: 80, width: 140, height: 160 },
-          'left-sleeve': { x: 40, y: 40, width: 60, height: 60 },
-          'right-sleeve': { x: 40, y: 40, width: 60, height: 60 },
-        };
-        const area = printArea[view as keyof typeof printArea];
-
-        // Scale and position the image inside the print area
-        const scaleFactor = Math.min(
-          area.width / imgInstance.width!,
-          area.height / imgInstance.height!,
-        );
-        imgInstance.scale(scaleFactor);
-        imgInstance.set({
-          left: area.x + (area.width - imgInstance.width! * scaleFactor) / 2,
-          top: area.y + (area.height - imgInstance.height! * scaleFactor) / 2,
-        });
-
-        fabricCanvas.add(imgInstance);
-        fabricCanvas.setActiveObject(imgInstance);
-        fabricCanvas.renderAll();
-      };
-    };
-  }
-};
-
-
 
   return (
     <div className="flex h-screen flex-col">
@@ -98,13 +134,6 @@ const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
           <Button variant="ghost" size="icon">
             <Redo2 className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon">
-            <Save className="h-4 w-4" />
-          </Button>
-          <div className="flex items-center gap-2">
-            <span>3D view</span>
-            <Switch />
-          </div>
           <Tabs defaultValue="design">
             <TabsList>
               <TabsTrigger value="design">Design</TabsTrigger>
@@ -125,18 +154,11 @@ const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
             <Button
               variant="ghost"
               className="justify-start gap-2"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={handleUploadClick}
             >
               <Upload className="h-4 w-4" />
               Uploads
             </Button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept="image/*"
-              onChange={handleFileUpload}
-            />
             <Button variant="ghost" className="justify-start gap-2">
               <Type className="h-4 w-4" />
               Text
@@ -177,15 +199,9 @@ const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
             <ResizablePanel defaultSize={50} minSize={25}>
               <div className="flex h-full flex-col bg-gray-50">
                 {/* T-Shirt Template */}
-                <div className="flex-1 p-4">
-                  <div className="relative flex h-full w-full items-center justify-center">
-                    <FabricCanvas
-                      width={340}
-                      height={400}
-                      view={view}
-                      onCanvasCreated={setFabricCanvas}
-                    />
-                  </div>
+                <div className="relative h-full w-full">
+                  <TShirtTemplate view={view} />
+                  <DesignCanvas view={view} width={340} height={400} />
                 </div>
               </div>
             </ResizablePanel>
@@ -196,16 +212,7 @@ const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
             {/* 3D Preview */}
             <ResizablePanel defaultSize={50} minSize={25}>
               <div className="h-full bg-gray-100">
-                <Canvas camera={{ position: [0, 0, 2] }}>
-                  <ambientLight intensity={0.5} />
-                  <pointLight position={[10, 10, 10]} />
-                  <mesh>
-                    <boxGeometry args={[1, 1.2, 0.2]} />
-                    <meshStandardMaterial color="white" />
-                  </mesh>
-                  <OrbitControls enableZoom={false} />
-                  <Environment preset="studio" />
-                </Canvas>
+                <ModelViewer modelUrl="/models/t_shirt.glb" />
               </div>
             </ResizablePanel>
           </ResizablePanelGroup>
