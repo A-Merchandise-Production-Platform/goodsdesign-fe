@@ -40,31 +40,39 @@ axiosInstance.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
+      _isRefreshing?: boolean;
     };
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      try {
-        const { refreshToken } = useAuthStore.getState();
-        if (refreshToken) {
-          const response = await AuthApi.refreshToken(refreshToken);
+      if (!originalRequest._isRefreshing) {
+        originalRequest._isRefreshing = true;
+        try {
+          const { refreshToken } = useAuthStore.getState();
+          if (refreshToken) {
+            const response = await AuthApi.refreshToken(refreshToken);
 
+            useAuthStore.setState({
+              accessToken: response.data.accessToken,
+              refreshToken: response.data.refreshToken,
+            });
+            return axiosInstance(originalRequest);
+          } else {
+            throw error;
+          }
+        } catch (error) {
           useAuthStore.setState({
-            accessToken: response.data.accessToken,
-            refreshToken: response.data.refreshToken,
+            accessToken: undefined,
+            refreshToken: undefined,
+            isAuth: false,
+            user: undefined,
           });
-          return axiosInstance(originalRequest);
-        } else {
           throw error;
+        } finally {
+          originalRequest._isRefreshing = false;
         }
-      } catch (error) {
-        useAuthStore.setState({
-          accessToken: undefined,
-          refreshToken: undefined,
-          isAuth: false,
-          user: undefined,
-        });
-        throw error;
+      } else {
+        return Promise.reject(error);
       }
     } else {
       throw error;
