@@ -1,9 +1,8 @@
 import buildQuery, { QueryOptions } from 'odata-query';
 
 import { axiosInstance } from '@/api';
+import { ApiResponse, ODataResponse } from '@/api/types/index';
 import { Area } from '@/types/area';
-
-import { ApiResponse, ODataResponse } from './types';
 
 export namespace AreaApi {
   export async function getAll(options: Partial<QueryOptions<Area>>) {
