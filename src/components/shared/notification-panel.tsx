@@ -23,7 +23,7 @@ export default function NotificationPanel() {
   const [notifications, setNotifications] = useState<Array<Notification>>([]);
   const [unreadNumber, setUnreadNumber] = useState(0);
   const [loading, setLoading] = useState<boolean>(true);
-  const connectionRef = useRef<signalR.HubConnection | null>(null);
+  const connectionRef = useRef<signalR.HubConnection | undefined>(undefined);
   const isMountedRef = useRef<boolean>(false);
 
   useEffect(() => {
@@ -99,7 +99,7 @@ export default function NotificationPanel() {
               console.error('Error stopping connection:', error);
             });
         }
-        connectionRef.current = null;
+        connectionRef.current = undefined;
       }
     };
   }, []);
