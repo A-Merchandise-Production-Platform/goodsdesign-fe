@@ -45,7 +45,9 @@ axiosInstance.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      if (!originalRequest._isRefreshing) {
+      if (originalRequest._isRefreshing) {
+        throw error;
+      } else {
         originalRequest._isRefreshing = true;
         try {
           const { refreshToken } = useAuthStore.getState();
@@ -71,8 +73,6 @@ axiosInstance.interceptors.response.use(
         } finally {
           originalRequest._isRefreshing = false;
         }
-      } else {
-        return Promise.reject(error);
       }
     } else {
       throw error;
