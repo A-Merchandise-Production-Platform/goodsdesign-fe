@@ -11,7 +11,6 @@ import { useDebounce } from '@/hooks/use-debounce';
 const INITIAL_ROLES = ['admin', 'manager', 'staff', 'factoryOwner', 'customer'];
 
 export function useUsersQuery() {
-  // State Management
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,10 +37,8 @@ export function useUsersQuery() {
   }, [sorting, sortField, sortOrder]);
 
   const fetchUsers = useCallback(async () => {
-    let isMounted = true;
     setIsLoading(true);
     setError(undefined);
-
     try {
       const result = await UserApi.getUsers({
         count: true,
@@ -79,27 +76,16 @@ export function useUsersQuery() {
             : []),
         ].join(' and '),
       });
-
-      if (isMounted) {
-        setData(result);
-      }
+      setData(result);
     } catch (error_) {
-      if (isMounted) {
-        setError(
-          error_ instanceof Error
-            ? error_
-            : new Error('An error occurred while fetching users'),
-        );
-      }
+      setError(
+        error_ instanceof Error
+          ? error_
+          : new Error('An error occurred while fetching users'),
+      );
     } finally {
-      if (isMounted) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     }
-
-    return () => {
-      isMounted = false;
-    };
   }, [
     page,
     pageSize,
@@ -110,7 +96,23 @@ export function useUsersQuery() {
   ]);
 
   useEffect(() => {
+    let mounted = true;
+
     fetchUsers();
+
+    return () => {
+      mounted = false;
+    };
+  }, [fetchUsers]);
+
+  const safeFetchUsers = useCallback(() => {
+    let mounted = true;
+    fetchUsers().then(() => {
+      if (!mounted) return;
+    });
+    return () => {
+      mounted = false;
+    };
   }, [fetchUsers]);
 
   const handlePaginationChange = useCallback(
@@ -140,7 +142,7 @@ export function useUsersQuery() {
     totalUsers: data?.['@odata.count'] ?? 0,
     isLoading,
     error,
-    refetch: fetchUsers,
+    refetch: safeFetchUsers,
     handlePaginationChange,
     handleSearchChange,
     handleRoleToggle,

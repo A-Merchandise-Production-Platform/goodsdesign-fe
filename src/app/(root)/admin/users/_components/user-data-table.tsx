@@ -1,7 +1,7 @@
 'use client';
 
-import { type ColumnDef, flexRender } from '@tanstack/react-table';
-import { Filter, RefreshCcwIcon, RefreshCwIcon } from 'lucide-react';
+import { flexRender } from '@tanstack/react-table';
+import { Filter, RefreshCwIcon } from 'lucide-react';
 
 import { getUserColumns } from '@/app/(root)/admin/users/_components/columns';
 import CreateUserDialog from '@/app/(root)/admin/users/_components/create-user-button';
@@ -60,12 +60,19 @@ export function UserDataTable() {
   } = useUsersQuery();
 
   const columns = getUserColumns({ refetch });
-
   const table = useUserTable(
     data ?? [],
     Math.ceil(totalUsers / pageSize),
     setSorting,
   );
+
+  if (isLoading && !data) {
+    return (
+      <div className="rounded-md border">
+        <TableSkeleton columns={columns.length} />
+      </div>
+    );
+  }
 
   return (
     <div>
