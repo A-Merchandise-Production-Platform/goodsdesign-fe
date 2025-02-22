@@ -38,8 +38,10 @@ export function useUsersQuery() {
   }, [sorting, sortField, sortOrder]);
 
   const fetchUsers = useCallback(async () => {
+    let isMounted = true;
     setIsLoading(true);
     setError(undefined);
+
     try {
       const result = await UserApi.getUsers({
         count: true,
@@ -77,16 +79,27 @@ export function useUsersQuery() {
             : []),
         ].join(' and '),
       });
-      setData(result);
+
+      if (isMounted) {
+        setData(result);
+      }
     } catch (error_) {
-      setError(
-        error_ instanceof Error
-          ? error_
-          : new Error('An error occurred while fetching users'),
-      );
+      if (isMounted) {
+        setError(
+          error_ instanceof Error
+            ? error_
+            : new Error('An error occurred while fetching users'),
+        );
+      }
     } finally {
-      setIsLoading(false);
+      if (isMounted) {
+        setIsLoading(false);
+      }
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [
     page,
     pageSize,
