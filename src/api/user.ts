@@ -1,7 +1,7 @@
 import buildQuery, { QueryOptions } from 'odata-query';
 
 import { axiosInstance } from '@/api';
-import { ApiResponse, ODataResponse } from '@/api/types';
+import { ApiResponse, Notification, ODataResponse } from '@/api/types';
 import { CreateUserDto, UpdateUserDto, User } from '@/api/types/user';
 
 export namespace UserApi {
@@ -39,6 +39,17 @@ export namespace UserApi {
     const response = await axiosInstance.delete<ApiResponse<null>>(
       `/users/${id}`,
     );
+    return response.data;
+  }
+
+  export async function getNotifications(
+    options: Partial<QueryOptions<Notification>>,
+  ) {
+    const query = buildQuery(options);
+    const response = await axiosInstance.get<ODataResponse<Notification>>(
+      `/notifications${query}`,
+    );
+
     return response.data;
   }
 }
