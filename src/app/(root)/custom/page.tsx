@@ -1,5 +1,4 @@
 'use client';
-
 import {
   BookMarked,
   Redo2,
@@ -22,6 +21,8 @@ import {
 } from '@/components/ui/resizable';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+import DesignCanvas from './_components/design-canvas';
+
 function TShirtTemplate({ view }: { view: string }) {
   const printArea = {
     front: { x: 100, y: 80, width: 140, height: 160 },
@@ -33,7 +34,7 @@ function TShirtTemplate({ view }: { view: string }) {
   const area = printArea[view as keyof typeof printArea];
 
   return (
-    <svg viewBox="0 0 340 400" className="h-full max-h-[80vh] w-full">
+    <svg viewBox="0 0 340 400" className="absolute h-full w-full">
       {/* Front View */}
       {view === 'front' && (
         <>
@@ -108,6 +109,11 @@ function TShirtTemplate({ view }: { view: string }) {
   );
 }
 
+function handleUploadClick() {
+  const input = document.querySelector('#image-upload') as HTMLInputElement;
+  input?.click();
+}
+
 export default function ProductDesigner() {
   const [view, setView] = React.useState('front');
 
@@ -145,7 +151,11 @@ export default function ProductDesigner() {
               <TShirt className="h-4 w-4" />
               Product
             </Button>
-            <Button variant="ghost" className="justify-start gap-2">
+            <Button
+              variant="ghost"
+              className="justify-start gap-2"
+              onClick={handleUploadClick}
+            >
               <Upload className="h-4 w-4" />
               Uploads
             </Button>
@@ -189,10 +199,9 @@ export default function ProductDesigner() {
             <ResizablePanel defaultSize={50} minSize={25}>
               <div className="flex h-full flex-col bg-gray-50">
                 {/* T-Shirt Template */}
-                <div className="flex-1 p-4">
-                  <div className="relative flex h-full w-full items-center justify-center">
-                    <TShirtTemplate view={view} />
-                  </div>
+                <div className="relative h-full w-full">
+                  <TShirtTemplate view={view} />
+                  <DesignCanvas view={view} width={340} height={400} />
                 </div>
               </div>
             </ResizablePanel>
