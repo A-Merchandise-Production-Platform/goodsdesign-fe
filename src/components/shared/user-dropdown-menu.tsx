@@ -46,10 +46,12 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <User className="mr-2 h-4 w-4" />
-          <span>Profile</span>
-        </DropdownMenuItem>
+        <Link href={'/profile'}>
+          <DropdownMenuItem>
+            <User className="mr-2 h-4 w-4" />
+            <span>Profile</span>
+          </DropdownMenuItem>
+        </Link>
         {isAuth && user.role.toUpperCase() === 'ADMIN' && (
           <Link href={'/admin'}>
             <DropdownMenuItem>

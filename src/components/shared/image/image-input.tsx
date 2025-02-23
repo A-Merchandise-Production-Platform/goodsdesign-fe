@@ -1,9 +1,8 @@
-/* eslint-disable unicorn/no-nested-ternary */
 'use client';
 
 import { Edit2, Upload, X } from 'lucide-react';
 import Image from 'next/image';
-import React from 'react';
+import { useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Cropper from 'react-easy-crop';
 
@@ -23,12 +22,16 @@ interface ImageInputProps {
   onChange: (file: File) => void;
   ratio?: '1:1' | '16:9' | 'round';
   showGrid?: boolean;
+  defaultImage?: string;
+  isTextDisplay?: boolean;
 }
 
 export default function ImageInput({
   onChange,
   ratio = '1:1',
   showGrid = true,
+  defaultImage,
+  isTextDisplay = false,
 }: ImageInputProps) {
   const {
     preview,
@@ -45,6 +48,7 @@ export default function ImageInput({
     isCropperOpen,
     setIsCropperOpen,
     handleEdit,
+    setDefaultImage,
   } = useImageUpload(onChange);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -52,6 +56,12 @@ export default function ImageInput({
     accept: { 'image/*': [] },
     multiple: false,
   });
+
+  useEffect(() => {
+    if (defaultImage) {
+      setDefaultImage(defaultImage);
+    }
+  }, [defaultImage, setDefaultImage]);
 
   const aspectRatio = {
     '1:1': 1,
@@ -80,7 +90,7 @@ export default function ImageInput({
               <>
                 <div className="relative h-full w-full">
                   <Image
-                    src={preview}
+                    src={preview || '/placeholder.svg'}
                     alt="Preview"
                     fill
                     className={`object-cover ${isRound ? 'rounded-full' : 'rounded-lg'}`}
@@ -115,9 +125,11 @@ export default function ImageInput({
               <div className="flex h-full flex-col items-center justify-center p-4 text-center">
                 <Upload className="mb-4 h-12 w-12 text-gray-400" />
                 <p className="text-sm text-gray-500">
-                  {isDragActive
-                    ? 'Drop the image here'
-                    : "Drag 'n' drop an image here, or click to select"}
+                  {isTextDisplay
+                    ? isDragActive
+                      ? 'Drop the image here'
+                      : "Drag 'n' drop an image here, or click to select"
+                    : undefined}
                 </p>
               </div>
             )}
