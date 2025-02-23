@@ -110,7 +110,6 @@ export function Shirt(props: JSX.IntrinsicElements['group']) {
                 <meshBasicMaterial transparent opacity={0} />
                 <Decal
                   ref={decalRef as any}
-                  debug // Makes "bounding box" of the decal visible
                   position={position} // Position of the decal
                   scale={scale} // Scale of the decal
                   rotation={rotation} // Rotation of the decal (can be a vector or a degree in radians)

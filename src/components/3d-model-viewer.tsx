@@ -1,8 +1,10 @@
 'use client';
 
 import {
+  ContactShadows,
   Decal,
   Environment,
+  Float,
   OrbitControls,
   useGLTF,
   useTexture,
@@ -56,15 +58,11 @@ export default function ModelViewer({ modelUrl }: ModelViewerProps) {
   return (
     <div className="h-full w-full">
       <Canvas>
-        {/* <ambientLight intensity={0.5} />
-        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-        <pointLight position={[-10, -10, -10]} /> */}
-
-        <Suspense>
-          {/* <Model modelUrl={modelUrl} decalUrl={modelUrl} /> */}
-          <Shirt />
-        </Suspense>
-
+        <Float>
+            {/* <Model modelUrl={modelUrl} decalUrl={modelUrl} /> */}
+            <Shirt />
+        </Float>
+        <ContactShadows position-y={-2.5} opacity={0.4} blur={3} />
         <Environment preset="sunset" />
         <OrbitControls />
       </Canvas>
