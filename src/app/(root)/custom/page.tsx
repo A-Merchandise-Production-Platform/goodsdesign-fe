@@ -212,7 +212,10 @@ export default function ProductDesigner() {
             {/* 3D Preview */}
             <ResizablePanel defaultSize={50} minSize={25}>
               <div className="h-full bg-gray-100">
-                <ModelViewer modelUrl="/models/t_shirt.glb" />
+                <ModelViewer
+                  modelUrl="/models/t_shirt.glb"
+                  decalUrl="/assets/logo.png"
+                />
               </div>
             </ResizablePanel>
           </ResizablePanelGroup>

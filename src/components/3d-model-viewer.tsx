@@ -1,21 +1,49 @@
 'use client';
 
-import { Environment, Html, OrbitControls, useGLTF } from '@react-three/drei';
+import {
+  Decal,
+  Environment,
+  OrbitControls,
+  useGLTF,
+  useTexture,
+} from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Suspense, useEffect, useState } from 'react';
 
 interface ModelViewerProps {
   modelUrl: string;
+  decalUrl?: string;
 }
 
-function Model({ modelUrl }: ModelViewerProps) {
+function Model({ modelUrl, decalUrl }: ModelViewerProps) {
   const { scene } = useGLTF(modelUrl);
-  return <primitive object={scene} scale={1} />;
+  const decalTexture = useTexture(decalUrl || '');
+  return (
+    <group>
+      <mesh>
+        <primitive object={scene} scale={1} />
+
+        {/* Decal Placement */}
+        {/* <meshBasicMaterial />
+        <Decal
+          debug // Makes "bounding box" of the decal visible
+          position={[0, 0, 0]} // Position of the decal
+          rotation={[0, 0, 0]} // Rotation of the decal (can be a vector or a degree in radians)
+          scale={1} // Scale of the decal
+        >
+          <meshBasicMaterial
+            map={decalTexture}
+            polygonOffset
+            polygonOffsetFactor={-1} // The material should take precedence over the original
+          />
+        </Decal> */}
+      </mesh>
+    </group>
+  );
 }
 
 export default function ModelViewer({ modelUrl }: ModelViewerProps) {
   const [isClient, setIsClient] = useState(false);
-  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -30,20 +58,8 @@ export default function ModelViewer({ modelUrl }: ModelViewerProps) {
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
         <pointLight position={[-10, -10, -10]} />
 
-        <Suspense
-          fallback={
-            <Html>
-              <p>Loading 3D model...</p>
-            </Html>
-          }
-        >
-          {hasError ? (
-            <Html>
-              <p>Failed to load 3D model.</p>
-            </Html>
-          ) : (
-            <Model modelUrl={modelUrl} />
-          )}
+        <Suspense>
+          <Model modelUrl={modelUrl} decalUrl={modelUrl} />
         </Suspense>
 
         <Environment preset="sunset" />
