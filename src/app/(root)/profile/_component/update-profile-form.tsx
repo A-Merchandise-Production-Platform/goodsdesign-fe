@@ -50,7 +50,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function UpdateProfileForm({}: UpdateProfileFormProps) {
   const { user } = useAuthStore();
-  const [file, setFile] = React.useState<File | undefined>(undefined);
+  const [file, setFile] = React.useState<File | undefined>();
 
   const defaultFormValue: FormValues = {
     email: user?.email!,
