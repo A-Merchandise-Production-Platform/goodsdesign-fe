@@ -10,6 +10,8 @@ import {
 import { Canvas } from '@react-three/fiber';
 import { Suspense, useEffect, useState } from 'react';
 
+import { Shirt } from './shirt';
+
 interface ModelViewerProps {
   modelUrl: string;
   decalUrl?: string;
@@ -54,12 +56,13 @@ export default function ModelViewer({ modelUrl }: ModelViewerProps) {
   return (
     <div className="h-full w-full">
       <Canvas>
-        <ambientLight intensity={0.5} />
+        {/* <ambientLight intensity={0.5} />
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-        <pointLight position={[-10, -10, -10]} />
+        <pointLight position={[-10, -10, -10]} /> */}
 
         <Suspense>
-          <Model modelUrl={modelUrl} decalUrl={modelUrl} />
+          {/* <Model modelUrl={modelUrl} decalUrl={modelUrl} /> */}
+          <Shirt />
         </Suspense>
 
         <Environment preset="sunset" />

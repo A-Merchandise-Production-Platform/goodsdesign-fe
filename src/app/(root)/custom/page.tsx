@@ -213,7 +213,7 @@ export default function ProductDesigner() {
             <ResizablePanel defaultSize={50} minSize={25}>
               <div className="h-full bg-gray-100">
                 <ModelViewer
-                  modelUrl="/models/t_shirt.glb"
+                  modelUrl="/models/t-shirt.glb"
                   decalUrl="/assets/logo.png"
                 />
               </div>
