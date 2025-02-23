@@ -4,7 +4,7 @@ Command: npx gltfjsx@6.5.3 public/models/t-shirt.glb -o src/components/shirt.tsx
 */
 
 import { Decal, useGLTF, useTexture } from '@react-three/drei';
-import { useControls } from 'leva';
+import { button, useControls } from 'leva';
 import { JSX, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTF } from 'three-stdlib';
@@ -32,43 +32,40 @@ type GLTFResult = GLTF & {
 
 export function Shirt(props: JSX.IntrinsicElements['group']) {
   const { nodes, materials } = useGLTF('/models/t-shirt.glb') as GLTFResult;
-  const decalTexture = useTexture('/assets/pray_for_Chimple.jpg');
+  const decalTexture = useTexture('/assets/logo.png');
   const decalRef = useRef(undefined);
 
   useControls({
     positionY: {
-      min: 0.8,
-      max: 1.5,
-      value: 0,
+      min: 1,
+      max: 1.7,
+      value: 1.38,
       step: 0.01,
       onChange: (value: any) => {
         setPosition([0, value, 0]);
       },
     },
-    positionX: {
-      min: -1.5,
-      max: 1.5,
-      value: 0,
-      step: 0.01,
-      onChange: (value: any) => {
-        setPosition([value, 1.2, 0]);
-      },
-    },
+
     scale: {
-      min: 0.3,
-      max: 10,
-      value: 1,
+      min: 0.25,
+      max: 0.5,
+      value: 0.3,
       step: 0.01,
       onChange: (value: any) => {
         setScale([value, value, value]);
       },
     },
+
+    reset: button(() => {
+      setPosition([0, 1.38, 0]);
+      setScale([0.3, 0.3, 0.3]);
+    }),
   });
 
   const [position, setPosition] = useState<[number, number, number]>([
-    0, 1.2, 0,
+    0, 1.38, 0,
   ]);
-  const [scale, setScale] = useState<[number, number, number]>([1, 1, 1]);
+  const [scale, setScale] = useState<[number, number, number]>([0.5, 0.5, 0.5]);
   const [rotation, setRotation] = useState<[number, number, number]>([0, 0, 0]);
 
   return (
@@ -110,9 +107,10 @@ export function Shirt(props: JSX.IntrinsicElements['group']) {
                 <meshBasicMaterial transparent opacity={0} />
                 <Decal
                   ref={decalRef as any}
-                  position={position} // Position of the decal
-                  scale={scale} // Scale of the decal
-                  rotation={rotation} // Rotation of the decal (can be a vector or a degree in radians)
+                  // debug // Makes "bounding box" of the decal visible
+                  position={position}
+                  scale={scale}
+                  rotation={rotation}
                 >
                   <meshBasicMaterial
                     map={decalTexture}
