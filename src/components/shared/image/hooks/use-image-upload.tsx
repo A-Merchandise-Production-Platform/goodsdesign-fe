@@ -1,6 +1,8 @@
+'use client';
+
 /* eslint-disable unicorn/no-null */
 import { useCallback, useState } from 'react';
-import { Area } from 'react-easy-crop';
+import type { Area } from 'react-easy-crop';
 
 export function useImageUpload(onChange: (file: File) => void) {
   const [preview, setPreview] = useState<string | null>(null);
@@ -28,7 +30,8 @@ export function useImageUpload(onChange: (file: File) => void) {
     setZoom(1);
     setRotation(0);
     setCroppedAreaPixels(null);
-  }, []);
+    onChange(new File([], ''));
+  }, [onChange]);
 
   const handleCropComplete = useCallback(
     (croppedArea: Area, croppedAreaPixels: Area) => {
@@ -56,6 +59,12 @@ export function useImageUpload(onChange: (file: File) => void) {
     setIsCropperOpen(true);
   }, []);
 
+  const setDefaultImage = useCallback((imageUrl: string) => {
+    setPreview(imageUrl);
+    // You might want to convert the URL to a File object here
+    // and call onChange with it if needed
+  }, []);
+
   return {
     preview,
     handleImageUpload,
@@ -71,6 +80,7 @@ export function useImageUpload(onChange: (file: File) => void) {
     isCropperOpen,
     setIsCropperOpen,
     handleEdit,
+    setDefaultImage,
   };
 }
 

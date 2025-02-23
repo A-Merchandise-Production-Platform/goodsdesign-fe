@@ -4,6 +4,7 @@ import { Route } from 'next';
 import Link from 'next/link';
 import React from 'react';
 
+import NotificationPanel from '@/components/shared/notification-panel';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -50,7 +51,11 @@ export function DynamicAdminHeader({ breadcrumbs }: DynamicAdminHeaderProps) {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <ThemeToggle />
+
+      <div className="flex items-center gap-4">
+        <NotificationPanel />
+        <ThemeToggle />
+      </div>
     </header>
   );
 }
