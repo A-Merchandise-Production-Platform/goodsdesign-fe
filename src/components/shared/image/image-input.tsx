@@ -1,6 +1,6 @@
 'use client';
 
-import { Edit2, LoaderCircleIcon, Trash2Icon, Upload, X } from 'lucide-react';
+import { Trash2Icon, Upload } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -24,6 +24,7 @@ interface ImageInputProps {
   showGrid?: boolean;
   defaultImage?: string;
   isTextDisplay?: boolean;
+  disabled?: boolean;
 }
 
 export default function ImageInput({
@@ -32,6 +33,7 @@ export default function ImageInput({
   showGrid = true,
   defaultImage,
   isTextDisplay = false,
+  disabled = false,
 }: ImageInputProps) {
   const {
     preview,
@@ -55,6 +57,7 @@ export default function ImageInput({
     onDrop: handleImageUpload,
     accept: { 'image/*': [] },
     multiple: false,
+    disabled: disabled,
   });
 
   useEffect(() => {
@@ -80,37 +83,43 @@ export default function ImageInput({
           <div
             {...getRootProps()}
             className={`relative ${isRound ? 'aspect-square' : ratio === '16:9' ? 'aspect-video' : 'aspect-square'} border-2 border-dashed transition-colors ${
-              isDragActive
+              isDragActive && !disabled
                 ? 'border-muted-foreground bg-primary/10'
                 : 'border-muted hover:border-muted-foreground'
-            } ${isRound ? 'rounded-full' : 'rounded-lg'}`}
+            } ${isRound ? 'rounded-full' : 'rounded-lg'} ${
+              disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+            }`}
           >
-            <input {...getInputProps()} />
+            <input {...getInputProps()} disabled={disabled} />
             {preview ? (
-              <div className="group relative h-full w-full cursor-pointer">
+              <div
+                className={`group relative h-full w-full ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+              >
                 <Image
                   src={preview || '/placeholder.svg'}
                   alt="Preview"
                   fill
                   className={`object-cover ${isRound ? 'rounded-full' : 'rounded-lg'}`}
                 />
-                <div className="bg-opacity-50 absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100">
-                  <div className="flex gap-2">
-                    <Button
-                      type={'button'}
-                      variant="outline"
-                      size="icon"
-                      onClick={event => {
-                        event.stopPropagation();
-                        removeImage();
-                        onChange('');
-                      }}
-                      aria-label="Remove image"
-                    >
-                      <Trash2Icon className="h-4 w-4" />
-                    </Button>
+                {!disabled && (
+                  <div className="bg-opacity-50 absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100">
+                    <div className="flex gap-2">
+                      <Button
+                        type={'button'}
+                        variant="outline"
+                        size="icon"
+                        onClick={event => {
+                          event.stopPropagation();
+                          removeImage();
+                          onChange('');
+                        }}
+                        aria-label="Remove image"
+                      >
+                        <Trash2Icon className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                )}
                 {isLoading ? (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div
@@ -123,13 +132,21 @@ export default function ImageInput({
                 ) : undefined}
               </div>
             ) : (
-              <div className="flex h-full cursor-pointer flex-col items-center justify-center p-4 text-center">
-                <Upload className="mb-4 h-12 w-12 text-gray-400" />
-                <p className="text-sm text-gray-500">
+              <div
+                className={`flex h-full flex-col items-center justify-center p-4 text-center ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+              >
+                <Upload
+                  className={`mb-4 h-12 w-12 ${disabled ? 'text-gray-300' : 'text-gray-400'}`}
+                />
+                <p
+                  className={`text-sm ${disabled ? 'text-gray-300' : 'text-gray-500'}`}
+                >
                   {isTextDisplay
-                    ? isDragActive
+                    ? isDragActive && !disabled
                       ? 'Drop the image here'
-                      : "Drag 'n' drop an image here, or click to select"
+                      : disabled
+                        ? 'Image upload disabled'
+                        : "Drag 'n' drop an image here, or click to select"
                     : undefined}
                 </p>
               </div>
@@ -138,7 +155,7 @@ export default function ImageInput({
         </CardContent>
       </Card>
 
-      <Dialog open={isCropperOpen} onOpenChange={setIsCropperOpen}>
+      <Dialog open={isCropperOpen && !disabled} onOpenChange={setIsCropperOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Crop Image</DialogTitle>

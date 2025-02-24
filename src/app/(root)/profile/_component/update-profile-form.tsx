@@ -71,6 +71,7 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
       UserApi.updateUser(id, payload),
     onSuccess: () => {
       toast.success('Profile updated successfully');
+      setIsFormChanged(false);
     },
     onError: (error: AxiosError<ApiResponse<null>>) => {
       toast.error(error.response?.data.message);
@@ -81,7 +82,6 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
     usePartialForm(formSchema, defaultFormValue);
 
   const onSubmit = (payload: Partial<FormValues>) => {
-    console.log(payload);
     mutation.mutate({ id: user?.id!, payload });
   };
 
@@ -148,7 +148,7 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
                       placeholder="userName"
                       type="text"
                       {...field}
-                      //   disabled={mutation.isPending}
+                      disabled={mutation.isPending}
                     />
                   </FormControl>
                   {form.formState.errors.userName ? (
@@ -168,6 +168,7 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
                   <Select
                     value={field.value ? 'true' : 'false'}
                     onValueChange={value => field.onChange(value === 'true')}
+                    disabled={mutation.isPending}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -197,7 +198,7 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
                         placeholder="Phone number"
                         {...field}
                         defaultCountry="VN"
-                        //   disabled={mutation.isPending}
+                        disabled={mutation.isPending}
                       />
                     </FormControl>
                     {form.formState.errors.phoneNumber ? (
@@ -226,7 +227,7 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
                               'pl-3 text-left font-normal',
                               !field.value && 'text-muted-foreground',
                             )}
-                            //   disabled={mutation.isPending}
+                            disabled={mutation.isPending}
                           >
                             {field.value ? (
                               format(field.value, 'PPP')
@@ -268,7 +269,7 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
             <div className="flex items-center justify-start gap-4">
               <Button
                 type="button"
-                disabled={!isFormChanged}
+                disabled={!isFormChanged || mutation.isPending}
                 variant={'outline'}
                 onClick={() => {
                   form.reset(defaultFormValue);
@@ -278,7 +279,11 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
                 <RotateCwIcon className="h-4 w-4" />
                 Reset
               </Button>
-              <Button type="submit" disabled={!isFormChanged}>
+              <Button
+                type="submit"
+                disabled={!isFormChanged || mutation.isPending}
+                isLoading={mutation.isPending}
+              >
                 {isFormChanged ? 'Save changes' : 'No changes to save'}
               </Button>
             </div>
