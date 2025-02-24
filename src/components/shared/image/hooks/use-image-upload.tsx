@@ -1,16 +1,31 @@
 'use client';
 
+import { ApiResponse } from '@/api/types';
+import { UploadApi } from '@/api/upload';
+import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 /* eslint-disable unicorn/no-null */
 import { useCallback, useState } from 'react';
 import type { Area } from 'react-easy-crop';
 
-export function useImageUpload(onChange: (file: File) => void) {
+export function useImageUpload(onChange: (fileUrl: string) => void) {
   const [preview, setPreview] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isCropperOpen, setIsCropperOpen] = useState(false);
+
+  const imageMutation = useMutation({
+    mutationFn: UploadApi.uploadImage,
+    onSuccess: data => {
+      onChange(data.fileUrl);
+      setPreview(data.fileUrl);
+    },
+    onError: (error: AxiosError<ApiResponse<null>>) => {
+      console.log(error.response?.data.message);
+    },
+  });
 
   const handleImageUpload = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles[0]) {
@@ -30,7 +45,7 @@ export function useImageUpload(onChange: (file: File) => void) {
     setZoom(1);
     setRotation(0);
     setCroppedAreaPixels(null);
-    onChange(new File([], ''));
+    onChange('');
   }, [onChange]);
 
   const handleCropComplete = useCallback(
@@ -48,21 +63,20 @@ export function useImageUpload(onChange: (file: File) => void) {
         rotation,
       );
       if (croppedImage) {
-        onChange(croppedImage);
-        setPreview(URL.createObjectURL(croppedImage));
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreview(reader.result as string);
+          imageMutation.mutate(croppedImage);
+        };
+        reader.readAsDataURL(croppedImage);
+        imageMutation.mutate(croppedImage);
       }
       setIsCropperOpen(false);
     }
   }, [preview, croppedAreaPixels, rotation, onChange]);
 
-  const handleEdit = useCallback(() => {
-    setIsCropperOpen(true);
-  }, []);
-
   const setDefaultImage = useCallback((imageUrl: string) => {
     setPreview(imageUrl);
-    // You might want to convert the URL to a File object here
-    // and call onChange with it if needed
   }, []);
 
   return {
@@ -79,8 +93,9 @@ export function useImageUpload(onChange: (file: File) => void) {
     handleCropConfirm,
     isCropperOpen,
     setIsCropperOpen,
-    handleEdit,
     setDefaultImage,
+    isLoading: imageMutation.isPending,
+    isError: imageMutation.isError,
   };
 }
 

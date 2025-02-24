@@ -1,6 +1,6 @@
 'use client';
 
-import { Edit2, Upload, X } from 'lucide-react';
+import { Edit2, LoaderCircleIcon, Trash2Icon, Upload, X } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -19,7 +19,7 @@ import {
 import { Slider } from '@/components/ui/slider';
 
 interface ImageInputProps {
-  onChange: (file: File) => void;
+  onChange: (fileUrl: string) => void;
   ratio?: '1:1' | '16:9' | 'round';
   showGrid?: boolean;
   defaultImage?: string;
@@ -47,8 +47,8 @@ export default function ImageInput({
     handleCropConfirm,
     isCropperOpen,
     setIsCropperOpen,
-    handleEdit,
     setDefaultImage,
+    isLoading,
   } = useImageUpload(onChange);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -87,42 +87,43 @@ export default function ImageInput({
           >
             <input {...getInputProps()} />
             {preview ? (
-              <>
-                <div className="relative h-full w-full">
-                  <Image
-                    src={preview || '/placeholder.svg'}
-                    alt="Preview"
-                    fill
-                    className={`object-cover ${isRound ? 'rounded-full' : 'rounded-lg'}`}
-                  />
+              <div className="group relative h-full w-full cursor-pointer">
+                <Image
+                  src={preview || '/placeholder.svg'}
+                  alt="Preview"
+                  fill
+                  className={`object-cover ${isRound ? 'rounded-full' : 'rounded-lg'}`}
+                />
+                <div className="bg-opacity-50 absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100">
+                  <div className="flex gap-2">
+                    <Button
+                      type={'button'}
+                      variant="outline"
+                      size="icon"
+                      onClick={event => {
+                        event.stopPropagation();
+                        removeImage();
+                        onChange('');
+                      }}
+                      aria-label="Remove image"
+                    >
+                      <Trash2Icon className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="absolute top-2 right-2 z-10 flex gap-2">
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    onClick={event => {
-                      event.stopPropagation();
-                      handleEdit();
-                    }}
-                    aria-label="Edit image"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={event => {
-                      event.stopPropagation();
-                      removeImage();
-                    }}
-                    aria-label="Remove image"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </>
+                {isLoading ? (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div
+                      className="inline-block size-8 animate-spin rounded-full border-2 border-solid border-white border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                      role="status"
+                    >
+                      <span className="sr-only">Loading...</span>
+                    </div>
+                  </div>
+                ) : undefined}
+              </div>
             ) : (
-              <div className="flex h-full flex-col items-center justify-center p-4 text-center">
+              <div className="flex h-full cursor-pointer flex-col items-center justify-center p-4 text-center">
                 <Upload className="mb-4 h-12 w-12 text-gray-400" />
                 <p className="text-sm text-gray-500">
                   {isTextDisplay
@@ -180,7 +181,9 @@ export default function ImageInput({
             <span>{rotation}°</span>
           </div>
           <DialogFooter>
-            <Button onClick={handleCropConfirm}>Confirm</Button>
+            <Button type={'button'} onClick={handleCropConfirm}>
+              Confirm
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
