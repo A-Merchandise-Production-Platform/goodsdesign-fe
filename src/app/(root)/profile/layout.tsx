@@ -4,6 +4,7 @@ import { ProfileSidebar } from '@/app/(root)/profile/_component/profile-sidebar'
 import Footer from '@/components/shared/footer';
 import Header from '@/components/shared/header';
 import AdminGuardProvider from '@/providers/admin-guard-provider';
+import AuthGuardProvider from '@/providers/auth-guard-provider';
 
 export const metadata: Metadata = {
   title: 'Profile',
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <main>
-      <AdminGuardProvider>
+      <AuthGuardProvider>
         <Header />
         <section className="mx-auto mt-16">
           <div className="container mx-auto pt-8">
@@ -25,7 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </section>
         <Footer />
-      </AdminGuardProvider>
+      </AuthGuardProvider>
     </main>
   );
 }

@@ -28,7 +28,7 @@ export namespace UserApi {
   }
 
   export async function updateUser(id: string, payload: UpdateUserDto) {
-    const response = await axiosInstance.put<ApiResponse<User>>(
+    const response = await axiosInstance.patch<ApiResponse<User>>(
       `/users/${id}`,
       payload,
     );

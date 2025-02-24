@@ -1,10 +1,15 @@
 'use client';
 
+import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { format } from 'date-fns';
 import { CalendarIcon, RotateCwIcon } from 'lucide-react';
 import React from 'react';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { ApiResponse, UpdateUserDto } from '@/api/types';
+import { UserApi } from '@/api/user';
 import ImageInput from '@/components/shared/image/image-input';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -44,47 +49,77 @@ const formSchema = z.object({
   phoneNumber: z.string().min(10).max(14).optional(),
   gender: z.boolean().optional(),
   dateOfBirth: z.date().optional(),
+  imageUrl: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 export default function UpdateProfileForm({}: UpdateProfileFormProps) {
   const { user } = useAuthStore();
-  const [file, setFile] = React.useState<File | undefined>();
 
   const defaultFormValue: FormValues = {
     email: user?.email!,
     userName: user?.userName!,
     phoneNumber: user?.phoneNumber!,
     gender: user?.gender!,
-    dateOfBirth: user?.dateOfBirth!,
+    dateOfBirth: new Date(user?.dateOfBirth!),
+    imageUrl: user?.imageUrl!,
   };
+
+  const mutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateUserDto }) =>
+      UserApi.updateUser(id, payload),
+    onSuccess: () => {
+      toast.success('Profile updated successfully');
+    },
+    onError: (error: AxiosError<ApiResponse<null>>) => {
+      toast.error(error.response?.data.message);
+    },
+  });
 
   const { form, handleSubmit, isFormChanged, setIsFormChanged } =
     usePartialForm(formSchema, defaultFormValue);
 
   const onSubmit = (payload: Partial<FormValues>) => {
     console.log(payload);
+    mutation.mutate({ id: user?.id!, payload });
   };
 
   if (!user) return;
 
   return (
-    <div className="flex gap-20">
-      <div className="flex flex-col gap-2">
-        <Label>Profile Picture</Label>
-        <div className="size-64">
-          <ImageInput
-            onChange={setFile}
-            ratio="1:1"
-            showGrid
-            defaultImage={user.imageUrl}
-          />
-        </div>
-      </div>
-      <div className="flex-1">
-        <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <Form {...form}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <div className="flex gap-20">
+          <div className="flex flex-col gap-2">
+            <div className="w-72">
+              <FormField
+                control={form.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Profile Picture</FormLabel>
+                    <FormControl>
+                      <ImageInput
+                        onChange={field.onChange}
+                        ratio="1:1"
+                        showGrid
+                        defaultImage={field.value}
+                      />
+                    </FormControl>
+                    {form.formState.errors.email ? (
+                      <FormMessage />
+                    ) : (
+                      <FormDescription>
+                        This is your avatar image.
+                      </FormDescription>
+                    )}
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+          <div className="flex-1 space-y-8">
             <FormField
               control={form.control}
               name="email"
@@ -210,6 +245,7 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
                           disabled={date =>
                             date > new Date() || date < new Date('1900-01-01')
                           }
+                          defaultMonth={field.value || new Date()}
                           initialFocus
                           fromYear={1960}
                           toYear={2030}
@@ -246,9 +282,9 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
                 {isFormChanged ? 'Save changes' : 'No changes to save'}
               </Button>
             </div>
-          </form>
-        </Form>
-      </div>
-    </div>
+          </div>
+        </div>
+      </form>
+    </Form>
   );
 }
