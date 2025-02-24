@@ -60,7 +60,11 @@ const createUserSchema = z.object({
   role: z.string().min(3, 'Please select a role'),
 });
 
-export default function CreateUserDialog() {
+interface CreateUserDialogProps {
+  refetch: () => void;
+}
+
+export default function CreateUserDialog({ refetch }: CreateUserDialogProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof createUserSchema>>({
@@ -84,6 +88,7 @@ export default function CreateUserDialog() {
     onSuccess: () => {
       toast.success('User created successfully');
       setIsDialogOpen(false);
+      refetch();
     },
     onError: (error: AxiosError<ApiResponse<null>>) => {
       toast.error(error.response?.data.message || 'Failed to create user');
@@ -282,14 +287,16 @@ export default function CreateUserDialog() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {ROLES.map(role => (
-                          <SelectItem
-                            key={role.value}
-                            value={role.value.toUpperCase()}
-                          >
-                            {role.label}
-                          </SelectItem>
-                        ))}
+                        {ROLES.filter(role => role.value !== 'admin').map(
+                          role => (
+                            <SelectItem
+                              key={role.value}
+                              value={role.value.toUpperCase()}
+                            >
+                              {role.label}
+                            </SelectItem>
+                          ),
+                        )}
                       </SelectContent>
                     </Select>
                     {form.formState.errors.role ? (

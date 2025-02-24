@@ -116,6 +116,11 @@ function handleUploadClick() {
 
 export default function ProductDesigner() {
   const [view, setView] = React.useState('front');
+  const [decalUrl, setDecalUrl] = React.useState('');
+
+  const handleExport = (imageUrl: string) => {
+    setDecalUrl(imageUrl);
+  };
 
   return (
     <div className="flex h-screen flex-col">
@@ -201,7 +206,12 @@ export default function ProductDesigner() {
                 {/* T-Shirt Template */}
                 <div className="relative h-full w-full">
                   <TShirtTemplate view={view} />
-                  <DesignCanvas view={view} width={340} height={400} />
+                  <DesignCanvas
+                    view={view}
+                    width={340}
+                    height={400}
+                    onExport={handleExport}
+                  />
                 </div>
               </div>
             </ResizablePanel>
@@ -214,7 +224,7 @@ export default function ProductDesigner() {
               <div className="h-full bg-gray-100">
                 <ModelViewer
                   modelUrl="/models/t-shirt.glb"
-                  decalUrl="/assets/logo.png"
+                  decalUrl={decalUrl}
                 />
               </div>
             </ResizablePanel>

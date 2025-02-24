@@ -26,27 +26,12 @@ function Model({ modelUrl, decalUrl }: ModelViewerProps) {
     <group>
       <mesh>
         <primitive object={scene} scale={1} />
-
-        {/* Decal Placement */}
-        {/* <meshBasicMaterial />
-        <Decal
-          debug // Makes "bounding box" of the decal visible
-          position={[0, 0, 0]} // Position of the decal
-          rotation={[0, 0, 0]} // Rotation of the decal (can be a vector or a degree in radians)
-          scale={1} // Scale of the decal
-        >
-          <meshBasicMaterial
-            map={decalTexture}
-            polygonOffset
-            polygonOffsetFactor={-1} // The material should take precedence over the original
-          />
-        </Decal> */}
       </mesh>
     </group>
   );
 }
 
-export default function ModelViewer({ modelUrl }: ModelViewerProps) {
+export default function ModelViewer({ modelUrl, decalUrl }: ModelViewerProps) {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -60,7 +45,7 @@ export default function ModelViewer({ modelUrl }: ModelViewerProps) {
       <Canvas>
         <Float>
           {/* <Model modelUrl={modelUrl} decalUrl={modelUrl} /> */}
-          <Shirt />
+          <Shirt decalUrl={decalUrl} />
         </Float>
         <ContactShadows position-y={-2.5} opacity={0.4} blur={3} />
         <Environment preset="sunset" />

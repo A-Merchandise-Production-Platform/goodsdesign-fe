@@ -40,24 +40,13 @@ axiosInstance.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
+      _isRetry?: boolean;
     };
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      try {
-        const { refreshToken } = useAuthStore.getState();
-        if (refreshToken) {
-          const response = await AuthApi.refreshToken(refreshToken);
 
-          useAuthStore.setState({
-            accessToken: response.data.accessToken,
-            refreshToken: response.data.refreshToken,
-          });
-          return axiosInstance(originalRequest);
-        } else {
-          throw error;
-        }
-      } catch (error) {
+      if (originalRequest._isRetry) {
         useAuthStore.setState({
           accessToken: undefined,
           refreshToken: undefined,
@@ -65,6 +54,30 @@ axiosInstance.interceptors.response.use(
           user: undefined,
         });
         throw error;
+      } else {
+        try {
+          const { refreshToken } = useAuthStore.getState();
+          if (refreshToken) {
+            originalRequest._isRetry = true;
+            const response = await AuthApi.refreshToken(refreshToken);
+
+            useAuthStore.setState({
+              accessToken: response.data.accessToken,
+              refreshToken: response.data.refreshToken,
+            });
+            return axiosInstance(originalRequest);
+          } else {
+            throw error;
+          }
+        } catch (error) {
+          useAuthStore.setState({
+            accessToken: undefined,
+            refreshToken: undefined,
+            isAuth: false,
+            user: undefined,
+          });
+          throw error;
+        }
       }
     } else {
       throw error;

@@ -1,10 +1,15 @@
+'use client';
+
 import * as fabric from 'fabric';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
+
+import { Button } from '@/components/ui/button';
 
 interface DesignCanvasProps {
   view: string;
   width: number;
   height: number;
+  onExport: (imageUrl: string) => void;
 }
 
 const printArea = {
@@ -14,44 +19,18 @@ const printArea = {
   'right-sleeve': { x: 40, y: 40, width: 60, height: 60 },
 };
 
-interface DesignState {
-  [key: string]: fabric.Object[];
-}
-
 export default function DesignCanvas({
   view,
   width,
   height,
+  onExport,
 }: DesignCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(undefined);
   const fabricRef = useRef<fabric.Canvas>(undefined);
-  const [designs, setDesigns] = useState<DesignState>({
-    front: [],
-    back: [],
-    'left-sleeve': [],
-    'right-sleeve': [],
-  });
-
-  // Save current canvas state before unmounting or switching views
-  const saveCurrentDesign = () => {
-    if (fabricRef.current) {
-      const objects = fabricRef.current.getObjects();
-      setDesigns(previous => ({
-        ...previous,
-        [view]: objects,
-      }));
-    }
-  };
 
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    // Save current design before reinitializing canvas
-    if (fabricRef.current) {
-      saveCurrentDesign();
-    }
-
-    // Initialize Fabric canvas
     fabricRef.current = new fabric.Canvas(canvasRef.current, {
       width,
       height,
@@ -59,8 +38,9 @@ export default function DesignCanvas({
       preserveObjectStacking: true,
     });
 
-    // Set clip area based on print area
     const area = printArea[view as keyof typeof printArea];
+
+    // Define clipping area (prevents objects from going outside)
     const clipPath = new fabric.Rect({
       left: area.x,
       top: area.y,
@@ -68,18 +48,9 @@ export default function DesignCanvas({
       height: area.height,
       absolutePositioned: true,
     });
-
     fabricRef.current.clipPath = clipPath;
 
-    // Restore designs for current view
-    if (designs[view]) {
-      designs[view].forEach(object => {
-        fabricRef.current?.add(object);
-      });
-      fabricRef.current?.renderAll();
-    }
-
-    // Add event listener for 'Delete' key
+    // Delete objects when pressing Delete key
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Delete' && fabricRef.current) {
         const activeObjects = fabricRef.current.getActiveObjects();
@@ -92,12 +63,9 @@ export default function DesignCanvas({
         }
       }
     };
-
     document.addEventListener('keydown', handleKeyDown);
 
-    // Clean up function
     return () => {
-      saveCurrentDesign();
       if (fabricRef.current) {
         fabricRef.current.dispose();
         fabricRef.current = undefined;
@@ -106,6 +74,7 @@ export default function DesignCanvas({
     };
   }, [view, width, height]);
 
+  // Function to upload image
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && fabricRef.current) {
@@ -141,9 +110,6 @@ export default function DesignCanvas({
           fabricRef.current?.add(imgInstance);
           fabricRef.current?.setActiveObject(imgInstance);
           fabricRef.current?.renderAll();
-
-          // Save the updated design
-          saveCurrentDesign();
         });
       });
     }
@@ -152,9 +118,54 @@ export default function DesignCanvas({
     event.target.value = '';
   };
 
+  const exportCanvas = () => {
+    if (!fabricRef.current) {
+      console.error('Canvas not initialized');
+      return;
+    }
+
+    try {
+      const dataURL = fabricRef.current.toDataURL({
+        format: 'png',
+        quality: 1,
+        multiplier: 1,
+      });
+
+      if (!dataURL || dataURL.length < 10) {
+        console.error('Exported image is empty');
+        return;
+      }
+
+      onExport(dataURL);
+    } catch (error) {
+      console.error('Error exporting canvas:', error);
+    }
+  };
+
+  // Function to add text
+  const addText = () => {
+    if (!fabricRef.current) return;
+
+    const text = new fabric.Textbox('Your Text', {
+      left: 100,
+      top: 100,
+      fontSize: 24,
+      fill: '#000000',
+      fontFamily: 'Arial',
+      selectable: true,
+      hasControls: true,
+    });
+
+    fabricRef.current.add(text);
+    fabricRef.current.setActiveObject(text);
+    fabricRef.current.renderAll();
+  };
+
   return (
     <div className="absolute inset-0 flex items-center justify-center">
-      <canvas ref={canvasRef as React.RefObject<HTMLCanvasElement>} />
+      <canvas ref={canvasRef as any} />
+
+      {/* Hidden File Input */}
       <input
         type="file"
         accept="image/*"
@@ -162,6 +173,12 @@ export default function DesignCanvas({
         className="hidden"
         id="image-upload"
       />
+
+      {/* Buttons */}
+      <div className="absolute right-4 bottom-4 flex gap-2">
+        <Button onClick={addText}>Add Text</Button>
+        <Button onClick={exportCanvas}>Export Design</Button>
+      </div>
     </div>
   );
 }

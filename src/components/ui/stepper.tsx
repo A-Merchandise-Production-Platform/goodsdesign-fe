@@ -46,7 +46,7 @@ export function Stepper({ steps, currentStep, onStepClick }: StepperProps) {
                       exit={{ scale: 0.8, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                       className={cn(
-                        'flex size-10 items-center justify-center rounded-full border-2 bg-background',
+                        'bg-background flex size-10 items-center justify-center rounded-full border-2',
                         index <= currentStep
                           ? 'border-primary text-primary'
                           : 'border-muted-foreground text-muted-foreground',
@@ -69,7 +69,7 @@ export function Stepper({ steps, currentStep, onStepClick }: StepperProps) {
           </li>
         ))}
       </ol>
-      <div className="absolute left-0 top-5 -z-10 w-full">
+      <div className="absolute top-5 left-0 -z-10 w-full">
         <Progress value={progressValue} className="h-1" />
       </div>
     </nav>

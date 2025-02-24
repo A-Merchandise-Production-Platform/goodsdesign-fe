@@ -1,17 +1,18 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import cn from 'classnames';
 import { format } from 'date-fns';
 import {
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
-  Edit,
+  BookUserIcon,
+  Ghost,
   MoreHorizontal,
-  Trash2,
 } from 'lucide-react';
 
 import type { User } from '@/api/types/user';
-import { Badge, BadgeVariant } from '@/components/ui/badge';
+import { DeleteUserButton } from '@/app/(root)/admin/users/_components/delete-user-button';
+import { EditUserButton } from '@/app/(root)/admin/users/_components/edit-user-button';
+import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -20,19 +21,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Separator } from '@/components/ui/separator';
+
+type UserColumnsProps = {
+  refetch: () => void;
+};
 
 const SortableHeader = ({ column, title }: { column: any; title: string }) => {
   return (
     <Button
-      variant="ghost"
+      variant="link"
       onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       type="button"
+      className="!p-0"
     >
       {title}
       {column.getIsSorted() === 'asc' ? (
@@ -46,7 +47,9 @@ const SortableHeader = ({ column, title }: { column: any; title: string }) => {
   );
 };
 
-export const userColumns: ColumnDef<User>[] = [
+export const getUserColumns = ({
+  refetch,
+}: UserColumnsProps): ColumnDef<User>[] => [
   {
     id: 'select',
     header: ({ table }) => (
@@ -118,7 +121,6 @@ export const userColumns: ColumnDef<User>[] = [
     accessorKey: 'phoneNumber',
     cell: ({ row }) => row.original.phoneNumber || 'N/A',
   },
-
   {
     id: 'status',
     header: 'Status',
@@ -168,29 +170,26 @@ export const userColumns: ColumnDef<User>[] = [
       return (
         <div className="flex justify-start">
           <DropdownMenu>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <span className="sr-only">Open menu</span>
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>More options</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem className="cursor-pointer">
-                <Edit className="mr-2 h-4 w-4" />
-                <span>Edit</span>
+              <DropdownMenuItem className="cursor-pointer" asChild>
+                <Button variant={'ghost'}>
+                  <BookUserIcon className="mr-2 h-4 w-4" />
+                  View Details
+                </Button>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer text-red-600">
-                <Trash2 className="mr-2 h-4 w-4" />
-                <span>Delete</span>
+              <Separator />
+              <DropdownMenuItem className="cursor-pointer" asChild>
+                <EditUserButton user={row.original} refetch={refetch} />
+              </DropdownMenuItem>
+              <Separator />
+              <DropdownMenuItem className="cursor-pointer" asChild>
+                <DeleteUserButton id={row.original.id} refetch={refetch} />
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
