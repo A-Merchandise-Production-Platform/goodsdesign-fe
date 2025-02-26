@@ -4,11 +4,10 @@ import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { format } from 'date-fns';
 import { CalendarIcon, RotateCwIcon } from 'lucide-react';
-import React from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
-import { ApiResponse, UpdateUserDto } from '@/api/types';
+import { ApiResponse } from '@/api/types';
 import { UserApi } from '@/api/user';
 import ImageInput from '@/components/shared/image/image-input';
 import { Button } from '@/components/ui/button';
@@ -23,7 +22,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { PhoneInput } from '@/components/ui/phone-input';
 import {
   Popover,
@@ -55,7 +53,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function UpdateProfileForm({}: UpdateProfileFormProps) {
-  const { user } = useAuthStore();
+  const { user, refreshUser } = useAuthStore();
 
   const defaultFormValue: FormValues = {
     email: user?.email!,
@@ -67,10 +65,10 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
   };
 
   const mutation = useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: UpdateUserDto }) =>
-      UserApi.updateUser(id, payload),
-    onSuccess: () => {
+    mutationFn: UserApi.updateProfile,
+    onSuccess: data => {
       toast.success('Profile updated successfully');
+      refreshUser();
       setIsFormChanged(false);
     },
     onError: (error: AxiosError<ApiResponse<null>>) => {
@@ -82,7 +80,7 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
     usePartialForm(formSchema, defaultFormValue);
 
   const onSubmit = (payload: Partial<FormValues>) => {
-    mutation.mutate({ id: user?.id!, payload });
+    mutation.mutate(payload);
   };
 
   if (!user) return;

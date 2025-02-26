@@ -48,3 +48,4 @@ export interface CreateUserDto {
 }
 
 export type UpdateUserDto = Partial<CreateUserDto>;
+export type UpdateProfileDto = Partial<Omit<UpdateUserDto, 'role'>>;

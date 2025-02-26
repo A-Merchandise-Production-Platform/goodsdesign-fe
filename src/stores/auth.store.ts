@@ -14,6 +14,7 @@ interface AuthStoreState {
   login: (accessToken: string, refreshToken: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  setUser: (user: AuthUser) => void;
 }
 
 export const defaultState: AuthStoreState = {
@@ -24,6 +25,7 @@ export const defaultState: AuthStoreState = {
   login: async () => {},
   logout: () => {},
   refreshUser: async () => {},
+  setUser: () => {},
 };
 
 export const useAuthStore = create<AuthStoreState>()(
@@ -65,6 +67,9 @@ export const useAuthStore = create<AuthStoreState>()(
               });
             });
         }
+      },
+      setUser: (user: AuthUser) => {
+        set({ user });
       },
     }),
     {

@@ -16,6 +16,7 @@ const menuItems: MenuItem[] = [
   { title: 'Home', href: '/' },
   { title: 'Login', href: '/login' },
   { title: 'Register', href: '/register' },
+  { title: 'System design', href: '/system-design' },
 ];
 
 export default function Header() {
