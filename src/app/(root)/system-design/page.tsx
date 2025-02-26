@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 
-import { ShippingApi } from '@/api/shipping';
 import {
   AddressSelector,
   AddressValue,
@@ -17,12 +16,6 @@ export default function Page() {
   });
 
   console.log(address);
-
-  const handleClick = () => {
-    ShippingApi.getAllDistricts(211).then(data => {
-      console.log(data);
-    });
-  };
 
   return (
     <div className="container mx-auto w-1/2 pt-10">
