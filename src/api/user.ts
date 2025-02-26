@@ -2,7 +2,12 @@ import buildQuery, { QueryOptions } from 'odata-query';
 
 import { axiosInstance } from '@/api';
 import { ApiResponse, Notification, ODataResponse } from '@/api/types';
-import { CreateUserDto, UpdateUserDto, User } from '@/api/types/user';
+import {
+  CreateUserDto,
+  UpdateProfileDto,
+  UpdateUserDto,
+  User,
+} from '@/api/types/user';
 
 export namespace UserApi {
   export async function getUsers(options: Partial<QueryOptions<User>>) {
@@ -33,6 +38,14 @@ export namespace UserApi {
       payload,
     );
     return response;
+  }
+
+  export async function updateProfile(payload: UpdateProfileDto) {
+    const response = await axiosInstance.patch<ApiResponse<User>>(
+      '/me',
+      payload,
+    );
+    return response.data;
   }
 
   export async function deleteUser(id: string) {

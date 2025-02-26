@@ -4,11 +4,10 @@ import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { format } from 'date-fns';
 import { CalendarIcon, RotateCwIcon } from 'lucide-react';
-import React from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
-import { ApiResponse, UpdateUserDto } from '@/api/types';
+import { ApiResponse } from '@/api/types';
 import { UserApi } from '@/api/user';
 import ImageInput from '@/components/shared/image/image-input';
 import { Button } from '@/components/ui/button';
@@ -23,7 +22,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { PhoneInput } from '@/components/ui/phone-input';
 import {
   Popover,
@@ -55,7 +53,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function UpdateProfileForm({}: UpdateProfileFormProps) {
-  const { user } = useAuthStore();
+  const { user, refreshUser } = useAuthStore();
 
   const defaultFormValue: FormValues = {
     email: user?.email!,
@@ -67,10 +65,11 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
   };
 
   const mutation = useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: UpdateUserDto }) =>
-      UserApi.updateUser(id, payload),
-    onSuccess: () => {
+    mutationFn: UserApi.updateProfile,
+    onSuccess: data => {
       toast.success('Profile updated successfully');
+      refreshUser();
+      setIsFormChanged(false);
     },
     onError: (error: AxiosError<ApiResponse<null>>) => {
       toast.error(error.response?.data.message);
@@ -81,8 +80,7 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
     usePartialForm(formSchema, defaultFormValue);
 
   const onSubmit = (payload: Partial<FormValues>) => {
-    console.log(payload);
-    mutation.mutate({ id: user?.id!, payload });
+    mutation.mutate(payload);
   };
 
   if (!user) return;
@@ -148,7 +146,7 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
                       placeholder="userName"
                       type="text"
                       {...field}
-                      //   disabled={mutation.isPending}
+                      disabled={mutation.isPending}
                     />
                   </FormControl>
                   {form.formState.errors.userName ? (
@@ -168,6 +166,7 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
                   <Select
                     value={field.value ? 'true' : 'false'}
                     onValueChange={value => field.onChange(value === 'true')}
+                    disabled={mutation.isPending}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -197,7 +196,7 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
                         placeholder="Phone number"
                         {...field}
                         defaultCountry="VN"
-                        //   disabled={mutation.isPending}
+                        disabled={mutation.isPending}
                       />
                     </FormControl>
                     {form.formState.errors.phoneNumber ? (
@@ -226,7 +225,7 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
                               'pl-3 text-left font-normal',
                               !field.value && 'text-muted-foreground',
                             )}
-                            //   disabled={mutation.isPending}
+                            disabled={mutation.isPending}
                           >
                             {field.value ? (
                               format(field.value, 'PPP')
@@ -268,7 +267,7 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
             <div className="flex items-center justify-start gap-4">
               <Button
                 type="button"
-                disabled={!isFormChanged}
+                disabled={!isFormChanged || mutation.isPending}
                 variant={'outline'}
                 onClick={() => {
                   form.reset(defaultFormValue);
@@ -278,7 +277,11 @@ export default function UpdateProfileForm({}: UpdateProfileFormProps) {
                 <RotateCwIcon className="h-4 w-4" />
                 Reset
               </Button>
-              <Button type="submit" disabled={!isFormChanged}>
+              <Button
+                type="submit"
+                disabled={!isFormChanged || mutation.isPending}
+                isLoading={mutation.isPending}
+              >
                 {isFormChanged ? 'Save changes' : 'No changes to save'}
               </Button>
             </div>

@@ -8,7 +8,6 @@ import { AuthApi } from '@/api/auth';
 import { useAuthStore } from '@/stores/auth.store';
 
 const baseUrl = process.env.API_URL;
-console.log('API_URL:', process.env.API_URL);
 
 export const axiosInstance = axios.create({
   baseURL: baseUrl,
@@ -59,12 +58,27 @@ axiosInstance.interceptors.response.use(
           const { refreshToken } = useAuthStore.getState();
           if (refreshToken) {
             originalRequest._isRetry = true;
-            const response = await AuthApi.refreshToken(refreshToken);
+            AuthApi.refreshToken(refreshToken)
+              .then(response => {
+                useAuthStore.setState({
+                  accessToken: response.data.accessToken,
+                  refreshToken: response.data.refreshToken,
+                });
+                return axiosInstance(originalRequest);
+              })
+              .catch(() => {
+                useAuthStore.setState({
+                  accessToken: undefined,
+                  refreshToken: undefined,
+                  isAuth: false,
+                  user: undefined,
+                });
+                throw error;
+              })
+              .finally(() => {
+                originalRequest._isRetry = false;
+              });
 
-            useAuthStore.setState({
-              accessToken: response.data.accessToken,
-              refreshToken: response.data.refreshToken,
-            });
             return axiosInstance(originalRequest);
           } else {
             throw error;

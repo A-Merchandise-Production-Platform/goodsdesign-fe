@@ -57,10 +57,10 @@ function Button({
       {...props}
     >
       {isLoading ? (
-        <>
+        <div className="flex items-center gap-2">
           <Loader2 className="h-4 w-4 animate-spin" />
-          {typeof children === 'string' ? 'Loading...' : children}
-        </>
+          Loading...
+        </div>
       ) : (
         children
       )}
