@@ -114,12 +114,14 @@ export default function NotificationPanel() {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon" className="relative">
           <BellIcon className="h-5 w-5" />
-          <Badge
-            variant="destructive"
-            className="absolute -top-3 -right-3 rounded-full px-2 py-1 text-xs"
-          >
-            {unreadNumber > 99 ? '99+' : unreadNumber}
-          </Badge>
+          {unreadNumber > 0 ? (
+            <Badge
+              variant="destructive"
+              className="absolute -top-3 -right-3 rounded-full px-2 py-1 text-xs"
+            >
+              {unreadNumber > 99 ? '99+' : unreadNumber}
+            </Badge>
+          ) : undefined}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-96 border" align={'end'}>
@@ -199,19 +201,25 @@ function NotificationList({
 
   return (
     <div className="space-y-4">
-      {Object.entries(groupedNotifications).map(([date, items]) => (
-        <div key={date} className="space-y-2">
-          <h3 className="text-muted-foreground px-2 text-sm font-medium">
-            {date === new Date().toLocaleDateString() ? 'Today' : date}
-          </h3>
-          {items.map(notification => (
-            <NotificationItem
-              key={notification.id}
-              notification={notification}
-            />
-          ))}
+      {notifications.length > 0 ? (
+        Object.entries(groupedNotifications).map(([date, items]) => (
+          <div key={date} className="space-y-2">
+            <h3 className="text-muted-foreground px-2 text-sm font-medium">
+              {date === new Date().toLocaleDateString() ? 'Today' : date}
+            </h3>
+            {items.map(notification => (
+              <NotificationItem
+                key={notification.id}
+                notification={notification}
+              />
+            ))}
+          </div>
+        ))
+      ) : (
+        <div className="text-muted-foreground flex h-96 items-center justify-center">
+          <p>No notifications yet</p>
         </div>
-      ))}
+      )}
     </div>
   );
 }

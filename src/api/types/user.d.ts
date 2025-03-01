@@ -48,4 +48,13 @@ export interface CreateUserDto {
 }
 
 export type UpdateUserDto = Partial<CreateUserDto>;
-export type UpdateProfileDto = Partial<Omit<UpdateUserDto, 'role'>>;
+
+interface Address {
+  provinceID: number;
+  districtID: number;
+  wardCode: string;
+  street: string;
+}
+export type UpdateProfileDto = Partial<Omit<UpdateUserDto, 'role'>> & {
+  addresses?: Address[];
+};
