@@ -77,7 +77,7 @@ export default function ImageInput({
   return (
     <>
       <Card
-        className={`mx-auto w-full ${isRound ? 'overflow-hidden rounded-full' : ''}`}
+        className={`mx-auto w-full p-0 ${isRound ? 'overflow-hidden rounded-full' : ''}`}
       >
         <CardContent className="p-2">
           <div
