@@ -29,6 +29,7 @@ interface ComboboxProps<T> {
   emptyText: string;
   disabled?: boolean;
   isLoading?: boolean;
+  className?: string;
 }
 
 export function Combobox<T>({
@@ -41,25 +42,33 @@ export function Combobox<T>({
   emptyText,
   disabled = false,
   isLoading = false,
+  className,
 }: ComboboxProps<T>) {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
 
+  const removeDiacritics = (str: string) => {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  };
+
   const filteredData = React.useMemo(() => {
+    const normalizedQuery = removeDiacritics(searchQuery.toLowerCase());
     return data.filter(item =>
-      displayValue(item).toLowerCase().includes(searchQuery.toLowerCase()),
+      removeDiacritics(displayValue(item).toLowerCase()).includes(
+        normalizedQuery,
+      ),
     );
   }, [data, displayValue, searchQuery]);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
           role="combobox"
           type="button"
           aria-expanded={open}
-          className="w-full justify-between"
+          className={cn('w-full justify-between', className)}
           disabled={disabled}
           isLoading={isLoading}
         >

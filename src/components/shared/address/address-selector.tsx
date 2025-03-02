@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { useDebounce } from '@/hooks/use-debounce';
 
 import { Combobox } from './combobox';
+import { Textarea } from '@/components/ui/textarea';
 
 export type AddressValue = {
   provinceId: number;
@@ -75,7 +76,9 @@ export function AddressSelector({
     setSelectedWard(value || undefined);
   };
 
-  const handleStreetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleStreetChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
     setStreet(event.target.value);
   };
 
@@ -96,7 +99,7 @@ export function AddressSelector({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col items-center gap-4">
         <Combobox<Province>
           data={provinces || []}
           value={selectedProvince}
@@ -156,13 +159,13 @@ export function AddressSelector({
           isLoading={isLoadingWards}
         />
       </div>
-      <Input
+      <Textarea
         placeholder="Enter address number & street..."
-        type="text"
         id="address"
         value={street}
         onChange={handleStreetChange}
         disabled={disabled}
+        className="resize-none"
       />
     </div>
   );

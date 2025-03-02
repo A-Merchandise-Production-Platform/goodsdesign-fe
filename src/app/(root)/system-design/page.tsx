@@ -5,7 +5,7 @@ import { useState } from 'react';
 import {
   AddressSelector,
   AddressValue,
-} from '@/components/shared/address/address-input';
+} from '@/components/shared/address/address-selector';
 
 export default function Page() {
   const [address, setAddress] = useState<AddressValue | undefined>({

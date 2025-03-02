@@ -42,6 +42,7 @@ function Button({
   asChild = false,
   isLoading = false,
   children,
+  type = 'button',
   ...props
 }: React.ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
