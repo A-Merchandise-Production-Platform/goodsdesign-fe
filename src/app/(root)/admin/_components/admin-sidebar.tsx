@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { AdminSidebarHeader } from '@/app/(root)/admin/components/admin-sidebar-header';
-import { adminSidebarItems } from '@/app/(root)/admin/components/admin-sidebar-items';
+import { AdminSidebarHeader } from '@/app/(root)/admin/_components/admin-sidebar-header';
+import { adminSidebarItems } from '@/app/(root)/admin/_components/admin-sidebar-items';
 import {
   Sidebar,
   SidebarContent,

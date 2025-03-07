@@ -7,6 +7,9 @@ import { Toaster } from '@/components/ui/sonner';
 import AuthProvider from '@/providers/auth-provider';
 import QueryClientProvider from '@/providers/query-client-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
+import Header from '@/components/shared/header';
+import Footer from '@/components/shared/footer';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -41,7 +44,15 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryClientProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              <ScrollArea className="h-screen">
+                <main className="container mx-auto pt-16">
+                  <Header />
+                  {children}
+                  <Footer />
+                </main>
+              </ScrollArea>
+            </AuthProvider>
           </QueryClientProvider>
           <Toaster richColors />
         </ThemeProvider>

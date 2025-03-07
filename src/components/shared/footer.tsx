@@ -6,7 +6,7 @@ export default function Footer() {
     <section className="fixed right-0 bottom-0 left-0 h-6 w-screen border-t p-1 backdrop-blur-md">
       <footer className="flex h-full w-full items-center justify-center">
         <p className="text-muted-foreground text-xs select-none">
-          &copy; 2024{' '}
+          &copy; {new Date().getFullYear()}{' '}
           <Link href="/" className="underline">
             GoodsDesign
           </Link>

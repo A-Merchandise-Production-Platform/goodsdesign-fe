@@ -1,6 +1,6 @@
 'use client';
 
-import { DynamicAdminHeader } from '@/app/(root)/admin/components/dynamic-admin-header';
+import { DynamicAdminHeader } from '@/app/(root)/admin/_components/dynamic-admin-header';
 import { UserDataTable } from '@/app/(root)/admin/users/_components/user-data-table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 

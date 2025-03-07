@@ -1,4 +1,4 @@
-import { DynamicAdminHeader } from '../components/dynamic-admin-header';
+import { DynamicAdminHeader } from '../_components/dynamic-admin-header';
 import CategoryManagement from './components/category-management';
 
 export default function CategoriesPage() {

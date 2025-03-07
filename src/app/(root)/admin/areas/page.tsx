@@ -1,7 +1,7 @@
 import AreaDataTable from '@/app/(root)/admin/areas/components/area-data-table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-import { DynamicAdminHeader } from '../components/dynamic-admin-header';
+import { DynamicAdminHeader } from '../_components/dynamic-admin-header';
 import AreaManagement from './components/area-management';
 
 export default function AreasPage() {
