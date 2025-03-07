@@ -26,9 +26,5 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="pt-6">
-      <MySidebar navItems={navItems} children={children} />
-    </div>
-  );
+  return <MySidebar navItems={navItems} children={children} />;
 }

@@ -1,24 +1,12 @@
 'use client';
-
-import { DynamicAdminHeader } from '@/app/(root)/admin/_components/dynamic-admin-header';
-import { UserDataTable } from '@/app/(root)/admin/users/_components/user-data-table';
-import { ScrollArea } from '@/components/ui/scroll-area';
-
 export default function Page() {
   return (
-    <div className="flex h-screen flex-col">
-      <DynamicAdminHeader
-        breadcrumbs={[
-          { href: '/admin', label: 'Dashboard' },
-          { label: 'Users' },
-        ]}
-      />
-      <ScrollArea className="grow">
-        <div className="p-4">
-          <h1 className="mb-4 text-2xl font-bold">User Management</h1>
-          <UserDataTable />
-        </div>
-      </ScrollArea>
+    <div className="grid h-full grid-cols-3 grid-rows-4 gap-4 rounded-lg md:grid-cols-3">
+      <div className="bg-muted/50 col-span-1 row-span-1 rounded-lg" />
+      <div className="bg-muted/50 col-span-1 row-span-1 rounded-lg" />
+      <div className="bg-muted/50 col-span-1 row-span-1 rounded-lg" />
+      <div className="bg-muted/50 col-span-2 row-span-3 rounded-lg" />
+      <div className="bg-muted/50 col-span-1 row-span-3 rounded-lg" />
     </div>
   );
 }
