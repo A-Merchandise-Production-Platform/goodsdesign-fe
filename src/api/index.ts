@@ -9,6 +9,15 @@ import { useAuthStore } from '@/stores/auth.store';
 
 const baseUrl = process.env.API_URL;
 
+const resetAuthState = () => {
+  useAuthStore.setState({
+    accessToken: undefined,
+    refreshToken: undefined,
+    isAuth: false,
+    user: undefined,
+  });
+};
+
 export const axiosInstance = axios.create({
   baseURL: baseUrl,
   headers: {
@@ -39,62 +48,32 @@ axiosInstance.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
-      _isRetry?: boolean;
     };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    if (error.response?.status !== 401 || originalRequest._retry) {
+      return Promise.reject(error);
+    }
 
-      if (originalRequest._isRetry) {
-        useAuthStore.setState({
-          accessToken: undefined,
-          refreshToken: undefined,
-          isAuth: false,
-          user: undefined,
-        });
-        throw error;
-      } else {
-        try {
-          const { refreshToken } = useAuthStore.getState();
-          if (refreshToken) {
-            originalRequest._isRetry = true;
-            AuthApi.refreshToken(refreshToken)
-              .then(response => {
-                useAuthStore.setState({
-                  accessToken: response.data.accessToken,
-                  refreshToken: response.data.refreshToken,
-                });
-                return axiosInstance(originalRequest);
-              })
-              .catch(() => {
-                useAuthStore.setState({
-                  accessToken: undefined,
-                  refreshToken: undefined,
-                  isAuth: false,
-                  user: undefined,
-                });
-                throw error;
-              })
-              .finally(() => {
-                originalRequest._isRetry = false;
-              });
+    originalRequest._retry = true;
+    const { refreshToken } = useAuthStore.getState();
 
-            return axiosInstance(originalRequest);
-          } else {
-            throw error;
-          }
-        } catch (error) {
-          useAuthStore.setState({
-            accessToken: undefined,
-            refreshToken: undefined,
-            isAuth: false,
-            user: undefined,
-          });
-          throw error;
-        }
-      }
-    } else {
-      throw error;
+    if (!refreshToken) {
+      resetAuthState();
+      return Promise.reject(error);
+    }
+
+    try {
+      const response = await AuthApi.refreshToken(refreshToken);
+      useAuthStore.setState({
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      });
+      return axiosInstance(originalRequest);
+    } catch (refreshError) {
+      resetAuthState();
+      return Promise.reject(error);
+    } finally {
+      originalRequest._retry = false;
     }
   },
 );

@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
+import { useAuthStore } from '@/stores/auth.store';
 
 const formSchema = z
   .object({
@@ -31,8 +32,8 @@ const formSchema = z
     password: z.string({ message: 'Password is required' }).min(6, {
       message: 'Password must be at least 6 characters',
     }),
-    userName: z.string({ message: 'Username is required' }).min(3, {
-      message: 'Username must be at least 3 characters',
+    name: z.string({ message: 'name is required' }).min(3, {
+      message: 'name must be at least 3 characters',
     }),
     confirmPassword: z
       .string({ message: 'Confirm password is required' })
@@ -44,25 +45,33 @@ const formSchema = z
 
 export default function RegisterForm() {
   const router = useRouter();
+  const { login } = useAuthStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
       password: '',
-      userName: '',
+      name: '',
       confirmPassword: '',
     },
   });
 
   const mutation = useMutation({
     mutationFn: AuthApi.register,
-    onError: (error: AxiosError<RegisterResponse>) => {
-      toast.error(error.response?.data.message);
+    onError: (error: AxiosError<null>) => {
+      if (error.status === 400) {
+        toast.error('Invalid input data');
+      } else if (error.status === 409) {
+        toast.error('Email already exists');
+      } else {
+        toast.error('Something went wrong');
+      }
     },
-    onSuccess: () => {
+    onSuccess: data => {
       toast.success('Account created successfully');
-      router.push('/login');
+      login(data);
+      router.push('/');
     },
   });
 
@@ -99,10 +108,10 @@ export default function RegisterForm() {
 
         <FormField
           control={form.control}
-          name="userName"
+          name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex-1">User Name</FormLabel>
+              <FormLabel className="flex-1">Name</FormLabel>
               <FormControl>
                 <Input placeholder=" Nguyen Van A" {...field} />
               </FormControl>

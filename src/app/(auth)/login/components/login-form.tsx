@@ -43,12 +43,12 @@ export default function LoginForm() {
     mutationFn: AuthApi.login,
     onError: (error: AxiosError<LoginResponse>) => {
       console.error(error);
-      toast.error(error.response?.data.message);
+      toast.error('Invalid Credentials');
     },
     onSuccess: data => {
       toast.success('Logged in successfully');
-      login(data.data.accessToken, data.data.refreshToken);
       router.push('/');
+      login(data);
     },
   });
 

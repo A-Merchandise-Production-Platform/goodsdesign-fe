@@ -3,6 +3,7 @@ import {
   GetMeResponse,
   LoginPayload,
   LoginResponse,
+  RefreshTokenResponse,
   RegisterFOPayload,
   RegisterPayload,
   RegisterResponse,
@@ -30,7 +31,7 @@ export namespace AuthApi {
   }
 
   export async function getMe(): Promise<GetMeResponse> {
-    const response = await axiosInstance.get<GetMeResponse>('/me');
+    const response = await axiosInstance.get<GetMeResponse>('/auth/me');
 
     return response.data;
   }
@@ -38,7 +39,7 @@ export namespace AuthApi {
   export async function refreshToken(
     refreshToken: string,
   ): Promise<LoginResponse> {
-    const response = await axiosInstance.post<LoginResponse>(
+    const response = await axiosInstance.post<RefreshTokenResponse>(
       '/auth/refresh-token',
       {
         refreshToken,

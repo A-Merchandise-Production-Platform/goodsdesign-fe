@@ -16,7 +16,7 @@ const nextConfig = {
   // Additional config options here
   output: 'standalone',
   env: {
-    API_URL: 'https://api.goodsdesign.uydev.id.vn/api',
+    API_URL: 'http://localhost:5000',
   },
 };
 

@@ -2,11 +2,11 @@ import { ApiResponse } from './index';
 
 export interface RegisterPayload {
   email: string;
+  name: string;
   password: string;
-  confirmPassword: string;
 }
 
-export interface RegisterResponse extends ApiResponse<null> {}
+export type RegisterResponse = LoginResponse;
 
 export interface Tokens {
   accessToken: string;
@@ -18,9 +18,15 @@ export interface LoginPayload {
   password: string;
 }
 
-export interface LoginResponse extends ApiResponse<Tokens> {}
+export interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: User;
+}
 
-export interface GetMeResponse extends ApiResponse<User> {}
+export type RefreshTokenResponse = LoginResponse;
+
+export type GetMeResponse = User;
 
 export interface RegisterFOPayload {
   email: string;

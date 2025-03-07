@@ -1,7 +1,6 @@
 import Link from 'next/link';
 
 import RegisterForm from '@/app/(auth)/register/components/register-form';
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -23,11 +22,6 @@ export default function Page() {
           <RegisterForm />
         </CardContent>
         <CardFooter className="flex flex-col items-start text-sm">
-          <Link href={'/register/factory-owner'} className="w-full">
-            <Button className="w-full" variant={'outline'}>
-              Register as a factory owner
-            </Button>
-          </Link>
           <Separator className="my-4" />
           <div className="flex items-center">
             <span className="text-muted-foreground mr-2 text-sm">

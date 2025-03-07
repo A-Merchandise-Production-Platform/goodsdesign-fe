@@ -6,6 +6,7 @@ import {
   LogOut,
   Sparkles,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -30,6 +31,12 @@ import { AuthUser } from '@/types/user';
 export function AdminSidebarHeader({ user }: { user: AuthUser }) {
   const { isMobile } = useSidebar();
   const { logout } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/');
+  };
 
   return (
     <SidebarMenu>
@@ -41,13 +48,13 @@ export function AdminSidebarHeader({ user }: { user: AuthUser }) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded">
-                <AvatarImage src={user.imageUrl || ''} alt={user.userName} />
+                <AvatarImage src={user.imageUrl || ''} alt={user.name} />
                 <AvatarFallback className="rounded-lg">
-                  {user.userName[0]}
+                  {user.name[0]}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.userName}</span>
+                <span className="truncate font-semibold">{user.name}</span>
                 <span className="truncate text-xs">{user.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
@@ -62,15 +69,13 @@ export function AdminSidebarHeader({ user }: { user: AuthUser }) {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.imageUrl || ''} alt={user.userName} />
+                  <AvatarImage src={user.imageUrl || ''} alt={user.name} />
                   <AvatarFallback className="rounded-lg">
-                    {user.userName[0]}
+                    {user.name[0]}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
-                    {user.userName}
-                  </span>
+                  <span className="truncate font-semibold">{user.name}</span>
                   <span className="truncate text-xs">{user.email}</span>
                 </div>
               </div>
@@ -98,7 +103,7 @@ export function AdminSidebarHeader({ user }: { user: AuthUser }) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout}>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

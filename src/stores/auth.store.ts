@@ -2,17 +2,19 @@ import { redirect } from 'next/navigation';
 import { toast } from 'sonner';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { useRouter } from 'next/navigation';
 
 import { AuthApi } from '@/api/auth';
 import { AuthUser } from '@/types/user';
+import { LoginResponse } from '@/api/types';
 
 interface AuthStoreState {
   isAuth: boolean;
   user: AuthUser | undefined;
   accessToken: string | undefined;
   refreshToken: string | undefined;
-  login: (accessToken: string, refreshToken: string) => Promise<void>;
-  logout: () => void;
+  login: (payload: LoginResponse) => Promise<void>;
+  logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   setUser: (user: AuthUser) => void;
 }
@@ -23,7 +25,7 @@ export const defaultState: AuthStoreState = {
   accessToken: undefined,
   refreshToken: undefined,
   login: async () => {},
-  logout: () => {},
+  logout: async () => {},
   refreshUser: async () => {},
   setUser: () => {},
 };
@@ -32,16 +34,15 @@ export const useAuthStore = create<AuthStoreState>()(
   persist(
     (set, get) => ({
       ...defaultState,
-      login: async (accessToken: string, refreshToken: string) => {
-        set({ accessToken, refreshToken });
-        if (accessToken && refreshToken) {
-          AuthApi.getMe().then(response => {
-            set({ isAuth: true, user: response.data });
-          });
-        }
+      login: async (payload: LoginResponse) => {
+        set({
+          accessToken: payload.accessToken,
+          refreshToken: payload.refreshToken,
+          user: payload.user,
+          isAuth: true,
+        });
       },
       logout: async () => {
-        await AuthApi.logout();
         set({
           isAuth: false,
           user: undefined,
@@ -55,7 +56,7 @@ export const useAuthStore = create<AuthStoreState>()(
         if (state.accessToken && state.refreshToken) {
           AuthApi.getMe()
             .then(response => {
-              set({ isAuth: true, user: response.data });
+              set({ isAuth: true, user: response });
             })
             .catch(() => {
               console.log('Failed to refresh user');
