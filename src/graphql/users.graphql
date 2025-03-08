@@ -1,0 +1,29 @@
+# src/graphql/users.graphql
+query GetUsers($filter: UserFilter) {
+  users(filter: $filter) {
+    meta {
+      limit
+      page
+      total
+      totalPages
+    }
+    items {
+      id
+      gender
+      email
+      createdAt
+      imageUrl
+      name
+      role
+      createdBy
+      dateOfBirth
+      deletedAt
+      deletedBy
+      isActive
+      isDeleted
+      phoneNumber
+      updatedAt
+      updatedBy
+    }
+  }
+}
