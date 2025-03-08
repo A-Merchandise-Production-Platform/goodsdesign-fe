@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import CreateUserButton from '@/app/(root)/admin/users/_components/create-user-button';
 
 const sortFields = [
   { label: 'Created Date', value: 'createdAt' },
@@ -49,7 +50,7 @@ export default function UserDataTable() {
 
   const debouncedSearch = useDebounce(searchQuery, 500);
 
-  const { data, isLoading, error } = useUsers({
+  const { data, isLoading } = useUsers({
     pagination: { page, limit: pageSize },
     sort: { [sortField]: sortDirection },
     ...(debouncedSearch ? { email: debouncedSearch } : {}),
@@ -154,28 +155,19 @@ export default function UserDataTable() {
             </PopoverContent>
           </Popover>
         </div>
-        <Button variant="outline" className="">
-          <PlusCircle className="h-4 w-4" />
-          Add User
-        </Button>
+        <CreateUserButton />
       </div>
-      {isLoading ? (
-        <div className="flex h-full items-center justify-center">
-          <Loader2 className="h-10 w-10 animate-spin" />
-          <p className="text-muted-foreground text-sm">Loading...</p>
-        </div>
-      ) : (
-        <DataTable
-          data={data?.users.items ?? []}
-          columns={columns}
-          pageCount={data?.users.meta.totalPages ?? 1}
-          currentPage={page}
-          pageSize={pageSize}
-          totalItems={data?.users.meta.total ?? 0}
-          onPageChange={setPage}
-          onPageSizeChange={handlePageSizeChange}
-        />
-      )}
+      <DataTable
+        data={data?.users.items ?? []}
+        columns={columns}
+        pageCount={data?.users.meta.totalPages ?? 1}
+        currentPage={page}
+        pageSize={pageSize}
+        totalItems={data?.users.meta.total ?? 0}
+        isLoading={isLoading}
+        onPageChange={setPage}
+        onPageSizeChange={handlePageSizeChange}
+      />
     </div>
   );
 }

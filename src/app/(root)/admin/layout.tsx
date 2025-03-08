@@ -1,4 +1,5 @@
 import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
+import AdminGuardProvider from '@/providers/admin-guard-provider';
 import { HomeIcon, ShoppingCartIcon, UsersIcon } from 'lucide-react';
 import { Metadata } from 'next';
 
@@ -26,5 +27,9 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <MySidebar navItems={navItems} children={children} />;
+  return (
+    <AdminGuardProvider>
+      <MySidebar navItems={navItems} children={children} />
+    </AdminGuardProvider>
+  );
 }

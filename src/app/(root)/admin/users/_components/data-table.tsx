@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -32,6 +33,7 @@ interface DataTableProps<TData, TValue> {
   currentPage?: number;
   pageSize?: number;
   totalItems?: number;
+  isLoading?: boolean;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
 }
@@ -43,6 +45,7 @@ export function DataTable<TData, TValue>({
   currentPage = 1,
   pageSize = 10,
   totalItems = 0,
+  isLoading = false,
   onPageChange,
   onPageSizeChange,
 }: DataTableProps<TData, TValue>) {
@@ -52,7 +55,7 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     state: {
       pagination: {
-        pageIndex: currentPage - 1, // Convert to 0-based index
+        pageIndex: currentPage - 1,
         pageSize,
       },
     },
@@ -60,7 +63,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex-grow overflow-auto rounded-md">
+      <div className="flex-grow overflow-auto rounded-md border">
         <Table>
           <TableHeader className="bg-background sticky top-0">
             {table.getHeaderGroups().map(headerGroup => (
@@ -81,7 +84,17 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              Array.from({ length: pageSize }).map((_, index) => (
+                <TableRow key={index}>
+                  {columns.map((column, cellIndex) => (
+                    <TableCell key={cellIndex}>
+                      <Skeleton className="h-6 w-[100px]" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map(row => (
                 <TableRow
                   key={row.id}
@@ -112,10 +125,18 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="bg-background flex h-14 items-center justify-between border-t px-4">
         <div className="text-muted-foreground text-sm">
-          Page {currentPage} of {pageCount}
+          {isLoading ? (
+            <Skeleton className="h-4 w-[100px]" />
+          ) : (
+            `Page ${currentPage} of ${pageCount}`
+          )}
         </div>
         <div className="text-muted-foreground text-sm">
-          Total {totalItems} items
+          {isLoading ? (
+            <Skeleton className="h-4 w-[100px]" />
+          ) : (
+            `Total ${totalItems} items`
+          )}
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -126,7 +147,7 @@ export function DataTable<TData, TValue>({
                 onPageChange?.(currentPage - 1);
               }
             }}
-            disabled={currentPage <= 1}
+            disabled={isLoading || currentPage <= 1}
           >
             <ChevronLeft className="h-4 w-4" />
             Previous
@@ -139,7 +160,7 @@ export function DataTable<TData, TValue>({
                 onPageChange?.(currentPage + 1);
               }
             }}
-            disabled={currentPage >= pageCount}
+            disabled={isLoading || currentPage >= pageCount}
           >
             Next
             <ChevronRight className="h-4 w-4" />
@@ -147,6 +168,7 @@ export function DataTable<TData, TValue>({
           <Select
             value={pageSize.toString()}
             onValueChange={value => onPageSizeChange?.(Number(value))}
+            disabled={isLoading}
           >
             <SelectTrigger className="w-[70px]">
               <SelectValue />
