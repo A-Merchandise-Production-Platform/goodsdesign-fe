@@ -1,10 +1,22 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { RoleBadge } from '@/components/ui/role-badge';
 import { GraphQlUser } from '@/graphql/generated';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
+import { MoreHorizontal } from 'lucide-react';
 import Image from 'next/image';
 
 export const columns: ColumnDef<Partial<GraphQlUser>>[] = [
@@ -85,6 +97,31 @@ export const columns: ColumnDef<Partial<GraphQlUser>>[] = [
     header: 'Updated At',
     cell: ({ row }) => {
       return <p>{format(row.original.updatedAt, 'dd/MM/yyyy HH:mm')}</p>;
+    },
+  },
+  {
+    id: 'actions',
+    enableHiding: false,
+    cell: ({ row }) => {
+      const payment = row.original;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="border">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem>Copy payment ID</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>View customer</DropdownMenuItem>
+            <DropdownMenuItem>View payment details</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
     },
   },
 ];
