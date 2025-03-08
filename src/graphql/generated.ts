@@ -64,6 +64,12 @@ export type GraphQlUser = {
   updatedBy?: Maybe<Scalars['String']['output']>;
 };
 
+export type MonthlyUserGrowth = {
+  __typename?: 'MonthlyUserGrowth';
+  month: Scalars['String']['output'];
+  users: Scalars['Int']['output'];
+};
+
 export type PaginatedUsers = {
   __typename?: 'PaginatedUsers';
   items: Array<GraphQlUser>;
@@ -108,6 +114,7 @@ export type Query = {
   products: Array<Product>;
   systemConfigBanks: Array<SystemConfigBank>;
   user: GraphQlUser;
+  userAnalytics: UserAnalytics;
   users: PaginatedUsers;
 };
 
@@ -117,6 +124,12 @@ export type QueryUserArgs = {
 
 export type QueryUsersArgs = {
   filter?: InputMaybe<UserFilter>;
+};
+
+export type RoleDistribution = {
+  __typename?: 'RoleDistribution';
+  count: Scalars['Int']['output'];
+  role: Scalars['String']['output'];
 };
 
 /** User roles */
@@ -157,6 +170,13 @@ export type SystemConfigBank = {
   updatedBy?: Maybe<Scalars['String']['output']>;
 };
 
+export type UserAnalytics = {
+  __typename?: 'UserAnalytics';
+  monthlyGrowth: Array<MonthlyUserGrowth>;
+  roleDistribution: Array<RoleDistribution>;
+  stats: UserStats;
+};
+
 export type UserFilter = {
   email?: InputMaybe<Scalars['String']['input']>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
@@ -172,6 +192,38 @@ export type UserSort = {
   updatedAt?: InputMaybe<SortOrder>;
 };
 
+export type UserStats = {
+  __typename?: 'UserStats';
+  activeUsers: Scalars['Int']['output'];
+  newUsersLast30Days: Scalars['Int']['output'];
+  totalUsers: Scalars['Int']['output'];
+};
+
+export type UserAnalyticsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type UserAnalyticsQuery = {
+  __typename?: 'Query';
+  userAnalytics: {
+    __typename?: 'UserAnalytics';
+    monthlyGrowth: Array<{
+      __typename?: 'MonthlyUserGrowth';
+      month: string;
+      users: number;
+    }>;
+    roleDistribution: Array<{
+      __typename?: 'RoleDistribution';
+      count: number;
+      role: string;
+    }>;
+    stats: {
+      __typename?: 'UserStats';
+      activeUsers: number;
+      newUsersLast30Days: number;
+      totalUsers: number;
+    };
+  };
+};
+
 export type GetUsersQueryVariables = Exact<{
   filter?: InputMaybe<UserFilter>;
 }>;
@@ -180,21 +232,31 @@ export type GetUsersQuery = {
   __typename?: 'Query';
   users: {
     __typename?: 'PaginatedUsers';
+    meta: {
+      __typename?: 'PaginationMeta';
+      limit: number;
+      page: number;
+      total: number;
+      totalPages: number;
+    };
     items: Array<{
       __typename?: 'GraphQLUser';
       id: string;
+      gender: boolean;
       email?: string | null;
+      createdAt: any;
+      imageUrl?: string | null;
       name?: string | null;
       role: Roles;
+      createdBy?: string | null;
+      dateOfBirth?: any | null;
+      deletedAt?: any | null;
+      deletedBy?: string | null;
       isActive: boolean;
-      createdAt: any;
+      isDeleted: boolean;
+      phoneNumber?: string | null;
+      updatedAt?: any | null;
+      updatedBy?: string | null;
     }>;
-    meta: {
-      __typename?: 'PaginationMeta';
-      total: number;
-      page: number;
-      limit: number;
-      totalPages: number;
-    };
   };
 };

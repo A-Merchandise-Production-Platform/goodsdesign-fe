@@ -1,0 +1,18 @@
+# src/graphql/userAnalytics.graphql
+query UserAnalytics {
+  userAnalytics {
+    monthlyGrowth {
+      month
+      users
+    }
+    roleDistribution {
+      count
+      role
+    }
+    stats {
+      activeUsers
+      newUsersLast30Days
+      totalUsers
+    }
+  }
+}
