@@ -38,8 +38,8 @@ export interface Role {
 
 export interface CreateUserDto {
   email: string;
+  name: string;
   password: string;
-  userName: string;
   phoneNumber?: string;
   gender?: boolean;
   dateOfBirth?: Date;

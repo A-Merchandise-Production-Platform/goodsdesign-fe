@@ -19,7 +19,7 @@ export function MySidebar({ navItems, children }: MySidebarProps) {
 
   return (
     <div className="grid h-[calc(100vh-4rem-1.5rem)] grid-cols-1 gap-6 pt-4 pb-2 md:grid-cols-[200px_1fr]">
-      <nav className="dark:bg-muted/30 bg-muted space-y-1 rounded-xl p-2">
+      <nav className="bg-background mb-6 space-y-1 rounded-xl p-2">
         {navItems.map(item => {
           const isActive = pathname === item.href;
           return (
@@ -40,9 +40,7 @@ export function MySidebar({ navItems, children }: MySidebarProps) {
           );
         })}
       </nav>
-      <div className="dark:bg-muted/30 bg-muted mb-6 h-full rounded-xl p-2">
-        {children}
-      </div>
+      <div className="mb-6 h-full rounded-xl">{children}</div>
     </div>
   );
 }

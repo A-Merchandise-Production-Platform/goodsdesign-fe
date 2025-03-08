@@ -1,28 +1,12 @@
 'use client';
 
-import { flexRender } from '@tanstack/react-table';
-import { Filter, RefreshCwIcon } from 'lucide-react';
-
-import { getUserColumns } from '@/app/(root)/admin/users/_components/columns';
-import CreateUserDialog from '@/app/(root)/admin/users/_components/create-user-button';
-import { TableSkeleton } from '@/app/(root)/admin/users/_components/table-skeleton';
-import { useUserTable } from '@/app/(root)/admin/users/_hooks/use-user-table';
-import { useUsersQuery } from '@/app/(root)/admin/users/_hooks/use-users-query';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { columns } from '@/app/(root)/admin/users/_components/columns';
+import { DataTable } from '@/app/(root)/admin/users/_components/data-table';
+import { useUsers } from '@/app/(root)/admin/users/_hooks/use-users';
+import { Roles, SortOrder } from '@/graphql/generated';
+import { useDebounce } from '@/hooks/use-debounce';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -31,226 +15,159 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { cn } from '@/lib/utils';
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  ArrowDown,
+  ArrowUp,
+  Filter,
+  Plus,
+  PlusCircle,
+  Search,
+} from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import CreateUserButton from '@/app/(root)/admin/users/_components/create-user-button';
 
-const INITIAL_ROLES = ['admin', 'manager', 'staff', 'factoryOwner', 'customer'];
+const sortFields = [
+  { label: 'Created Date', value: 'createdAt' },
+  { label: 'Name', value: 'name' },
+  { label: 'Email', value: 'email' },
+  { label: 'Updated Date', value: 'updatedAt' },
+] as const;
 
-export function UserDataTable() {
-  const {
-    data,
-    totalUsers,
-    isLoading,
-    refetch,
-    handlePaginationChange,
-    handleRoleToggle,
-    handleSearchChange,
-    searchTerm,
-    selectedRoles,
-    sorting,
-    setSorting,
-    page,
-    pageSize,
-  } = useUsersQuery();
+export default function UserDataTable() {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRole, setSelectedRole] = useState<Roles | 'ALL'>('ALL');
+  const [sortField, setSortField] =
+    useState<(typeof sortFields)[number]['value']>('createdAt');
+  const [sortDirection, setSortDirection] = useState<SortOrder>(SortOrder.Desc);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const columns = getUserColumns({ refetch });
-  const table = useUserTable(
-    data ?? [],
-    Math.ceil(totalUsers / pageSize),
-    setSorting,
-  );
+  const debouncedSearch = useDebounce(searchQuery, 500);
 
-  if (isLoading && !data) {
-    return (
-      <div className="rounded-md border">
-        <TableSkeleton columns={columns.length} />
-      </div>
+  const { data, isLoading } = useUsers({
+    pagination: { page, limit: pageSize },
+    sort: { [sortField]: sortDirection },
+    ...(debouncedSearch ? { email: debouncedSearch } : {}),
+    ...(selectedRole !== 'ALL' ? { role: selectedRole } : {}),
+  });
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setPage(1);
+  };
+
+  const handleSortDirectionChange = () => {
+    setSortDirection(prev =>
+      prev === SortOrder.Asc ? SortOrder.Desc : SortOrder.Asc,
     );
-  }
+  };
 
   return (
-    <div>
-      {/* Search and Filters */}
-      <div className="flex items-center py-4">
+    <div className="flex flex-col space-y-4">
+      <div className="flex items-center gap-2">
         <div className="flex flex-1 items-center gap-2">
-          <Input
-            placeholder="Search users..."
-            value={searchTerm}
-            onChange={event => handleSearchChange(event.target.value)}
-            className="max-w-sm"
-          />
-          <Popover>
+          <div className="relative w-96">
+            <Search className="text-muted-foreground absolute top-2.5 left-2 h-4 w-4" />
+            <Input
+              placeholder="Search by email..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+          <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
               <Button variant="outline">
                 <Filter className="mr-2 h-4 w-4" />
                 Filter
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80" align={'start'}>
+            <PopoverContent className="w-80" align="end">
               <div className="grid gap-4">
                 <div className="space-y-2">
-                  <h4 className="leading-none font-medium">Roles</h4>
-                  <p className="text-muted-foreground text-sm">
-                    Select the roles you want to filter by.
-                  </p>
+                  <h4 className="font-medium">Role</h4>
+                  <Select
+                    value={selectedRole}
+                    onValueChange={value => {
+                      setSelectedRole(value as Roles | 'ALL');
+                      setPage(1);
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ALL">All Roles</SelectItem>
+                      {Object.values(Roles).map(role => (
+                        <SelectItem key={role} value={role}>
+                          {role.charAt(0) + role.slice(1).toLowerCase()}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="grid gap-2">
-                  {INITIAL_ROLES.map(role => (
-                    <div key={role} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={role}
-                        checked={selectedRoles.includes(role)}
-                        onCheckedChange={() => handleRoleToggle(role)}
-                      />
-                      <Label htmlFor={role}>{role}</Label>
-                    </div>
-                  ))}
+                <div className="space-y-2">
+                  <h4 className="font-medium">Sort By</h4>
+                  <div className="flex gap-2">
+                    <Select
+                      value={sortField}
+                      onValueChange={value => {
+                        setSortField(value as typeof sortField);
+                        setPage(1);
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sortFields.map(field => (
+                          <SelectItem key={field.value} value={field.value}>
+                            {field.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      onClick={handleSortDirectionChange}
+                    >
+                      {sortDirection === SortOrder.Asc ? (
+                        <div className="flex items-center gap-2">
+                          <ArrowDown className="h-4 w-4" />
+                          DSC
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <ArrowUp className="h-4 w-4" />
+                          ASC
+                        </div>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </PopoverContent>
           </Popover>
         </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            className={cn('flex items-center')}
-            onClick={refetch}
-            type="button"
-            variant={'outline'}
-          >
-            <RefreshCwIcon
-              className={cn(isLoading && 'animate-spin', 'h-4 w-4')}
-            />
-          </Button>
-          <CreateUserDialog refetch={refetch} />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
-                Columns
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter(column => column.getCanHide())
-                .map(column => (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={value => column.toggleVisibility(!!value)}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <CreateUserButton />
       </div>
-
-      {/* Table */}
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? undefined
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableSkeleton columns={columns.length} />
-            ) : data.length > 0 ? (
-              table.getRowModel().rows.map(row => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <p className="text-muted-foreground ml-4 flex-1 text-sm">
-          {totalUsers} user(s) found.
-        </p>
-        <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Rows per page</p>
-          <Select
-            value={`${pageSize}`}
-            onValueChange={value => {
-              handlePaginationChange(page, Number(value));
-            }}
-          >
-            <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder={pageSize} />
-            </SelectTrigger>
-            <SelectContent side="top">
-              {[10, 20, 30, 40, 50].map(size => (
-                <SelectItem key={size} value={`${size}`}>
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePaginationChange(page - 1, pageSize)}
-            disabled={page === 1}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePaginationChange(page + 1, pageSize)}
-            disabled={page * pageSize >= totalUsers}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      <DataTable
+        data={data?.users.items ?? []}
+        columns={columns}
+        pageCount={data?.users.meta.totalPages ?? 1}
+        currentPage={page}
+        pageSize={pageSize}
+        totalItems={data?.users.meta.total ?? 0}
+        isLoading={isLoading}
+        onPageChange={setPage}
+        onPageSizeChange={handlePageSizeChange}
+      />
     </div>
   );
 }

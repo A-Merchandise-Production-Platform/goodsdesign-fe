@@ -1,12 +1,15 @@
 'use client';
+
+import UserAnalyticss from '@/app/(root)/admin/users/_components/user-analyticss';
+import UserDataTable from '@/app/(root)/admin/users/_components/user-data-table';
+
 export default function Page() {
   return (
-    <div className="grid h-full grid-cols-3 grid-rows-4 gap-4 rounded-lg md:grid-cols-3">
-      <div className="bg-muted/50 col-span-1 row-span-1 rounded-lg" />
-      <div className="bg-muted/50 col-span-1 row-span-1 rounded-lg" />
-      <div className="bg-muted/50 col-span-1 row-span-1 rounded-lg" />
-      <div className="bg-muted/50 col-span-2 row-span-3 rounded-lg" />
-      <div className="bg-muted/50 col-span-1 row-span-3 rounded-lg" />
+    <div className="h-full space-y-4">
+      <UserAnalyticss />
+      <div className="bg-background min-h-[calc(100vh-20rem-1.5rem)] rounded-lg p-4">
+        <UserDataTable />
+      </div>
     </div>
   );
 }
