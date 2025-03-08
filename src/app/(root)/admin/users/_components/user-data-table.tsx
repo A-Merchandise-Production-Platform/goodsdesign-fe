@@ -50,7 +50,7 @@ export default function UserDataTable() {
 
   const debouncedSearch = useDebounce(searchQuery, 500);
 
-  const { data, isLoading } = useUsers({
+  const { data, isLoading, refetch } = useUsers({
     pagination: { page, limit: pageSize },
     sort: { [sortField]: sortDirection },
     ...(debouncedSearch ? { email: debouncedSearch } : {}),
@@ -155,11 +155,11 @@ export default function UserDataTable() {
             </PopoverContent>
           </Popover>
         </div>
-        <CreateUserButton />
+        <CreateUserButton onSuccess={refetch} />
       </div>
       <DataTable
         data={data?.users.items ?? []}
-        columns={columns}
+        columns={columns({ refetch })}
         pageCount={data?.users.meta.totalPages ?? 1}
         currentPage={page}
         pageSize={pageSize}

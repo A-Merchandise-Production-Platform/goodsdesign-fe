@@ -18,8 +18,27 @@ import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { MoreHorizontal } from 'lucide-react';
 import Image from 'next/image';
+import { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import UpdateUserForm from './update-user-form';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { UserApi } from '@/api/user';
+import { toast } from 'sonner';
 
-export const columns: ColumnDef<Partial<GraphQlUser>>[] = [
+interface ColumnsProps {
+  refetch: () => Promise<any>;
+}
+
+export const columns = ({
+  refetch,
+}: ColumnsProps): ColumnDef<Partial<GraphQlUser>>[] => [
   {
     id: 'no',
     header: 'No',
@@ -103,24 +122,94 @@ export const columns: ColumnDef<Partial<GraphQlUser>>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original;
+      const user = row.original;
+      const [editOpen, setEditOpen] = useState(false);
+      const [deleteOpen, setDeleteOpen] = useState(false);
+      const queryClient = useQueryClient();
+
+      const deleteMutation = useMutation({
+        mutationFn: () => UserApi.deleteUser(user.id!),
+        onSuccess: () => {
+          toast.success('User deleted successfully');
+          refetch();
+          setDeleteOpen(false);
+        },
+        onError: () => {
+          toast.error('Failed to delete user');
+        },
+      });
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="border">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Copy payment ID</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="border">
+              <DropdownMenuLabel className="text-muted-foreground text-sm">
+                Actions
+              </DropdownMenuLabel>
+              <DropdownMenuItem onSelect={() => setEditOpen(true)}>
+                Edit user
+              </DropdownMenuItem>
+              <DropdownMenuItem>View details</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onSelect={() => setDeleteOpen(true)}
+                className="text-destructive"
+              >
+                Delete user
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Dialog open={editOpen} onOpenChange={setEditOpen}>
+            <DialogContent hideCloseButton>
+              <DialogHeader>
+                <DialogTitle>Update User</DialogTitle>
+                <DialogDescription>
+                  Update user information in your application.
+                </DialogDescription>
+              </DialogHeader>
+              <UpdateUserForm
+                user={user as GraphQlUser}
+                onSuccess={() => {
+                  refetch();
+                  setEditOpen(false);
+                }}
+                onClose={() => setEditOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Delete User</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to delete this user? This action cannot
+                  be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDeleteOpen(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => deleteMutation.mutate()}
+                  disabled={deleteMutation.isPending}
+                  isLoading={deleteMutation.isPending}
+                >
+                  Delete
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </>
       );
     },
   },

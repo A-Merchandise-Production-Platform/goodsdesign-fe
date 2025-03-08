@@ -28,20 +28,20 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { PasswordInput } from '@/components/ui/password-input';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { UserApi } from '@/api/user';
 import { toast } from 'sonner';
 import { PhoneInput } from '@/components/ui/phone-input';
+import { GraphQlUser } from '@/graphql/generated';
+import { usePartialForm } from '@/hooks/use-partial-form';
 
 const formSchema = z.object({
-  email: z.string().email(),
-  name: z.string().min(3),
-  password: z.string().min(6),
-  phoneNumber: z.string(),
-  gender: z.boolean(),
-  dateOfBirth: z.date(),
-  role: z.nativeEnum(Roles),
+  email: z.string().email().optional(),
+  name: z.string().min(3).optional(),
+  phoneNumber: z.string().optional(),
+  gender: z.boolean().optional(),
+  dateOfBirth: z.date().optional(),
+  role: z.nativeEnum(Roles).optional(),
 });
 
 const availableRoles = [
@@ -51,47 +51,52 @@ const availableRoles = [
   Roles.Customer,
 ];
 
-interface CreateUserFormProps {
+interface UpdateUserFormProps {
+  user: GraphQlUser;
   onSuccess?: () => void;
   onClose?: () => void;
 }
 
-export default function CreateUserForm({
+export default function UpdateUserForm({
+  user,
   onSuccess,
   onClose,
-}: CreateUserFormProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      name: '',
-      password: '',
-      phoneNumber: '',
-      gender: false,
-      dateOfBirth: new Date(),
-      role: Roles.Customer,
-    },
-  });
+}: UpdateUserFormProps) {
+  const queryClient = useQueryClient();
+  const defaultValues = {
+    email: user.email || '',
+    name: user.name || '',
+    phoneNumber: user.phoneNumber || '',
+    gender: user.gender,
+    dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : new Date(),
+    role: user.role,
+  };
 
-  const mutation = useMutation({
-    mutationFn: UserApi.create,
+  const updateMutation = useMutation({
+    mutationFn: (data: z.infer<typeof formSchema>) =>
+      UserApi.updateUser(user.id, data),
     onSuccess: () => {
-      toast.success('User created successfully');
+      toast.success('User updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['users_analytics'] });
       onSuccess?.();
       onClose?.();
+      setIsFormChanged(false);
     },
     onError: () => {
-      toast.error('Failed to create user');
+      toast.error('Failed to update user');
     },
   });
 
-  const onSubmit = (payload: z.infer<typeof formSchema>) => {
-    mutation.mutate(payload);
+  const { form, handleSubmit, isFormChanged, setIsFormChanged } =
+    usePartialForm(formSchema, defaultValues);
+
+  const onSubmit = (payload: Partial<z.infer<typeof formSchema>>) => {
+    updateMutation.mutate(payload);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pt-6">
         <FormField
           control={form.control}
           name="email"
@@ -102,7 +107,7 @@ export default function CreateUserForm({
                 <Input
                   placeholder="email@example.com"
                   {...field}
-                  disabled={mutation.isPending}
+                  disabled={updateMutation.isPending}
                 />
               </FormControl>
               {form.formState.errors.email ? (
@@ -123,7 +128,7 @@ export default function CreateUserForm({
                 <Input
                   placeholder="John Doe"
                   {...field}
-                  disabled={mutation.isPending}
+                  disabled={updateMutation.isPending}
                 />
               </FormControl>
               {form.formState.errors.name ? (
@@ -145,34 +150,13 @@ export default function CreateUserForm({
                   placeholder="Phone number"
                   {...field}
                   defaultCountry="VN"
-                  disabled={mutation.isPending}
+                  disabled={updateMutation.isPending}
                 />
               </FormControl>
               {form.formState.errors.phoneNumber ? (
                 <FormMessage />
               ) : (
                 <FormDescription>This is user phone number.</FormDescription>
-              )}
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <PasswordInput
-                  placeholder="user password"
-                  {...field}
-                  disabled={mutation.isPending}
-                />
-              </FormControl>
-              {form.formState.errors.password ? (
-                <FormMessage />
-              ) : (
-                <FormDescription>This is user password.</FormDescription>
               )}
             </FormItem>
           )}
@@ -195,7 +179,7 @@ export default function CreateUserForm({
                           !field.value && 'text-muted-foreground',
                         )}
                         type="button"
-                        disabled={mutation.isPending}
+                        disabled={updateMutation.isPending}
                       >
                         {field.value ? (
                           format(field.value, 'PPP')
@@ -239,8 +223,8 @@ export default function CreateUserForm({
                 <FormLabel>Gender</FormLabel>
                 <Select
                   onValueChange={value => field.onChange(value === 'true')}
-                  defaultValue={field.value ? 'true' : 'false'}
-                  disabled={mutation.isPending}
+                  value={field.value ? 'true' : 'false'}
+                  disabled={updateMutation.isPending}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -270,8 +254,8 @@ export default function CreateUserForm({
               <FormLabel>Role</FormLabel>
               <Select
                 onValueChange={field.onChange}
-                defaultValue={field.value}
-                disabled={mutation.isPending}
+                value={field.value}
+                disabled={updateMutation.isPending}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -298,10 +282,10 @@ export default function CreateUserForm({
         <Button
           type="submit"
           className="w-full"
-          disabled={mutation.isPending}
-          isLoading={mutation.isPending}
+          disabled={updateMutation.isPending || !isFormChanged}
+          isLoading={updateMutation.isPending}
         >
-          Submit
+          Update
         </Button>
       </form>
     </Form>

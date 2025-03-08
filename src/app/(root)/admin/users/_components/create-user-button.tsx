@@ -10,11 +10,13 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import CreateUserForm from '@/app/(root)/admin/users/_components/create-user-form';
-import { useQueryClient } from '@tanstack/react-query';
 
-export default function CreateUserButton() {
+interface CreateUserButtonProps {
+  onSuccess: () => Promise<any>;
+}
+
+export default function CreateUserButton({ onSuccess }: CreateUserButtonProps) {
   const [open, setOpen] = useState(false);
-  const queryClient = useQueryClient();
 
   return (
     <Dialog open={open} onClose={() => setOpen(false)}>
@@ -32,9 +34,10 @@ export default function CreateUserButton() {
           </DialogDescription>
         </DialogHeader>
         <CreateUserForm
-          onSuccess={() =>
-            queryClient.invalidateQueries({ queryKey: ['users'] })
-          }
+          onSuccess={() => {
+            onSuccess();
+            setOpen(false);
+          }}
           onClose={() => setOpen(false)}
         />
       </DialogContent>
