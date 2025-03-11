@@ -117,8 +117,9 @@ export default function OversizeTshirtModel(): React.ReactElement {
           uploadedImage,
           imagePosition.x,
           imagePosition.y,
-          500,
-          500,
+          // 800,
+          // 1000,
+          300,300
         );
       }
 

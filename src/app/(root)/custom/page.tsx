@@ -11,101 +11,67 @@ import {
   Wand2,
 } from 'lucide-react';
 import * as React from 'react';
+import Image from 'next/image';
 
 import ModelViewer from '@/components/3d-model-viewer';
 import { Button } from '@/components/ui/button';
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from '@/components/ui/resizable';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import DesignCanvas from './_components/design-canvas';
 
 function TShirtTemplate({ view }: { view: string }) {
   const printArea = {
-    front: { x: 100, y: 80, width: 140, height: 160 },
-    back: { x: 100, y: 80, width: 140, height: 160 },
-    'left-sleeve': { x: 40, y: 40, width: 60, height: 60 },
-    'right-sleeve': { x: 40, y: 40, width: 60, height: 60 },
+    front: { x: 128, y: 128, width: 256, height: 320 },
+    back: { x: 128, y: 64, width: 256, height: 384 },
+    'left-sleeve': { x: 192, y: 176, width: 128, height: 128 },
+    'right-sleeve': { x: 192, y: 176, width: 128, height: 128 },
   };
 
   const area = printArea[view as keyof typeof printArea];
 
+  const imageMap = {
+    front: '/models/oversize_tshirt_variants/front.png',
+    back: '/models/oversize_tshirt_variants/back.png',
+    'left-sleeve': '/models/oversize_tshirt_variants/left.png',
+    'right-sleeve': '/models/oversize_tshirt_variants/right.png',
+  };
+
   return (
-    <svg viewBox="0 0 340 400" className="absolute h-full w-full">
-      {/* Front View */}
-      {view === 'front' && (
-        <>
-          <path
-            d="M70,50 C70,50 100,20 170,20 C240,20 270,50 270,50 L320,100 L290,140 L270,120 L270,380 L70,380 L70,120 L50,140 L20,100 L70,50"
-            fill="white"
-            stroke="black"
-            strokeWidth="2"
-          />
-          {/* Collar */}
-          <path
-            d="M140,20 C140,20 170,25 200,20 C180,35 160,35 140,20"
-            fill="none"
-            stroke="black"
-            strokeWidth="2"
-          />
-        </>
-      )}
-
-      {/* Back View */}
-      {view === 'back' && (
-        <>
-          <path
-            d="M70,50 C70,50 100,20 170,20 C240,20 270,50 270,50 L320,100 L290,140 L270,120 L270,380 L70,380 L70,120 L50,140 L20,100 L70,50"
-            fill="white"
-            stroke="black"
-            strokeWidth="2"
-          />
-          {/* Back Collar */}
-          <path
-            d="M140,20 C140,20 170,15 200,20"
-            fill="none"
-            stroke="black"
-            strokeWidth="2"
-          />
-        </>
-      )}
-
-      {/* Sleeve Views */}
-      {(view === 'left-sleeve' || view === 'right-sleeve') && (
-        <path
-          d="M50,50 L200,50 L180,200 L70,200 Z"
-          fill="white"
-          stroke="black"
-          strokeWidth="2"
+    <div className="absolute h-full w-full">
+      <div className="relative h-full w-full">
+        <Image
+          src={imageMap[view as keyof typeof imageMap]}
+          alt={`T-shirt ${view} view`}
+          fill
+          className="object-contain"
+          priority
         />
-      )}
+      </div>
+      <svg className="pointer-events-none absolute inset-0 h-full w-full">
+        {/* Print Area */}
+        <rect
+          x={area.x}
+          y={area.y}
+          width={area.width}
+          height={area.height}
+          fill="none"
+          stroke="#666"
+          strokeWidth="2"
+          strokeDasharray="5,5"
+        />
 
-      {/* Print Area */}
-      <rect
-        x={area.x}
-        y={area.y}
-        width={area.width}
-        height={area.height}
-        fill="none"
-        stroke="#666"
-        strokeWidth="2"
-        strokeDasharray="5,5"
-      />
-
-      {/* Safe Print Area Text */}
-      <text
-        x={area.x + area.width / 2}
-        y={area.y + area.height / 2}
-        textAnchor="middle"
-        fill="#666"
-        fontSize="12"
-      >
-        Safe Print Area
-      </text>
-    </svg>
+        {/* Safe Print Area Text */}
+        <text
+          x={area.x + area.width / 2}
+          y={area.y + area.height / 2}
+          textAnchor="middle"
+          fill="#666"
+          fontSize="12"
+        >
+          Safe Print Area
+        </text>
+      </svg>
+    </div>
   );
 }
 
@@ -187,7 +153,7 @@ export default function ProductDesigner() {
           </div>
         </div>
 
-        {/* Resizable Content */}
+        {/* Main Content */}
         <div className="flex flex-1 flex-col">
           {/* View Selector Tabs */}
           <Tabs value={view} onValueChange={setView} className="border-b">
@@ -199,36 +165,26 @@ export default function ProductDesigner() {
             </TabsList>
           </Tabs>
 
-          <ResizablePanelGroup direction="horizontal" className="flex-1">
+          <div className="grid h-[32rem] flex-1 grid-cols-2">
             {/* Design Area */}
-            <ResizablePanel defaultSize={50} minSize={25}>
-              <div className="flex h-full flex-col bg-gray-50">
-                {/* T-Shirt Template */}
-                <div className="relative h-full w-full">
-                  <TShirtTemplate view={view} />
-                  <DesignCanvas
-                    view={view}
-                    width={340}
-                    height={400}
-                    onExport={handleExport}
-                  />
-                </div>
-              </div>
-            </ResizablePanel>
-
-            {/* Resizable Handle */}
-            <ResizableHandle withHandle />
-
-            {/* 3D Preview */}
-            <ResizablePanel defaultSize={50} minSize={25}>
-              <div className="h-full bg-gray-100">
-                <ModelViewer
-                  modelUrl="/models/t-shirt.glb"
-                  decalUrl={decalUrl}
+            <div className="flex w-full">
+              {/* T-Shirt Template */}
+              <div className="relative mx-auto h-[32rem] w-[32rem]">
+                <TShirtTemplate view={view} />
+                <DesignCanvas
+                  view={view}
+                  width={340}
+                  height={400}
+                  onExport={handleExport}
                 />
               </div>
-            </ResizablePanel>
-          </ResizablePanelGroup>
+            </div>
+
+            {/* 3D Preview */}
+            <div className="h-[32rem] bg-gray-100">
+              <ModelViewer modelUrl="/models/t-shirt.glb" decalUrl={decalUrl} />
+            </div>
+          </div>
         </div>
       </div>
 

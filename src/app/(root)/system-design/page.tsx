@@ -1,6 +1,5 @@
 'use client';
 
-import TextureBakeModel from '@/app/(root)/system-design/_components/test-model';
 import OversizeTshirtModel from './_components/oversize-tshirt-model';
 
 export default function Page() {

@@ -1,8 +1,5 @@
 import { Metadata } from 'next';
 
-import Footer from '@/components/shared/footer';
-import Header from '@/components/shared/header';
-
 export const metadata: Metadata = {
   title: 'System Design',
   description: 'System Design',

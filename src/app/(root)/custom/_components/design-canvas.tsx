@@ -13,10 +13,10 @@ interface DesignCanvasProps {
 }
 
 const printArea = {
-  front: { x: 80, y: 45, width: 180, height: 205 },
-  back: { x: 80, y: 45, width: 180, height: 205 },
-  'left-sleeve': { x: 40, y: 40, width: 60, height: 60 },
-  'right-sleeve': { x: 40, y: 40, width: 60, height: 60 },
+  front: { x: 41.5, y: 71.5, width: 256, height: 320 },
+  back: { x: 41.5, y: 7.5, width: 256, height: 384 },
+  'left-sleeve': { x: 105.5, y: 119.5, width: 128, height: 128 },
+  'right-sleeve': { x: 105.5, y: 119.5, width: 128, height: 128 },
 };
 
 export default function DesignCanvas({
