@@ -29,9 +29,10 @@ type GLTFResult = GLTF & {
 // ✅ FIXED: `decalUrl` is now correctly inside props
 interface ShirtProps extends Record<string, any> {
   decalUrl?: string;
+  color?: string;
 }
 
-export function Shirt({ decalUrl, ...props }: ShirtProps) {
+export function Shirt({ decalUrl, color = '#ffffff', ...props }: ShirtProps) {
   const { nodes, materials } = useGLTF('/models/t-shirt.glb') as GLTFResult;
   const decalRef = useRef<THREE.Mesh>(undefined);
 
@@ -44,8 +45,13 @@ export function Shirt({ decalUrl, ...props }: ShirtProps) {
   ]);
   const [scale, setScale] = useState<[number, number, number]>([0.3, 0.3, 0.3]);
   const [rotation, setRotation] = useState<[number, number, number]>([0, 0, 0]);
+  const [shirtColor, setShirtColor] = useState(color);
 
   useControls({
+    color: {
+      value: color,
+      onChange: (value: string) => setShirtColor(value),
+    },
     positionY: {
       min: 1,
       max: 1.7,
@@ -77,21 +83,25 @@ export function Shirt({ decalUrl, ...props }: ShirtProps) {
           <group rotation={[Math.PI / 2, 0, 0]}>
             <mesh
               geometry={nodes.Object_14.geometry}
-              material={materials.Body_FRONT_2664}
-            />
+            >
+              <meshStandardMaterial color={shirtColor} />
+            </mesh>
             <mesh
               geometry={nodes.Object_15.geometry}
-              material={materials.Body_FRONT_2664}
-            />
+            >
+              <meshStandardMaterial color={shirtColor} />
+            </mesh>
             <mesh
               geometry={nodes.Object_16.geometry}
-              material={materials.Body_FRONT_2664}
-            />
+            >
+              <meshStandardMaterial color={shirtColor} />
+            </mesh>
             <group>
               <mesh
                 geometry={nodes.Object_2.geometry}
-                material={materials.Body_FRONT_2664}
-              />
+              >
+                <meshStandardMaterial color={shirtColor} />
+              </mesh>
               <mesh geometry={nodes.Object_2_1.geometry}>
                 <meshBasicMaterial transparent opacity={0} />
                 {decalTexture && (
@@ -113,28 +123,34 @@ export function Shirt({ decalUrl, ...props }: ShirtProps) {
             </group>
             <mesh
               geometry={nodes.Object_11.geometry}
-              material={materials.Body_FRONT_2664}
-            />
+            >
+              <meshStandardMaterial color={shirtColor} />
+            </mesh>
             <mesh
               geometry={nodes.Object_12.geometry}
-              material={materials.Body_FRONT_2664}
-            />
+            >
+              <meshStandardMaterial color={shirtColor} />
+            </mesh>
             <mesh
               geometry={nodes.Object_6.geometry}
-              material={materials.Body_FRONT_2664}
-            />
+            >
+              <meshStandardMaterial color={shirtColor} />
+            </mesh>
             <mesh
               geometry={nodes.Object_8.geometry}
-              material={materials.Body_FRONT_2664}
-            />
+            >
+              <meshStandardMaterial color={shirtColor} />
+            </mesh>
             <mesh
               geometry={nodes.Object_18.geometry}
-              material={materials.Sleeves_FRONT_2669}
-            />
+            >
+              <meshStandardMaterial color={shirtColor} />
+            </mesh>
             <mesh
               geometry={nodes.Object_20.geometry}
-              material={materials.Sleeves_FRONT_2669}
-            />
+            >
+              <meshStandardMaterial color={shirtColor} />
+            </mesh>
           </group>
         </group>
       </group>
