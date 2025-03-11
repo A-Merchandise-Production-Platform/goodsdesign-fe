@@ -9,11 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <section className="mt-16">
-      <Header />
-      {children}
-      <Footer />
-    </section>
-  );
+  return <section>{children}</section>;
 }
