@@ -81,25 +81,17 @@ export function Shirt({ decalUrl, color = '#ffffff', ...props }: ShirtProps) {
           scale={5.674}
         >
           <group rotation={[Math.PI / 2, 0, 0]}>
-            <mesh
-              geometry={nodes.Object_14.geometry}
-            >
+            <mesh geometry={nodes.Object_14.geometry}>
               <meshStandardMaterial color={shirtColor} />
             </mesh>
-            <mesh
-              geometry={nodes.Object_15.geometry}
-            >
+            <mesh geometry={nodes.Object_15.geometry}>
               <meshStandardMaterial color={shirtColor} />
             </mesh>
-            <mesh
-              geometry={nodes.Object_16.geometry}
-            >
+            <mesh geometry={nodes.Object_16.geometry}>
               <meshStandardMaterial color={shirtColor} />
             </mesh>
             <group>
-              <mesh
-                geometry={nodes.Object_2.geometry}
-              >
+              <mesh geometry={nodes.Object_2.geometry}>
                 <meshStandardMaterial color={shirtColor} />
               </mesh>
               <mesh geometry={nodes.Object_2_1.geometry}>
@@ -121,34 +113,22 @@ export function Shirt({ decalUrl, color = '#ffffff', ...props }: ShirtProps) {
                 )}
               </mesh>
             </group>
-            <mesh
-              geometry={nodes.Object_11.geometry}
-            >
+            <mesh geometry={nodes.Object_11.geometry}>
               <meshStandardMaterial color={shirtColor} />
             </mesh>
-            <mesh
-              geometry={nodes.Object_12.geometry}
-            >
+            <mesh geometry={nodes.Object_12.geometry}>
               <meshStandardMaterial color={shirtColor} />
             </mesh>
-            <mesh
-              geometry={nodes.Object_6.geometry}
-            >
+            <mesh geometry={nodes.Object_6.geometry}>
               <meshStandardMaterial color={shirtColor} />
             </mesh>
-            <mesh
-              geometry={nodes.Object_8.geometry}
-            >
+            <mesh geometry={nodes.Object_8.geometry}>
               <meshStandardMaterial color={shirtColor} />
             </mesh>
-            <mesh
-              geometry={nodes.Object_18.geometry}
-            >
+            <mesh geometry={nodes.Object_18.geometry}>
               <meshStandardMaterial color={shirtColor} />
             </mesh>
-            <mesh
-              geometry={nodes.Object_20.geometry}
-            >
+            <mesh geometry={nodes.Object_20.geometry}>
               <meshStandardMaterial color={shirtColor} />
             </mesh>
           </group>
