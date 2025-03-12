@@ -28,13 +28,50 @@ export default function DesignCanvas({
   const canvasRef = useRef<HTMLCanvasElement>(undefined);
   const fabricRef = useRef<fabric.Canvas>(undefined);
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && fabricRef.current) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const imgData = e.target?.result as string;
+        const imageUrl = imgData;
+        const imageElement = new Image();
+        imageElement.crossOrigin = 'anonymous';
+        imageElement.src = imageUrl;
+        imageElement.onload = () => {
+          const fabricImage = new fabric.Image(imageElement);
+          const area = printArea[view as keyof typeof printArea];
+
+          // Scale image to fit print area while maintaining aspect ratio
+          const scale = Math.min(
+            area.width / (fabricImage.width ?? 1),
+            area.height / (fabricImage.height ?? 1),
+          );
+
+          fabricImage.set({
+            scaleX: scale,
+            scaleY: scale,
+            left: area.x + (area.width - (fabricImage.width ?? 0) * scale) / 2,
+            top: area.y + (area.height - (fabricImage.height ?? 0) * scale) / 2,
+          });
+
+          fabricRef.current?.add(fabricImage);
+          fabricRef.current?.setActiveObject(fabricImage);
+          fabricRef.current?.renderAll();
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+    event.target.value = '';
+  };
+
   useEffect(() => {
     if (!canvasRef.current) return;
 
     fabricRef.current = new fabric.Canvas(canvasRef.current, {
       width,
       height,
-      backgroundColor: 'transparent',
+      backgroundColor: 'white', // Set white background
       preserveObjectStacking: true,
     });
 
@@ -49,6 +86,11 @@ export default function DesignCanvas({
       absolutePositioned: true,
     });
     fabricRef.current.clipPath = clipPath;
+
+    // Auto-export on any canvas change
+    fabricRef.current.on('object:modified', () => exportCanvas());
+    fabricRef.current.on('object:added', () => exportCanvas());
+    fabricRef.current.on('object:removed', () => exportCanvas());
 
     // Delete objects when pressing Delete key
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -74,50 +116,6 @@ export default function DesignCanvas({
     };
   }, [view, width, height]);
 
-  // Function to upload image
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && fabricRef.current) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.addEventListener('load', event => {
-        let imageUrl = event.target?.result as string;
-        let imageElement = document.createElement('img');
-        imageElement.src = imageUrl;
-
-        // Ensure the image is fully loaded before adding to the canvas
-        imageElement.addEventListener('load', function () {
-          const imgInstance = new fabric.Image(imageElement, {
-            scaleX: 1,
-            scaleY: 1,
-            selectable: true,
-            hasControls: true,
-          });
-
-          const area = printArea[view as keyof typeof printArea];
-
-          // Scale and position the image inside the print area
-          const scaleFactor = Math.min(
-            area.width / imgInstance.width!,
-            area.height / imgInstance.height!,
-          );
-          imgInstance.scale(scaleFactor);
-          imgInstance.set({
-            left: area.x + (area.width - imgInstance.width! * scaleFactor) / 2,
-            top: area.y + (area.height - imgInstance.height! * scaleFactor) / 2,
-          });
-
-          fabricRef.current?.add(imgInstance);
-          fabricRef.current?.setActiveObject(imgInstance);
-          fabricRef.current?.renderAll();
-        });
-      });
-    }
-
-    // Reset the input value to allow uploading the same file again
-    event.target.value = '';
-  };
-
   const exportCanvas = () => {
     if (!fabricRef.current) {
       console.error('Canvas not initialized');
@@ -135,6 +133,21 @@ export default function DesignCanvas({
         console.error('Exported image is empty');
         return;
       }
+
+      // Validate data URL format
+      if (!dataURL.startsWith('data:image/png;base64,')) {
+        console.error(
+          'Invalid data URL format:',
+          dataURL.substring(0, 30) + '...',
+        );
+        return;
+      }
+
+      // Log successful export
+      console.log('Successfully exported canvas image:', {
+        size: dataURL.length,
+        preview: dataURL.substring(0, 30) + '...',
+      });
 
       onExport(dataURL);
     } catch (error) {
@@ -169,7 +182,7 @@ export default function DesignCanvas({
       <input
         type="file"
         accept="image/*"
-        onChange={handleFileUpload}
+        onChange={handleImageUpload}
         className="hidden"
         id="image-upload"
       />

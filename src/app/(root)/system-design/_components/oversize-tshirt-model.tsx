@@ -90,7 +90,7 @@ export default function OversizeTshirtModel(): React.ReactElement {
   );
   const [imagePosition, setImagePosition] = useState<ImagePosition>({
     x: 1500,
-    y: 1500,
+    y: 2000,
   });
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -119,7 +119,8 @@ export default function OversizeTshirtModel(): React.ReactElement {
           imagePosition.y,
           // 800,
           // 1000,
-          300,300
+          300,
+          300,
         );
       }
 

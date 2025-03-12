@@ -10,14 +10,22 @@ import {
   Upload,
   Wand2,
 } from 'lucide-react';
-import * as React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 
-import ModelViewer from '@/components/3d-model-viewer';
+import OversizeTshirtModel from './_components/oversize-tshirt-model';
+import * as THREE from 'three';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import DesignCanvas from './_components/design-canvas';
+
+const imageMap = {
+  front: '/models/oversize_tshirt_variants/front.png',
+  back: '/models/oversize_tshirt_variants/back.png',
+  'left-sleeve': '/models/oversize_tshirt_variants/left.png',
+  'right-sleeve': '/models/oversize_tshirt_variants/right.png',
+};
 
 function TShirtTemplate({ view }: { view: string }) {
   const printArea = {
@@ -82,10 +90,138 @@ function handleUploadClick() {
 
 export default function ProductDesigner() {
   const [view, setView] = React.useState('front');
-  const [decalUrl, setDecalUrl] = React.useState('');
+  const [currentTexture, setCurrentTexture] = React.useState<string>(
+    imageMap['front'],
+  );
+  const [uploadedImage, setUploadedImage] =
+    React.useState<HTMLImageElement | null>(null);
+  const defaultPositions = {
+    front: { x: 750, y: 3150 },
+    back: { x: 2200, y: 3150 },
+    'left-sleeve': { x: 2110, y: 2000 },
+    'right-sleeve': { x: 3330, y: 2000 },
+  };
 
-  const handleExport = (imageUrl: string) => {
-    setDecalUrl(imageUrl);
+  const [imagePosition, setImagePosition] = React.useState<{
+    x: number;
+    y: number;
+  }>(defaultPositions.front);
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [texture, setTexture] = React.useState<THREE.CanvasTexture | null>(
+    null,
+  );
+  const isDragging = useRef(false);
+
+  const CANVAS_SIZE = 4096;
+
+  // Cache for texture images
+  const textureCache = useRef<Record<string, HTMLImageElement>>({});
+  const [isCanvasVisible, setIsCanvasVisible] = React.useState(true);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const updateCanvas = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw background texture
+      if (textureCache.current[currentTexture]) {
+        ctx.drawImage(
+          textureCache.current[currentTexture],
+          0,
+          0,
+          canvas.width,
+          canvas.height,
+        );
+      }
+
+      // Draw uploaded image if any
+      if (uploadedImage) {
+        ctx.drawImage(
+          uploadedImage,
+          imagePosition.x,
+          imagePosition.y,
+          300,
+          300,
+        );
+      }
+
+      // Only update texture on model when not dragging
+      if (!isDragging.current) {
+        updateTextureOnModel();
+      }
+    };
+
+    // Load texture if not cached
+    if (!textureCache.current[currentTexture]) {
+      const img = document.createElement('img');
+      img.onload = () => {
+        textureCache.current[currentTexture] = img;
+        updateCanvas();
+      };
+      img.src = currentTexture;
+    } else {
+      updateCanvas();
+    }
+  }, [currentTexture, uploadedImage, imagePosition]);
+
+  // Show canvas after view change
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsCanvasVisible(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [view]);
+
+  const updateTextureOnModel = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const newTexture = new THREE.CanvasTexture(canvas);
+    newTexture.flipY = false;
+    newTexture.colorSpace = THREE.SRGBColorSpace;
+    setTexture(newTexture);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    img.onload = () => {
+      setUploadedImage(img);
+    };
+  };
+
+  const handleMouseDown = () => {
+    isDragging.current = true;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDragging.current || !uploadedImage) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    let x = ((e.clientX - rect.left) / rect.width) * CANVAS_SIZE - 250;
+    const y = ((e.clientY - rect.top) / rect.height) * CANVAS_SIZE - 250;
+
+    // Adjust x position based on view
+    if (view === 'left-sleeve') {
+      x = Math.max(2000, Math.min(x, 3000)); // Keep on left side
+    } else if (view === 'right-sleeve') {
+      x = Math.max(0, Math.min(x, 1000)); // Keep on right side
+    } else {
+      x = Math.max(1000, Math.min(x, 2000)); // Keep in center for front/back
+    }
+
+    setImagePosition({ x, y });
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+    updateTextureOnModel();
   };
 
   return (
@@ -122,14 +258,23 @@ export default function ProductDesigner() {
               <TShirt className="h-4 w-4" />
               Product
             </Button>
-            <Button
-              variant="ghost"
-              className="justify-start gap-2"
-              onClick={handleUploadClick}
-            >
-              <Upload className="h-4 w-4" />
-              Uploads
-            </Button>
+            <div className="relative">
+              <Button
+                variant="ghost"
+                className="justify-start gap-2"
+                onClick={handleUploadClick}
+              >
+                <Upload className="h-4 w-4" />
+                Uploads
+              </Button>
+              <input
+                id="image-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </div>
             <Button variant="ghost" className="justify-start gap-2">
               <Type className="h-4 w-4" />
               Text
@@ -156,8 +301,21 @@ export default function ProductDesigner() {
         {/* Main Content */}
         <div className="flex flex-1 flex-col">
           {/* View Selector Tabs */}
-          <Tabs value={view} onValueChange={setView} className="border-b">
-            <TabsList className="w-full justify-start rounded-none">
+          <Tabs
+            value={view}
+            onValueChange={newView => {
+              // Hide canvas immediately
+              setIsCanvasVisible(false);
+              // Update all states immediately
+              setCurrentTexture(imageMap[newView as keyof typeof imageMap]);
+              setImagePosition(
+                defaultPositions[newView as keyof typeof defaultPositions],
+              );
+              setView(newView);
+            }}
+            className="border-b"
+          >
+            <TabsList className="z-20 w-full justify-start rounded-none">
               <TabsTrigger value="front">Front</TabsTrigger>
               <TabsTrigger value="back">Back</TabsTrigger>
               <TabsTrigger value="left-sleeve">Left sleeve</TabsTrigger>
@@ -165,24 +323,41 @@ export default function ProductDesigner() {
             </TabsList>
           </Tabs>
 
-          <div className="grid h-[32rem] flex-1 grid-cols-2">
-            {/* Design Area */}
-            <div className="flex w-full">
-              {/* T-Shirt Template */}
-              <div className="relative mx-auto h-[32rem] w-[32rem]">
-                <TShirtTemplate view={view} />
-                <DesignCanvas
-                  view={view}
-                  width={340}
-                  height={400}
-                  onExport={handleExport}
+          <div className="flex h-[32rem] flex-1 gap-4 p-4">
+            {/* Khu vực chứa Texture Image Preview & Upload */}
+            <div className="bg-muted relative z-10 flex h-[32rem] w-[32rem] flex-col items-center justify-center gap-4">
+              <div
+                className={`absolute -z-10 flex flex-col items-center gap-4 ${
+                  view === 'front'
+                    ? '-top-190 -left-10'
+                    : view === 'back'
+                      ? '-top-190 -left-121.5'
+                      : view === 'left-sleeve'
+                        ? '-top-105 -left-110'
+                        : '-top-105 -left-205'
+                }`}
+              >
+                <canvas
+                  ref={canvasRef}
+                  width={CANVAS_SIZE}
+                  height={CANVAS_SIZE}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                  className="p-4"
+                  style={{
+                    width: '1280px',
+                    height: '1280px',
+                    visibility: isCanvasVisible ? 'visible' : 'hidden',
+                  }}
                 />
               </div>
             </div>
 
-            {/* 3D Preview */}
-            <div className="h-[32rem] bg-gray-100">
-              <ModelViewer modelUrl="/models/t-shirt.glb" decalUrl={decalUrl} />
+            {/* Khu vực chứa Model 3D */}
+            <div className="relative flex-grow rounded-lg">
+              <OversizeTshirtModel texture={texture} />
             </div>
           </div>
         </div>
