@@ -11,14 +11,11 @@ import {
   Wand2,
 } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
-import Image from 'next/image';
 
 import OversizeTshirtModel from './_components/oversize-tshirt-model';
 import * as THREE from 'three';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-import DesignCanvas from './_components/design-canvas';
 
 const imageMap = {
   front: '/models/oversize_tshirt_variants/front.png',
@@ -26,62 +23,6 @@ const imageMap = {
   'left-sleeve': '/models/oversize_tshirt_variants/left.png',
   'right-sleeve': '/models/oversize_tshirt_variants/right.png',
 };
-
-function TShirtTemplate({ view }: { view: string }) {
-  const printArea = {
-    front: { x: 128, y: 128, width: 256, height: 320 },
-    back: { x: 128, y: 64, width: 256, height: 384 },
-    'left-sleeve': { x: 192, y: 176, width: 128, height: 128 },
-    'right-sleeve': { x: 192, y: 176, width: 128, height: 128 },
-  };
-
-  const area = printArea[view as keyof typeof printArea];
-
-  const imageMap = {
-    front: '/models/oversize_tshirt_variants/front.png',
-    back: '/models/oversize_tshirt_variants/back.png',
-    'left-sleeve': '/models/oversize_tshirt_variants/left.png',
-    'right-sleeve': '/models/oversize_tshirt_variants/right.png',
-  };
-
-  return (
-    <div className="absolute h-full w-full">
-      <div className="relative h-full w-full">
-        <Image
-          src={imageMap[view as keyof typeof imageMap]}
-          alt={`T-shirt ${view} view`}
-          fill
-          className="object-contain"
-          priority
-        />
-      </div>
-      <svg className="pointer-events-none absolute inset-0 h-full w-full">
-        {/* Print Area */}
-        <rect
-          x={area.x}
-          y={area.y}
-          width={area.width}
-          height={area.height}
-          fill="none"
-          stroke="#666"
-          strokeWidth="2"
-          strokeDasharray="5,5"
-        />
-
-        {/* Safe Print Area Text */}
-        <text
-          x={area.x + area.width / 2}
-          y={area.y + area.height / 2}
-          textAnchor="middle"
-          fill="#666"
-          fontSize="12"
-        >
-          Safe Print Area
-        </text>
-      </svg>
-    </div>
-  );
-}
 
 function handleUploadClick() {
   const input = document.querySelector('#image-upload') as HTMLInputElement;
@@ -100,6 +41,47 @@ export default function ProductDesigner() {
     back: { x: 2200, y: 3150 },
     'left-sleeve': { x: 2110, y: 2000 },
     'right-sleeve': { x: 3330, y: 2000 },
+  };
+  const imageSize = { width: 200, height: 200 };
+
+  const getDesignZoneLimits = (view: string) => {
+    switch (view) {
+      case 'front':
+        return {
+          minX: 500,
+          maxX: 1350,
+          minY: 2900,
+          maxY: 3800,
+        };
+      case 'back':
+        return {
+          minX: 1950,
+          maxX: 2800,
+          minY: 2800,
+          maxY: 3800,
+        };
+      case 'left-sleeve':
+        return {
+          minX: 2100,
+          maxX: 2400,
+          minY: 2000,
+          maxY: 2300,
+        };
+      case 'right-sleeve':
+        return {
+          minX: 3350,
+          maxX: 3650,
+          minY: 2000,
+          maxY: 2300,
+        };
+      default:
+        return {
+          minX: 500,
+          maxX: 1350,
+          minY: 2900,
+          maxY: 3800,
+        };
+    }
   };
 
   const [imagePosition, setImagePosition] = React.useState<{
@@ -139,14 +121,27 @@ export default function ProductDesigner() {
         );
       }
 
+      // Draw design zone indicator
+      const limits = getDesignZoneLimits(view);
+      ctx.strokeStyle = 'rgba(0, 120, 255, 0.5)';
+      ctx.lineWidth = 4;
+      ctx.setLineDash([10, 10]);
+      ctx.strokeRect(
+        limits.minX,
+        limits.minY,
+        limits.maxX - limits.minX,
+        limits.maxY - limits.minY,
+      );
+      ctx.setLineDash([]);
+
       // Draw uploaded image if any
       if (uploadedImage) {
         ctx.drawImage(
           uploadedImage,
           imagePosition.x,
           imagePosition.y,
-          300,
-          300,
+          imageSize.width,
+          imageSize.height,
         );
       }
 
@@ -204,17 +199,21 @@ export default function ProductDesigner() {
     if (!isDragging.current || !uploadedImage) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
-    let x = ((e.clientX - rect.left) / rect.width) * CANVAS_SIZE - 250;
-    const y = ((e.clientY - rect.top) / rect.height) * CANVAS_SIZE - 250;
+    const rawX = ((e.clientX - rect.left) / rect.width) * CANVAS_SIZE - 250;
+    const rawY = ((e.clientY - rect.top) / rect.height) * CANVAS_SIZE - 250;
 
-    // Adjust x position based on view
-    if (view === 'left-sleeve') {
-      x = Math.max(2000, Math.min(x, 3000)); // Keep on left side
-    } else if (view === 'right-sleeve') {
-      x = Math.max(0, Math.min(x, 1000)); // Keep on right side
-    } else {
-      x = Math.max(1000, Math.min(x, 2000)); // Keep in center for front/back
-    }
+    // Get limits based on current view
+    const limits = getDesignZoneLimits(view);
+
+    // Constrain position within design zone, accounting for image dimensions
+    const x = Math.max(
+      limits.minX,
+      Math.min(rawX, limits.maxX - imageSize.width),
+    );
+    const y = Math.max(
+      limits.minY,
+      Math.min(rawY, limits.maxY - imageSize.height),
+    );
 
     setImagePosition({ x, y });
   };
@@ -315,7 +314,7 @@ export default function ProductDesigner() {
             }}
             className="border-b"
           >
-            <TabsList className="w-full justify-start rounded-none z-20">
+            <TabsList className="z-20 w-full justify-start rounded-none">
               <TabsTrigger value="front">Front</TabsTrigger>
               <TabsTrigger value="back">Back</TabsTrigger>
               <TabsTrigger value="left-sleeve">Left sleeve</TabsTrigger>
@@ -333,8 +332,8 @@ export default function ProductDesigner() {
                     : view === 'back'
                       ? '-top-190 -left-121.5'
                       : view === 'left-sleeve'
-                        ? '-top-105 -left-110'
-                        : '-top-105 -left-205'
+                        ? '-top-150 -left-155'
+                        : '-top-150 -left-275'
                 }`}
               >
                 <canvas
@@ -347,8 +346,14 @@ export default function ProductDesigner() {
                   onMouseLeave={handleMouseUp}
                   className="p-4"
                   style={{
-                    width: '1280px',
-                    height: '1280px',
+                    width:
+                      view === 'left-sleeve' || view === 'right-sleeve'
+                        ? '1600px'
+                        : '1280px',
+                    height:
+                      view === 'left-sleeve' || view === 'right-sleeve'
+                        ? '1600px'
+                        : '1280px',
                     visibility: isCanvasVisible ? 'visible' : 'hidden',
                   }}
                 />
@@ -356,7 +361,7 @@ export default function ProductDesigner() {
             </div>
 
             {/* Khu vực chứa Model 3D */}
-            <div className="relative flex-grow rounded-lg">
+            <div className="relative z-10 flex-grow rounded-lg">
               <OversizeTshirtModel texture={texture} />
             </div>
           </div>
