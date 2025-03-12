@@ -315,7 +315,7 @@ export default function ProductDesigner() {
             }}
             className="border-b"
           >
-            <TabsList className="z-20 w-full justify-start rounded-none">
+            <TabsList className="w-full justify-start rounded-none z-20">
               <TabsTrigger value="front">Front</TabsTrigger>
               <TabsTrigger value="back">Back</TabsTrigger>
               <TabsTrigger value="left-sleeve">Left sleeve</TabsTrigger>

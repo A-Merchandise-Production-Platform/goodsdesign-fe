@@ -112,6 +112,13 @@ export default function OversizeTshirtModel(): React.ReactElement {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
+      // Draw draggable zone indicator
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]); // Create dashed line
+      ctx.strokeRect(1000, 1000, 1200, 1500); // Match the boundaries from handleMouseMove
+      ctx.setLineDash([]); // Reset line style
+
       if (uploadedImage) {
         ctx.drawImage(
           uploadedImage,
@@ -162,6 +169,16 @@ export default function OversizeTshirtModel(): React.ReactElement {
     const rect = e.currentTarget.getBoundingClientRect();
     let x = ((e.clientX - rect.left) / rect.width) * CANVAS_SIZE - 250;
     let y = ((e.clientY - rect.top) / rect.height) * CANVAS_SIZE - 250;
+
+    // Define boundaries for the draggable area (front of t-shirt)
+    const minX = 1000; // Left boundary
+    const maxX = 2200; // Right boundary
+    const minY = 1000; // Top boundary
+    const maxY = 2500; // Bottom boundary
+
+    // Clamp the position within boundaries
+    x = Math.max(minX, Math.min(maxX, x));
+    y = Math.max(minY, Math.min(maxY, y));
 
     setImagePosition({ x, y });
   };
