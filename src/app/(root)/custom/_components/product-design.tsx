@@ -38,43 +38,46 @@ export default function ProductDesigner() {
     imageMap['front'],
   );
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
-  const [isCanvasVisible, setIsCanvasVisible] = useState(true);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
   const textureCache = useRef<Record<string, HTMLImageElement>>({});
 
-  const CANVAS_SIZE = 4096;
+  const getCanvasSize = (currentView: string) => {
+    return currentView === 'front' || currentView === 'back' ? 1280 : 1600;
+  };
+
+  const CANVAS_SIZE = getCanvasSize(view);
 
   const getDesignZoneLimits = (view: string) => {
     switch (view) {
       case 'front':
         return {
-          minX: 500,
-          maxX: 1350,
-          minY: 2900,
-          maxY: 3800,
+          minX: 160,
+          maxX: 410,
+          minY: 900,
+          maxY: 1180,
         };
       case 'back':
         return {
-          minX: 1950,
-          maxX: 2800,
-          minY: 2800,
-          maxY: 3800,
+          minX: 610,
+          maxX: 880,
+          minY: 870,
+          maxY: 1180,
         };
       case 'left-sleeve':
         return {
-          minX: 2100,
-          maxX: 2400,
-          minY: 2000,
-          maxY: 2300,
+          minX: 820,
+          maxX: 940,
+          minY: 780,
+          maxY: 900,
         };
       case 'right-sleeve':
         return {
-          minX: 3350,
-          maxX: 3650,
-          minY: 2000,
-          maxY: 2300,
+          minX: 1300,
+          maxX: 1420,
+          minY: 780,
+          maxY: 900,
         };
       default:
         return {
@@ -99,8 +102,9 @@ export default function ProductDesigner() {
     fabricCanvasRef.current = new fabric.Canvas(canvasRef.current, {
       width: CANVAS_SIZE,
       height: CANVAS_SIZE,
-      selection: true, // Enable selection of multiple objects
-      preserveObjectStacking: true, // Maintain object stacking order
+      selection: true,
+      preserveObjectStacking: true,
+      interactive: true,
     });
 
     // Set up event listeners
@@ -128,32 +132,35 @@ export default function ProductDesigner() {
     // Add design zone indicator
     addDesignZoneIndicator(view);
 
+    // Make sure all objects are selectable and evented
+    fabricCanvasRef.current.getObjects().forEach(obj => {
+      if (obj.get('data')?.type !== 'designZone') {
+        obj.set({
+          selectable: true,
+          evented: true,
+        });
+      }
+    });
+
+    fabricCanvasRef.current.renderAll();
+
     return () => {
+      document.removeEventListener('keydown', handleKeyDown);
       if (fabricCanvasRef.current) {
         fabricCanvasRef.current.dispose();
       }
     };
-  }, []);
+  }, [view, currentTexture]); // Re-initialize when view or texture changes
 
   // Update canvas when view changes
   useEffect(() => {
     if (!fabricCanvasRef.current) return;
-
-    // Hide canvas during transition
-    setIsCanvasVisible(false);
 
     // Update background texture
     loadBackgroundTexture(imageMap[view as keyof typeof imageMap]);
 
     // Update design zone indicator
     addDesignZoneIndicator(view);
-
-    // Show canvas after a short delay
-    const timer = setTimeout(() => {
-      setIsCanvasVisible(true);
-    }, 100);
-
-    return () => clearTimeout(timer);
   }, [view]);
 
   // Load background texture
@@ -233,8 +240,8 @@ export default function ProductDesigner() {
       height: limits.maxY - limits.minY,
       fill: 'rgba(0, 120, 255, 0.05)',
       stroke: 'rgba(0, 120, 255, 0.7)',
-      strokeWidth: 4,
-      strokeDashArray: [10, 10],
+      strokeWidth: 1,
+      strokeDashArray: [15, 10],
       selectable: false,
       evented: false,
       data: { type: 'designZone' },
@@ -320,6 +327,8 @@ export default function ProductDesigner() {
       fill: '#000000',
       originX: 'center',
       originY: 'center',
+      selectable: true,
+      evented: true,
     });
 
     fabricCanvasRef.current.add(text);
@@ -411,8 +420,6 @@ export default function ProductDesigner() {
           <Tabs
             value={view}
             onValueChange={newView => {
-              // Hide canvas immediately
-              setIsCanvasVisible(false);
               // Update texture
               setCurrentTexture(imageMap[newView as keyof typeof imageMap]);
               // Update view
@@ -440,28 +447,21 @@ export default function ProductDesigner() {
                       : view === 'left-sleeve'
                         ? '-top-150 -left-155'
                         : '-top-150 -left-275'
-                }`}
+                } `}
               >
                 <canvas
                   ref={canvasRef}
                   className="p-4"
                   style={{
-                    width:
-                      view === 'left-sleeve' || view === 'right-sleeve'
-                        ? '1600px'
-                        : '1280px',
-                    height:
-                      view === 'left-sleeve' || view === 'right-sleeve'
-                        ? '1600px'
-                        : '1280px',
-                    visibility: isCanvasVisible ? 'visible' : 'hidden',
+                    width: `${CANVAS_SIZE}px`,
+                    height: `${CANVAS_SIZE}px`,
                   }}
                 />
               </div>
             </div>
 
             {/* 3D Model Area */}
-            <div className="relative z-10 flex-grow">
+            <div className="relative z-10 h-[32rem] flex-grow">
               <OversizeTshirtModel texture={texture} />
             </div>
           </div>
