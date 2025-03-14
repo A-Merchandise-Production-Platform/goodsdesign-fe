@@ -109,38 +109,43 @@ export default function ProductDesigner() {
 
     // Set up event listeners
     fabricCanvasRef.current.on('object:modified', updateTextureOnModel);
-    fabricCanvasRef.current.on('object:added', updateTextureOnModel);
-    fabricCanvasRef.current.on('object:removed', updateTextureOnModel);
+    fabricCanvasRef.current.on('object:added', e => {
+      const obj = e.target as fabric.Object;
+      applyClipPathToObject(obj, view);
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Delete' && fabricCanvasRef.current) {
-        const activeObjects = fabricCanvasRef.current.getActiveObjects();
-        if (activeObjects.length > 0) {
-          activeObjects.forEach(object => {
-            fabricCanvasRef.current?.remove(object);
-          });
-          fabricCanvasRef.current.discardActiveObject();
-          fabricCanvasRef.current.renderAll();
-        }
+      // If object is fully outside, remove it
+      if (isObjectFullyOutside(obj, view)) {
+        fabricCanvasRef.current?.remove(obj);
       }
-    };
-    document.addEventListener('keydown', handleKeyDown);
+    });
+
+    fabricCanvasRef.current.on('mouse:down', e => {
+      if (!e.target) return;
+
+      const obj = e.target as fabric.Object;
+
+      // If object is fully outside, remove it
+      if (isObjectFullyOutside(obj, view)) {
+        fabricCanvasRef.current?.remove(obj);
+        fabricCanvasRef.current?.renderAll();
+      }
+    });
+
+    fabricCanvasRef.current.on('object:scaling', e => {
+      const obj = e.target as fabric.Object;
+
+      // If object is fully outside after scaling, remove it
+      if (isObjectFullyOutside(obj, view)) {
+        fabricCanvasRef.current?.remove(obj);
+      }
+    });
+    fabricCanvasRef.current.on('object:removed', updateTextureOnModel);
 
     // Load background texture
     loadBackgroundTexture(currentTexture);
 
     // Add design zone indicator
     addDesignZoneIndicator(view);
-
-    // Make sure all objects are selectable and evented
-    fabricCanvasRef.current.getObjects().forEach(obj => {
-      if (obj.get('data')?.type !== 'designZone') {
-        obj.set({
-          selectable: true,
-          evented: true,
-        });
-      }
-    });
 
     fabricCanvasRef.current.renderAll();
 
@@ -188,6 +193,39 @@ export default function ProductDesigner() {
       updateTextureOnModel();
     };
     img.src = texturePath;
+  };
+
+  const applyClipPathToObject = (obj: fabric.Object, view: string) => {
+    if (!fabricCanvasRef.current) return;
+
+    const limits = getDesignZoneLimits(view);
+
+    // Create a clip path for the object
+    const clipPath = new fabric.Rect({
+      left: limits.minX,
+      top: limits.minY,
+      width: limits.maxX - limits.minX,
+      height: limits.maxY - limits.minY,
+      absolutePositioned: true, // Ensures it applies correctly
+    });
+
+    obj.set({
+      clipPath,
+    });
+
+    fabricCanvasRef.current.renderAll();
+  };
+
+  const isObjectFullyOutside = (obj: fabric.Object, view: string) => {
+    const limits = getDesignZoneLimits(view);
+    const objBounds = obj.getBoundingRect();
+
+    return (
+      objBounds.left + objBounds.width < limits.minX ||
+      objBounds.left > limits.maxX ||
+      objBounds.top + objBounds.height < limits.minY ||
+      objBounds.top > limits.maxY
+    );
   };
 
   // Set background image on canvas
@@ -284,7 +322,7 @@ export default function ProductDesigner() {
       imageElement.src = event.target.result.toString();
 
       imageElement.onload = () => {
-        const fabricImage = new FabricImage(imageElement);
+        const fabricImage = new fabric.Image(imageElement);
         const limits = getDesignZoneLimits(view);
         const maxWidth = limits.maxX - limits.minX;
         const maxHeight = limits.maxY - limits.minY;
@@ -303,7 +341,14 @@ export default function ProductDesigner() {
             limits.minY + (maxHeight - (fabricImage.height ?? 0) * scale) / 2,
         });
 
-        // Add the image to the canvas
+        // Apply Clipping Path
+        applyClipPathToObject(fabricImage, view);
+
+        // If object is fully outside, remove it
+        if (isObjectFullyOutside(fabricImage, view)) {
+          return;
+        }
+
         fabricCanvasRef.current?.add(fabricImage);
         fabricCanvasRef.current?.setActiveObject(fabricImage);
         fabricCanvasRef.current?.renderAll();
@@ -312,6 +357,19 @@ export default function ProductDesigner() {
 
     reader.readAsDataURL(file);
     e.target.value = '';
+  };
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Delete' && fabricCanvasRef.current) {
+      const activeObjects = fabricCanvasRef.current.getActiveObjects();
+      if (activeObjects.length > 0) {
+        activeObjects.forEach(object => {
+          fabricCanvasRef.current?.remove(object);
+        });
+        fabricCanvasRef.current.discardActiveObject();
+        fabricCanvasRef.current.renderAll();
+      }
+    }
   };
 
   // Add text to canvas
@@ -331,9 +389,12 @@ export default function ProductDesigner() {
       evented: true,
     });
 
+    // Apply Clipping Path
+    applyClipPathToObject(text, view);
+
     fabricCanvasRef.current.add(text);
     fabricCanvasRef.current.setActiveObject(text);
-    updateTextureOnModel();
+    fabricCanvasRef.current.renderAll();
   };
 
   return (
