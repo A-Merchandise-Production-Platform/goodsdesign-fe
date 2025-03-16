@@ -665,7 +665,7 @@ export default function ProductDesigner() {
 
             {/* 3D Model Area */}
             <div className="relative z-10 h-[32rem] flex-grow">
-              <OversizeTshirtModel texture={texture} />
+              <OversizeTshirtModel texture={texture} view={view} />
             </div>
           </div>
         </div>
