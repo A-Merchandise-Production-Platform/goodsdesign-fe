@@ -20,7 +20,7 @@ const cameraPositions = {
 };
 
 function Model({ texture, view }: ModelProps) {
-  const { scene } = useGLTF('/models/oversize_tshirt_variants/ovtshirt.gltf');
+  const { scene } = useGLTF('/models/shirt.glb');
   const targetRotation = useRef(0);
   const { camera } = useThree();
 
@@ -109,12 +109,12 @@ export default function OversizeTshirtModel({
       <directionalLight position={[2, 5, 2]} intensity={1} />
       <OrbitControls
         enableZoom={true}
-        minPolarAngle={Math.PI / 2}
-        maxPolarAngle={Math.PI / 2}
+        enablePan={false}
+        minPolarAngle={Math.PI / 3.5}
+        maxPolarAngle={Math.PI / 1.5}
         minDistance={0.2}
         maxDistance={0.5}
       />
     </Canvas>
   );
 }
-
