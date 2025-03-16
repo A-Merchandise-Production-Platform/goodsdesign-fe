@@ -386,7 +386,6 @@ export default function ProductDesigner() {
     e.target.value = '';
   };
 
-
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Delete' && fabricCanvasRef.current) {
       const activeObjects = fabricCanvasRef.current.getActiveObjects();
@@ -439,7 +438,7 @@ export default function ProductDesigner() {
     setDesigns(prev => {
       const newDesigns: SerializedDesign = {
         ...prev,
-        [view]: serializedObjects
+        [view]: serializedObjects,
       };
       return newDesigns;
     });
@@ -666,7 +665,7 @@ export default function ProductDesigner() {
 
             {/* 3D Model Area */}
             <div className="relative z-10 h-[32rem] flex-grow">
-              <OversizeTshirtModel texture={texture} />
+              <OversizeTshirtModel texture={texture} view={view} />
             </div>
           </div>
         </div>
