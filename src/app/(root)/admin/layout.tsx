@@ -1,6 +1,6 @@
 import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 import AdminGuardProvider from '@/providers/admin-guard-provider';
-import { HomeIcon, ShoppingCartIcon, UsersIcon } from 'lucide-react';
+import { HomeIcon, ShoppingCartIcon, UsersIcon, CogIcon } from 'lucide-react';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -19,6 +19,11 @@ const navItems: NavItem[] = [
     href: '/admin/products',
     label: 'Products',
     icon: <ShoppingCartIcon className="size-4" />,
+  },
+  {
+    href: '/admin/system',
+    label: 'System',
+    icon: <CogIcon className="size-4" />,
   },
 ];
 

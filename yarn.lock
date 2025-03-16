@@ -2418,11 +2418,6 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.6.tgz#628effeeae2064a1b4e79f78e81d87b7e5fc7b50"
   integrity sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==
 
-"@types/fabric@^5.3.10":
-  version "5.3.10"
-  resolved "https://registry.yarnpkg.com/@types/fabric/-/fabric-5.3.10.tgz#0f0e83786ac8b8101c780018ba75070478782313"
-  integrity sha512-fsJIuVkU+B2AnmQh+Ml2X0ax3NmRIqLvEXmZ+squX60HaF89TvdIP6tI6Uk5srXaauswTwPOOfWE7k2QboUZCg==
-
 "@types/js-yaml@^4.0.0":
   version "4.0.9"
   resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-4.0.9.tgz#cd82382c4f902fed9691a2ed79ec68c5898af4c2"
