@@ -157,11 +157,11 @@ export function useColors(includeDeleted: boolean = false) {
           createSystemConfigColorDto: newColor,
         },
       });
-      
+
       if (data.errors) {
         throw new Error(data.errors[0]?.message || 'Failed to create color');
       }
-      
+
       return data.data.createSystemConfigColor;
     },
     onSuccess: () => {
@@ -169,8 +169,11 @@ export function useColors(includeDeleted: boolean = false) {
       toast.success('Color created successfully');
     },
     onError: (error: ErrorResponse) => {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to create color';
-      
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to create color';
+
       if (errorMessage.includes('already exists')) {
         toast.error('A color with this code already exists');
       } else {
@@ -190,7 +193,9 @@ export function useColors(includeDeleted: boolean = false) {
       });
 
       if (response.errors) {
-        throw new Error(response.errors[0]?.message || 'Failed to update color');
+        throw new Error(
+          response.errors[0]?.message || 'Failed to update color',
+        );
       }
 
       return response.data.updateSystemConfigColor;
@@ -200,8 +205,11 @@ export function useColors(includeDeleted: boolean = false) {
       toast.success('Color updated successfully');
     },
     onError: (error: ErrorResponse) => {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to update color';
-      
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to update color';
+
       if (errorMessage.includes('already exists')) {
         toast.error('A color with this code already exists');
       } else {
@@ -216,11 +224,11 @@ export function useColors(includeDeleted: boolean = false) {
         query: DELETE_COLOR_MUTATION,
         variables: { id },
       });
-      
+
       if (data.errors) {
         throw new Error(data.errors[0]?.message || 'Failed to delete color');
       }
-      
+
       return data.data.removeSystemConfigColor;
     },
     onSuccess: () => {
@@ -229,7 +237,10 @@ export function useColors(includeDeleted: boolean = false) {
     },
     onError: (error: ErrorResponse) => {
       const errorMessage = error.response?.data?.message || error.message;
-      if (errorMessage?.includes('in use') || errorMessage?.includes('being used')) {
+      if (
+        errorMessage?.includes('in use') ||
+        errorMessage?.includes('being used')
+      ) {
         toast.error('This color cannot be deleted as it is being used');
       } else {
         toast.error(errorMessage || 'Failed to delete color');
@@ -243,11 +254,11 @@ export function useColors(includeDeleted: boolean = false) {
         query: RESTORE_COLOR_MUTATION,
         variables: { id },
       });
-      
+
       if (data.errors) {
         throw new Error(data.errors[0]?.message || 'Failed to restore color');
       }
-      
+
       return data.data.restoreSystemConfigColor;
     },
     onSuccess: () => {
@@ -255,7 +266,10 @@ export function useColors(includeDeleted: boolean = false) {
       toast.success('Color restored successfully');
     },
     onError: (error: ErrorResponse) => {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to restore color';
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to restore color';
       toast.error(errorMessage);
     },
   });

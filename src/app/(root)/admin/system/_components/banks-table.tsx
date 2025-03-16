@@ -32,7 +32,12 @@ import {
 } from '@/components/ui/table';
 import { MoreHorizontal, Plus, Search } from 'lucide-react';
 import { useState } from 'react';
-import { Bank, CreateBankDto, UpdateBankDto, useBanks } from '../_hooks/use-banks';
+import {
+  Bank,
+  CreateBankDto,
+  UpdateBankDto,
+  useBanks,
+} from '../_hooks/use-banks';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -54,8 +59,17 @@ import {
 
 const bankFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  code: z.string().min(1, 'Code is required').regex(/^[A-Z0-9]+$/, 'Code must contain only uppercase letters and numbers'),
-  bin: z.string().min(1, 'BIN is required').regex(/^[0-9]+$/, 'BIN must contain only numbers'),
+  code: z
+    .string()
+    .min(1, 'Code is required')
+    .regex(
+      /^[A-Z0-9]+$/,
+      'Code must contain only uppercase letters and numbers',
+    ),
+  bin: z
+    .string()
+    .min(1, 'BIN is required')
+    .regex(/^[0-9]+$/, 'BIN must contain only numbers'),
   shortName: z.string().min(1, 'Short name is required'),
   logo: z.string().url('Must be a valid URL').or(z.string().length(0)),
   transferSupported: z.boolean().default(false),
@@ -71,8 +85,12 @@ export function BanksTable() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingBank, setEditingBank] = useState<string | null>(null);
-  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
-  const [filterTransfer, setFilterTransfer] = useState<'all' | 'yes' | 'no'>('all');
+  const [filterStatus, setFilterStatus] = useState<
+    'all' | 'active' | 'inactive'
+  >('all');
+  const [filterTransfer, setFilterTransfer] = useState<'all' | 'yes' | 'no'>(
+    'all',
+  );
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<BankFormValues>({
@@ -106,21 +124,25 @@ export function BanksTable() {
   } = useBanks(true);
 
   const filteredBanks = banks.filter((bank: Bank) => {
-    const matchesSearch = 
+    const matchesSearch =
       bank.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       bank.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
       bank.swiftCode?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
       false;
 
-    const matchesStatus = 
-      filterStatus === 'all' ? true :
-      filterStatus === 'active' ? bank.isActive :
-      !bank.isActive;
+    const matchesStatus =
+      filterStatus === 'all'
+        ? true
+        : filterStatus === 'active'
+          ? bank.isActive
+          : !bank.isActive;
 
-    const matchesTransfer = 
-      filterTransfer === 'all' ? true :
-      filterTransfer === 'yes' ? bank.isTransfer :
-      !bank.isTransfer;
+    const matchesTransfer =
+      filterTransfer === 'all'
+        ? true
+        : filterTransfer === 'yes'
+          ? bank.isTransfer
+          : !bank.isTransfer;
 
     return matchesSearch && matchesStatus && matchesTransfer;
   });
@@ -145,17 +167,17 @@ export function BanksTable() {
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message;
       setServerError(errorMessage);
-      
+
       // Set specific field errors
       if (errorMessage.includes('code already exists')) {
-        form.setError('code', { 
+        form.setError('code', {
           type: 'manual',
-          message: 'A bank with this code already exists'
+          message: 'A bank with this code already exists',
         });
       } else if (errorMessage.includes('bin already exists')) {
         form.setError('bin', {
           type: 'manual',
-          message: 'A bank with this BIN already exists'
+          message: 'A bank with this BIN already exists',
         });
       }
     }
@@ -181,7 +203,7 @@ export function BanksTable() {
   return (
     <div className="bg-background space-y-4 rounded-md p-4">
       <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4 flex-1">
+        <div className="flex flex-1 items-center gap-4">
           <div className="relative w-64">
             <Search className="text-muted-foreground absolute top-2.5 left-2 h-4 w-4" />
             <Input
@@ -194,7 +216,9 @@ export function BanksTable() {
 
           <Select
             value={filterStatus}
-            onValueChange={(value: 'all' | 'active' | 'inactive') => setFilterStatus(value)}
+            onValueChange={(value: 'all' | 'active' | 'inactive') =>
+              setFilterStatus(value)
+            }
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter by status" />
@@ -208,7 +232,9 @@ export function BanksTable() {
 
           <Select
             value={filterTransfer}
-            onValueChange={(value: 'all' | 'yes' | 'no') => setFilterTransfer(value)}
+            onValueChange={(value: 'all' | 'yes' | 'no') =>
+              setFilterTransfer(value)
+            }
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter by transfer" />
@@ -247,13 +273,16 @@ export function BanksTable() {
               </DialogDescription>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(handleSubmit)}
+                className="space-y-4"
+              >
                 {serverError && (
-                  <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+                  <div className="bg-destructive/15 text-destructive rounded-md p-3 text-sm">
                     {serverError}
                   </div>
                 )}
-                
+
                 <FormField
                   control={form.control}
                   name="name"
@@ -389,7 +418,6 @@ export function BanksTable() {
                       </FormItem>
                     )}
                   />
-
                 </div>
 
                 <FormField
@@ -402,7 +430,7 @@ export function BanksTable() {
                         <Input
                           type="number"
                           {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          onChange={e => field.onChange(Number(e.target.value))}
                         />
                       </FormControl>
                       <FormMessage />
@@ -422,10 +450,7 @@ export function BanksTable() {
                   >
                     Cancel
                   </Button>
-                  <Button
-                    type="submit"
-                    disabled={isCreating || isUpdating}
-                  >
+                  <Button type="submit" disabled={isCreating || isUpdating}>
                     {isCreating || isUpdating ? (
                       <LoadingSpinner className="mr-2" />
                     ) : null}
@@ -479,7 +504,9 @@ export function BanksTable() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={bank.isDeleted ? 'destructive' : 'secondary'}>
+                    <Badge
+                      variant={bank.isDeleted ? 'destructive' : 'secondary'}
+                    >
                       {bank.isDeleted ? 'Deleted' : 'Active'}
                     </Badge>
                   </TableCell>

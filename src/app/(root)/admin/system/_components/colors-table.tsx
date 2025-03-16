@@ -48,9 +48,13 @@ import {
 
 const colorFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  code: z.string()
+  code: z
+    .string()
     .min(1, 'Color code is required')
-    .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, 'Must be a valid hex color code (e.g., #FF0000)'),
+    .regex(
+      /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
+      'Must be a valid hex color code (e.g., #FF0000)',
+    ),
 });
 
 type ColorFormValues = z.infer<typeof colorFormSchema>;
@@ -103,11 +107,11 @@ export function ColorsTable() {
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message;
       setServerError(errorMessage);
-      
+
       if (errorMessage.includes('already exists')) {
-        form.setError('code', { 
+        form.setError('code', {
           type: 'manual',
-          message: 'A color with this code already exists'
+          message: 'A color with this code already exists',
         });
       }
     }
@@ -120,7 +124,10 @@ export function ColorsTable() {
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message;
-      if (errorMessage.includes('in use') || errorMessage.includes('being used')) {
+      if (
+        errorMessage.includes('in use') ||
+        errorMessage.includes('being used')
+      ) {
         toast.error('This color cannot be deleted as it is being used');
       } else {
         toast.error(errorMessage || 'Failed to delete color');
@@ -181,9 +188,12 @@ export function ColorsTable() {
               </DialogDescription>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(handleSubmit)}
+                className="space-y-4"
+              >
                 {serverError && (
-                  <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+                  <div className="bg-destructive/15 text-destructive rounded-md p-3 text-sm">
                     {serverError}
                   </div>
                 )}
@@ -210,7 +220,11 @@ export function ColorsTable() {
                       <FormLabel>Color Code</FormLabel>
                       <FormControl>
                         <div className="flex gap-2">
-                          <Input {...field} placeholder="#000000" className="flex-1" />
+                          <Input
+                            {...field}
+                            placeholder="#000000"
+                            className="flex-1"
+                          />
                           <div
                             className="h-10 w-10 rounded border"
                             style={{ backgroundColor: field.value }}
@@ -233,10 +247,7 @@ export function ColorsTable() {
                   >
                     Cancel
                   </Button>
-                  <Button
-                    type="submit"
-                    disabled={isCreating || isUpdating}
-                  >
+                  <Button type="submit" disabled={isCreating || isUpdating}>
                     {isCreating || isUpdating ? (
                       <LoadingSpinner className="mr-2" />
                     ) : null}
@@ -285,7 +296,9 @@ export function ColorsTable() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={color.isDeleted ? 'destructive' : 'secondary'}>
+                    <Badge
+                      variant={color.isDeleted ? 'destructive' : 'secondary'}
+                    >
                       {color.isDeleted ? 'Deleted' : 'Active'}
                     </Badge>
                   </TableCell>

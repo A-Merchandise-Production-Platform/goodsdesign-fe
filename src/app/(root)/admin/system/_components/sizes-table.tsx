@@ -47,9 +47,13 @@ import {
 import { toast } from 'sonner';
 
 const sizeFormSchema = z.object({
-  code: z.string()
+  code: z
+    .string()
     .min(1, 'Size code is required')
-    .regex(/^[A-Z0-9]+$/, 'Code must contain only uppercase letters and numbers'),
+    .regex(
+      /^[A-Z0-9]+$/,
+      'Code must contain only uppercase letters and numbers',
+    ),
   isActive: z.boolean().default(true),
 });
 
@@ -83,7 +87,7 @@ export function SizesTable() {
     isRestoring,
   } = useSizes(true); // Include soft-deleted sizes
 
-  const filteredSizes = sizes.filter((size:Size ) =>
+  const filteredSizes = sizes.filter((size: Size) =>
     size.code.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
@@ -101,11 +105,11 @@ export function SizesTable() {
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message;
       setServerError(errorMessage);
-      
+
       if (errorMessage.includes('already exists')) {
-        form.setError('code', { 
+        form.setError('code', {
           type: 'manual',
-          message: 'A size with this code already exists'
+          message: 'A size with this code already exists',
         });
       }
     }
@@ -118,7 +122,10 @@ export function SizesTable() {
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message;
-      if (errorMessage.includes('in use') || errorMessage.includes('being used')) {
+      if (
+        errorMessage.includes('in use') ||
+        errorMessage.includes('being used')
+      ) {
         toast.error('This size cannot be deleted as it is being used');
       } else {
         toast.error(errorMessage || 'Failed to delete size');
@@ -187,9 +194,12 @@ export function SizesTable() {
               </DialogDescription>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(handleSubmit)}
+                className="space-y-4"
+              >
                 {serverError && (
-                  <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+                  <div className="bg-destructive/15 text-destructive rounded-md p-3 text-sm">
                     {serverError}
                   </div>
                 )}
@@ -236,10 +246,7 @@ export function SizesTable() {
                   >
                     Cancel
                   </Button>
-                  <Button
-                    type="submit"
-                    disabled={isCreating || isUpdating}
-                  >
+                  <Button type="submit" disabled={isCreating || isUpdating}>
                     {isCreating || isUpdating ? (
                       <LoadingSpinner className="mr-2" />
                     ) : null}
@@ -270,7 +277,7 @@ export function SizesTable() {
                 </TableCell>
               </TableRow>
             ) : filteredSizes.length > 0 ? (
-              filteredSizes.map((size:Size ) => (
+              filteredSizes.map((size: Size) => (
                 <TableRow key={size.id}>
                   <TableCell>{size.code}</TableCell>
                   <TableCell>
@@ -279,7 +286,9 @@ export function SizesTable() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={size.isDeleted ? 'destructive' : 'secondary'}>
+                    <Badge
+                      variant={size.isDeleted ? 'destructive' : 'secondary'}
+                    >
                       {size.isDeleted ? 'Deleted' : 'Active'}
                     </Badge>
                   </TableCell>
@@ -299,7 +308,7 @@ export function SizesTable() {
                             <DropdownMenuItem
                               onClick={() => {
                                 const sizeToEdit = sizes.find(
-                                  (s:Size ) => s.id === size.id,
+                                  (s: Size) => s.id === size.id,
                                 );
                                 if (sizeToEdit) {
                                   setEditingSize(size.id);

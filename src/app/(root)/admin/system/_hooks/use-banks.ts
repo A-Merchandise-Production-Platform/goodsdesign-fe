@@ -218,11 +218,11 @@ export function useBanks(includeDeleted: boolean = false) {
           createSystemConfigBankDto: newBank,
         },
       });
-      
+
       if (data.errors) {
         throw new Error(data.errors[0]?.message || 'Failed to create bank');
       }
-      
+
       return data.data.createSystemConfigBank;
     },
     onSuccess: () => {
@@ -230,8 +230,11 @@ export function useBanks(includeDeleted: boolean = false) {
       toast.success('Bank created successfully');
     },
     onError: (error: ErrorResponse) => {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to create bank';
-      
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to create bank';
+
       if (errorMessage.includes('code already exists')) {
         toast.error('A bank with this code already exists');
       } else if (errorMessage.includes('bin already exists')) {
@@ -253,7 +256,9 @@ export function useBanks(includeDeleted: boolean = false) {
       });
 
       if (response.data.errors) {
-        throw new Error(response.data.errors[0]?.message || 'Failed to update bank');
+        throw new Error(
+          response.data.errors[0]?.message || 'Failed to update bank',
+        );
       }
 
       return response.data.data.updateSystemConfigBank;
@@ -263,8 +268,11 @@ export function useBanks(includeDeleted: boolean = false) {
       toast.success('Bank updated successfully');
     },
     onError: (error: ErrorResponse) => {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to update bank';
-      
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to update bank';
+
       if (errorMessage.includes('code already exists')) {
         toast.error('A bank with this code already exists');
       } else if (errorMessage.includes('bin already exists')) {

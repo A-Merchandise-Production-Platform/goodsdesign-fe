@@ -119,11 +119,11 @@ export function useSizes(includeDeleted: boolean = false) {
           createSystemConfigSizeDto: newSize,
         },
       });
-      
+
       if (data.errors) {
         throw new Error(data.errors[0]?.message || 'Failed to create size');
       }
-      
+
       return data.data.createSystemConfigSize;
     },
     onSuccess: () => {
@@ -131,8 +131,11 @@ export function useSizes(includeDeleted: boolean = false) {
       toast.success('Size created successfully');
     },
     onError: (error: ErrorResponse) => {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to create size';
-      
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to create size';
+
       if (errorMessage.includes('already exists')) {
         toast.error('A size with this code already exists');
       } else {
@@ -152,7 +155,9 @@ export function useSizes(includeDeleted: boolean = false) {
       });
 
       if (response.data.errors) {
-        throw new Error(response.data.errors[0]?.message || 'Failed to update size');
+        throw new Error(
+          response.data.errors[0]?.message || 'Failed to update size',
+        );
       }
 
       return response.data.data.updateSystemConfigSize;
@@ -162,8 +167,11 @@ export function useSizes(includeDeleted: boolean = false) {
       toast.success('Size updated successfully');
     },
     onError: (error: ErrorResponse) => {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to update size';
-      
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to update size';
+
       if (errorMessage.includes('already exists')) {
         toast.error('A size with this code already exists');
       } else {
@@ -178,11 +186,13 @@ export function useSizes(includeDeleted: boolean = false) {
         query: DELETE_SIZE_MUTATION,
         variables: { id },
       });
-      
+
       if (response.data.errors) {
-        throw new Error(response.data.errors[0]?.message || 'Failed to delete size');
+        throw new Error(
+          response.data.errors[0]?.message || 'Failed to delete size',
+        );
       }
-      
+
       return response.data.data.removeSystemConfigSize;
     },
     onSuccess: () => {
@@ -191,7 +201,10 @@ export function useSizes(includeDeleted: boolean = false) {
     },
     onError: (error: ErrorResponse) => {
       const errorMessage = error.response?.data?.message || error.message;
-      if (errorMessage?.includes('in use') || errorMessage?.includes('being used')) {
+      if (
+        errorMessage?.includes('in use') ||
+        errorMessage?.includes('being used')
+      ) {
         toast.error('This size cannot be deleted as it is being used');
       } else {
         toast.error(errorMessage || 'Failed to delete size');
@@ -205,11 +218,13 @@ export function useSizes(includeDeleted: boolean = false) {
         query: RESTORE_SIZE_MUTATION,
         variables: { id },
       });
-      
+
       if (response.data.errors) {
-        throw new Error(response.data.errors[0]?.message || 'Failed to restore size');
+        throw new Error(
+          response.data.errors[0]?.message || 'Failed to restore size',
+        );
       }
-      
+
       return response.data.data.restoreSystemConfigSize;
     },
     onSuccess: () => {
@@ -218,7 +233,7 @@ export function useSizes(includeDeleted: boolean = false) {
     },
     onError: (error: ErrorResponse) => {
       const errorMessage = error.response?.data?.message || error.message;
-      
+
       if (errorMessage?.includes('already exists')) {
         toast.error('A size with this code already exists');
       } else if (errorMessage?.includes('not found')) {
