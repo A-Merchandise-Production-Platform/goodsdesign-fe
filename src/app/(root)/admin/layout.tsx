@@ -20,6 +20,11 @@ const navItems: NavItem[] = [
     label: 'Products',
     icon: <ShoppingCartIcon className="size-4" />,
   },
+  {
+    href: '/admin/categories',
+    label: 'Categories',
+    icon: <ShoppingCartIcon className="size-4" />,
+  },
 ];
 
 export default function AdminLayout({

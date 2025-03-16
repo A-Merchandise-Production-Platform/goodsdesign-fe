@@ -18,8 +18,8 @@ export function MySidebar({ navItems, children }: MySidebarProps) {
   const pathname = usePathname();
 
   return (
-    <div className="grid h-[calc(100vh-4rem-1.5rem)] grid-cols-1 gap-6 pt-4 pb-2 md:grid-cols-[200px_1fr]">
-      <nav className="bg-background mb-6 space-y-1 rounded-xl p-2">
+    <div className="grid grid-cols-1 gap-4 pt-4 pb-2 md:grid-cols-[200px_1fr]">
+      <nav className="bg-background space-y-1 rounded-xl p-2">
         {navItems.map(item => {
           const isActive = pathname === item.href;
           return (
@@ -40,7 +40,7 @@ export function MySidebar({ navItems, children }: MySidebarProps) {
           );
         })}
       </nav>
-      <div className="mb-6 h-full rounded-xl">{children}</div>
+      <div className="h-full rounded-xl">{children}</div>
     </div>
   );
 }

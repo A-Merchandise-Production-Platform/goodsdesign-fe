@@ -1,0 +1,25 @@
+query GetCategory($categoryId: String!) {
+  category(id: $categoryId) {
+    createdAt
+    description
+    id
+    imageUrl
+    isActive
+    name
+    totalProducts
+    updatedAt
+  }
+}
+
+query GetAllCategories {
+  categories {
+    createdAt
+    description
+    id
+    imageUrl
+    isActive
+    name
+    totalProducts
+    updatedAt
+  }
+}

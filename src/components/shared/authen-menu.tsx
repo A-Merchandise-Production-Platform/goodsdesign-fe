@@ -18,7 +18,7 @@ export default function AuthenMenu() {
 
       {isAuth && user ? (
         <div className="flex items-center gap-4">
-          <NotificationPanel />
+          {/* <NotificationPanel /> */}
           <UserDropdownMenu user={user} />
         </div>
       ) : (
