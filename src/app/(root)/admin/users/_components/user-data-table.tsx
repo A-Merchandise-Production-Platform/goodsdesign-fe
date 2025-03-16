@@ -3,7 +3,13 @@
 import { columns } from '@/app/(root)/admin/users/_components/columns';
 import { DataTable } from '@/app/(root)/admin/users/_components/data-table';
 import { useUsers } from '@/app/(root)/admin/users/_hooks/use-users';
-import { Roles, SortOrder } from '@/graphql/generated';
+import { Roles } from '@/graphql/generated';
+
+enum SortOrder {
+  Asc = 'ASC',
+  Desc = 'DESC',
+}
+
 import { useDebounce } from '@/hooks/use-debounce';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -63,7 +69,7 @@ export default function UserDataTable() {
   };
 
   const handleSortDirectionChange = () => {
-    setSortDirection(prev =>
+    setSortDirection((prev: SortOrder) =>
       prev === SortOrder.Asc ? SortOrder.Desc : SortOrder.Asc,
     );
   };
