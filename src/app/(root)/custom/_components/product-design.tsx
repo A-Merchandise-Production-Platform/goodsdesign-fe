@@ -386,7 +386,6 @@ export default function ProductDesigner() {
     e.target.value = '';
   };
 
-
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Delete' && fabricCanvasRef.current) {
       const activeObjects = fabricCanvasRef.current.getActiveObjects();
@@ -439,7 +438,7 @@ export default function ProductDesigner() {
     setDesigns(prev => {
       const newDesigns: SerializedDesign = {
         ...prev,
-        [view]: serializedObjects
+        [view]: serializedObjects,
       };
       return newDesigns;
     });
