@@ -1,7 +1,14 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,9 +16,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -20,22 +27,22 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { MoreHorizontal, Plus, Search } from "lucide-react"
-import { useColors } from "../_hooks/use-colors"
-import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import { Badge } from "@/components/ui/badge"
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { MoreHorizontal, Plus, Search } from 'lucide-react';
+import { useColors } from '../_hooks/use-colors';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Badge } from '@/components/ui/badge';
 
 export function ColorsTable() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [editingColor, setEditingColor] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingColor, setEditingColor] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    name: "",
-    code: "",
+    name: '',
+    code: '',
     isActive: true,
-  })
+  });
 
   const {
     colors,
@@ -49,67 +56,67 @@ export function ColorsTable() {
     isUpdating,
     isDeleting,
     isRestoring,
-  } = useColors(true) // Include soft-deleted colors
+  } = useColors(true); // Include soft-deleted colors
 
   const filteredColors = colors.filter(
-    (color) =>
+    color =>
       color.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       color.code.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  );
 
   const handleSubmit = async () => {
     try {
       if (editingColor) {
-        await updateColor({ id: editingColor, data: formData })
+        await updateColor({ id: editingColor, data: formData });
       } else {
-        await createColor(formData)
+        await createColor(formData);
       }
-      setIsAddDialogOpen(false)
-      resetForm()
+      setIsAddDialogOpen(false);
+      resetForm();
     } catch (error) {
-      console.error("Error saving color:", error)
+      console.error('Error saving color:', error);
     }
-  }
+  };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this color?")) {
-      await deleteColor(id)
+    if (window.confirm('Are you sure you want to delete this color?')) {
+      await deleteColor(id);
     }
-  }
+  };
 
   const handleRestore = async (id: string) => {
-    await restoreColor(id)
-  }
+    await restoreColor(id);
+  };
 
   const resetForm = () => {
     setFormData({
-      name: "",
-      code: "",
+      name: '',
+      code: '',
       isActive: true,
-    })
-    setEditingColor(null)
-  }
+    });
+    setEditingColor(null);
+  };
 
-  if (error) return <div>Error loading colors</div>
+  if (error) return <div>Error loading colors</div>;
 
   return (
-    <div className="space-y-4 bg-background rounded-md p-4">
-      <div className="flex justify-between items-center">
+    <div className="bg-background space-y-4 rounded-md p-4">
+      <div className="flex items-center justify-between">
         <div className="relative w-64">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="text-muted-foreground absolute top-2.5 left-2 h-4 w-4" />
           <Input
             placeholder="Search colors..."
             className="pl-8"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
           />
         </div>
 
         <Dialog
           open={isAddDialogOpen}
-          onOpenChange={(open) => {
-            setIsAddDialogOpen(open)
-            if (!open) resetForm()
+          onOpenChange={open => {
+            setIsAddDialogOpen(open);
+            if (!open) resetForm();
           }}
         >
           <DialogTrigger asChild>
@@ -120,9 +127,12 @@ export function ColorsTable() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{editingColor ? "Edit Color" : "Add New Color"}</DialogTitle>
+              <DialogTitle>
+                {editingColor ? 'Edit Color' : 'Add New Color'}
+              </DialogTitle>
               <DialogDescription>
-                Fill in the details for the {editingColor ? "color update" : "new color configuration"}.
+                Fill in the details for the{' '}
+                {editingColor ? 'color update' : 'new color configuration'}.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -133,7 +143,9 @@ export function ColorsTable() {
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={e =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   className="col-span-3"
                 />
               </div>
@@ -145,10 +157,15 @@ export function ColorsTable() {
                   <Input
                     id="code"
                     value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                    onChange={e =>
+                      setFormData({ ...formData, code: e.target.value })
+                    }
                     className="flex-1"
                   />
-                  <div className="w-10 h-10 rounded border" style={{ backgroundColor: formData.code }} />
+                  <div
+                    className="h-10 w-10 rounded border"
+                    style={{ backgroundColor: formData.code }}
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
@@ -161,7 +178,9 @@ export function ColorsTable() {
                       type="checkbox"
                       id="isActive"
                       checked={formData.isActive}
-                      onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                      onChange={e =>
+                        setFormData({ ...formData, isActive: e.target.checked })
+                      }
                     />
                     <Label htmlFor="isActive">Active</Label>
                   </div>
@@ -169,13 +188,19 @@ export function ColorsTable() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => {
-                setIsAddDialogOpen(false)
-                resetForm()
-              }}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsAddDialogOpen(false);
+                  resetForm();
+                }}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleSubmit} disabled={isCreating || isUpdating}>
+              <Button
+                onClick={handleSubmit}
+                disabled={isCreating || isUpdating}
+              >
                 {isCreating || isUpdating ? (
                   <LoadingSpinner className="mr-2" />
                 ) : null}
@@ -205,16 +230,19 @@ export function ColorsTable() {
                 </TableCell>
               </TableRow>
             ) : filteredColors.length > 0 ? (
-              filteredColors.map((color) => (
+              filteredColors.map(color => (
                 <TableRow key={color.id}>
                   <TableCell>{color.name}</TableCell>
                   <TableCell>{color.code}</TableCell>
                   <TableCell>
-                    <div className="w-8 h-8 rounded border" style={{ backgroundColor: color.code }} />
+                    <div
+                      className="h-8 w-8 rounded border"
+                      style={{ backgroundColor: color.code }}
+                    />
                   </TableCell>
                   <TableCell>
-                    <Badge variant={color.isActive ? "success" : "destructive"}>
-                      {color.isActive ? "Active" : "Inactive"}
+                    <Badge variant={color.isActive ? 'success' : 'destructive'}>
+                      {color.isActive ? 'Active' : 'Inactive'}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -232,15 +260,17 @@ export function ColorsTable() {
                           <>
                             <DropdownMenuItem
                               onClick={() => {
-                                const colorToEdit = colors.find((c) => c.id === color.id)
+                                const colorToEdit = colors.find(
+                                  c => c.id === color.id,
+                                );
                                 if (colorToEdit) {
-                                  setEditingColor(color.id)
+                                  setEditingColor(color.id);
                                   setFormData({
                                     name: colorToEdit.name,
                                     code: colorToEdit.code,
                                     isActive: colorToEdit.isActive,
-                                  })
-                                  setIsAddDialogOpen(true)
+                                  });
+                                  setIsAddDialogOpen(true);
                                 }
                               }}
                             >
@@ -254,7 +284,9 @@ export function ColorsTable() {
                             </DropdownMenuItem>
                           </>
                         ) : (
-                          <DropdownMenuItem onClick={() => handleRestore(color.id)}>
+                          <DropdownMenuItem
+                            onClick={() => handleRestore(color.id)}
+                          >
                             Restore
                           </DropdownMenuItem>
                         )}
@@ -274,5 +306,5 @@ export function ColorsTable() {
         </Table>
       </div>
     </div>
-  )
-} 
+  );
+}

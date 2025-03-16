@@ -114,7 +114,11 @@ const RESTORE_SIZE_MUTATION = `
 export function useSizes(includeDeleted: boolean = false) {
   const queryClient = useQueryClient();
 
-  const { data: sizes = [], isLoading, error } = useQuery({
+  const {
+    data: sizes = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['sizes', includeDeleted],
     queryFn: async () => {
       const { data } = await axiosInstance.post('/graphql', {
@@ -139,7 +143,7 @@ export function useSizes(includeDeleted: boolean = false) {
       queryClient.invalidateQueries({ queryKey: ['sizes'] });
       toast.success('Size created successfully');
     },
-    onError: (error) => {
+    onError: error => {
       toast.error('Failed to create size');
       console.error('Error creating size:', error);
     },
@@ -160,7 +164,7 @@ export function useSizes(includeDeleted: boolean = false) {
       queryClient.invalidateQueries({ queryKey: ['sizes'] });
       toast.success('Size updated successfully');
     },
-    onError: (error) => {
+    onError: error => {
       toast.error('Failed to update size');
       console.error('Error updating size:', error);
     },
@@ -178,7 +182,7 @@ export function useSizes(includeDeleted: boolean = false) {
       queryClient.invalidateQueries({ queryKey: ['sizes'] });
       toast.success('Size deleted successfully');
     },
-    onError: (error) => {
+    onError: error => {
       toast.error('Failed to delete size');
       console.error('Error deleting size:', error);
     },
@@ -196,7 +200,7 @@ export function useSizes(includeDeleted: boolean = false) {
       queryClient.invalidateQueries({ queryKey: ['sizes'] });
       toast.success('Size restored successfully');
     },
-    onError: (error) => {
+    onError: error => {
       toast.error('Failed to restore size');
       console.error('Error restoring size:', error);
     },
@@ -215,4 +219,4 @@ export function useSizes(includeDeleted: boolean = false) {
     isDeleting: deleteMutation.isPending,
     isRestoring: restoreMutation.isPending,
   };
-} 
+}

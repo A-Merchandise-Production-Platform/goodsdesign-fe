@@ -122,7 +122,11 @@ const RESTORE_COLOR_MUTATION = `
 export function useColors(includeDeleted: boolean = false) {
   const queryClient = useQueryClient();
 
-  const { data: colors = [], isLoading, error } = useQuery({
+  const {
+    data: colors = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['colors', includeDeleted],
     queryFn: async () => {
       const { data } = await axiosInstance.post('/graphql', {
@@ -147,7 +151,7 @@ export function useColors(includeDeleted: boolean = false) {
       queryClient.invalidateQueries({ queryKey: ['colors'] });
       toast.success('Color created successfully');
     },
-    onError: (error) => {
+    onError: error => {
       toast.error('Failed to create color');
       console.error('Error creating color:', error);
     },
@@ -168,7 +172,7 @@ export function useColors(includeDeleted: boolean = false) {
       queryClient.invalidateQueries({ queryKey: ['colors'] });
       toast.success('Color updated successfully');
     },
-    onError: (error) => {
+    onError: error => {
       toast.error('Failed to update color');
       console.error('Error updating color:', error);
     },
@@ -186,7 +190,7 @@ export function useColors(includeDeleted: boolean = false) {
       queryClient.invalidateQueries({ queryKey: ['colors'] });
       toast.success('Color deleted successfully');
     },
-    onError: (error) => {
+    onError: error => {
       toast.error('Failed to delete color');
       console.error('Error deleting color:', error);
     },
@@ -204,7 +208,7 @@ export function useColors(includeDeleted: boolean = false) {
       queryClient.invalidateQueries({ queryKey: ['colors'] });
       toast.success('Color restored successfully');
     },
-    onError: (error) => {
+    onError: error => {
       toast.error('Failed to restore color');
       console.error('Error restoring color:', error);
     },
@@ -223,4 +227,4 @@ export function useColors(includeDeleted: boolean = false) {
     isDeleting: deleteMutation.isPending,
     isRestoring: restoreMutation.isPending,
   };
-} 
+}

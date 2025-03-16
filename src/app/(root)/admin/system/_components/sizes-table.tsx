@@ -1,7 +1,14 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,9 +16,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -20,21 +27,21 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { MoreHorizontal, Plus, Search } from "lucide-react"
-import { useSizes } from "../_hooks/use-sizes"
-import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import { Badge } from "@/components/ui/badge"
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { MoreHorizontal, Plus, Search } from 'lucide-react';
+import { useSizes } from '../_hooks/use-sizes';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Badge } from '@/components/ui/badge';
 
 export function SizesTable() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [editingSize, setEditingSize] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingSize, setEditingSize] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    code: "",
+    code: '',
     isActive: true,
-  })
+  });
 
   const {
     sizes,
@@ -48,65 +55,64 @@ export function SizesTable() {
     isUpdating,
     isDeleting,
     isRestoring,
-  } = useSizes(true) // Include soft-deleted sizes
+  } = useSizes(true); // Include soft-deleted sizes
 
-  const filteredSizes = sizes.filter(
-    (size) =>
-      size.code.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredSizes = sizes.filter(size =>
+    size.code.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   const handleSubmit = async () => {
     try {
       if (editingSize) {
-        await updateSize({ id: editingSize, data: formData })
+        await updateSize({ id: editingSize, data: formData });
       } else {
-        await createSize(formData)
+        await createSize(formData);
       }
-      setIsAddDialogOpen(false)
-      resetForm()
+      setIsAddDialogOpen(false);
+      resetForm();
     } catch (error) {
-      console.error("Error saving size:", error)
+      console.error('Error saving size:', error);
     }
-  }
+  };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this size?")) {
-      await deleteSize(id)
+    if (window.confirm('Are you sure you want to delete this size?')) {
+      await deleteSize(id);
     }
-  }
+  };
 
   const handleRestore = async (id: string) => {
-    await restoreSize(id)
-  }
+    await restoreSize(id);
+  };
 
   const resetForm = () => {
     setFormData({
-      code: "",
+      code: '',
       isActive: true,
-    })
-    setEditingSize(null)
-  }
+    });
+    setEditingSize(null);
+  };
 
-  if (error) return <div>Error loading sizes</div>
+  if (error) return <div>Error loading sizes</div>;
 
   return (
-    <div className="space-y-4 bg-background rounded-md p-4">
-      <div className="flex justify-between items-center">
+    <div className="bg-background space-y-4 rounded-md p-4">
+      <div className="flex items-center justify-between">
         <div className="relative w-64">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="text-muted-foreground absolute top-2.5 left-2 h-4 w-4" />
           <Input
             placeholder="Search sizes..."
             className="pl-8"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
           />
         </div>
 
         <Dialog
           open={isAddDialogOpen}
-          onOpenChange={(open) => {
-            setIsAddDialogOpen(open)
-            if (!open) resetForm()
+          onOpenChange={open => {
+            setIsAddDialogOpen(open);
+            if (!open) resetForm();
           }}
         >
           <DialogTrigger asChild>
@@ -117,9 +123,12 @@ export function SizesTable() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{editingSize ? "Edit Size" : "Add New Size"}</DialogTitle>
+              <DialogTitle>
+                {editingSize ? 'Edit Size' : 'Add New Size'}
+              </DialogTitle>
               <DialogDescription>
-                Fill in the details for the {editingSize ? "size update" : "new size configuration"}.
+                Fill in the details for the{' '}
+                {editingSize ? 'size update' : 'new size configuration'}.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -130,7 +139,9 @@ export function SizesTable() {
                 <Input
                   id="code"
                   value={formData.code}
-                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                  onChange={e =>
+                    setFormData({ ...formData, code: e.target.value })
+                  }
                   className="col-span-3"
                 />
               </div>
@@ -142,7 +153,9 @@ export function SizesTable() {
                       type="checkbox"
                       id="isActive"
                       checked={formData.isActive}
-                      onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                      onChange={e =>
+                        setFormData({ ...formData, isActive: e.target.checked })
+                      }
                     />
                     <Label htmlFor="isActive">Is Active</Label>
                   </div>
@@ -150,13 +163,19 @@ export function SizesTable() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => {
-                setIsAddDialogOpen(false)
-                resetForm()
-              }}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsAddDialogOpen(false);
+                  resetForm();
+                }}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleSubmit} disabled={isCreating || isUpdating}>
+              <Button
+                onClick={handleSubmit}
+                disabled={isCreating || isUpdating}
+              >
                 {isCreating || isUpdating ? (
                   <LoadingSpinner className="mr-2" />
                 ) : null}
@@ -184,12 +203,12 @@ export function SizesTable() {
                 </TableCell>
               </TableRow>
             ) : filteredSizes.length > 0 ? (
-              filteredSizes.map((size) => (
+              filteredSizes.map(size => (
                 <TableRow key={size.id}>
                   <TableCell>{size.code}</TableCell>
                   <TableCell>
-                    <Badge variant={size.isActive ? "success" : "destructive"}>
-                      {size.isActive ? "Active" : "Inactive"}
+                    <Badge variant={size.isActive ? 'success' : 'destructive'}>
+                      {size.isActive ? 'Active' : 'Inactive'}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -207,14 +226,16 @@ export function SizesTable() {
                           <>
                             <DropdownMenuItem
                               onClick={() => {
-                                const sizeToEdit = sizes.find((s) => s.id === size.id)
+                                const sizeToEdit = sizes.find(
+                                  s => s.id === size.id,
+                                );
                                 if (sizeToEdit) {
-                                  setEditingSize(size.id)
+                                  setEditingSize(size.id);
                                   setFormData({
                                     code: sizeToEdit.code,
                                     isActive: sizeToEdit.isActive,
-                                  })
-                                  setIsAddDialogOpen(true)
+                                  });
+                                  setIsAddDialogOpen(true);
                                 }
                               }}
                             >
@@ -228,7 +249,9 @@ export function SizesTable() {
                             </DropdownMenuItem>
                           </>
                         ) : (
-                          <DropdownMenuItem onClick={() => handleRestore(size.id)}>
+                          <DropdownMenuItem
+                            onClick={() => handleRestore(size.id)}
+                          >
                             Restore
                           </DropdownMenuItem>
                         )}
@@ -248,5 +271,5 @@ export function SizesTable() {
         </Table>
       </div>
     </div>
-  )
-} 
+  );
+}

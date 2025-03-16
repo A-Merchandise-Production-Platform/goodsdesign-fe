@@ -186,7 +186,11 @@ const RESTORE_BANK_MUTATION = `
 export function useBanks(includeDeleted: boolean = false) {
   const queryClient = useQueryClient();
 
-  const { data: banks = [], isLoading, error } = useQuery({
+  const {
+    data: banks = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['banks', includeDeleted],
     queryFn: async () => {
       const { data } = await axiosInstance.post('/graphql', {
@@ -211,7 +215,7 @@ export function useBanks(includeDeleted: boolean = false) {
       queryClient.invalidateQueries({ queryKey: ['banks'] });
       toast.success('Bank created successfully');
     },
-    onError: (error) => {
+    onError: error => {
       toast.error('Failed to create bank');
       console.error('Error creating bank:', error);
     },
@@ -232,7 +236,7 @@ export function useBanks(includeDeleted: boolean = false) {
       queryClient.invalidateQueries({ queryKey: ['banks'] });
       toast.success('Bank updated successfully');
     },
-    onError: (error) => {
+    onError: error => {
       toast.error('Failed to update bank');
       console.error('Error updating bank:', error);
     },
@@ -250,7 +254,7 @@ export function useBanks(includeDeleted: boolean = false) {
       queryClient.invalidateQueries({ queryKey: ['banks'] });
       toast.success('Bank deleted successfully');
     },
-    onError: (error) => {
+    onError: error => {
       toast.error('Failed to delete bank');
       console.error('Error deleting bank:', error);
     },
@@ -268,7 +272,7 @@ export function useBanks(includeDeleted: boolean = false) {
       queryClient.invalidateQueries({ queryKey: ['banks'] });
       toast.success('Bank restored successfully');
     },
-    onError: (error) => {
+    onError: error => {
       toast.error('Failed to restore bank');
       console.error('Error restoring bank:', error);
     },
@@ -287,4 +291,4 @@ export function useBanks(includeDeleted: boolean = false) {
     isDeleting: deleteMutation.isPending,
     isRestoring: restoreMutation.isPending,
   };
-} 
+}
