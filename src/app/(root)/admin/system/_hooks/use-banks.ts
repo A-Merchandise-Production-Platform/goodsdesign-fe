@@ -53,6 +53,15 @@ export interface UpdateBankDto {
   isActive?: boolean;
 }
 
+interface ErrorResponse {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}
+
 const GET_BANKS_QUERY = `
   query GetBanks($includeDeleted: Boolean) {
     systemConfigBanks(includeDeleted: $includeDeleted) {
@@ -209,15 +218,27 @@ export function useBanks(includeDeleted: boolean = false) {
           createSystemConfigBankDto: newBank,
         },
       });
+      
+      if (data.errors) {
+        throw new Error(data.errors[0]?.message || 'Failed to create bank');
+      }
+      
       return data.data.createSystemConfigBank;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['banks'] });
       toast.success('Bank created successfully');
     },
-    onError: error => {
-      toast.error('Failed to create bank');
-      console.error('Error creating bank:', error);
+    onError: (error: ErrorResponse) => {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to create bank';
+      
+      if (errorMessage.includes('code already exists')) {
+        toast.error('A bank with this code already exists');
+      } else if (errorMessage.includes('bin already exists')) {
+        toast.error('A bank with this BIN already exists');
+      } else {
+        toast.error(errorMessage);
+      }
     },
   });
 
@@ -230,15 +251,27 @@ export function useBanks(includeDeleted: boolean = false) {
           updateSystemConfigBankDto: data,
         },
       });
+
+      if (response.data.errors) {
+        throw new Error(response.data.errors[0]?.message || 'Failed to update bank');
+      }
+
       return response.data.data.updateSystemConfigBank;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['banks'] });
       toast.success('Bank updated successfully');
     },
-    onError: error => {
-      toast.error('Failed to update bank');
-      console.error('Error updating bank:', error);
+    onError: (error: ErrorResponse) => {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to update bank';
+      
+      if (errorMessage.includes('code already exists')) {
+        toast.error('A bank with this code already exists');
+      } else if (errorMessage.includes('bin already exists')) {
+        toast.error('A bank with this BIN already exists');
+      } else {
+        toast.error(errorMessage);
+      }
     },
   });
 

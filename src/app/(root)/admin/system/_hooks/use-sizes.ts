@@ -26,6 +26,15 @@ export interface UpdateSizeDto {
   isActive?: boolean;
 }
 
+interface ErrorResponse {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}
+
 const GET_SIZES_QUERY = `
   query GetSizes($includeDeleted: Boolean) {
     systemConfigSizes(includeDeleted: $includeDeleted) {
@@ -33,12 +42,6 @@ const GET_SIZES_QUERY = `
       code
       isActive
       isDeleted
-      createdAt
-      createdBy
-      updatedAt
-      updatedBy
-      deletedAt
-      deletedBy
     }
   }
 `;
@@ -50,12 +53,6 @@ const CREATE_SIZE_MUTATION = `
       code
       isActive
       isDeleted
-      createdAt
-      createdBy
-      updatedAt
-      updatedBy
-      deletedAt
-      deletedBy
     }
   }
 `;
@@ -67,12 +64,6 @@ const UPDATE_SIZE_MUTATION = `
       code
       isActive
       isDeleted
-      createdAt
-      createdBy
-      updatedAt
-      updatedBy
-      deletedAt
-      deletedBy
     }
   }
 `;
@@ -84,12 +75,6 @@ const DELETE_SIZE_MUTATION = `
       code
       isActive
       isDeleted
-      createdAt
-      createdBy
-      updatedAt
-      updatedBy
-      deletedAt
-      deletedBy
     }
   }
 `;
@@ -101,12 +86,6 @@ const RESTORE_SIZE_MUTATION = `
       code
       isActive
       isDeleted
-      createdAt
-      createdBy
-      updatedAt
-      updatedBy
-      deletedAt
-      deletedBy
     }
   }
 `;
@@ -125,6 +104,9 @@ export function useSizes(includeDeleted: boolean = false) {
         query: GET_SIZES_QUERY,
         variables: { includeDeleted },
       });
+      if (data.errors) {
+        throw new Error(data.errors[0]?.message || 'Failed to fetch sizes');
+      }
       return data.data.systemConfigSizes;
     },
   });
@@ -137,15 +119,25 @@ export function useSizes(includeDeleted: boolean = false) {
           createSystemConfigSizeDto: newSize,
         },
       });
+      
+      if (data.errors) {
+        throw new Error(data.errors[0]?.message || 'Failed to create size');
+      }
+      
       return data.data.createSystemConfigSize;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sizes'] });
       toast.success('Size created successfully');
     },
-    onError: error => {
-      toast.error('Failed to create size');
-      console.error('Error creating size:', error);
+    onError: (error: ErrorResponse) => {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to create size';
+      
+      if (errorMessage.includes('already exists')) {
+        toast.error('A size with this code already exists');
+      } else {
+        toast.error(errorMessage);
+      }
     },
   });
 
@@ -158,15 +150,25 @@ export function useSizes(includeDeleted: boolean = false) {
           updateSystemConfigSizeDto: data,
         },
       });
+
+      if (response.data.errors) {
+        throw new Error(response.data.errors[0]?.message || 'Failed to update size');
+      }
+
       return response.data.data.updateSystemConfigSize;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sizes'] });
       toast.success('Size updated successfully');
     },
-    onError: error => {
-      toast.error('Failed to update size');
-      console.error('Error updating size:', error);
+    onError: (error: ErrorResponse) => {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to update size';
+      
+      if (errorMessage.includes('already exists')) {
+        toast.error('A size with this code already exists');
+      } else {
+        toast.error(errorMessage);
+      }
     },
   });
 
@@ -176,15 +178,24 @@ export function useSizes(includeDeleted: boolean = false) {
         query: DELETE_SIZE_MUTATION,
         variables: { id },
       });
+      
+      if (response.data.errors) {
+        throw new Error(response.data.errors[0]?.message || 'Failed to delete size');
+      }
+      
       return response.data.data.removeSystemConfigSize;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sizes'] });
       toast.success('Size deleted successfully');
     },
-    onError: error => {
-      toast.error('Failed to delete size');
-      console.error('Error deleting size:', error);
+    onError: (error: ErrorResponse) => {
+      const errorMessage = error.response?.data?.message || error.message;
+      if (errorMessage?.includes('in use') || errorMessage?.includes('being used')) {
+        toast.error('This size cannot be deleted as it is being used');
+      } else {
+        toast.error(errorMessage || 'Failed to delete size');
+      }
     },
   });
 
@@ -194,15 +205,27 @@ export function useSizes(includeDeleted: boolean = false) {
         query: RESTORE_SIZE_MUTATION,
         variables: { id },
       });
+      
+      if (response.data.errors) {
+        throw new Error(response.data.errors[0]?.message || 'Failed to restore size');
+      }
+      
       return response.data.data.restoreSystemConfigSize;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sizes'] });
       toast.success('Size restored successfully');
     },
-    onError: error => {
-      toast.error('Failed to restore size');
-      console.error('Error restoring size:', error);
+    onError: (error: ErrorResponse) => {
+      const errorMessage = error.response?.data?.message || error.message;
+      
+      if (errorMessage?.includes('already exists')) {
+        toast.error('A size with this code already exists');
+      } else if (errorMessage?.includes('not found')) {
+        toast.error('Size not found');
+      } else {
+        toast.error(errorMessage || 'Failed to restore size');
+      }
     },
   });
 

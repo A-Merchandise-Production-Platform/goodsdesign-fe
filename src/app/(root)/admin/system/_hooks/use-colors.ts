@@ -119,6 +119,15 @@ const RESTORE_COLOR_MUTATION = `
   }
 `;
 
+interface ErrorResponse {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}
+
 export function useColors(includeDeleted: boolean = false) {
   const queryClient = useQueryClient();
 
@@ -133,6 +142,9 @@ export function useColors(includeDeleted: boolean = false) {
         query: GET_COLORS_QUERY,
         variables: { includeDeleted },
       });
+      if (data.errors) {
+        throw new Error(data.errors[0]?.message || 'Failed to fetch colors');
+      }
       return data.data.systemConfigColors;
     },
   });
@@ -145,72 +157,106 @@ export function useColors(includeDeleted: boolean = false) {
           createSystemConfigColorDto: newColor,
         },
       });
+      
+      if (data.errors) {
+        throw new Error(data.errors[0]?.message || 'Failed to create color');
+      }
+      
       return data.data.createSystemConfigColor;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['colors'] });
       toast.success('Color created successfully');
     },
-    onError: error => {
-      toast.error('Failed to create color');
-      console.error('Error creating color:', error);
+    onError: (error: ErrorResponse) => {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to create color';
+      
+      if (errorMessage.includes('already exists')) {
+        toast.error('A color with this code already exists');
+      } else {
+        toast.error(errorMessage);
+      }
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateColorDto }) => {
-      const response = await axiosInstance.post('/graphql', {
+      const { data: response } = await axiosInstance.post('/graphql', {
         query: UPDATE_COLOR_MUTATION,
         variables: {
           id,
           updateSystemConfigColorDto: data,
         },
       });
-      return response.data.data.updateSystemConfigColor;
+
+      if (response.errors) {
+        throw new Error(response.errors[0]?.message || 'Failed to update color');
+      }
+
+      return response.data.updateSystemConfigColor;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['colors'] });
       toast.success('Color updated successfully');
     },
-    onError: error => {
-      toast.error('Failed to update color');
-      console.error('Error updating color:', error);
+    onError: (error: ErrorResponse) => {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to update color';
+      
+      if (errorMessage.includes('already exists')) {
+        toast.error('A color with this code already exists');
+      } else {
+        toast.error(errorMessage);
+      }
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await axiosInstance.post('/graphql', {
+      const { data } = await axiosInstance.post('/graphql', {
         query: DELETE_COLOR_MUTATION,
         variables: { id },
       });
-      return response.data.data.removeSystemConfigColor;
+      
+      if (data.errors) {
+        throw new Error(data.errors[0]?.message || 'Failed to delete color');
+      }
+      
+      return data.data.removeSystemConfigColor;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['colors'] });
       toast.success('Color deleted successfully');
     },
-    onError: error => {
-      toast.error('Failed to delete color');
-      console.error('Error deleting color:', error);
+    onError: (error: ErrorResponse) => {
+      const errorMessage = error.response?.data?.message || error.message;
+      if (errorMessage?.includes('in use') || errorMessage?.includes('being used')) {
+        toast.error('This color cannot be deleted as it is being used');
+      } else {
+        toast.error(errorMessage || 'Failed to delete color');
+      }
     },
   });
 
   const restoreMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await axiosInstance.post('/graphql', {
+      const { data } = await axiosInstance.post('/graphql', {
         query: RESTORE_COLOR_MUTATION,
         variables: { id },
       });
-      return response.data.data.restoreSystemConfigColor;
+      
+      if (data.errors) {
+        throw new Error(data.errors[0]?.message || 'Failed to restore color');
+      }
+      
+      return data.data.restoreSystemConfigColor;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['colors'] });
       toast.success('Color restored successfully');
     },
-    onError: error => {
-      toast.error('Failed to restore color');
-      console.error('Error restoring color:', error);
+    onError: (error: ErrorResponse) => {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to restore color';
+      toast.error(errorMessage);
     },
   });
 
