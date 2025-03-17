@@ -1,19 +1,32 @@
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
+export type MakeEmpty<
+  T extends { [key: string]: unknown },
+  K extends keyof T,
+> = { [_ in K]?: never };
+export type Incremental<T> =
+  | T
+  | {
+      [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never;
+    };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
-  DateTime: { input: any; output: any; }
-  JSON: { input: any; output: any; }
+  ID: { input: string; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
+  DateTime: { input: any; output: any };
+  JSON: { input: any; output: any };
 };
 
 export type BlankVariancesEntity = {
@@ -100,60 +113,50 @@ export type Mutation = {
   updateSystemConfigSize: SystemConfigSize;
 };
 
-
 export type MutationCreateSystemConfigBankArgs = {
   createSystemConfigBankDto: CreateSystemConfigBankDto;
   userId?: InputMaybe<Scalars['String']['input']>;
 };
-
 
 export type MutationCreateSystemConfigColorArgs = {
   createSystemConfigColorDto: CreateSystemConfigColorDto;
   userId?: InputMaybe<Scalars['String']['input']>;
 };
 
-
 export type MutationCreateSystemConfigSizeArgs = {
   createSystemConfigSizeDto: CreateSystemConfigSizeDto;
   userId?: InputMaybe<Scalars['String']['input']>;
 };
-
 
 export type MutationRemoveSystemConfigBankArgs = {
   id: Scalars['String']['input'];
   userId?: InputMaybe<Scalars['String']['input']>;
 };
 
-
 export type MutationRemoveSystemConfigColorArgs = {
   id: Scalars['String']['input'];
   userId?: InputMaybe<Scalars['String']['input']>;
 };
-
 
 export type MutationRemoveSystemConfigSizeArgs = {
   id: Scalars['String']['input'];
   userId?: InputMaybe<Scalars['String']['input']>;
 };
 
-
 export type MutationRestoreSystemConfigBankArgs = {
   id: Scalars['String']['input'];
   userId?: InputMaybe<Scalars['String']['input']>;
 };
-
 
 export type MutationRestoreSystemConfigColorArgs = {
   id: Scalars['String']['input'];
   userId?: InputMaybe<Scalars['String']['input']>;
 };
 
-
 export type MutationRestoreSystemConfigSizeArgs = {
   id: Scalars['String']['input'];
   userId?: InputMaybe<Scalars['String']['input']>;
 };
-
 
 export type MutationUpdateSystemConfigBankArgs = {
   id: Scalars['String']['input'];
@@ -161,13 +164,11 @@ export type MutationUpdateSystemConfigBankArgs = {
   userId?: InputMaybe<Scalars['String']['input']>;
 };
 
-
 export type MutationUpdateSystemConfigColorArgs = {
   id: Scalars['String']['input'];
   updateSystemConfigColorDto: UpdateSystemConfigColorDto;
   userId?: InputMaybe<Scalars['String']['input']>;
 };
-
 
 export type MutationUpdateSystemConfigSizeArgs = {
   id: Scalars['String']['input'];
@@ -232,56 +233,45 @@ export type Query = {
   users: PaginatedUsers;
 };
 
-
 export type QueryBlankVarianceArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type QueryCategoriesArgs = {
   searchInput?: InputMaybe<CategorySearchEntity>;
 };
 
-
 export type QueryCategoryArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type QuerySystemConfigBankArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type QuerySystemConfigBanksArgs = {
   includeDeleted?: InputMaybe<Scalars['Boolean']['input']>;
 };
-
 
 export type QuerySystemConfigColorArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type QuerySystemConfigColorsArgs = {
   includeDeleted?: InputMaybe<Scalars['Boolean']['input']>;
 };
-
 
 export type QuerySystemConfigSizeArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type QuerySystemConfigSizesArgs = {
   includeDeleted?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
-
 export type QueryUserArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type QueryUsersArgs = {
   filter?: InputMaybe<UserFilter>;
@@ -299,7 +289,7 @@ export enum Roles {
   Customer = 'CUSTOMER',
   Factoryowner = 'FACTORYOWNER',
   Manager = 'MANAGER',
-  Staff = 'STAFF'
+  Staff = 'STAFF',
 }
 
 export type SortInput = {
@@ -430,29 +420,125 @@ export type GetCategoryQueryVariables = Exact<{
   categoryId: Scalars['String']['input'];
 }>;
 
-
-export type GetCategoryQuery = { __typename?: 'Query', category: { __typename?: 'CategoryEntity', createdAt: any, description?: string | null, id: string, imageUrl?: string | null, isActive: boolean, name: string, totalProducts?: number | null, updatedAt?: any | null } };
+export type GetCategoryQuery = {
+  __typename?: 'Query';
+  category: {
+    __typename?: 'CategoryEntity';
+    createdAt: any;
+    description?: string | null;
+    id: string;
+    imageUrl?: string | null;
+    isActive: boolean;
+    name: string;
+    totalProducts?: number | null;
+    updatedAt?: any | null;
+  };
+};
 
 export type GetAllCategoryQueryVariables = Exact<{
   searchInput?: InputMaybe<CategorySearchEntity>;
 }>;
 
+export type GetAllCategoryQuery = {
+  __typename?: 'Query';
+  categories: Array<{
+    __typename?: 'CategoryEntity';
+    id: string;
+    name: string;
+    totalProducts?: number | null;
+    updatedAt?: any | null;
+    imageUrl?: string | null;
+    isActive: boolean;
+    description?: string | null;
+    createdAt: any;
+  }>;
+};
 
-export type GetAllCategoryQuery = { __typename?: 'Query', categories: Array<{ __typename?: 'CategoryEntity', id: string, name: string, totalProducts?: number | null, updatedAt?: any | null, imageUrl?: string | null, isActive: boolean, description?: string | null, createdAt: any }> };
+export type GetAllProductsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetAllProductsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetAllProductsQuery = {
+  __typename?: 'Query';
+  products: Array<{
+    __typename?: 'ProductEntity';
+    id: string;
+    name: string;
+    imageUrl?: string | null;
+    createdAt: any;
+    deletedAt?: any | null;
+    isActive: boolean;
+    updatedAt?: any | null;
+    category?: {
+      __typename?: 'CategoryEntity';
+      id: string;
+      imageUrl?: string | null;
+      isActive: boolean;
+      name: string;
+      description?: string | null;
+      createdAt: any;
+      createdBy?: string | null;
+      totalProducts?: number | null;
+    } | null;
+  }>;
+};
 
+export type UserAnalyticsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetAllProductsQuery = { __typename?: 'Query', products: Array<{ __typename?: 'ProductEntity', id: string, name: string, imageUrl?: string | null, createdAt: any, deletedAt?: any | null, isActive: boolean, updatedAt?: any | null, category?: { __typename?: 'CategoryEntity', id: string, imageUrl?: string | null, isActive: boolean, name: string, description?: string | null, createdAt: any, createdBy?: string | null, totalProducts?: number | null } | null }> };
-
-export type UserAnalyticsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type UserAnalyticsQuery = { __typename?: 'Query', userAnalytics: { __typename?: 'UserAnalyticsEntity', monthlyGrowth: Array<{ __typename?: 'MonthlyGrowth', month: string, users: number }>, roleDistribution: Array<{ __typename?: 'RoleDistribution', count: number, role: Roles }>, stats: { __typename?: 'UserAnalyticsStats', activeUsers: number, newUsersLast30Days: number, totalUsers: number } } };
+export type UserAnalyticsQuery = {
+  __typename?: 'Query';
+  userAnalytics: {
+    __typename?: 'UserAnalyticsEntity';
+    monthlyGrowth: Array<{
+      __typename?: 'MonthlyGrowth';
+      month: string;
+      users: number;
+    }>;
+    roleDistribution: Array<{
+      __typename?: 'RoleDistribution';
+      count: number;
+      role: Roles;
+    }>;
+    stats: {
+      __typename?: 'UserAnalyticsStats';
+      activeUsers: number;
+      newUsersLast30Days: number;
+      totalUsers: number;
+    };
+  };
+};
 
 export type GetUsersQueryVariables = Exact<{
   filter?: InputMaybe<UserFilter>;
 }>;
 
-
-export type GetUsersQuery = { __typename?: 'Query', users: { __typename?: 'PaginatedUsers', meta: { __typename?: 'PaginationMeta', limit: number, page: number, total: number, totalPages: number }, items: Array<{ __typename?: 'UserEntity', id: string, gender: boolean, email?: string | null, createdAt: any, imageUrl?: string | null, name?: string | null, role: Roles, createdBy?: string | null, dateOfBirth?: any | null, deletedAt?: any | null, deletedBy?: string | null, isActive: boolean, isDeleted: boolean, phoneNumber?: string | null, updatedAt?: any | null, updatedBy?: string | null }> } };
+export type GetUsersQuery = {
+  __typename?: 'Query';
+  users: {
+    __typename?: 'PaginatedUsers';
+    meta: {
+      __typename?: 'PaginationMeta';
+      limit: number;
+      page: number;
+      total: number;
+      totalPages: number;
+    };
+    items: Array<{
+      __typename?: 'UserEntity';
+      id: string;
+      gender: boolean;
+      email?: string | null;
+      createdAt: any;
+      imageUrl?: string | null;
+      name?: string | null;
+      role: Roles;
+      createdBy?: string | null;
+      dateOfBirth?: any | null;
+      deletedAt?: any | null;
+      deletedBy?: string | null;
+      isActive: boolean;
+      isDeleted: boolean;
+      phoneNumber?: string | null;
+      updatedAt?: any | null;
+      updatedBy?: string | null;
+    }>;
+  };
+};
