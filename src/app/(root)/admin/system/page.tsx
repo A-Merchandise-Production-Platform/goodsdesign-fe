@@ -10,8 +10,8 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState('sizes');
 
   return (
-    <div className="container mx-auto py-6">
-      <h1 className="mb-6 text-2xl font-bold">System Configuration</h1>
+    <div className="bg-background container mx-auto rounded-lg p-4">
+      <h1 className="mb-4 text-2xl font-bold">System Configuration</h1>
 
       <Tabs
         defaultValue="sizes"
@@ -19,7 +19,7 @@ export default function Page() {
         onValueChange={setActiveTab}
         className="w-full"
       >
-        <TabsList className="mb-8 grid w-full grid-cols-3">
+        <TabsList className="mb-4 grid w-full grid-cols-3">
           <TabsTrigger value="sizes">Sizes</TabsTrigger>
           <TabsTrigger value="colors">Colors</TabsTrigger>
           <TabsTrigger value="banks">Banks</TabsTrigger>

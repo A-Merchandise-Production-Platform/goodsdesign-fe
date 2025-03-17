@@ -201,7 +201,7 @@ export function BanksTable() {
   if (error) return <div>Error loading banks</div>;
 
   return (
-    <div className="bg-background space-y-4 rounded-md p-4">
+    <div className="bg-background space-y-4 rounded-md">
       <div className="flex items-center justify-between gap-4">
         <div className="flex flex-1 items-center gap-4">
           <div className="relative w-64">

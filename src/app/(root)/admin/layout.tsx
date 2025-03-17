@@ -16,6 +16,11 @@ const navItems: NavItem[] = [
     icon: <UsersIcon className="size-4" />,
   },
   {
+    href: '/admin/categories',
+    label: 'Categories',
+    icon: <ShoppingCartIcon className="size-4" />,
+  },
+  {
     href: '/admin/products',
     label: 'Products',
     icon: <ShoppingCartIcon className="size-4" />,
@@ -24,11 +29,6 @@ const navItems: NavItem[] = [
     href: '/admin/system',
     label: 'System',
     icon: <CogIcon className="size-4" />,
-  },
-  {
-    href: '/admin/categories',
-    label: 'Categories',
-    icon: <ShoppingCartIcon className="size-4" />,
   },
 ];
 

@@ -1,22 +1,25 @@
-import Image from 'next/image';
-import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 interface Category {
   id: string;
   name: string;
-  description: string;
-  imageUrl: string;
-  totalProducts: number;
+  description?: string | null;
+  imageUrl?: string | null;
+  totalProducts?: number | null;
   isActive: boolean;
   createdAt: string;
-  updatedAt: string | null;
+  updatedAt?: string | null;
 }
 
 interface CategoryCardProps {
@@ -25,8 +28,18 @@ interface CategoryCardProps {
 
 export default function CategoryCard({ categories }: CategoryCardProps) {
   return (
-    <div className="container mx-auto py-8">
-      <h2 className="mb-6 text-3xl font-bold">Shop by Category</h2>
+    <div className="container mx-auto">
+      <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+        <div className="bg-card rounded-lg">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="relative">
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
+              <Input placeholder="Search products..." className="pl-10" />
+            </div>
+          </div>
+        </div>
+        <Button variant="outline">+ Add New Categories</Button>
+      </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {categories.map(category => (
           <Link

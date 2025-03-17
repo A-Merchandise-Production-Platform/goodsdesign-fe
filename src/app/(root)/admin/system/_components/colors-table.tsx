@@ -153,7 +153,7 @@ export function ColorsTable() {
   if (error) return <div>Error loading colors</div>;
 
   return (
-    <div className="bg-background space-y-4 rounded-md p-4">
+    <div className="bg-background space-y-4 rounded-md">
       <div className="flex items-center justify-between">
         <div className="relative w-64">
           <Search className="text-muted-foreground absolute top-2.5 left-2 h-4 w-4" />
