@@ -11,15 +11,15 @@ query GetCategory($categoryId: String!) {
   }
 }
 
-query GetAllCategories {
-  categories {
-    createdAt
-    description
+query GetAllCategory($searchInput: CategorySearchEntity) {
+  categories(searchInput: $searchInput) {
     id
-    imageUrl
-    isActive
     name
     totalProducts
     updatedAt
+    imageUrl
+    isActive
+    description
+    createdAt
   }
 }

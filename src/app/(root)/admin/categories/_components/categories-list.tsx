@@ -11,7 +11,5 @@ export default function CategoriesList() {
     return <div>Loading...</div>;
   }
 
-  console.log(data);
-
   return <CategoryCard categories={data?.categories || []} />;
 }

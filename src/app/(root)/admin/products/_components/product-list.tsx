@@ -21,6 +21,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Search, Filter } from 'lucide-react';
 import { useProducts } from '@/app/(root)/admin/products/_hooks/use-products';
+import { useDebounce } from '@/hooks/use-debounce';
 
 // Define types based on the provided data structure
 interface Category {
@@ -54,6 +55,7 @@ export default function ProductList() {
 
   // State for search and filters
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -88,7 +90,7 @@ export default function ProductList() {
 
     const matchesSearch = product.name
       .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+      .includes(debouncedSearchTerm.toLowerCase());
     const matchesCategory =
       categoryFilter === 'all' || product.category.name === categoryFilter;
     const matchesStatus =

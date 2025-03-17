@@ -1,4 +1,4 @@
-import { GetAllCategoriesQuery } from '@/graphql/generated';
+import { GetAllCategoryQuery } from '@/graphql/generated';
 import { graphqlClient } from '@/lib/graphql-client';
 import { useQuery } from '@tanstack/react-query';
 
@@ -21,6 +21,6 @@ export function useCategories() {
   return useQuery({
     queryKey: ['categories'],
     queryFn: () =>
-      graphqlClient.request<GetAllCategoriesQuery>(GET_CATEGORIES_QUERY),
+      graphqlClient.request<GetAllCategoryQuery>(GET_CATEGORIES_QUERY),
   });
 }
