@@ -24,38 +24,38 @@ interface ModelProps {
 const TEXTURE_VARIANTS: TextureVariant[] = [
   {
     name: 'White',
-    path: '/models/oversize_tshirt_variants/original_white.png',
+    path: '/models/shirt/white.png',
     color: '#ffffff',
   },
   {
     name: 'Blush Pink',
-    path: '/models/oversize_tshirt_variants/original_blush_pink.png',
+    path: '/models/shirt/pink.png',
     color: '#ffc0cb',
   },
   {
     name: 'Classic Navy',
-    path: '/models/oversize_tshirt_variants/original_classic_navy.png',
+    path: '/models/shirt/navy.png',
     color: '#000080',
   },
   {
     name: 'Jet Black',
-    path: '/models/oversize_tshirt_variants/original_jet_black.png',
+    path: '/models/shirt/black.png',
     color: '#000000',
   },
   {
     name: 'Medium Gray',
-    path: '/models/oversize_tshirt_variants/original_medium_gray.png',
+    path: '/models/shirt/ray.png',
     color: '#808080',
   },
   {
     name: 'Mint Green',
-    path: '/models/oversize_tshirt_variants/original_mint_green.png',
+    path: '/models/shirt/green.png',
     color: '#98ff98',
   },
 ];
 
 function Model({ texture }: ModelProps) {
-  const { scene } = useGLTF('/models/oversize_tshirt_variants/ovtshirt.gltf');
+  const { scene } = useGLTF('/models/shirt/ovtshirt.gltf');
 
   // Cập nhật texture trên model
   useEffect(() => {

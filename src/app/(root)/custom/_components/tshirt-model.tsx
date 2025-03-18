@@ -63,7 +63,10 @@ function Model({ texture, view, color }: ModelProps) {
 
   // Handle texture and color updates
   useEffect(() => {
-    const updateMaterial = (tex: THREE.Texture | null, materialColor: string) => {
+    const updateMaterial = (
+      tex: THREE.Texture | null,
+      materialColor: string,
+    ) => {
       if (!scene) return;
 
       scene.traverse((child: THREE.Object3D) => {
@@ -113,10 +116,7 @@ export default function OversizeTshirtModel({
   color,
 }: OversizeTshirtModelProps) {
   return (
-    <Canvas
-      camera={{ fov: 85 }}
-      className="bg-muted h-full w-full border"
-    >
+    <Canvas camera={{ fov: 85 }} className="bg-muted h-full w-full border">
       <Suspense fallback={null}>
         <Model texture={texture} view={view} color={color} />
       </Suspense>
