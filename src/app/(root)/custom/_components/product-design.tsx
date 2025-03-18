@@ -21,7 +21,7 @@ import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import * as fabric from 'fabric';
 import * as THREE from 'three';
-import { FabricImage, Image as FImage } from 'fabric';
+import { FabricImage } from 'fabric';
 
 interface DesignObject {
   type: string;
@@ -308,7 +308,7 @@ export default function ProductDesigner() {
       top: limits.minY,
       width: limits.maxX - limits.minX,
       height: limits.maxY - limits.minY,
-      fill: 'rgba(0, 120, 255, 0.05)',
+      fill: 'rgba(0, 0, 0, 0)',
       stroke: 'rgba(0, 120, 255, 0.7)',
       strokeWidth: 1,
       strokeDashArray: [15, 10],
