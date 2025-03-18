@@ -63,12 +63,22 @@ axiosInstance.interceptors.response.use(
     }
 
     try {
-      const response = await AuthApi.refreshToken(refreshToken);
-      useAuthStore.setState({
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
-      });
-      return axiosInstance(originalRequest);
+      const response = await AuthApi.refreshToken(refreshToken)
+        .then(res => {
+          useAuthStore.setState({
+            accessToken: res.accessToken,
+            refreshToken: res.refreshToken,
+          });
+          return axiosInstance(originalRequest);
+        })
+        .catch(() => {
+          resetAuthState();
+          return Promise.reject(error);
+        })
+        .finally(() => {
+          originalRequest._retry = false;
+        });
+      return response;
     } catch (refreshError) {
       resetAuthState();
       return Promise.reject(error);

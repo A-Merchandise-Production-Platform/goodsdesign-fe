@@ -1,18 +1,15 @@
-import { DynamicAdminHeader } from '../_components/dynamic-admin-header';
-import CategoryManagement from './components/category-management';
+import CategoriesList from '@/app/(root)/admin/categories/_components/categories-list';
 
 export default function CategoriesPage() {
   return (
-    <div>
-      <DynamicAdminHeader
-        breadcrumbs={[
-          { href: '/admin', label: 'Dashboard' },
-          { label: 'Categories' },
-        ]}
-      />
-      <div className="mx-auto p-4">
-        <h1 className="text-2xl font-bold">Category Management</h1>
-        <CategoryManagement />
+    <div className="h-full gap-4 space-y-4 rounded-lg">
+      <div className="grid h-52 w-full grid-cols-3 gap-4">
+        <div className="bg-background col-span-1 rounded-lg" />
+        <div className="bg-background col-span-1 rounded-lg" />
+        <div className="bg-background col-span-1 rounded-lg" />
+      </div>
+      <div className="bg-background col-span-3 rounded-lg p-4">
+        <CategoriesList />
       </div>
     </div>
   );

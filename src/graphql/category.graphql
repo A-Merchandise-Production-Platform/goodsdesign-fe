@@ -1,0 +1,25 @@
+query GetCategory($categoryId: String!) {
+  category(id: $categoryId) {
+    createdAt
+    description
+    id
+    imageUrl
+    isActive
+    name
+    totalProducts
+    updatedAt
+  }
+}
+
+query GetAllCategory($searchInput: CategorySearchEntity) {
+  categories(searchInput: $searchInput) {
+    id
+    name
+    totalProducts
+    updatedAt
+    imageUrl
+    isActive
+    description
+    createdAt
+  }
+}
