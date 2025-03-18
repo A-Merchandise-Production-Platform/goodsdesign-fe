@@ -9,6 +9,7 @@ import * as THREE from 'three';
 interface ModelProps {
   texture: THREE.Texture | null;
   view: string;
+  color: string;
 }
 
 // Camera positions for each view
@@ -19,7 +20,7 @@ const cameraPositions = {
   'right-sleeve': { position: [0.25, 0.05, 0], target: [0, 0, 0] },
 };
 
-function Model({ texture, view }: ModelProps) {
+function Model({ texture, view, color }: ModelProps) {
   const { scene } = useGLTF('/models/shirt.glb');
   const targetRotation = useRef(0);
   const { camera } = useThree();
@@ -60,30 +61,42 @@ function Model({ texture, view }: ModelProps) {
     }
   });
 
-  // Handle texture updates
+  // Handle texture and color updates
   useEffect(() => {
-    const updateMaterial = (tex: THREE.Texture | null) => {
-      if (!scene || !tex) return;
+    const updateMaterial = (tex: THREE.Texture | null, materialColor: string) => {
+      if (!scene) return;
 
       scene.traverse((child: THREE.Object3D) => {
         if (child instanceof THREE.Mesh && child.material) {
           if (Array.isArray(child.material)) {
             child.material.forEach((mat: THREE.Material) => {
               if (mat instanceof THREE.MeshStandardMaterial) {
-                mat.map = tex;
+                // Only update the texture if provided
+                if (tex) {
+                  mat.map = tex;
+                  tex.colorSpace = THREE.SRGBColorSpace;
+                }
+                // Set base color while preserving texture
+                mat.color.set(materialColor);
                 mat.needsUpdate = true;
               }
             });
           } else if (child.material instanceof THREE.MeshStandardMaterial) {
-            child.material.map = tex;
+            // Only update the texture if provided
+            if (tex) {
+              child.material.map = tex;
+              tex.colorSpace = THREE.SRGBColorSpace;
+            }
+            // Set base color while preserving texture
+            child.material.color.set(materialColor);
             child.material.needsUpdate = true;
           }
         }
       });
     };
 
-    updateMaterial(texture);
-  }, [scene, texture]);
+    updateMaterial(texture, color);
+  }, [scene, texture, color]);
 
   return <primitive object={scene} />;
 }
@@ -91,19 +104,21 @@ function Model({ texture, view }: ModelProps) {
 export interface OversizeTshirtModelProps {
   texture: THREE.CanvasTexture | null;
   view: string;
+  color: string;
 }
 
 export default function OversizeTshirtModel({
   texture,
   view,
+  color,
 }: OversizeTshirtModelProps) {
   return (
     <Canvas
       camera={{ fov: 85 }}
-      className="bg-muted h-full w-full rounded-lg border"
+      className="bg-muted h-full w-full border"
     >
       <Suspense fallback={null}>
-        <Model texture={texture} view={view} />
+        <Model texture={texture} view={view} color={color} />
       </Suspense>
       <ambientLight intensity={0.5} />
       <directionalLight position={[2, 5, 2]} intensity={1} />

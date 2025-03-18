@@ -1,6 +1,7 @@
 'use client';
 import {
   BookMarked,
+  ChevronDown,
   Redo2,
   Save,
   Shapes,
@@ -13,6 +14,12 @@ import {
 } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import * as fabric from 'fabric';
 import * as THREE from 'three';
 import { FabricImage, Image as FImage } from 'fabric';
@@ -40,16 +47,26 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const imageMap = {
-  front: '/models/oversize_tshirt_variants/front.png',
-  back: '/models/oversize_tshirt_variants/back.png',
-  'left-sleeve': '/models/oversize_tshirt_variants/left.png',
-  'right-sleeve': '/models/oversize_tshirt_variants/right.png',
+  front: '/models/oversize_tshirt_variants/original.png',
+  back: '/models/oversize_tshirt_variants/original.png',
+  'left-sleeve': '/models/oversize_tshirt_variants/original.png',
+  'right-sleeve': '/models/oversize_tshirt_variants/original.png',
 };
 
 function handleUploadClick() {
   const input = document.querySelector('#image-upload') as HTMLInputElement;
   input?.click();
 }
+
+type ShirtColor = (typeof SHIRT_COLORS)[number]['value'];
+
+const SHIRT_COLORS = [
+  { name: 'White', value: '#FFFFFF' },
+  { name: 'Black', value: '#000000' },
+  { name: 'Navy', value: '#000080' },
+  { name: 'Red', value: '#FF0000' },
+  { name: 'Green', value: '#008000' },
+] as const;
 
 export default function ProductDesigner() {
   const [view, setView] = useState('front');
@@ -58,6 +75,9 @@ export default function ProductDesigner() {
   );
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
   const [designs, setDesigns] = useState<Record<string, DesignObject[]>>({});
+  const [shirtColor, setShirtColor] = useState<ShirtColor>(
+    SHIRT_COLORS[0].value,
+  );
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
@@ -532,7 +552,7 @@ export default function ProductDesigner() {
   return (
     <div className="flex h-screen flex-col">
       {/* Header */}
-      <header className="z-20 flex h-14 items-center justify-between border-b px-6">
+      <header className="z-50 flex h-14 items-center justify-between border-b px-6">
         <div className="flex items-center gap-4">
           <h1 className="text-lg font-semibold">White T-Shirt</h1>
           <Button variant="link" className="text-blue-500">
@@ -565,12 +585,33 @@ export default function ProductDesigner() {
 
       <div className="flex flex-1">
         {/* Fixed Sidebar */}
-        <div className="z-20 w-64 border-r">
+        <div className="z-50 w-64 border-r">
           <div className="flex flex-col gap-4 p-4">
-            <Button variant="ghost" className="justify-start gap-2">
-              <TShirt className="h-4 w-4" />
-              Product
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="w-full justify-start gap-2">
+                  <TShirt className="h-4 w-4" style={{ color: shirtColor }} />
+                  <span>Product Color</span>
+                  <ChevronDown className="ml-auto h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                {SHIRT_COLORS.map(color => (
+                  <DropdownMenuItem
+                    key={color.value}
+                    onClick={() => setShirtColor(color.value)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="h-4 w-4 rounded border"
+                        style={{ backgroundColor: color.value }}
+                      />
+                      {color.name}
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <div className="relative">
               <Button
                 variant="ghost"
@@ -630,7 +671,7 @@ export default function ProductDesigner() {
             }}
             className="border-b"
           >
-            <TabsList className="z-20 w-full justify-start rounded-none">
+            <TabsList className="z-50 w-full justify-start rounded-none">
               <TabsTrigger value="front">Front</TabsTrigger>
               <TabsTrigger value="back">Back</TabsTrigger>
               <TabsTrigger value="left-sleeve">Left sleeve</TabsTrigger>
@@ -638,7 +679,7 @@ export default function ProductDesigner() {
             </TabsList>
           </Tabs>
 
-          <div className="flex h-[32rem] flex-1 gap-4 pt-4">
+          <div className="relative flex h-[32rem] w-[64rem] flex-1 gap-4 pt-4">
             {/* Canvas Area */}
             <div className="bg-muted relative z-10 flex h-[32rem] w-[32rem] flex-col items-center justify-center gap-4">
               <div
@@ -661,11 +702,67 @@ export default function ProductDesigner() {
                   }}
                 />
               </div>
+              <div
+                className={`bg-muted absolute ${
+                  view === 'front'
+                    ? 'right-0 bottom-0 h-[30rem] w-[2rem]'
+                    : view === 'back'
+                      ? 'bottom-0 left-0 h-[20rem] w-[2rem]'
+                      : view === 'left-sleeve'
+                        ? 'right-0 bottom-0 h-[9rem] w-[28rem]'
+                        : 'bottom-0 left-0 h-[8rem] w-[5rem]'
+                } `}
+              />
+              {view === 'front' && (
+                <div className="bg-muted absolute bottom-0 left-0 h-[2rem] w-[3rem]" />
+              )}
             </div>
 
+            {/* Front */}
+            {view === 'front' && (
+              <div className="absolute -top-40 -right-50 z-30 h-[11.1rem] w-[80rem] bg-background-secondary" />
+            )}
+            {view === 'front' && (
+              <div className="absolute top-10 right-0 z-20 h-[30rem] w-[32rem] bg-background-secondary" />
+            )}
+            {view === 'front' && (
+              <div className="absolute top-122 -left-4 z-20 h-[2rem] w-[1rem] bg-background-secondary" />
+            )}
+
+            {/* Back */}
+            {view === 'back' && (
+              <div className="absolute -top-40 -right-50 z-30 h-[11.1rem] w-[100rem] bg-background-secondary" />
+            )}
+            {view === 'back' && (
+              <div className="absolute top-0 right-256 z-20 h-[32rem] w-[30rem] bg-background-secondary" />
+            )}
+
+            {/* Left */}
+            {view === 'left-sleeve' && (
+              <div className="absolute top-10 right-0 z-20 h-[31rem] w-[32rem] bg-background-secondary" />
+            )}
+            {view === 'left-sleeve' && (
+              <div className="absolute top-132 -left-4 z-20 h-[30rem] w-[40rem] bg-background-secondary" />
+            )}
+            {view === 'left-sleeve' && (
+              <div className="absolute top-70 right-256 z-20 h-[45rem] w-[38rem] bg-background-secondary" />
+            )}
+
+            {/* Right */}
+            {view === 'right-sleeve' && (
+              <div className="absolute top-30 right-256 z-20 h-[26rem] w-[62rem] bg-background-secondary" />
+            )}
+            {view === 'right-sleeve' && (
+              <div className="absolute top-132 right-220 z-20 h-[30rem] w-[78rem] bg-background-secondary" />
+            )}
+
             {/* 3D Model Area */}
-            <div className="relative z-10 h-[32rem] flex-grow">
-              <OversizeTshirtModel texture={texture} view={view} />
+            <div className="relative z-20 h-[32rem] flex-grow">
+              <OversizeTshirtModel
+                texture={texture}
+                view={view}
+                color={shirtColor}
+              />
             </div>
           </div>
         </div>
