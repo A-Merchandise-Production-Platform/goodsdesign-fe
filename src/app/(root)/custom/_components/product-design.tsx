@@ -21,7 +21,7 @@ import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import * as fabric from 'fabric';
 import * as THREE from 'three';
-import { FabricImage, Image as FImage } from 'fabric';
+import { FabricImage } from 'fabric';
 
 interface DesignObject {
   type: string;
@@ -192,6 +192,7 @@ export default function ProductDesigner() {
   // Update canvas when view changes
   useEffect(() => {
     if (!fabricCanvasRef.current) return;
+    console.log(designs);
 
     // Update background texture
     loadBackgroundTexture(currentTexture);
@@ -308,7 +309,7 @@ export default function ProductDesigner() {
       top: limits.minY,
       width: limits.maxX - limits.minX,
       height: limits.maxY - limits.minY,
-      fill: 'rgba(0, 120, 255, 0.05)',
+      fill: 'rgba(0, 0, 0, 0)',
       stroke: 'rgba(0, 120, 255, 0.7)',
       strokeWidth: 1,
       strokeDashArray: [15, 10],
@@ -710,59 +711,29 @@ export default function ProductDesigner() {
                   }}
                 />
               </div>
-              <div
-                className={`bg-muted absolute ${
-                  view === 'front'
-                    ? 'right-0 bottom-0 h-[30rem] w-[2rem]'
-                    : view === 'back'
-                      ? 'bottom-0 left-0 h-[20rem] w-[2rem]'
-                      : view === 'left-sleeve'
-                        ? 'right-0 bottom-0 h-[9rem] w-[28rem]'
-                        : 'bottom-0 left-0 h-[8rem] w-[5rem]'
-                } `}
-              />
-              {view === 'front' && (
-                <div className="bg-muted absolute bottom-0 left-0 h-[2rem] w-[3rem]" />
+
+              {(view === 'left-sleeve' || view === 'right-sleeve') && (
+                <div className="absolute bottom-0 left-0 h-[9rem] w-[31rem] bg-muted" />
               )}
+              {(view === 'left-sleeve' || view === 'right-sleeve') && (
+                <div className="absolute top-0 left-0 h-[6rem] w-[31rem] bg-muted" />
+              )}
+
+              {view === 'front' && (
+                <div className="absolute bottom-0 left-0 h-[2rem] w-[31rem] bg-muted" />
+              )}
+
+              <div className="absolute top-0 left-0 h-[1rem] w-[31rem] bg-muted" />
+              <div className="absolute bottom-0 left-0 h-[1rem] w-[31rem] bg-muted" />
+              <div className="absolute right-0 bottom-0 h-[32rem] w-[2rem] bg-muted" />
+              <div className="absolute bottom-0 left-0 h-[32rem] w-[2rem] bg-muted" />
             </div>
 
-            {/* Front */}
-            {view === 'front' && (
-              <div className="bg-background-secondary absolute -top-40 -right-50 z-30 h-[11.1rem] w-[80rem]" />
-            )}
-            {view === 'front' && (
-              <div className="bg-background-secondary absolute top-10 right-0 z-20 h-[30rem] w-[32rem]" />
-            )}
-            {view === 'front' && (
-              <div className="bg-background-secondary absolute top-122 -left-4 z-20 h-[2rem] w-[1rem]" />
-            )}
-
-            {/* Back */}
-            {view === 'back' && (
-              <div className="bg-background-secondary absolute -top-40 -right-50 z-30 h-[11.1rem] w-[100rem]" />
-            )}
-            {view === 'back' && (
-              <div className="bg-background-secondary absolute top-0 right-256 z-20 h-[32rem] w-[30rem]" />
-            )}
-
-            {/* Left */}
-            {view === 'left-sleeve' && (
-              <div className="bg-background-secondary absolute top-10 right-0 z-20 h-[31rem] w-[32rem]" />
-            )}
-            {view === 'left-sleeve' && (
-              <div className="bg-background-secondary absolute top-132 -left-4 z-20 h-[30rem] w-[40rem]" />
-            )}
-            {view === 'left-sleeve' && (
-              <div className="bg-background-secondary absolute top-70 right-256 z-20 h-[45rem] w-[38rem]" />
-            )}
-
-            {/* Right */}
-            {view === 'right-sleeve' && (
-              <div className="bg-background-secondary absolute top-30 right-256 z-20 h-[26rem] w-[62rem]" />
-            )}
-            {view === 'right-sleeve' && (
-              <div className="bg-background-secondary absolute top-132 right-220 z-20 h-[30rem] w-[78rem]" />
-            )}
+            {/* Background Elements */}
+            <div className="absolute -top-40 -right-50 z-30 h-[11.1rem] w-[110rem] bg-background-secondary" />
+            <div className="absolute top-0 right-256 z-20 h-[63rem] w-[68rem] bg-background-secondary" />
+            <div className="absolute top-4 -right-71 z-20 h-[33rem] w-[50rem] bg-background-secondary" />
+            <div className="absolute top-132 -left-4 z-20 h-[30rem] w-[70rem] bg-background-secondary" />
 
             {/* 3D Model Area */}
             <div className="relative z-20 h-[32rem] flex-grow">
