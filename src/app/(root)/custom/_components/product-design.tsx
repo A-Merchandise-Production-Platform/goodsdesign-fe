@@ -11,6 +11,12 @@ import {
   Upload,
   Wand2,
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import * as fabric from 'fabric';
@@ -39,12 +45,14 @@ import OversizeTshirtModel from './tshirt-model';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const imageMap = {
-  front: '/models/oversize_tshirt_variants/front.png',
-  back: '/models/oversize_tshirt_variants/back.png',
-  'left-sleeve': '/models/oversize_tshirt_variants/left.png',
-  'right-sleeve': '/models/oversize_tshirt_variants/right.png',
-};
+const SHIRT_COLORS = [
+  { name: 'White', path: '/models/shirt/white.png', color: '#ffffff' },
+  { name: 'Pink', path: '/models/shirt/pink.png', color: '#ffc0cb' },
+  { name: 'Mint', path: '/models/shirt/mint.png', color: '#b2f2bb' },
+  { name: 'Black', path: '/models/shirt/black.png', color: '#000000' },
+  { name: 'Gray', path: '/models/shirt/gray.png', color: '#808080' },
+  { name: 'Navy', path: '/models/shirt/navy.png', color: '#003366' },
+];
 
 function handleUploadClick() {
   const input = document.querySelector('#image-upload') as HTMLInputElement;
@@ -54,9 +62,10 @@ function handleUploadClick() {
 export default function ProductDesigner() {
   const [view, setView] = useState('front');
   const [currentTexture, setCurrentTexture] = useState<string>(
-    imageMap['front'],
+    SHIRT_COLORS[0].path,
   );
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
+  const [showColorDialog, setShowColorDialog] = useState(false);
   const [designs, setDesigns] = useState<Record<string, DesignObject[]>>({});
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -185,7 +194,7 @@ export default function ProductDesigner() {
     if (!fabricCanvasRef.current) return;
 
     // Update background texture
-    loadBackgroundTexture(imageMap[view as keyof typeof imageMap]);
+    loadBackgroundTexture(currentTexture);
 
     // Update design zone indicator
     addDesignZoneIndicator(view);
@@ -532,7 +541,7 @@ export default function ProductDesigner() {
   return (
     <div className="flex h-screen flex-col">
       {/* Header */}
-      <header className="z-20 flex h-14 items-center justify-between border-b px-6">
+      <header className="z-50 flex h-14 items-center justify-between border-b px-6">
         <div className="flex items-center gap-4">
           <h1 className="text-lg font-semibold">White T-Shirt</h1>
           <Button variant="link" className="text-blue-500">
@@ -565,12 +574,52 @@ export default function ProductDesigner() {
 
       <div className="flex flex-1">
         {/* Fixed Sidebar */}
-        <div className="z-20 w-64 border-r">
+        <div className="z-50 w-64 border-r">
           <div className="flex flex-col gap-4 p-4">
-            <Button variant="ghost" className="justify-start gap-2">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-2"
+              onClick={() => setShowColorDialog(true)}
+            >
               <TShirt className="h-4 w-4" />
-              Product
+              <span>T-Shirt</span>
             </Button>
+
+            <Dialog open={showColorDialog} onOpenChange={setShowColorDialog}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Choose T-Shirt Color</DialogTitle>
+                </DialogHeader>
+                <div className="grid grid-cols-3 gap-4 py-4">
+                  {SHIRT_COLORS.map(colorOption => (
+                    <button
+                      key={colorOption.name}
+                      className={`hover:bg-accent flex flex-col items-center gap-2 rounded-lg border p-3 ${
+                        currentTexture === colorOption.path
+                          ? 'border-primary'
+                          : 'border-border'
+                      }`}
+                      onClick={() => {
+                        // Save current design before changing color
+                        saveCurrentDesign();
+                        setCurrentTexture(colorOption.path);
+                        setShowColorDialog(false);
+                        // Load saved design after changing color
+                        setTimeout(() => loadSavedDesign(), 0);
+                      }}
+                    >
+                      <div
+                        className="h-12 w-12 rounded-full border"
+                        style={{ backgroundColor: colorOption.color }}
+                      />
+                      <span className="text-sm font-medium">
+                        {colorOption.name}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </DialogContent>
+            </Dialog>
             <div className="relative">
               <Button
                 variant="ghost"
@@ -624,13 +673,13 @@ export default function ProductDesigner() {
               // Save current design before switching view
               saveCurrentDesign();
               // Update texture
-              setCurrentTexture(imageMap[newView as keyof typeof imageMap]);
+              setCurrentTexture(currentTexture);
               // Update view
               setView(newView);
             }}
             className="border-b"
           >
-            <TabsList className="z-20 w-full justify-start rounded-none">
+            <TabsList className="z-50 w-full justify-start rounded-none">
               <TabsTrigger value="front">Front</TabsTrigger>
               <TabsTrigger value="back">Back</TabsTrigger>
               <TabsTrigger value="left-sleeve">Left sleeve</TabsTrigger>
@@ -638,7 +687,7 @@ export default function ProductDesigner() {
             </TabsList>
           </Tabs>
 
-          <div className="flex h-[32rem] flex-1 gap-4 pt-4">
+          <div className="relative flex h-[32rem] w-[64rem] flex-1 gap-4 pt-4">
             {/* Canvas Area */}
             <div className="bg-muted relative z-10 flex h-[32rem] w-[32rem] flex-col items-center justify-center gap-4">
               <div
@@ -661,11 +710,67 @@ export default function ProductDesigner() {
                   }}
                 />
               </div>
+              <div
+                className={`bg-muted absolute ${
+                  view === 'front'
+                    ? 'right-0 bottom-0 h-[30rem] w-[2rem]'
+                    : view === 'back'
+                      ? 'bottom-0 left-0 h-[20rem] w-[2rem]'
+                      : view === 'left-sleeve'
+                        ? 'right-0 bottom-0 h-[9rem] w-[28rem]'
+                        : 'bottom-0 left-0 h-[8rem] w-[5rem]'
+                } `}
+              />
+              {view === 'front' && (
+                <div className="bg-muted absolute bottom-0 left-0 h-[2rem] w-[3rem]" />
+              )}
             </div>
 
+            {/* Front */}
+            {view === 'front' && (
+              <div className="bg-background-secondary absolute -top-40 -right-50 z-30 h-[11.1rem] w-[80rem]" />
+            )}
+            {view === 'front' && (
+              <div className="bg-background-secondary absolute top-10 right-0 z-20 h-[30rem] w-[32rem]" />
+            )}
+            {view === 'front' && (
+              <div className="bg-background-secondary absolute top-122 -left-4 z-20 h-[2rem] w-[1rem]" />
+            )}
+
+            {/* Back */}
+            {view === 'back' && (
+              <div className="bg-background-secondary absolute -top-40 -right-50 z-30 h-[11.1rem] w-[100rem]" />
+            )}
+            {view === 'back' && (
+              <div className="bg-background-secondary absolute top-0 right-256 z-20 h-[32rem] w-[30rem]" />
+            )}
+
+            {/* Left */}
+            {view === 'left-sleeve' && (
+              <div className="bg-background-secondary absolute top-10 right-0 z-20 h-[31rem] w-[32rem]" />
+            )}
+            {view === 'left-sleeve' && (
+              <div className="bg-background-secondary absolute top-132 -left-4 z-20 h-[30rem] w-[40rem]" />
+            )}
+            {view === 'left-sleeve' && (
+              <div className="bg-background-secondary absolute top-70 right-256 z-20 h-[45rem] w-[38rem]" />
+            )}
+
+            {/* Right */}
+            {view === 'right-sleeve' && (
+              <div className="bg-background-secondary absolute top-30 right-256 z-20 h-[26rem] w-[62rem]" />
+            )}
+            {view === 'right-sleeve' && (
+              <div className="bg-background-secondary absolute top-132 right-220 z-20 h-[30rem] w-[78rem]" />
+            )}
+
             {/* 3D Model Area */}
-            <div className="relative z-10 h-[32rem] flex-grow">
-              <OversizeTshirtModel texture={texture} view={view} />
+            <div className="relative z-20 h-[32rem] flex-grow">
+              <OversizeTshirtModel
+                texture={texture}
+                view={view}
+                color="#FFFFFF"
+              />
             </div>
           </div>
         </div>
