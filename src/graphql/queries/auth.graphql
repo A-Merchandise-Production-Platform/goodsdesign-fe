@@ -17,3 +17,63 @@ mutation Login($loginInput: LoginDto!) {
     }
   }
 }
+
+mutation Register($registerInput: RegisterDto!) {
+  register(registerInput: $registerInput) {
+    accessToken
+    refreshToken
+    user {
+      createdAt
+      dateOfBirth
+      email
+      gender
+      id
+      imageUrl
+      isActive
+      name
+      phoneNumber
+      role
+      updatedAt
+    }
+  }
+}
+
+mutation RefreshToken($refreshTokenInput: RefreshTokenDto!) {
+  refreshToken(refreshTokenInput: $refreshTokenInput) {
+    accessToken
+    refreshToken
+    user {
+      createdAt
+      dateOfBirth
+      email
+      gender
+      id
+      imageUrl
+      isActive
+      name
+      phoneNumber
+      role
+      updatedAt
+    }
+  }
+}
+
+mutation Logout {
+  logout
+}
+
+query GetMe {
+  getMe {
+    createdAt
+    dateOfBirth
+    email
+    gender
+    id
+    imageUrl
+    isActive
+    name
+    phoneNumber
+    role
+    updatedAt
+  }
+}

@@ -13,15 +13,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { UserEntity } from '@/graphql/generated/graphql';
+import { useLogoutMutation, UserEntity } from '@/graphql/generated/graphql';
 import { useAuthStore } from '@/stores/auth.store';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface UserDropdownMenuProps {
   user: UserEntity;
 }
 
 export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
-  const { isAuth } = useAuthStore();
+  const router = useRouter();
+  const { isAuth, logout } = useAuthStore();
+  const [logoutMutation, { loading }] = useLogoutMutation({
+    onCompleted: () => {
+      router.push('/login');
+      logout();
+      toast.success('Logged out successfully');
+    },
+    onError: error => {
+      toast.error(error.message);
+    },
+  });
 
   return (
     <DropdownMenu>
@@ -64,7 +77,7 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
           <span>Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => logoutMutation()}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>

@@ -13,7 +13,6 @@ interface AuthStoreState {
   refreshToken: string | undefined;
   login: (payload: LoginResponse) => Promise<void>;
   logout: () => Promise<void>;
-  refreshUser: () => Promise<void>;
   setUser: (user: UserEntity) => void;
 }
 
@@ -24,7 +23,6 @@ export const defaultState: AuthStoreState = {
   refreshToken: undefined,
   login: async () => {},
   logout: async () => {},
-  refreshUser: async () => {},
   setUser: () => {},
 };
 
@@ -48,24 +46,6 @@ export const useAuthStore = create<AuthStoreState>()(
           refreshToken: undefined,
         });
         toast.success('Logged out successfully');
-      },
-      refreshUser: async () => {
-        const state = get();
-        if (state.accessToken && state.refreshToken) {
-          AuthApi.getMe()
-            .then(response => {
-              set({ isAuth: true, user: response });
-            })
-            .catch(() => {
-              console.log('Failed to refresh user');
-              set({
-                isAuth: false,
-                user: undefined,
-                accessToken: undefined,
-                refreshToken: undefined,
-              });
-            });
-        }
       },
       setUser: (user: UserEntity) => {
         set({ user });

@@ -1,15 +1,10 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import * as z from 'zod';
 
-import { AuthApi } from '@/api/auth';
-import { RegisterResponse } from '@/api/types/auth';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -21,8 +16,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { PasswordInput } from '@/components/ui/password-input';
 import { useAuthStore } from '@/stores/auth.store';
+import { useRegisterMutation } from '@/graphql/generated/graphql';
+import { toast } from 'sonner';
 
 const formSchema = z
   .object({
@@ -41,6 +37,7 @@ const formSchema = z
   })
   .refine(data => data.password === data.confirmPassword, {
     message: 'Confirm passwords do not match',
+    path: ['confirmPassword'],
   });
 
 export default function RegisterForm() {
@@ -57,26 +54,33 @@ export default function RegisterForm() {
     },
   });
 
-  const mutation = useMutation({
-    mutationFn: AuthApi.register,
-    onError: (error: AxiosError<null>) => {
-      if (error.status === 400) {
-        toast.error('Invalid input data');
-      } else if (error.status === 409) {
-        toast.error('Email already exists');
-      } else {
-        toast.error('Something went wrong');
-      }
-    },
-    onSuccess: data => {
+  const [registerMutation, { loading }] = useRegisterMutation({
+    onCompleted: data => {
+      console.log(data);
       toast.success('Account created successfully');
-      login(data);
+      login({
+        accessToken: data.register.accessToken,
+        refreshToken: data.register.refreshToken,
+        user: data.register.user,
+      });
       router.push('/');
+    },
+    onError: error => {
+      console.log(error);
+      toast.error(error.message);
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    mutation.mutate(values);
+    registerMutation({
+      variables: {
+        registerInput: {
+          email: values.email,
+          name: values.name,
+          password: values.password,
+        },
+      },
+    });
   }
 
   return (
@@ -92,7 +96,11 @@ export default function RegisterForm() {
             <FormItem>
               <FormLabel className="flex-1">Email</FormLabel>
               <FormControl>
-                <Input placeholder="email@gmail.com" {...field} />
+                <Input
+                  placeholder="email@gmail.com"
+                  {...field}
+                  disabled={loading}
+                />
               </FormControl>
 
               {form.formState.errors.email ? (
@@ -113,10 +121,14 @@ export default function RegisterForm() {
             <FormItem>
               <FormLabel className="flex-1">Name</FormLabel>
               <FormControl>
-                <Input placeholder=" Nguyen Van A" {...field} />
+                <Input
+                  placeholder=" Nguyen Van A"
+                  {...field}
+                  disabled={loading}
+                />
               </FormControl>
 
-              {form.formState.errors.email ? (
+              {form.formState.errors.name ? (
                 <FormMessage />
               ) : (
                 <FormDescription>
@@ -135,14 +147,19 @@ export default function RegisterForm() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <PasswordInput placeholder="Password" {...field} />
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    {...field}
+                    disabled={loading}
+                  />
                 </FormControl>
 
-                {form.formState.errors.email ? (
+                {form.formState.errors.password ? (
                   <FormMessage className="line-clamp-1" />
                 ) : (
                   <FormDescription>
-                    Password must be at least 8 characters long.
+                    Password must be at least 6 characters long.
                   </FormDescription>
                 )}
               </FormItem>
@@ -154,10 +171,16 @@ export default function RegisterForm() {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>Confirm Password</FormLabel>
                 <FormControl>
-                  <PasswordInput placeholder="Confirm Password" {...field} />
+                  <Input
+                    type="password"
+                    placeholder="Confirm Password"
+                    {...field}
+                    disabled={loading}
+                  />
                 </FormControl>
-                {form.formState.errors.email ? (
+                {form.formState.errors.confirmPassword ? (
                   <FormMessage />
                 ) : (
                   <FormDescription>
@@ -169,7 +192,7 @@ export default function RegisterForm() {
           />
         </div>
 
-        <Button type="submit" className="w-full" isLoading={mutation.isPending}>
+        <Button type="submit" className="w-full" isLoading={loading}>
           Register
         </Button>
       </form>
