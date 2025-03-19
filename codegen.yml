@@ -1,9 +1,12 @@
-schema: 'http://localhost:5000/graphql'
-documents: 'src/graphql/**/*.graphql'
+schema: 'http://localhost:5000/graphql' # Replace with your API endpoint
+documents: 'src/graphql/queries/*.graphql' # Path to your GraphQL files
 generates:
-  src/graphql/generated.ts:
+  src/graphql/generated/graphql.tsx: # Output file for generated types
     plugins:
       - 'typescript'
       - 'typescript-operations'
+      - 'typescript-react-apollo'
     config:
-      fetcher: fetch
+      withHooks: true # Generates React hooks like useQuery
+      withComponent: false
+      withHOC: false

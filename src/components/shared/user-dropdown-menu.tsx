@@ -2,8 +2,6 @@
 
 import { LockKeyholeIcon, LogOut, Settings, User } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -15,37 +13,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { UserEntity } from '@/graphql/generated/graphql';
 import { useAuthStore } from '@/stores/auth.store';
-import { AuthUser as UserType } from '@/types/user';
-import { useMutation } from '@tanstack/react-query';
-import { AuthApi } from '@/api/auth';
-import { toast } from 'sonner';
 
 interface UserDropdownMenuProps {
-  user: UserType;
+  user: UserEntity;
 }
 
 export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
-  const { logout, isAuth } = useAuthStore();
-
-  const router = useRouter();
-
-  const mutation = useMutation({
-    mutationFn: AuthApi.logout,
-    onSuccess: () => {
-      router.push('/');
-      toast.success('Logged out successfully');
-      logout();
-    },
-  });
+  const { isAuth } = useAuthStore();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="bg-muted relative h-9 w-9">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={user.imageUrl || ''} alt={user.name} />
-            <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+            <AvatarImage src={user.imageUrl || ''} alt={user.name || ''} />
+            <AvatarFallback>
+              {user.name?.charAt(0).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
@@ -78,7 +64,7 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
           <span>Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => mutation.mutate()}>
+        <DropdownMenuItem>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>

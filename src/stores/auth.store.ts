@@ -1,22 +1,20 @@
-import { redirect } from 'next/navigation';
 import { toast } from 'sonner';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { useRouter } from 'next/navigation';
 
 import { AuthApi } from '@/api/auth';
-import { AuthUser } from '@/types/user';
 import { LoginResponse } from '@/api/types';
+import { UserEntity } from '@/graphql/generated/graphql';
 
 interface AuthStoreState {
   isAuth: boolean;
-  user: AuthUser | undefined;
+  user: UserEntity | undefined;
   accessToken: string | undefined;
   refreshToken: string | undefined;
   login: (payload: LoginResponse) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
-  setUser: (user: AuthUser) => void;
+  setUser: (user: UserEntity) => void;
 }
 
 export const defaultState: AuthStoreState = {
@@ -69,7 +67,7 @@ export const useAuthStore = create<AuthStoreState>()(
             });
         }
       },
-      setUser: (user: AuthUser) => {
+      setUser: (user: UserEntity) => {
         set({ user });
       },
     }),

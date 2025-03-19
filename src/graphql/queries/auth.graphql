@@ -1,0 +1,19 @@
+mutation Login($loginInput: LoginDto!) {
+  login(loginInput: $loginInput) {
+    accessToken
+    refreshToken
+    user {
+      createdAt
+      dateOfBirth
+      email
+      gender
+      id
+      imageUrl
+      isActive
+      name
+      phoneNumber
+      role
+      updatedAt
+    }
+  }
+}
