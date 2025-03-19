@@ -713,27 +713,27 @@ export default function ProductDesigner() {
               </div>
 
               {(view === 'left-sleeve' || view === 'right-sleeve') && (
-                <div className="absolute bottom-0 left-0 h-[9rem] w-[31rem] bg-muted" />
+                <div className="bg-muted absolute bottom-0 left-0 h-[9rem] w-[31rem]" />
               )}
               {(view === 'left-sleeve' || view === 'right-sleeve') && (
-                <div className="absolute top-0 left-0 h-[6rem] w-[31rem] bg-muted" />
+                <div className="bg-muted absolute top-0 left-0 h-[6rem] w-[31rem]" />
               )}
 
               {view === 'front' && (
-                <div className="absolute bottom-0 left-0 h-[2rem] w-[31rem] bg-muted" />
+                <div className="bg-muted absolute bottom-0 left-0 h-[2rem] w-[31rem]" />
               )}
 
-              <div className="absolute top-0 left-0 h-[1rem] w-[31rem] bg-muted" />
-              <div className="absolute bottom-0 left-0 h-[1rem] w-[31rem] bg-muted" />
-              <div className="absolute right-0 bottom-0 h-[32rem] w-[2rem] bg-muted" />
-              <div className="absolute bottom-0 left-0 h-[32rem] w-[2rem] bg-muted" />
+              <div className="bg-muted absolute top-0 left-0 h-[1rem] w-[31rem]" />
+              <div className="bg-muted absolute bottom-0 left-0 h-[1rem] w-[31rem]" />
+              <div className="bg-muted absolute right-0 bottom-0 h-[32rem] w-[2rem]" />
+              <div className="bg-muted absolute bottom-0 left-0 h-[32rem] w-[2rem]" />
             </div>
 
             {/* Background Elements */}
-            <div className="absolute -top-40 -right-50 z-30 h-[11.1rem] w-[110rem] bg-background-secondary" />
-            <div className="absolute top-0 right-256 z-20 h-[63rem] w-[68rem] bg-background-secondary" />
-            <div className="absolute top-4 -right-71 z-20 h-[33rem] w-[50rem] bg-background-secondary" />
-            <div className="absolute top-132 -left-4 z-20 h-[30rem] w-[70rem] bg-background-secondary" />
+            <div className="bg-background-secondary absolute -top-40 -right-50 z-30 h-[11.1rem] w-[110rem]" />
+            <div className="bg-background-secondary absolute top-0 right-256 z-20 h-[63rem] w-[68rem]" />
+            <div className="bg-background-secondary absolute top-4 -right-71 z-20 h-[33rem] w-[50rem]" />
+            <div className="bg-background-secondary absolute top-132 -left-4 z-20 h-[30rem] w-[70rem]" />
 
             {/* 3D Model Area */}
             <div className="relative z-20 h-[32rem] flex-grow">

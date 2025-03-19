@@ -2,21 +2,34 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
+export type MakeEmpty<
+  T extends { [key: string]: unknown },
+  K extends keyof T,
+> = { [_ in K]?: never };
+export type Incremental<T> =
+  | T
+  | {
+      [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never;
+    };
 const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
-  DateTime: { input: any; output: any; }
-  JSON: { input: any; output: any; }
+  ID: { input: string; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
+  DateTime: { input: any; output: any };
+  JSON: { input: any; output: any };
 };
 
 /** Authentication response */
@@ -203,209 +216,168 @@ export type Mutation = {
   updateUser: UserEntity;
 };
 
-
 export type MutationCreateBlankVarianceArgs = {
   createBlankVarianceInput: CreateBlankVarianceDto;
 };
-
 
 export type MutationCreateCategoryArgs = {
   createCategoryInput: CreateCategoryDto;
 };
 
-
 export type MutationCreateDesignPositionArgs = {
   input: CreateDesignPositionDto;
 };
-
 
 export type MutationCreateNotificationArgs = {
   input: CreateNotificationDto;
 };
 
-
 export type MutationCreateProductArgs = {
   input: CreateProductDto;
 };
-
 
 export type MutationCreateProductDesignArgs = {
   input: CreateProductDesignDto;
 };
 
-
 export type MutationCreateProductPositionTypeArgs = {
   input: CreateProductPositionTypeDto;
 };
-
 
 export type MutationCreateSystemConfigBankArgs = {
   input: CreateSystemConfigBankDto;
 };
 
-
 export type MutationCreateSystemConfigColorArgs = {
   input: CreateSystemConfigColorDto;
 };
-
 
 export type MutationCreateSystemConfigSizeArgs = {
   input: CreateSystemConfigSizeDto;
 };
 
-
 export type MutationCreateUserArgs = {
   createUserInput: CreateUserDto;
 };
-
 
 export type MutationDeleteBlankVarianceArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type MutationDeleteCategoryArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type MutationDeleteProductArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type MutationDeleteUserArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type MutationLoginArgs = {
   loginInput: LoginDto;
 };
 
-
 export type MutationMarkNotificationAsReadArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationRefreshTokenArgs = {
   refreshTokenInput: RefreshTokenDto;
 };
 
-
 export type MutationRegisterArgs = {
   registerInput: RegisterDto;
 };
-
 
 export type MutationRemoveDesignPositionArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type MutationRemoveNotificationArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationRemoveProductDesignArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type MutationRemoveProductPositionTypeArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationRemoveSystemConfigBankArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type MutationRemoveSystemConfigColorArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationRemoveSystemConfigSizeArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type MutationRestoreCategoryArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type MutationRestoreProductArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type MutationToggleActiveCategoryArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type MutationToggleActiveProductArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type MutationUpdateBlankVarianceArgs = {
   id: Scalars['String']['input'];
   updateBlankVarianceInput: UpdateBlankVarianceDto;
 };
 
-
 export type MutationUpdateCategoryArgs = {
   id: Scalars['String']['input'];
   updateCategoryInput: UpdateCategoryDto;
 };
 
-
 export type MutationUpdateDesignPositionArgs = {
   input: UpdateDesignPositionDto;
 };
 
-
 export type MutationUpdateNotificationArgs = {
   input: UpdateNotificationDto;
 };
-
 
 export type MutationUpdateProductArgs = {
   id: Scalars['String']['input'];
   input: UpdateProductDto;
 };
 
-
 export type MutationUpdateProductDesignArgs = {
   input: UpdateProductDesignDto;
 };
-
 
 export type MutationUpdateProductPositionTypeArgs = {
   input: UpdateProductPositionTypeDto;
 };
 
-
 export type MutationUpdateSystemConfigBankArgs = {
   input: UpdateSystemConfigBankDto;
 };
-
 
 export type MutationUpdateSystemConfigColorArgs = {
   input: UpdateSystemConfigColorDto;
 };
 
-
 export type MutationUpdateSystemConfigSizeArgs = {
   input: UpdateSystemConfigSizeDto;
 };
-
 
 export type MutationUpdateUserArgs = {
   id: Scalars['String']['input'];
@@ -499,71 +471,57 @@ export type Query = {
   users: Array<UserEntity>;
 };
 
-
 export type QueryBlankVarianceArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type QueryCategoryArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type QueryDesignPositionArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryDesignPositionsArgs = {
   designId?: InputMaybe<Scalars['String']['input']>;
 };
 
-
 export type QueryNotificationArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryProductArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type QueryProductDesignArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryProductDesignsArgs = {
   userId?: InputMaybe<Scalars['String']['input']>;
 };
 
-
 export type QueryProductPositionTypeArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryProductPositionTypesArgs = {
   productId: Scalars['String']['input'];
 };
 
-
 export type QuerySystemConfigBankArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QuerySystemConfigColorArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type QuerySystemConfigSizeArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryUserArgs = {
   id: Scalars['String']['input'];
@@ -587,7 +545,7 @@ export enum Roles {
   Customer = 'CUSTOMER',
   Factoryowner = 'FACTORYOWNER',
   Manager = 'MANAGER',
-  Staff = 'STAFF'
+  Staff = 'STAFF',
 }
 
 export type SystemConfigBankEntity = {
@@ -733,32 +691,54 @@ export type LoginMutationVariables = Exact<{
   loginInput: LoginDto;
 }>;
 
-
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthResponseDto', accessToken: string, refreshToken: string, user: { __typename?: 'UserEntity', createdAt: any, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null } } };
-
+export type LoginMutation = {
+  __typename?: 'Mutation';
+  login: {
+    __typename?: 'AuthResponseDto';
+    accessToken: string;
+    refreshToken: string;
+    user: {
+      __typename?: 'UserEntity';
+      createdAt: any;
+      dateOfBirth?: any | null;
+      email?: string | null;
+      gender: boolean;
+      id: string;
+      imageUrl?: string | null;
+      isActive: boolean;
+      name?: string | null;
+      phoneNumber?: string | null;
+      role: Roles;
+      updatedAt?: any | null;
+    };
+  };
+};
 
 export const LoginDocument = gql`
-    mutation Login($loginInput: LoginDto!) {
-  login(loginInput: $loginInput) {
-    accessToken
-    refreshToken
-    user {
-      createdAt
-      dateOfBirth
-      email
-      gender
-      id
-      imageUrl
-      isActive
-      name
-      phoneNumber
-      role
-      updatedAt
+  mutation Login($loginInput: LoginDto!) {
+    login(loginInput: $loginInput) {
+      accessToken
+      refreshToken
+      user {
+        createdAt
+        dateOfBirth
+        email
+        gender
+        id
+        imageUrl
+        isActive
+        name
+        phoneNumber
+        role
+        updatedAt
+      }
     }
   }
-}
-    `;
-export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
+`;
+export type LoginMutationFn = Apollo.MutationFunction<
+  LoginMutation,
+  LoginMutationVariables
+>;
 
 /**
  * __useLoginMutation__
@@ -777,10 +757,21 @@ export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutati
  *   },
  * });
  */
-export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
-      }
+export function useLoginMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    LoginMutation,
+    LoginMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<LoginMutation, LoginMutationVariables>(
+    LoginDocument,
+    options,
+  );
+}
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<
+  LoginMutation,
+  LoginMutationVariables
+>;
