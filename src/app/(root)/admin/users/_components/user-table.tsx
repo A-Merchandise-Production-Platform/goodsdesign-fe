@@ -1,8 +1,6 @@
 'use client';
 
-import * as React from 'react';
 import {
-  type ColumnDef,
   type ColumnFiltersState,
   type SortingState,
   type VisibilityState,
@@ -13,21 +11,14 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import {
-  ArrowUpDown,
-  ChevronDown,
-  MoreHorizontal,
-  PlusCircle,
-} from 'lucide-react';
+import { ChevronDown, RefreshCwIcon } from 'lucide-react';
+import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
@@ -39,25 +30,22 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import AddUserForm from './add-user-form';
 import {
   type GetUsersQuery,
   useGetUsersQuery,
 } from '@/graphql/generated/graphql';
+import AddUserForm from './add-user-form';
 import { columns } from './columns';
 
 export type User = GetUsersQuery['users'][number];
 
-export default function UserTable() {
+interface UserTableProps {
+  refetch: () => void;
+  loading: boolean;
+  data: GetUsersQuery['users'] | undefined;
+}
+
+export default function UserTable({ refetch, loading, data }: UserTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -67,11 +55,8 @@ export default function UserTable() {
   const [rowSelection, setRowSelection] = React.useState({});
   const [globalFilter, setGlobalFilter] = React.useState('');
 
-  // Mock data - replace with your GraphQL query
-  const { data, loading, error, refetch } = useGetUsersQuery();
-
   const table = useReactTable({
-    data: data?.users || [],
+    data: data || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -103,6 +88,9 @@ export default function UserTable() {
           />
         </div>
         <div className="flex items-center space-x-2">
+          <Button variant="outline" size="icon" onClick={() => refetch()}>
+            <RefreshCwIcon className="h-4 w-4" />
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
@@ -132,7 +120,7 @@ export default function UserTable() {
           <AddUserForm />
         </div>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border shadow-sm">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (

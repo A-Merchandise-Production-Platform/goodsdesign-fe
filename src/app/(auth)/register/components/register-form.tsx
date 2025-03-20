@@ -87,7 +87,7 @@ export default function RegisterForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="mx-auto max-w-3xl space-y-8 pt-8"
+        className="mx-auto max-w-3xl space-y-8"
       >
         <FormField
           control={form.control}
@@ -139,58 +139,56 @@ export default function RegisterForm() {
           )}
         />
 
-        <div className="space-y-6">
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Password"
-                    {...field}
-                    disabled={loading}
-                  />
-                </FormControl>
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  {...field}
+                  disabled={loading}
+                />
+              </FormControl>
 
-                {form.formState.errors.password ? (
-                  <FormMessage className="line-clamp-1" />
-                ) : (
-                  <FormDescription>
-                    Password must be at least 6 characters long.
-                  </FormDescription>
-                )}
-              </FormItem>
-            )}
-          />
+              {form.formState.errors.password ? (
+                <FormMessage className="line-clamp-1" />
+              ) : (
+                <FormDescription>
+                  Password must be at least 6 characters long.
+                </FormDescription>
+              )}
+            </FormItem>
+          )}
+        />
 
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Confirm Password"
-                    {...field}
-                    disabled={loading}
-                  />
-                </FormControl>
-                {form.formState.errors.confirmPassword ? (
-                  <FormMessage />
-                ) : (
-                  <FormDescription>
-                    Confirm your password to make sure it matches
-                  </FormDescription>
-                )}
-              </FormItem>
-            )}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Confirm Password"
+                  {...field}
+                  disabled={loading}
+                />
+              </FormControl>
+              {form.formState.errors.confirmPassword ? (
+                <FormMessage />
+              ) : (
+                <FormDescription>
+                  Confirm your password to make sure it matches
+                </FormDescription>
+              )}
+            </FormItem>
+          )}
+        />
 
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? 'Registering...' : 'Register'}

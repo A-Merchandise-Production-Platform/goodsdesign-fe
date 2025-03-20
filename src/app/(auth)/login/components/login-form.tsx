@@ -67,7 +67,7 @@ export default function LoginForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="mx-auto max-w-3xl space-y-8 pt-8"
+        className="mx-auto max-w-3xl space-y-8"
       >
         <FormField
           control={form.control}
