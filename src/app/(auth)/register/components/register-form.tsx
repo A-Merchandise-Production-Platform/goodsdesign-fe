@@ -192,8 +192,8 @@ export default function RegisterForm() {
           />
         </div>
 
-        <Button type="submit" className="w-full" isLoading={loading}>
-          Register
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? 'Registering...' : 'Register'}
         </Button>
       </form>
     </Form>

@@ -118,8 +118,8 @@ export default function LoginForm() {
           )}
         />
 
-        <Button type="submit" className="w-full" isLoading={loading}>
-          Login
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
         </Button>
       </form>
     </Form>
