@@ -1,0 +1,38 @@
+query GetAllCategories {
+  categories {
+    createdAt
+    description
+    id
+    imageUrl
+    isActive
+    name
+    totalProducts
+    updatedAt
+  }
+}
+
+mutation CreateCategory($createCategoryInput: CreateCategoryDto!) {
+  createCategory(createCategoryInput: $createCategoryInput) {
+    createdAt
+    description
+    id
+    imageUrl
+    isActive
+    name
+    totalProducts
+    updatedAt
+  }
+}
+
+mutation DeleteCategory($deleteCategoryId: String!) {
+  deleteCategory(id: $deleteCategoryId) {
+    createdAt
+    description
+    id
+    imageUrl
+    isActive
+    name
+    totalProducts
+    updatedAt
+  }
+}
