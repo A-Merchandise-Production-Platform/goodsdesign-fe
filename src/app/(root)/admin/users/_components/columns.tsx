@@ -1,4 +1,7 @@
-import { GetUsersQuery } from '@/graphql/generated/graphql';
+import {
+  GetUsersQuery,
+  useDeleteUserMutation,
+} from '@/graphql/generated/graphql';
 import { ColumnDef } from '@tanstack/react-table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -12,6 +15,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 export type User = GetUsersQuery['users'][number];
 
@@ -122,7 +138,7 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       const isActive = row.getValue('isActive') as boolean;
       return (
-        <Badge variant={isActive ? 'success' : 'secondary'} className="text-xs">
+        <Badge variant={isActive ? 'default' : 'secondary'} className="text-xs">
           {isActive ? 'Active' : 'Inactive'}
         </Badge>
       );
@@ -162,6 +178,18 @@ export const columns: ColumnDef<User>[] = [
     id: 'actions',
     cell: ({ row }) => {
       const user = row.original;
+      const [deleteUser] = useDeleteUserMutation({
+        variables: {
+          deleteUserId: user.id,
+        },
+        refetchQueries: ['GetUsers'],
+        onCompleted: () => {
+          toast.success('User deleted successfully');
+        },
+        onError: error => {
+          toast.error(error.message || 'Failed to delete user');
+        },
+      });
 
       return (
         <DropdownMenu>
@@ -181,9 +209,35 @@ export const columns: ColumnDef<User>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem>View details</DropdownMenuItem>
             <DropdownMenuItem>Edit user</DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive">
-              Delete user
-            </DropdownMenuItem>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem
+                  className="text-destructive"
+                  onSelect={e => e.preventDefault()}
+                >
+                  Delete user
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete{' '}
+                    {user.name || 'this user'}'s account and remove their data
+                    from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={() => deleteUser()}
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       );
