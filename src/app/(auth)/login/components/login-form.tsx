@@ -20,8 +20,8 @@ import { useLoginMutation } from '@/graphql/generated/graphql';
 import { useAuthStore } from '@/stores/auth.store';
 
 const formSchema = z.object({
-  email: z.string(),
-  password: z.string(),
+  email: z.string().email(),
+  password: z.string().min(6),
 });
 
 export default function LoginForm() {
