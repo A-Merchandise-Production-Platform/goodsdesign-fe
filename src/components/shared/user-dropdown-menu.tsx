@@ -40,9 +40,9 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="bg-muted relative h-9 w-9">
-          <Avatar className="h-9 w-9">
+          <Avatar className="h-9 w-9 rounded-md">
             <AvatarImage src={user.imageUrl || ''} alt={user.name || ''} />
-            <AvatarFallback>
+            <AvatarFallback className="rounded-md">
               {user.name?.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>

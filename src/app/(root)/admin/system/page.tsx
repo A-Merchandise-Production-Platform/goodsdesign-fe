@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Page() {
   return (
-    <div className="bg-background container mx-auto rounded-lg p-4">
+    <div className="bg-background container mx-auto rounded-lg">
       <Tabs defaultValue="banks">
         <TabsList className="mb-4">
           <TabsTrigger value="banks">Banks</TabsTrigger>
