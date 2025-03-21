@@ -18,6 +18,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -121,7 +122,15 @@ export default function AddProductForm() {
                       disabled={loading}
                     />
                   </FormControl>
-                  <FormMessage />
+                  {form.formState.errors.name ? (
+                    <FormMessage>
+                      {form.formState.errors.name.message}
+                    </FormMessage>
+                  ) : (
+                    <FormDescription>
+                      This is the name of the product.
+                    </FormDescription>
+                  )}
                 </FormItem>
               )}
             />
@@ -140,7 +149,15 @@ export default function AddProductForm() {
                       rows={3}
                     />
                   </FormControl>
-                  <FormMessage />
+                  {form.formState.errors.description ? (
+                    <FormMessage>
+                      {form.formState.errors.description.message}
+                    </FormMessage>
+                  ) : (
+                    <FormDescription>
+                      This is the description of the product.
+                    </FormDescription>
+                  )}
                 </FormItem>
               )}
             />
@@ -156,7 +173,7 @@ export default function AddProductForm() {
                     disabled={loading}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                     </FormControl>
@@ -168,7 +185,15 @@ export default function AddProductForm() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  {form.formState.errors.categoryId ? (
+                    <FormMessage>
+                      {form.formState.errors.categoryId.message}
+                    </FormMessage>
+                  ) : (
+                    <FormDescription>
+                      This is the category of the product.
+                    </FormDescription>
+                  )}
                 </FormItem>
               )}
             />

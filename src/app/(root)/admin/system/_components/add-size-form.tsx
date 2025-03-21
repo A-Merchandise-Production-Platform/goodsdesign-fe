@@ -2,10 +2,13 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PlusCircleIcon } from 'lucide-react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -25,48 +28,47 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { useCreateCategoryMutation } from '@/graphql/generated/graphql';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { useCreateSystemConfigSizeMutation } from '@/graphql/generated/graphql';
+
 const formSchema = z.object({
-  name: z.string().min(2, {
-    message: 'Name must be at least 2 characters.',
-  }),
-  description: z.string().min(2, {
-    message: 'Description must be at least 2 characters.',
-  }),
+  name: z.string().min(1, 'Name is required'),
+  code: z.string().min(1, 'Code is required'),
+  isActive: z.boolean().default(true),
 });
 
-export default function AddCategoryForm() {
-  const [createCategory, { loading }] = useCreateCategoryMutation();
+type FormValues = z.infer<typeof formSchema>;
+
+export default function AddSizeForm() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      description: '',
+      code: '',
+      isActive: true,
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      await createCategory({
-        variables: {
-          createCategoryInput: {
-            name: values.name,
-            description: values.description,
-          },
-        },
-      });
-
+  const [createSize, { loading }] = useCreateSystemConfigSizeMutation({
+    refetchQueries: ['GetAllSystemConfigSizes'],
+    onCompleted: () => {
+      setIsOpen(false);
       form.reset();
-      toast.success('Category created successfully.');
-    } catch (error) {
-      toast.error('Something went wrong.');
-    }
-  }
+      toast.success('Size added successfully');
+    },
+    onError: error => {
+      toast.error(error.message || 'Failed to add size');
+    },
+  });
+
+  const onSubmit = (data: FormValues) => {
+    createSize({
+      variables: {
+        input: data,
+      },
+    });
+  };
 
   return (
     <Dialog
@@ -79,14 +81,14 @@ export default function AddCategoryForm() {
       <DialogTrigger asChild>
         <Button variant="outline">
           <PlusCircleIcon className="mr-2 h-4 w-4" />
-          Add Category
+          Add Size
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Category</DialogTitle>
+          <DialogTitle>Add New Size</DialogTitle>
           <DialogDescription>
-            Add a new category to the system.
+            Fill in the details to add a new size to the system.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -96,10 +98,10 @@ export default function AddCategoryForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Size Name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Category name"
+                      placeholder="Enter size name"
                       {...field}
                       disabled={loading}
                     />
@@ -107,8 +109,29 @@ export default function AddCategoryForm() {
                   {form.formState.errors.name ? (
                     <FormMessage />
                   ) : (
+                    <FormDescription>The name of the size.</FormDescription>
+                  )}
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Code</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter size code"
+                      {...field}
+                      disabled={loading}
+                    />
+                  </FormControl>
+                  {form.formState.errors.code ? (
+                    <FormMessage />
+                  ) : (
                     <FormDescription>
-                      This is the name of the category.
+                      The code representation of the size (e.g. XL, XXL).
                     </FormDescription>
                   )}
                 </FormItem>
@@ -116,34 +139,25 @@ export default function AddCategoryForm() {
             />
             <FormField
               control={form.control}
-              name="description"
+              name="isActive"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
+                <FormItem className="mt-2 flex flex-row items-center rounded-md">
                   <FormControl>
-                    <Textarea
-                      placeholder="Category description"
-                      {...field}
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
                       disabled={loading}
-                      className="resize-none"
-                      rows={3}
                     />
                   </FormControl>
-                  {form.formState.errors.description ? (
-                    <FormMessage>
-                      {form.formState.errors.description.message}
-                    </FormMessage>
-                  ) : (
-                    <FormDescription>
-                      This is the description of the category.
-                    </FormDescription>
-                  )}
+                  <div className="space-y-1 leading-none">
+                    <FormLabel className="ml-2">Active</FormLabel>
+                  </div>
                 </FormItem>
               )}
             />
             <DialogFooter>
-              <Button type="submit" disabled={loading} className="w-full">
-                {loading ? 'Creating...' : 'Create'}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Saving...' : 'Save Size'}
               </Button>
             </DialogFooter>
           </form>

@@ -1,0 +1,131 @@
+query GetAllSystemConfigBanks {
+  systemConfigBanks {
+    bin
+    code
+    id
+    isActive
+    isDeleted
+    logo
+    name
+    shortName
+  }
+}
+
+query GetSystemConfigBankById($systemConfigBankId: ID!) {
+  systemConfigBank(id: $systemConfigBankId) {
+    bin
+    code
+    id
+    isActive
+    isDeleted
+    logo
+    name
+    shortName
+  }
+}
+
+mutation CreateSystemConfigBank($input: CreateSystemConfigBankDto!) {
+  createSystemConfigBank(input: $input) {
+    bin
+    code
+    id
+    isActive
+    isDeleted
+    logo
+    name
+    shortName
+  }
+}
+
+mutation RemoveSystemConfigBank($removeSystemConfigBankId: ID!) {
+  removeSystemConfigBank(id: $removeSystemConfigBankId) {
+    bin
+    id
+    code
+    isActive
+    isDeleted
+    logo
+    name
+    shortName
+  }
+}
+
+query GetAllSystemConfigColors {
+  systemConfigColors {
+    code
+    id
+    isActive
+    isDeleted
+    name
+  }
+}
+
+query GetSystemConfigColorById($systemConfigColorId: ID!) {
+  systemConfigColor(id: $systemConfigColorId) {
+    code
+    id
+    isActive
+    isDeleted
+    name
+  }
+}
+
+mutation CreateSystemConfigColor($input: CreateSystemConfigColorDto!) {
+  createSystemConfigColor(input: $input) {
+    code
+    id
+    isActive
+    isDeleted
+    name
+  }
+}
+
+mutation RemoveSystemConfigColor($removeSystemConfigColorId: ID!) {
+  removeSystemConfigColor(id: $removeSystemConfigColorId) {
+    code
+    id
+    isActive
+    isDeleted
+    name
+  }
+}
+
+query GetAllSystemConfigSizes {
+  systemConfigSizes {
+    code
+    id
+    isActive
+    isDeleted
+    name
+  }
+}
+
+query GetSystemConfigSizeById($systemConfigSizeId: ID!) {
+  systemConfigSize(id: $systemConfigSizeId) {
+    code
+    id
+    isActive
+    isDeleted
+    name
+  }
+}
+
+mutation CreateSystemConfigSize($input: CreateSystemConfigSizeDto!) {
+  createSystemConfigSize(input: $input) {
+    code
+    id
+    isActive
+    isDeleted
+    name
+  }
+}
+
+mutation RemoveSystemConfigSize($removeSystemConfigSizeId: ID!) {
+  removeSystemConfigSize(id: $removeSystemConfigSizeId) {
+    code
+    id
+    isActive
+    isDeleted
+    name
+  }
+}
