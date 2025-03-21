@@ -21,15 +21,6 @@ export namespace AuthApi {
     return response.data;
   }
 
-  export async function login(payload: LoginPayload): Promise<LoginResponse> {
-    const response = await axiosInstance.post<LoginResponse>(
-      '/auth/login',
-      payload,
-    );
-
-    return response.data;
-  }
-
   export async function getMe(): Promise<GetMeResponse> {
     const response = await axiosInstance.get<GetMeResponse>('/auth/me');
 

@@ -28,7 +28,7 @@ export function MySidebar({ navItems, children }: MySidebarProps) {
               href={item.href}
               className={`block rounded-md px-3 py-2 text-sm ${
                 isActive
-                  ? 'bg-primary/80 text-primary-foreground dark:text-primary-foreground font-medium'
+                  ? 'bg-primary text-primary-foreground dark:text-primary-foreground font-medium'
                   : 'text-muted-foreground dark:hover:bg-muted hover:bg-primary/5'
               }`}
             >

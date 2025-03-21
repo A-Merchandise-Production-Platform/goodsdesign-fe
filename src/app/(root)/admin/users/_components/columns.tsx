@@ -1,124 +1,243 @@
-'use client';
-
-import { Badge } from '@/components/ui/badge';
 import {
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+  GetUsersQuery,
+  useDeleteUserMutation,
+} from '@/graphql/generated/graphql';
+import { ColumnDef } from '@tanstack/react-table';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { RoleBadge } from '@/components/ui/role-badge';
-import { GraphQlUser } from '@/graphql/generated';
-import { ColumnDef } from '@tanstack/react-table';
-import { format } from 'date-fns';
-import { MoreHorizontal } from 'lucide-react';
-import Image from 'next/image';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
-export const columns: ColumnDef<Partial<GraphQlUser>>[] = [
-  {
-    id: 'no',
-    header: 'No',
-    cell: ({ row, table }) => {
-      const pageIndex = table.options.state?.pagination?.pageIndex ?? 0;
-      const pageSize = table.options.state?.pagination?.pageSize ?? 10;
-      return (
-        <p className="text-muted-foreground text-sm">
-          {pageIndex * pageSize + row.index + 1}
-        </p>
-      );
-    },
-  },
-  {
-    accessorKey: 'imageUrl',
-    header: 'Image',
-    cell: ({ row }) => {
-      return (
-        <Image
-          src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${row.original.name}`}
-          alt={row.original.name ?? ''}
-          width={40}
-          height={40}
-          className="rounded-lg"
-        />
-      );
-    },
-  },
+export type User = GetUsersQuery['users'][number];
+
+export const columns: ColumnDef<User>[] = [
+  //   {
+  //     id: 'select',
+  //     header: ({ table }) => (
+  //       <div className="flex items-center space-x-2">
+  //         <input
+  //           type="checkbox"
+  //           className="text-primary focus:ring-primary h-4 w-4 rounded border-gray-300"
+  //           checked={
+  //             table.getIsAllPageRowsSelected() ||
+  //             (table.getIsSomePageRowsSelected() && 'indeterminate')
+  //           }
+  //           onChange={e => table.toggleAllPageRowsSelected(!!e.target.checked)}
+  //           aria-label="Select all"
+  //         />
+  //       </div>
+  //     ),
+  //     cell: ({ row }) => (
+  //       <div className="flex items-center space-x-2">
+  //         <input
+  //           type="checkbox"
+  //           className="text-primary focus:ring-primary h-4 w-4 rounded border-gray-300"
+  //           checked={row.getIsSelected()}
+  //           onChange={e => row.toggleSelected(!!e.target.checked)}
+  //           aria-label="Select row"
+  //         />
+  //       </div>
+  //     ),
+  //     enableSorting: false,
+  //     enableHiding: false,
+  //   },
   {
     accessorKey: 'name',
-    header: 'Name',
-  },
-  {
-    accessorKey: 'email',
-    header: 'Email',
-  },
-  {
-    accessorKey: 'phoneNumber',
-    header: 'Phone Number',
+    header: 'User',
     cell: ({ row }) => {
-      return <p>{row.original.phoneNumber ?? 'N/A'}</p>;
+      const user = row.original;
+      const getInitials = () => {
+        if (!user.name) return 'U';
+        const nameParts = user.name.split(' ');
+        if (nameParts.length > 1) {
+          return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+        }
+        return user.name.charAt(0).toUpperCase();
+      };
+
+      return (
+        <div className="flex items-center gap-3">
+          <Avatar className="h-8 w-8">
+            <AvatarImage
+              src={user.imageUrl ?? undefined}
+              alt={user.name || 'User'}
+            />
+            <AvatarFallback className="bg-primary/10 text-primary text-xs">
+              {getInitials()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="font-medium">{user.name || 'Unnamed User'}</span>
+            <span className="text-muted-foreground text-xs">{user.email}</span>
+          </div>
+        </div>
+      );
     },
   },
   {
     accessorKey: 'role',
-    header: 'Role',
-    cell: ({ row }) => {
-      return <RoleBadge role={row.original.role!} outline />;
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className="p-0 hover:bg-transparent"
+        >
+          Role
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
     },
-  },
-  {
-    accessorKey: 'isActive',
-    header: 'Status',
     cell: ({ row }) => {
+      const role = row.getValue('role') as string;
       return (
         <Badge
-          variant={
-            row.original.isActive ? 'outline-success' : 'outline-warning'
-          }
+          variant={role === 'ADMIN' ? 'default' : 'outline'}
+          className="text-xs"
         >
-          {row.original.isActive ? 'Active' : 'Inactive'}
+          {role}
         </Badge>
       );
     },
   },
   {
-    accessorKey: 'createdAt',
-    header: 'Created At',
+    accessorKey: 'isActive',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className="p-0 hover:bg-transparent"
+        >
+          Status
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
-      return <p>{format(row.original.createdAt, 'dd/MM/yyyy HH:mm')}</p>;
+      const isActive = row.getValue('isActive') as boolean;
+      return (
+        <Badge variant={isActive ? 'default' : 'secondary'} className="text-xs">
+          {isActive ? 'Active' : 'Inactive'}
+        </Badge>
+      );
     },
   },
   {
-    accessorKey: 'updatedAt',
-    header: 'Updated At',
+    accessorKey: 'phoneNumber',
+    header: 'Phone',
     cell: ({ row }) => {
-      return <p>{format(row.original.updatedAt, 'dd/MM/yyyy HH:mm')}</p>;
+      const phoneNumber = row.getValue('phoneNumber') as string | null;
+      return <span>{phoneNumber || '—'}</span>;
+    },
+  },
+  {
+    accessorKey: 'createdAt',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className="p-0 hover:bg-transparent"
+        >
+          Joined
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const createdAt = row.getValue('createdAt') as string | null;
+      const formatted = createdAt
+        ? new Date(createdAt).toLocaleDateString()
+        : '—';
+      return <span>{formatted}</span>;
     },
   },
   {
     id: 'actions',
-    enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original;
+      const user = row.original;
+      const [deleteUser] = useDeleteUserMutation({
+        variables: {
+          deleteUserId: user.id,
+        },
+        refetchQueries: ['GetUsers'],
+        onCompleted: () => {
+          toast.success('User deleted successfully');
+        },
+        onError: error => {
+          toast.error(error.message || 'Failed to delete user');
+        },
+      });
 
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-8 w-8 p-0">
+            <Button variant="ghost" className="h-8 w-8 p-0">
               <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
+              <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="border">
+          <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Copy payment ID</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(user.id)}
+            >
+              Copy user ID
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>View details</DropdownMenuItem>
+            <DropdownMenuItem>Edit user</DropdownMenuItem>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem
+                  className="text-destructive"
+                  onSelect={e => e.preventDefault()}
+                >
+                  Delete user
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete{' '}
+                    {user.name || 'this user'}'s account and remove their data
+                    from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={() => deleteUser()}
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       );

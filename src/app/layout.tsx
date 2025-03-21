@@ -5,11 +5,11 @@ import localFont from 'next/font/local';
 
 import { Toaster } from '@/components/ui/sonner';
 import AuthProvider from '@/providers/auth-provider';
-import QueryClientProvider from '@/providers/query-client-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import Header from '@/components/shared/header';
 import Footer from '@/components/shared/footer';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import ApolloClientProvider from '@/providers/apollo-client-provider';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -35,15 +35,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-background-secondary antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <QueryClientProvider>
+        <ApolloClientProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
             <AuthProvider>
               <ScrollArea className="h-screen">
                 <main className="container mx-auto pt-16">
@@ -53,9 +53,10 @@ export default function RootLayout({
                 </main>
               </ScrollArea>
             </AuthProvider>
-          </QueryClientProvider>
-          <Toaster richColors />
-        </ThemeProvider>
+
+            <Toaster richColors position="bottom-right" />
+          </ThemeProvider>
+        </ApolloClientProvider>
       </body>
     </html>
   );

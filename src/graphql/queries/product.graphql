@@ -1,0 +1,44 @@
+query GetAllProducts {
+  products {
+    category {
+      name
+    }
+    id
+    imageUrl
+    isActive
+    name
+    updatedAt
+    createdAt
+    description
+  }
+}
+
+mutation CreateProduct($input: CreateProductDto!) {
+  createProduct(input: $input) {
+    category {
+      name
+    }
+    id
+    imageUrl
+    isActive
+    name
+    updatedAt
+    createdAt
+    description
+  }
+}
+
+mutation DeleteProduct($deleteProductId: String!) {
+  deleteProduct(id: $deleteProductId) {
+    category {
+      name
+    }
+    id
+    imageUrl
+    isActive
+    name
+    updatedAt
+    createdAt
+    description
+  }
+}
