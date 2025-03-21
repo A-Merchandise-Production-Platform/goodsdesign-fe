@@ -730,10 +730,10 @@ export default function ProductDesigner() {
             </div>
 
             {/* Background Elements */}
-            <div className="bg-background-secondary absolute -top-40 -right-50 z-30 h-[11.1rem] w-[110rem]" />
-            <div className="bg-background-secondary absolute top-0 right-256 z-20 h-[63rem] w-[68rem]" />
-            <div className="bg-background-secondary absolute top-4 -right-71 z-20 h-[33rem] w-[50rem]" />
-            <div className="bg-background-secondary absolute top-132 -left-4 z-20 h-[30rem] w-[70rem]" />
+            <div className="bg-background absolute -top-40 -right-50 z-30 h-[11.1rem] w-[110rem]" />
+            <div className="bg-background absolute top-0 right-256 z-20 h-[63rem] w-[68rem]" />
+            <div className="bg-background absolute top-4 -right-71 z-20 h-[33rem] w-[50rem]" />
+            <div className="bg-background absolute top-132 -left-4 z-20 h-[30rem] w-[70rem]" />
 
             {/* 3D Model Area */}
             <div className="relative z-20 h-[32rem] flex-grow">
