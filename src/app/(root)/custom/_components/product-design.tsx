@@ -1028,7 +1028,7 @@ export default function ProductDesigner() {
               </div>
 
               {(view === 'left-sleeve' || view === 'right-sleeve') && (
-                <div className="absolute bottom-0 left-0 h-[11rem] w-[31rem] bg-muted" />
+                <div className="bg-muted absolute bottom-0 left-0 h-[11rem] w-[31rem]" />
               )}
               {(view === 'left-sleeve' || view === 'right-sleeve') && (
                 <div className="bg-muted absolute top-0 left-0 h-[22rem] w-[4rem]" />
