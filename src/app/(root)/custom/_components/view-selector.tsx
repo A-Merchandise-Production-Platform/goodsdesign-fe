@@ -1,5 +1,4 @@
-'use client';
-
+import React from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ViewSelectorProps {
@@ -7,7 +6,7 @@ interface ViewSelectorProps {
   onViewChange: (view: string) => void;
 }
 
-export function ViewSelector({ view, onViewChange }: ViewSelectorProps) {
+const ViewSelector: React.FC<ViewSelectorProps> = ({ view, onViewChange }) => {
   return (
     <Tabs value={view} onValueChange={onViewChange} className="border-b">
       <TabsList className="z-50 w-full justify-start rounded-none">
@@ -18,4 +17,6 @@ export function ViewSelector({ view, onViewChange }: ViewSelectorProps) {
       </TabsList>
     </Tabs>
   );
-}
+};
+
+export default ViewSelector;

@@ -1,14 +1,13 @@
-'use client';
-
-import { Redo2, Save, Undo2 } from 'lucide-react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Redo2, Save, Undo2 } from 'lucide-react';
 
 interface HeaderProps {
   onSave: () => void;
 }
 
-export function Header({ onSave }: HeaderProps) {
+const DesignHeader: React.FC<HeaderProps> = ({ onSave }) => {
   return (
     <header className="z-50 flex h-14 items-center justify-between border-b px-6">
       <div className="flex items-center gap-4">
@@ -41,4 +40,6 @@ export function Header({ onSave }: HeaderProps) {
       </div>
     </header>
   );
-}
+};
+
+export default DesignHeader;

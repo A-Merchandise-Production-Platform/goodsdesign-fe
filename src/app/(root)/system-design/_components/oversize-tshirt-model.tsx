@@ -81,7 +81,7 @@ function Model({ texture }: ModelProps) {
   return <primitive object={scene} />;
 }
 
-export default function OversizeTshirtModel(): React.ReactElement {
+export default function TshirtModel(): React.ReactElement {
   const [currentTexture, setCurrentTexture] = useState<string>(
     TEXTURE_VARIANTS[0].path,
   );

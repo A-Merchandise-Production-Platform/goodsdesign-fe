@@ -1,9 +1,8 @@
-'use client';
-
-import { ShirtIcon as TShirt } from 'lucide-react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
+import { ShirtIcon as TShirt } from 'lucide-react';
 
-export function Footer() {
+const DesignFooter: React.FC = () => {
   return (
     <div className="flex items-center justify-between border-t p-4">
       <div className="flex items-center gap-4">
@@ -21,4 +20,6 @@ export function Footer() {
       </div>
     </div>
   );
-}
+};
+
+export default DesignFooter;
