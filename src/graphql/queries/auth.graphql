@@ -14,6 +14,10 @@ mutation Login($loginInput: LoginDto!) {
       phoneNumber
       role
       updatedAt
+      factory {
+        name
+        factoryStatus
+      }
     }
   }
 }
@@ -34,6 +38,10 @@ mutation Register($registerInput: RegisterDto!) {
       phoneNumber
       role
       updatedAt
+      factory {
+        name
+        factoryStatus
+      }
     }
   }
 }
@@ -54,6 +62,10 @@ mutation RefreshToken($refreshTokenInput: RefreshTokenDto!) {
       phoneNumber
       role
       updatedAt
+      factory {
+        name
+        factoryStatus
+      }
     }
   }
 }
@@ -75,5 +87,9 @@ query GetMe {
     phoneNumber
     role
     updatedAt
+    factory {
+      name
+      factoryStatus
+    }
   }
 }

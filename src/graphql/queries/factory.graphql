@@ -1,0 +1,34 @@
+query GetMyFactory {
+  getMyFactory {
+    addressId
+    businessLicenseUrl
+    contactPersonName
+    contactPersonPhone
+    contractUrl
+    description
+    establishedDate
+    factoryStatus
+    isSubmitted
+    leadTime
+    maxPrintingCapacity
+    minimumOrderQuantity
+    name
+    operationalHours
+    owner {
+      email
+      name
+      imageUrl
+    }
+    printingMethods
+    products {
+      id
+      imageUrl
+      name
+    }
+    qualityCertifications
+    specializations
+    taxIdentificationNumber
+    totalEmployees
+    website
+  }
+}

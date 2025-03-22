@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input';
 import { useAuthStore } from '@/stores/auth.store';
 import { useRegisterMutation } from '@/graphql/generated/graphql';
 import { toast } from 'sonner';
+import { Switch } from '@/components/ui/switch';
 
 const formSchema = z
   .object({
@@ -34,6 +35,7 @@ const formSchema = z
     confirmPassword: z
       .string({ message: 'Confirm password is required' })
       .min(6, { message: 'Confirm password must be at least 6 characters' }),
+    isFactory: z.boolean(),
   })
   .refine(data => data.password === data.confirmPassword, {
     message: 'Confirm passwords do not match',
@@ -51,6 +53,7 @@ export default function RegisterForm() {
       password: '',
       name: '',
       confirmPassword: '',
+      isFactory: false,
     },
   });
 
@@ -78,6 +81,7 @@ export default function RegisterForm() {
           email: values.email,
           name: values.name,
           password: values.password,
+          isFactoryOwner: values.isFactory,
         },
       },
     });
@@ -186,6 +190,28 @@ export default function RegisterForm() {
                   Confirm your password to make sure it matches
                 </FormDescription>
               )}
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="isFactory"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+              <div className="space-y-0.5">
+                <FormLabel>Factory Account</FormLabel>
+                <FormDescription>
+                  If you are a factory account, please check this box.
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  disabled={loading}
+                />
+              </FormControl>
             </FormItem>
           )}
         />

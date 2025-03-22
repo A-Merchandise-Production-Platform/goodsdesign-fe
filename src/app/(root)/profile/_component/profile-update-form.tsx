@@ -39,12 +39,12 @@ import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth.store';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import { Separator } from '@/components/ui/separator';
+import { Label } from '@/components/ui/label';
 
 // Define the form schema with validation
 const profileFormSchema = z.object({
   id: z.string(),
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-  email: z.string().email({ message: 'Please enter a valid email address.' }),
   phoneNumber: z
     .string()
     .refine(isValidPhoneNumber, { message: 'Invalid phone number' })
@@ -69,7 +69,6 @@ export default function ProfilePage() {
     defaultValues: {
       id: '',
       name: '',
-      email: '',
       phoneNumber: '',
       dateOfBirth: new Date(),
       gender: true,
@@ -84,7 +83,6 @@ export default function ProfilePage() {
       const defaultValues = {
         id: user.id,
         name: user.name || '',
-        email: user.email || '',
         phoneNumber: user.phoneNumber || '',
         dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : new Date(),
         gender: user.gender,
@@ -141,7 +139,6 @@ export default function ProfilePage() {
     const updateInput: Partial<ProfileFormValues> = {};
 
     if ('name' in changedFields) updateInput.name = data.name;
-    if ('email' in changedFields) updateInput.email = data.email;
     if ('phoneNumber' in changedFields)
       updateInput.phoneNumber = data.phoneNumber;
     if ('dateOfBirth' in changedFields)
@@ -207,26 +204,17 @@ export default function ProfilePage() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="email" />
-                      </FormControl>
-                      {form.formState.errors.email ? (
-                        <FormMessage />
-                      ) : (
-                        <FormDescription>
-                          This is your email that will be used to login to the
-                          website.
-                        </FormDescription>
-                      )}
-                    </FormItem>
-                  )}
-                />
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" value={user?.email || ''} disabled />
+                  <p className="text-muted-foreground text-sm">
+                    This is your email that will be used to login to the website
+                    <span className="text-destructive ml-1 font-bold">
+                      (cannot be changed)
+                    </span>
+                    .
+                  </p>
+                </div>
 
                 <div className="flex items-center gap-4">
                   <FormField
@@ -284,6 +272,7 @@ export default function ProfilePage() {
                                 date > new Date() ||
                                 date < new Date('1900-01-01')
                               }
+                              defaultMonth={field.value}
                               initialFocus
                               captionLayout="dropdown-buttons"
                               fromYear={1900}
