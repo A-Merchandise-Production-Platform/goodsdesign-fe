@@ -1,6 +1,11 @@
 'use client';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export const SHIRT_COLORS = [
   { name: 'White', path: '/models/shirt/white.png', color: '#ffffff' },

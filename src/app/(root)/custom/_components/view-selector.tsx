@@ -9,11 +9,7 @@ interface ViewSelectorProps {
 
 export function ViewSelector({ view, onViewChange }: ViewSelectorProps) {
   return (
-    <Tabs
-      value={view}
-      onValueChange={onViewChange}
-      className="border-b"
-    >
+    <Tabs value={view} onValueChange={onViewChange} className="border-b">
       <TabsList className="z-50 w-full justify-start rounded-none">
         <TabsTrigger value="front">Front</TabsTrigger>
         <TabsTrigger value="back">Back</TabsTrigger>
