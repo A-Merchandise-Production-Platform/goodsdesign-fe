@@ -104,17 +104,17 @@ function Model({ texture, view, color }: ModelProps) {
   return <primitive object={scene} />;
 }
 
-export interface OversizeTshirtModelProps {
+export interface TshirtModelProps {
   texture: THREE.CanvasTexture | null;
   view: string;
   color: string;
 }
 
-export default function OversizeTshirtModel({
+export default function TshirtModel({
   texture,
   view,
   color,
-}: OversizeTshirtModelProps) {
+}: TshirtModelProps) {
   return (
     <Canvas camera={{ fov: 85 }} className="bg-muted h-full w-full border">
       <Suspense fallback={null}>
