@@ -1,63 +1,17 @@
 'use client';
-import {
-  BookMarked,
-  Redo2,
-  Save,
-  Shapes,
-  ShirtIcon as TShirt,
-  Smile,
-  Type,
-  Undo2,
-  Upload,
-  Wand2,
-} from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import type React from 'react';
-import { useEffect, useRef, useState } from 'react';
-import * as fabric from 'fabric';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import * as fabric from 'fabric';
+import DesignHeader from './design-header';
+import DesignSidebar from './design-sidebar';
+import DesignCanvas from './design-canvas';
+import DesignFooter from './design-footer';
+import ViewSelector from './view-selector';
+import { SHIRT_COLORS } from './shirt-colors';
 
-interface DesignObject {
-  type: string;
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-  scaleX: number;
-  scaleY: number;
-  angle: number;
-  src?: string;
-  text?: string;
-  fontSize?: number;
-  fill?: string | null;
-  fontFamily?: string;
-  view: string;
-}
-
-type SerializedDesign = Record<string, DesignObject[]>;
-
-import TshirtModel from './tshirt-model';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-const SHIRT_COLORS = [
-  { name: 'White', path: '/models/shirt/white.png', color: '#ffffff' },
-  { name: 'Pink', path: '/models/shirt/pink.png', color: '#ffc0cb' },
-  { name: 'Mint', path: '/models/shirt/mint.png', color: '#b2f2bb' },
-  { name: 'Black', path: '/models/shirt/black.png', color: '#000000' },
-  { name: 'Gray', path: '/models/shirt/gray.png', color: '#808080' },
-  { name: 'Navy', path: '/models/shirt/navy.png', color: '#003366' },
-];
-
-function handleUploadClick() {
-  const input = document.querySelector('#image-upload') as HTMLInputElement;
-  input?.click();
-}
+// Types
+import { SerializedDesign } from '@/types/shirt';
+import { DesignObject } from '@/types/design-object';
 
 export default function ProductDesigner() {
   const [view, setView] = useState('front');
@@ -66,19 +20,21 @@ export default function ProductDesigner() {
   );
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
   const [showColorDialog, setShowColorDialog] = useState(false);
-  const [designs, setDesigns] = useState<Record<string, DesignObject[]>>({});
+  const [designs, setDesigns] = useState<SerializedDesign>({});
 
-  // Add debounce mechanism for texture updates
-  const textureUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const pendingUpdateRef = useRef(false);
-
+  // Refs for canvas management
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
   const textureCache = useRef<Record<string, HTMLImageElement>>({});
   const tempCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  // Add debounce mechanism for texture updates
+  const textureUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingUpdateRef = useRef(false);
+
   const CANVAS_SIZE = 1280;
 
+  // Get design zone limits based on view
   const getDesignZoneLimits = (view: string) => {
     const scaleFactor = CANVAS_SIZE / 1280;
 
@@ -121,7 +77,6 @@ export default function ProductDesigner() {
 
   // Initialize temporary canvas for texture generation
   useEffect(() => {
-    // Create a temporary canvas for texture generation
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = CANVAS_SIZE;
     tempCanvas.height = CANVAS_SIZE;
@@ -131,89 +86,6 @@ export default function ProductDesigner() {
       tempCanvasRef.current = null;
     };
   }, []);
-
-  // Initialize Fabric.js canvas
-  useEffect(() => {
-    if (!canvasRef.current) return;
-
-    // Clean up previous canvas if it exists
-    if (fabricCanvasRef.current) {
-      fabricCanvasRef.current.dispose();
-    }
-
-    // Create new Fabric.js canvas
-    fabricCanvasRef.current = new fabric.Canvas(canvasRef.current, {
-      width: CANVAS_SIZE,
-      height: CANVAS_SIZE,
-      selection: true,
-      preserveObjectStacking: true,
-      interactive: true,
-    });
-
-    // Set up event listeners with debouncing
-    fabricCanvasRef.current.on('object:modified', debounceTextureUpdate);
-    fabricCanvasRef.current.on('object:added', e => {
-      const obj = e.target as fabric.Object;
-      applyClipPathToObject(obj, view);
-
-      // Store the current view with the object
-      obj.set('data', { ...obj.get('data'), view: view });
-
-      // If object is fully outside, remove it
-      if (isObjectFullyOutside(obj, view)) {
-        fabricCanvasRef.current?.remove(obj);
-      }
-
-      debounceTextureUpdate();
-    });
-
-    fabricCanvasRef.current.on('mouse:down', e => {
-      if (!e.target) return;
-
-      const obj = e.target as fabric.Object;
-
-      // If object is fully outside, remove it
-      if (isObjectFullyOutside(obj, view)) {
-        fabricCanvasRef.current?.remove(obj);
-        fabricCanvasRef.current?.renderAll();
-        debounceTextureUpdate();
-      }
-    });
-
-    fabricCanvasRef.current.on('object:scaling', e => {
-      const obj = e.target as fabric.Object;
-
-      // If object is fully outside after scaling, remove it
-      if (isObjectFullyOutside(obj, view)) {
-        fabricCanvasRef.current?.remove(obj);
-      }
-    });
-
-    fabricCanvasRef.current.on('object:removed', debounceTextureUpdate);
-
-    // Load background texture
-    loadBackgroundTexture(currentTexture);
-
-    // Add design zone indicator
-    addDesignZoneIndicator(view);
-
-    // Add keyboard event listener
-    document.addEventListener('keydown', handleKeyDown);
-
-    fabricCanvasRef.current.renderAll();
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      if (fabricCanvasRef.current) {
-        fabricCanvasRef.current.dispose();
-      }
-
-      // Clear any pending updates
-      if (textureUpdateTimeoutRef.current) {
-        clearTimeout(textureUpdateTimeoutRef.current);
-      }
-    };
-  }, [view, currentTexture]); // Re-initialize when view or texture changes
 
   // Debounce texture updates to improve performance
   const debounceTextureUpdate = () => {
@@ -232,42 +104,17 @@ export default function ProductDesigner() {
     }, 300); // 300ms debounce time
   };
 
-  // Update canvas when view changes
-  useEffect(() => {
-    if (!fabricCanvasRef.current) return;
+  // Check if an object is fully outside the design zone
+  const isObjectFullyOutside = (obj: fabric.Object, view: string) => {
+    const limits = getDesignZoneLimits(view);
+    const objBounds = obj.getBoundingRect();
 
-    // Update background texture
-    loadBackgroundTexture(currentTexture);
-
-    // Update design zone indicator
-    addDesignZoneIndicator(view);
-  }, [view]);
-
-  // Load background texture
-  const loadBackgroundTexture = (texturePath: string) => {
-    if (!fabricCanvasRef.current) return;
-
-    // Check if texture is already cached
-    if (textureCache.current[texturePath]) {
-      setBackgroundImage(textureCache.current[texturePath]);
-      return;
-    }
-
-    // Load texture
-    const img = document.createElement('img');
-    img.crossOrigin = 'anonymous'; // Add this to avoid CORS issues
-    img.onload = () => {
-      textureCache.current[texturePath] = img;
-      setBackgroundImage(img);
-    };
-    img.onerror = err => {
-      console.error('Error loading texture:', err);
-      // Fallback to a plain background if image fails to load
-      fabricCanvasRef.current!.backgroundColor = '#f0f0f0';
-      fabricCanvasRef.current!.renderAll();
-      debounceTextureUpdate();
-    };
-    img.src = texturePath;
+    return (
+      objBounds.left + objBounds.width < limits.minX ||
+      objBounds.left > limits.maxX ||
+      objBounds.top + objBounds.height < limits.minY ||
+      objBounds.top > limits.maxY
+    );
   };
 
   // Apply clip path to object
@@ -294,17 +141,65 @@ export default function ProductDesigner() {
     fabricCanvasRef.current.renderAll();
   };
 
-  // Check if an object is fully outside the design zone
-  const isObjectFullyOutside = (obj: fabric.Object, view: string) => {
-    const limits = getDesignZoneLimits(view);
-    const objBounds = obj.getBoundingRect();
+  // Add design zone indicator
+  const addDesignZoneIndicator = (view: string) => {
+    if (!fabricCanvasRef.current) return;
 
-    return (
-      objBounds.left + objBounds.width < limits.minX ||
-      objBounds.left > limits.maxX ||
-      objBounds.top + objBounds.height < limits.minY ||
-      objBounds.top > limits.maxY
-    );
+    // Remove existing design zone indicator
+    const existingIndicator = fabricCanvasRef.current
+      .getObjects()
+      .find(obj => obj.get('data')?.type === 'designZone');
+    if (existingIndicator) {
+      fabricCanvasRef.current.remove(existingIndicator);
+    }
+
+    // Get design zone limits
+    const limits = getDesignZoneLimits(view);
+
+    // Create design zone indicator with a more visible style
+    const designZone = new fabric.Rect({
+      left: limits.minX,
+      top: limits.minY,
+      width: limits.maxX - limits.minX,
+      height: limits.maxY - limits.minY,
+      fill: 'rgba(0, 0, 0, 0)',
+      stroke: 'rgba(0, 120, 255, 0.7)',
+      strokeWidth: 1,
+      strokeDashArray: [15, 10],
+      selectable: false,
+      evented: false,
+      data: { type: 'designZone' },
+    });
+
+    fabricCanvasRef.current.add(designZone);
+    fabricCanvasRef.current.renderAll();
+  };
+
+  // Load background texture
+  const loadBackgroundTexture = (texturePath: string) => {
+    if (!fabricCanvasRef.current) return;
+
+    // Check if texture is already cached
+    if (textureCache.current[texturePath]) {
+      setBackgroundImage(textureCache.current[texturePath]);
+      return;
+    }
+
+    // Load texture
+    const img = document.createElement('img');
+    img.crossOrigin = 'anonymous'; // Add this to avoid CORS issues
+    img.onload = () => {
+      textureCache.current[texturePath] = img;
+      setBackgroundImage(img);
+    };
+    img.onerror = err => {
+      console.error('Error loading texture:', err);
+      // Fallback to a plain background if image fails to load
+      fabricCanvasRef.current!.backgroundColor = '#f0f0f0';
+      fabricCanvasRef.current!.renderAll();
+      debounceTextureUpdate();
+    };
+    img.src = texturePath;
   };
 
   // Set background image on canvas
@@ -350,42 +245,7 @@ export default function ProductDesigner() {
     debounceTextureUpdate();
   };
 
-  // Add design zone indicator
-  const addDesignZoneIndicator = (view: string) => {
-    if (!fabricCanvasRef.current) return;
-
-    // Remove existing design zone indicator
-    const existingIndicator = fabricCanvasRef.current
-      .getObjects()
-      .find(obj => obj.get('data')?.type === 'designZone');
-    if (existingIndicator) {
-      fabricCanvasRef.current.remove(existingIndicator);
-    }
-
-    // Get design zone limits
-    const limits = getDesignZoneLimits(view);
-
-    // Create design zone indicator with a more visible style
-    const designZone = new fabric.Rect({
-      left: limits.minX,
-      top: limits.minY,
-      width: limits.maxX - limits.minX,
-      height: limits.maxY - limits.minY,
-      fill: 'rgba(0, 0, 0, 0)',
-      stroke: 'rgba(0, 120, 255, 0.7)',
-      strokeWidth: 1,
-      strokeDashArray: [15, 10],
-      selectable: false,
-      evented: false,
-      data: { type: 'designZone' },
-    });
-
-    fabricCanvasRef.current.add(designZone);
-
-    fabricCanvasRef.current.renderAll();
-  };
-
-  // Update texture on 3D model - optimized version
+  // Update texture on 3D model
   const updateTextureOnModel = () => {
     if (!fabricCanvasRef.current || !tempCanvasRef.current) return;
 
@@ -440,14 +300,14 @@ export default function ProductDesigner() {
           const promise = new Promise<void>(resolve => {
             const img = new Image();
             img.crossOrigin = 'anonymous';
-            img.src = src; // Now we know src is a string
+            img.src = src;
 
             if (img.complete) {
-              loadedImages[src] = img; // Now we know src is a string
+              loadedImages[src] = img;
               resolve();
             } else {
               img.onload = () => {
-                loadedImages[src] = img; // Now we know src is a string
+                loadedImages[src] = img;
                 resolve();
               };
               img.onerror = () => {
@@ -535,86 +395,6 @@ export default function ProductDesigner() {
     });
   };
 
-  // Check if object data is outside its design zone
-  const isObjectDataOutsideDesignZone = (
-    objData: DesignObject,
-    objView: string,
-  ) => {
-    const limits = getDesignZoneLimits(objView);
-
-    // Calculate object bounds based on its data
-    const objLeft = objData.left;
-    const objTop = objData.top;
-    const objWidth = objData.width * objData.scaleX;
-    const objHeight = objData.height * objData.scaleY;
-    const objRight = objLeft + objWidth;
-    const objBottom = objTop + objHeight;
-
-    // Check if any part of the object is outside the design zone
-    return (
-      objLeft < limits.minX ||
-      objRight > limits.maxX ||
-      objTop < limits.minY ||
-      objBottom > limits.maxY
-    );
-  };
-
-  // Helper function to draw images on the canvas
-  const drawImageOnCanvas = (
-    img: HTMLImageElement,
-    objData: DesignObject,
-    ctx: CanvasRenderingContext2D,
-  ) => {
-    ctx.save();
-    ctx.translate(
-      objData.left + (objData.width * objData.scaleX) / 2,
-      objData.top + (objData.height * objData.scaleY) / 2,
-    );
-    ctx.rotate(((objData.angle || 0) * Math.PI) / 180);
-    ctx.drawImage(
-      img,
-      (-objData.width * objData.scaleX) / 2,
-      (-objData.height * objData.scaleY) / 2,
-      objData.width * objData.scaleX,
-      objData.height * objData.scaleY,
-    );
-    ctx.restore();
-  };
-
-  // Helper function to draw images on the canvas with clipping
-  const drawImageOnCanvasWithClipping = (
-    img: HTMLImageElement,
-    objData: DesignObject,
-    ctx: CanvasRenderingContext2D,
-    limits: { minX: number; maxX: number; minY: number; maxY: number },
-  ) => {
-    ctx.save();
-
-    // Apply clipping path for this object's view
-    ctx.beginPath();
-    ctx.rect(
-      limits.minX,
-      limits.minY,
-      limits.maxX - limits.minX,
-      limits.maxY - limits.minY,
-    );
-    ctx.clip();
-
-    ctx.translate(
-      objData.left + (objData.width * objData.scaleX) / 2,
-      objData.top + (objData.height * objData.scaleY) / 2,
-    );
-    ctx.rotate(((objData.angle || 0) * Math.PI) / 180);
-    ctx.drawImage(
-      img,
-      (-objData.width * objData.scaleX) / 2,
-      (-objData.height * objData.scaleY) / 2,
-      objData.width * objData.scaleX,
-      objData.height * objData.scaleY,
-    );
-    ctx.restore();
-  };
-
   // Save current canvas state
   const saveCurrentDesign = () => {
     if (!fabricCanvasRef.current) return;
@@ -662,7 +442,7 @@ export default function ProductDesigner() {
     });
   };
 
-  // Update the loadSavedDesign function to ensure clip paths are applied correctly
+  // Load saved design
   const loadSavedDesign = () => {
     if (!fabricCanvasRef.current) return;
 
@@ -724,6 +504,89 @@ export default function ProductDesigner() {
     debounceTextureUpdate();
   };
 
+  // Initialize Fabric.js canvas
+  useEffect(() => {
+    if (!canvasRef.current) return;
+
+    // Clean up previous canvas if it exists
+    if (fabricCanvasRef.current) {
+      fabricCanvasRef.current.dispose();
+    }
+
+    // Create new Fabric.js canvas
+    fabricCanvasRef.current = new fabric.Canvas(canvasRef.current, {
+      width: CANVAS_SIZE,
+      height: CANVAS_SIZE,
+      selection: true,
+      preserveObjectStacking: true,
+      interactive: true,
+    });
+
+    // Set up event listeners with debouncing
+    fabricCanvasRef.current.on('object:modified', debounceTextureUpdate);
+    fabricCanvasRef.current.on('object:added', e => {
+      const obj = e.target as fabric.Object;
+      applyClipPathToObject(obj, view);
+
+      // Store the current view with the object
+      obj.set('data', { ...obj.get('data'), view: view });
+
+      // If object is fully outside, remove it
+      if (isObjectFullyOutside(obj, view)) {
+        fabricCanvasRef.current?.remove(obj);
+      }
+
+      debounceTextureUpdate();
+    });
+
+    fabricCanvasRef.current.on('mouse:down', e => {
+      if (!e.target) return;
+
+      const obj = e.target as fabric.Object;
+
+      // If object is fully outside, remove it
+      if (isObjectFullyOutside(obj, view)) {
+        fabricCanvasRef.current?.remove(obj);
+        fabricCanvasRef.current?.renderAll();
+        debounceTextureUpdate();
+      }
+    });
+
+    fabricCanvasRef.current.on('object:scaling', e => {
+      const obj = e.target as fabric.Object;
+
+      // If object is fully outside after scaling, remove it
+      if (isObjectFullyOutside(obj, view)) {
+        fabricCanvasRef.current?.remove(obj);
+      }
+    });
+
+    fabricCanvasRef.current.on('object:removed', debounceTextureUpdate);
+
+    // Load background texture
+    loadBackgroundTexture(currentTexture);
+
+    // Add design zone indicator
+    addDesignZoneIndicator(view);
+
+    // Add keyboard event listener
+    document.addEventListener('keydown', handleKeyDown);
+
+    fabricCanvasRef.current.renderAll();
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      if (fabricCanvasRef.current) {
+        fabricCanvasRef.current.dispose();
+      }
+
+      // Clear any pending updates
+      if (textureUpdateTimeoutRef.current) {
+        clearTimeout(textureUpdateTimeoutRef.current);
+      }
+    };
+  }, [view, currentTexture]);
+
   // Load saved design when view changes
   useEffect(() => {
     loadSavedDesign();
@@ -731,37 +594,16 @@ export default function ProductDesigner() {
     setTimeout(() => debounceTextureUpdate(), 100);
   }, [view]);
 
-  // Add text to canvas
-  const addText = () => {
+  // Update canvas when view changes
+  useEffect(() => {
     if (!fabricCanvasRef.current) return;
 
-    const limits = getDesignZoneLimits(view);
-    const text = new fabric.IText('Edit this text', {
-      left: limits.minX + (limits.maxX - limits.minX) / 2,
-      top: limits.minY + (limits.maxY - limits.minY) / 2,
-      fontFamily: 'Arial',
-      fontSize: 40,
-      fill: '#000000',
-      originX: 'center',
-      originY: 'center',
-      selectable: true,
-      evented: true,
-    });
+    // Update background texture
+    loadBackgroundTexture(currentTexture);
 
-    // Store the current view with the text object
-    text.set('data', { view: view });
-
-    // Apply Clipping Path
-    applyClipPathToObject(text, view);
-
-    fabricCanvasRef.current.add(text);
-    fabricCanvasRef.current.setActiveObject(text);
-    fabricCanvasRef.current.renderAll();
-
-    // Save the design and update 3D model
-    saveCurrentDesign();
-    debounceTextureUpdate();
-  };
+    // Update design zone indicator
+    addDesignZoneIndicator(view);
+  }, [view]);
 
   // Update 3D model when designs change
   useEffect(() => {
@@ -835,6 +677,7 @@ export default function ProductDesigner() {
     e.target.value = '';
   };
 
+  // Handle key press (delete)
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Delete' && fabricCanvasRef.current) {
       const activeObjects = fabricCanvasRef.current.getActiveObjects();
@@ -852,231 +695,82 @@ export default function ProductDesigner() {
     }
   };
 
+  // Add text to canvas
+  const addText = () => {
+    if (!fabricCanvasRef.current) return;
+
+    const limits = getDesignZoneLimits(view);
+    const text = new fabric.IText('Edit this text', {
+      left: limits.minX + (limits.maxX - limits.minX) / 2,
+      top: limits.minY + (limits.maxY - limits.minY) / 2,
+      fontFamily: 'Arial',
+      fontSize: 40,
+      fill: '#000000',
+      originX: 'center',
+      originY: 'center',
+      selectable: true,
+      evented: true,
+    });
+
+    // Store the current view with the text object
+    text.set('data', { view: view });
+
+    // Apply Clipping Path
+    applyClipPathToObject(text, view);
+
+    fabricCanvasRef.current.add(text);
+    fabricCanvasRef.current.setActiveObject(text);
+    fabricCanvasRef.current.renderAll();
+
+    // Save the design and update 3D model
+    saveCurrentDesign();
+    debounceTextureUpdate();
+  };
+
+  const handleColorChange = (texturePath: string) => {
+    // Save current design before changing color
+    saveCurrentDesign();
+    setCurrentTexture(texturePath);
+    setShowColorDialog(false);
+    // Load saved design after changing color
+    setTimeout(() => loadSavedDesign(), 0);
+  };
+
+  const handleViewChange = (newView: string) => {
+    // Save current design before switching view
+    saveCurrentDesign();
+    // Update texture
+    setCurrentTexture(currentTexture);
+    // Update view
+    setView(newView);
+  };
+
   return (
     <div className="flex h-screen flex-col">
-      {/* Header */}
-      <header className="z-50 flex h-14 items-center justify-between border-b px-6">
-        <div className="flex items-center gap-4">
-          <h1 className="text-lg font-semibold">White T-Shirt</h1>
-          <Button variant="link" className="text-blue-500">
-            Change product
-          </Button>
-        </div>
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon">
-            <Undo2 className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <Redo2 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={saveCurrentDesign}
-            title="Save current design"
-          >
-            <Save className="h-4 w-4" />
-          </Button>
-          <Tabs defaultValue="design">
-            <TabsList>
-              <TabsTrigger value="design">Design</TabsTrigger>
-              <TabsTrigger value="mockups">Mockups</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-      </header>
+      <DesignHeader onSave={saveCurrentDesign} />
 
       <div className="flex flex-1">
-        {/* Fixed Sidebar */}
-        <div className="z-50 w-64 border-r">
-          <div className="flex flex-col gap-4 p-4">
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-2"
-              onClick={() => setShowColorDialog(true)}
-            >
-              <TShirt className="h-4 w-4" />
-              <span>T-Shirt</span>
-            </Button>
+        <DesignSidebar
+          showColorDialog={showColorDialog}
+          setShowColorDialog={setShowColorDialog}
+          currentTexture={currentTexture}
+          onColorChange={handleColorChange}
+          onImageUpload={handleImageUpload}
+          onAddText={addText}
+        />
 
-            <Dialog open={showColorDialog} onOpenChange={setShowColorDialog}>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Choose T-Shirt Color</DialogTitle>
-                </DialogHeader>
-                <div className="grid grid-cols-3 gap-4 py-4">
-                  {SHIRT_COLORS.map(colorOption => (
-                    <button
-                      key={colorOption.name}
-                      className={`hover:bg-accent flex flex-col items-center gap-2 rounded-lg border p-3 ${
-                        currentTexture === colorOption.path
-                          ? 'border-primary'
-                          : 'border-border'
-                      }`}
-                      onClick={() => {
-                        // Save current design before changing color
-                        saveCurrentDesign();
-                        setCurrentTexture(colorOption.path);
-                        setShowColorDialog(false);
-                        // Load saved design after changing color
-                        setTimeout(() => loadSavedDesign(), 0);
-                      }}
-                    >
-                      <div
-                        className="h-12 w-12 rounded-full border"
-                        style={{ backgroundColor: colorOption.color }}
-                      />
-                      <span className="text-sm font-medium">
-                        {colorOption.name}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </DialogContent>
-            </Dialog>
-            <div className="relative">
-              <Button
-                variant="ghost"
-                className="justify-start gap-2"
-                onClick={handleUploadClick}
-              >
-                <Upload className="h-4 w-4" />
-                Uploads
-              </Button>
-              <input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-            </div>
-            <Button
-              variant="ghost"
-              className="justify-start gap-2"
-              onClick={addText}
-            >
-              <Type className="h-4 w-4" />
-              Text
-            </Button>
-            <Button variant="ghost" className="justify-start gap-2">
-              <BookMarked className="h-4 w-4" />
-              Saved designs
-            </Button>
-            <Button variant="ghost" className="justify-start gap-2">
-              <Smile className="h-4 w-4" />
-              Clipart
-            </Button>
-            <Button variant="ghost" className="justify-start gap-2">
-              <Wand2 className="h-4 w-4" />
-              Quick Designs
-            </Button>
-            <Button variant="ghost" className="justify-start gap-2">
-              <Shapes className="h-4 w-4" />
-              Shapes
-            </Button>
-          </div>
-        </div>
-
-        {/* Main Content */}
         <div className="flex flex-1 flex-col">
-          {/* View Selector Tabs */}
-          <Tabs
-            value={view}
-            onValueChange={newView => {
-              // Save current design before switching view
-              saveCurrentDesign();
-              // Update texture
-              setCurrentTexture(currentTexture);
-              // Update view
-              setView(newView);
-            }}
-            className="border-b"
-          >
-            <TabsList className="z-50 w-full justify-start rounded-none">
-              <TabsTrigger value="front">Front</TabsTrigger>
-              <TabsTrigger value="back">Back</TabsTrigger>
-              <TabsTrigger value="left-sleeve">Left sleeve</TabsTrigger>
-              <TabsTrigger value="right-sleeve">Right sleeve</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <ViewSelector view={view} onViewChange={handleViewChange} />
 
-          <div className="relative flex h-[32rem] w-[64rem] flex-1 gap-4 pt-4">
-            {/* Canvas Area */}
-            <div className="bg-muted relative z-10 flex h-[32rem] w-[32rem] flex-col items-center justify-center gap-4">
-              <div
-                className={`absolute -z-10 flex flex-col items-center gap-4 ${
-                  view === 'front'
-                    ? '-top-190 -left-10'
-                    : view === 'back'
-                      ? '-top-190 -left-121.5'
-                      : view === 'left-sleeve'
-                        ? '-top-110 -left-110'
-                        : '-top-110 -left-205'
-                } `}
-              >
-                <canvas
-                  ref={canvasRef}
-                  className="p-4"
-                  style={{
-                    width: `${view === 'front' || view === 'back' ? '1280px' : '1600px'}`,
-                    height: `${view === 'front' || view === 'back' ? '1280px' : '1600px'}`,
-                    transform: 'scale(1)',
-                    transformOrigin: 'top left',
-                  }}
-                />
-              </div>
-
-              {(view === 'left-sleeve' || view === 'right-sleeve') && (
-                <div className="bg-muted absolute bottom-0 left-0 h-[11rem] w-[31rem]" />
-              )}
-              {(view === 'left-sleeve' || view === 'right-sleeve') && (
-                <div className="bg-muted absolute top-0 left-0 h-[22rem] w-[4rem]" />
-              )}
-              {(view === 'left-sleeve' || view === 'right-sleeve') && (
-                <div className="bg-muted absolute top-0 right-0 h-[22rem] w-[4rem]" />
-              )}
-
-              {view === 'front' && (
-                <div className="bg-muted absolute bottom-0 left-0 h-[2rem] w-[31rem]" />
-              )}
-
-              <div className="bg-muted absolute top-0 left-0 h-[1rem] w-[31rem]" />
-              <div className="bg-muted absolute bottom-0 left-0 h-[1rem] w-[31rem]" />
-              <div className="bg-muted absolute right-0 bottom-0 h-[32rem] w-[2rem]" />
-              <div className="bg-muted absolute bottom-0 left-0 h-[32rem] w-[2rem]" />
-            </div>
-
-            {/* Background Elements */}
-            <div className="bg-background absolute -top-40 -right-50 z-30 h-[11.1rem] w-[110rem]" />
-            <div className="bg-background absolute top-0 right-256 z-20 h-[63rem] w-[68rem]" />
-            <div className="bg-background absolute top-4 -right-71 z-20 h-[33rem] w-[50rem]" />
-            <div className="bg-background absolute top-132 -left-4 z-20 h-[30rem] w-[70rem]" />
-
-            {/* 3D Model Area */}
-            <div className="relative z-20 h-[32rem] flex-grow">
-              <TshirtModel texture={texture} view={view} color="#FFFFFF" />
-            </div>
-          </div>
+          <DesignCanvas
+            canvasRef={canvasRef as any}
+            view={view}
+            texture={texture}
+          />
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="flex items-center justify-between border-t p-4">
-        <div className="flex items-center gap-4">
-          <div className="h-16 w-16 bg-gray-100">
-            <TShirt className="h-full w-full p-4" />
-          </div>
-          <div>
-            <h3 className="font-semibold">White T-Shirt</h3>
-            <p className="text-sm text-gray-500">$25.00</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-500">1 out of 5 products</span>
-          <Button>Add to cart</Button>
-        </div>
-      </div>
+      <DesignFooter />
     </div>
   );
 }
