@@ -40,7 +40,7 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
   };
 
   return (
-    <div className="z-50 w-64 border-r">
+    <div className="z-40 w-64 border-r">
       <div className="flex flex-col gap-4 p-4">
         <Button
           variant="ghost"
