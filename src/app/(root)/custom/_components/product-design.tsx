@@ -21,7 +21,6 @@ import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import * as fabric from 'fabric';
 import * as THREE from 'three';
-import { FabricImage } from 'fabric';
 
 interface DesignObject {
   type: string;
@@ -37,6 +36,7 @@ interface DesignObject {
   fontSize?: number;
   fill?: string | null;
   fontFamily?: string;
+  view: string;
 }
 
 type SerializedDesign = Record<string, DesignObject[]>;
@@ -68,55 +68,69 @@ export default function ProductDesigner() {
   const [showColorDialog, setShowColorDialog] = useState(false);
   const [designs, setDesigns] = useState<Record<string, DesignObject[]>>({});
 
+  // Add debounce mechanism for texture updates
+  const textureUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingUpdateRef = useRef(false);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
   const textureCache = useRef<Record<string, HTMLImageElement>>({});
+  const tempCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const getCanvasSize = (currentView: string) => {
-    return currentView === 'front' || currentView === 'back' ? 1280 : 1600;
-  };
-
-  const CANVAS_SIZE = getCanvasSize(view);
+  const CANVAS_SIZE = 1280;
 
   const getDesignZoneLimits = (view: string) => {
-    switch (view) {
-      case 'front':
-        return {
-          minX: 160,
-          maxX: 410,
-          minY: 900,
-          maxY: 1180,
-        };
-      case 'back':
-        return {
-          minX: 610,
-          maxX: 880,
-          minY: 870,
-          maxY: 1180,
-        };
-      case 'left-sleeve':
-        return {
-          minX: 820,
-          maxX: 940,
-          minY: 780,
-          maxY: 900,
-        };
-      case 'right-sleeve':
-        return {
-          minX: 1300,
-          maxX: 1420,
-          minY: 780,
-          maxY: 900,
-        };
-      default:
-        return {
-          minX: 500,
-          maxX: 1350,
-          minY: 2900,
-          maxY: 3800,
-        };
-    }
+    const scaleFactor = CANVAS_SIZE / 1280;
+
+    const zones = {
+      front: {
+        minX: 160 * scaleFactor,
+        maxX: 410 * scaleFactor,
+        minY: 900 * scaleFactor,
+        maxY: 1180 * scaleFactor,
+      },
+      back: {
+        minX: 610 * scaleFactor,
+        maxX: 880 * scaleFactor,
+        minY: 870 * scaleFactor,
+        maxY: 1180 * scaleFactor,
+      },
+      'left-sleeve': {
+        minX: 650 * scaleFactor,
+        maxX: 760 * scaleFactor,
+        minY: 620 * scaleFactor,
+        maxY: 720 * scaleFactor,
+      },
+      'right-sleeve': {
+        minX: 1030 * scaleFactor,
+        maxX: 1140 * scaleFactor,
+        minY: 620 * scaleFactor,
+        maxY: 720 * scaleFactor,
+      },
+    };
+
+    return (
+      zones[view as keyof typeof zones] || {
+        minX: 500 * scaleFactor,
+        maxX: 1350 * scaleFactor,
+        minY: 2900 * scaleFactor,
+        maxY: 3800 * scaleFactor,
+      }
+    );
   };
+
+  // Initialize temporary canvas for texture generation
+  useEffect(() => {
+    // Create a temporary canvas for texture generation
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = CANVAS_SIZE;
+    tempCanvas.height = CANVAS_SIZE;
+    tempCanvasRef.current = tempCanvas;
+
+    return () => {
+      tempCanvasRef.current = null;
+    };
+  }, []);
 
   // Initialize Fabric.js canvas
   useEffect(() => {
@@ -136,16 +150,21 @@ export default function ProductDesigner() {
       interactive: true,
     });
 
-    // Set up event listeners
-    fabricCanvasRef.current.on('object:modified', updateTextureOnModel);
+    // Set up event listeners with debouncing
+    fabricCanvasRef.current.on('object:modified', debounceTextureUpdate);
     fabricCanvasRef.current.on('object:added', e => {
       const obj = e.target as fabric.Object;
       applyClipPathToObject(obj, view);
+
+      // Store the current view with the object
+      obj.set('data', { ...obj.get('data'), view: view });
 
       // If object is fully outside, remove it
       if (isObjectFullyOutside(obj, view)) {
         fabricCanvasRef.current?.remove(obj);
       }
+
+      debounceTextureUpdate();
     });
 
     fabricCanvasRef.current.on('mouse:down', e => {
@@ -157,6 +176,7 @@ export default function ProductDesigner() {
       if (isObjectFullyOutside(obj, view)) {
         fabricCanvasRef.current?.remove(obj);
         fabricCanvasRef.current?.renderAll();
+        debounceTextureUpdate();
       }
     });
 
@@ -168,7 +188,8 @@ export default function ProductDesigner() {
         fabricCanvasRef.current?.remove(obj);
       }
     });
-    fabricCanvasRef.current.on('object:removed', updateTextureOnModel);
+
+    fabricCanvasRef.current.on('object:removed', debounceTextureUpdate);
 
     // Load background texture
     loadBackgroundTexture(currentTexture);
@@ -186,13 +207,34 @@ export default function ProductDesigner() {
       if (fabricCanvasRef.current) {
         fabricCanvasRef.current.dispose();
       }
+
+      // Clear any pending updates
+      if (textureUpdateTimeoutRef.current) {
+        clearTimeout(textureUpdateTimeoutRef.current);
+      }
     };
   }, [view, currentTexture]); // Re-initialize when view or texture changes
+
+  // Debounce texture updates to improve performance
+  const debounceTextureUpdate = () => {
+    pendingUpdateRef.current = true;
+
+    if (textureUpdateTimeoutRef.current) {
+      clearTimeout(textureUpdateTimeoutRef.current);
+    }
+
+    textureUpdateTimeoutRef.current = setTimeout(() => {
+      if (pendingUpdateRef.current) {
+        saveCurrentDesign();
+        updateTextureOnModel();
+        pendingUpdateRef.current = false;
+      }
+    }, 300); // 300ms debounce time
+  };
 
   // Update canvas when view changes
   useEffect(() => {
     if (!fabricCanvasRef.current) return;
-    console.log(designs);
 
     // Update background texture
     loadBackgroundTexture(currentTexture);
@@ -223,17 +265,19 @@ export default function ProductDesigner() {
       // Fallback to a plain background if image fails to load
       fabricCanvasRef.current!.backgroundColor = '#f0f0f0';
       fabricCanvasRef.current!.renderAll();
-      updateTextureOnModel();
+      debounceTextureUpdate();
     };
     img.src = texturePath;
   };
 
+  // Apply clip path to object
   const applyClipPathToObject = (obj: fabric.Object, view: string) => {
     if (!fabricCanvasRef.current) return;
 
+    // Get the design zone limits for the CURRENT view only
     const limits = getDesignZoneLimits(view);
 
-    // Create a clip path for the object
+    // Create a clip path for the object based on the CURRENT view's design zone
     const clipPath = new fabric.Rect({
       left: limits.minX,
       top: limits.minY,
@@ -242,6 +286,7 @@ export default function ProductDesigner() {
       absolutePositioned: true, // Ensures it applies correctly
     });
 
+    // Apply the clip path to the object
     obj.set({
       clipPath,
     });
@@ -249,6 +294,7 @@ export default function ProductDesigner() {
     fabricCanvasRef.current.renderAll();
   };
 
+  // Check if an object is fully outside the design zone
   const isObjectFullyOutside = (obj: fabric.Object, view: string) => {
     const limits = getDesignZoneLimits(view);
     const objBounds = obj.getBoundingRect();
@@ -268,14 +314,30 @@ export default function ProductDesigner() {
     // Create a fabric image object
     const fabricImage = new fabric.Image(img);
 
-    // Calculate scale to fit canvas
-    const scaleX = fabricCanvasRef.current.width! / img.width;
-    const scaleY = fabricCanvasRef.current.height! / img.height;
+    // Calculate scale to fit canvas while maintaining aspect ratio
+    const canvasAspect =
+      fabricCanvasRef.current.width! / fabricCanvasRef.current.height!;
+    const imageAspect = img.width / img.height;
+
+    let scaleX, scaleY;
+    if (imageAspect > canvasAspect) {
+      // Image is wider than canvas
+      scaleX = scaleY = fabricCanvasRef.current.width! / img.width;
+    } else {
+      // Image is taller than canvas
+      scaleX = scaleY = fabricCanvasRef.current.height! / img.height;
+    }
+
+    // Center the background image
+    const left = (fabricCanvasRef.current.width! - img.width * scaleX) / 2;
+    const top = (fabricCanvasRef.current.height! - img.height * scaleY) / 2;
 
     // Set properties
     fabricImage.set({
       scaleX: scaleX,
       scaleY: scaleY,
+      left: left,
+      top: top,
       originX: 'left',
       originY: 'top',
       selectable: false,
@@ -285,7 +347,7 @@ export default function ProductDesigner() {
     // Set as background image
     fabricCanvasRef.current.backgroundImage = fabricImage;
     fabricCanvasRef.current.renderAll();
-    updateTextureOnModel();
+    debounceTextureUpdate();
   };
 
   // Add design zone indicator
@@ -323,17 +385,390 @@ export default function ProductDesigner() {
     fabricCanvasRef.current.renderAll();
   };
 
-  // Update texture on 3D model
+  // Update texture on 3D model - optimized version
   const updateTextureOnModel = () => {
+    if (!fabricCanvasRef.current || !tempCanvasRef.current) return;
+
+    const tempCanvas = tempCanvasRef.current;
+    const tempCtx = tempCanvas.getContext('2d');
+
+    if (!tempCtx) return;
+
+    // Clear the canvas
+    tempCtx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+    // First, draw the current background
+    if (fabricCanvasRef.current.backgroundImage) {
+      const bgImage = fabricCanvasRef.current.backgroundImage as fabric.Image;
+      const bgElement = bgImage._element as HTMLImageElement;
+
+      if (bgElement) {
+        const { left = 0, top = 0, scaleX = 1, scaleY = 1 } = bgImage;
+        tempCtx.drawImage(
+          bgElement,
+          0,
+          0,
+          bgElement.width,
+          bgElement.height,
+          left,
+          top,
+          bgElement.width * scaleX,
+          bgElement.height * scaleY,
+        );
+      }
+    }
+
+    // Get all views
+    const allViews = ['front', 'back', 'left-sleeve', 'right-sleeve'];
+
+    // Prepare all images first to avoid async issues
+    const imagePromises: Promise<void>[] = [];
+    const loadedImages: Record<string, HTMLImageElement> = {};
+
+    // First pass: load all images
+    allViews.forEach(viewName => {
+      const viewDesigns = designs[viewName] || [];
+
+      viewDesigns.forEach(objData => {
+        // Make sure src exists and is a string before using it as an index
+        const src = objData.src;
+        if (
+          objData.type === 'image' &&
+          typeof src === 'string' &&
+          !loadedImages[src]
+        ) {
+          const promise = new Promise<void>(resolve => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.src = src; // Now we know src is a string
+
+            if (img.complete) {
+              loadedImages[src] = img; // Now we know src is a string
+              resolve();
+            } else {
+              img.onload = () => {
+                loadedImages[src] = img; // Now we know src is a string
+                resolve();
+              };
+              img.onerror = () => {
+                // Resolve even on error to avoid hanging
+                resolve();
+              };
+            }
+          });
+
+          imagePromises.push(promise);
+        }
+      });
+    });
+
+    // Wait for all images to load, then render everything
+    Promise.all(imagePromises).then(() => {
+      // Second pass: draw all objects with their respective clip paths
+      allViews.forEach(viewName => {
+        const viewDesigns = designs[viewName] || [];
+
+        viewDesigns.forEach(objData => {
+          // Get the design zone limits for this object's view
+          const limits = getDesignZoneLimits(objData.view);
+
+          // Apply clipping path for this view
+          tempCtx.save();
+          tempCtx.beginPath();
+          tempCtx.rect(
+            limits.minX,
+            limits.minY,
+            limits.maxX - limits.minX,
+            limits.maxY - limits.minY,
+          );
+          tempCtx.clip();
+
+          if (objData.type === 'textbox' && objData.text) {
+            // For text objects
+            tempCtx.translate(
+              objData.left + (objData.width * objData.scaleX) / 2,
+              objData.top + (objData.height * objData.scaleY) / 2,
+            );
+            tempCtx.rotate(((objData.angle || 0) * Math.PI) / 180);
+            tempCtx.font = `${objData.fontSize}px ${objData.fontFamily || 'Arial'}`;
+            tempCtx.fillStyle = objData.fill || '#000000';
+            tempCtx.textAlign = 'center';
+            tempCtx.textBaseline = 'middle';
+            tempCtx.fillText(objData.text, 0, 0);
+          } else if (
+            objData.type === 'image' &&
+            typeof objData.src === 'string' &&
+            loadedImages[objData.src]
+          ) {
+            // For image objects - we've explicitly checked objData.src is a string
+            const img = loadedImages[objData.src];
+
+            tempCtx.translate(
+              objData.left + (objData.width * objData.scaleX) / 2,
+              objData.top + (objData.height * objData.scaleY) / 2,
+            );
+            tempCtx.rotate(((objData.angle || 0) * Math.PI) / 180);
+            tempCtx.drawImage(
+              img,
+              (-objData.width * objData.scaleX) / 2,
+              (-objData.height * objData.scaleY) / 2,
+              objData.width * objData.scaleX,
+              objData.height * objData.scaleY,
+            );
+          }
+
+          tempCtx.restore();
+        });
+      });
+
+      // Create a new texture from the combined canvas
+      const newTexture = new THREE.CanvasTexture(tempCanvas);
+      newTexture.flipY = false;
+      newTexture.colorSpace = THREE.SRGBColorSpace;
+
+      // Dispose of previous texture to prevent memory leaks
+      if (texture) {
+        texture.dispose();
+      }
+
+      setTexture(newTexture);
+    });
+  };
+
+  // Check if object data is outside its design zone
+  const isObjectDataOutsideDesignZone = (
+    objData: DesignObject,
+    objView: string,
+  ) => {
+    const limits = getDesignZoneLimits(objView);
+
+    // Calculate object bounds based on its data
+    const objLeft = objData.left;
+    const objTop = objData.top;
+    const objWidth = objData.width * objData.scaleX;
+    const objHeight = objData.height * objData.scaleY;
+    const objRight = objLeft + objWidth;
+    const objBottom = objTop + objHeight;
+
+    // Check if any part of the object is outside the design zone
+    return (
+      objLeft < limits.minX ||
+      objRight > limits.maxX ||
+      objTop < limits.minY ||
+      objBottom > limits.maxY
+    );
+  };
+
+  // Helper function to draw images on the canvas
+  const drawImageOnCanvas = (
+    img: HTMLImageElement,
+    objData: DesignObject,
+    ctx: CanvasRenderingContext2D,
+  ) => {
+    ctx.save();
+    ctx.translate(
+      objData.left + (objData.width * objData.scaleX) / 2,
+      objData.top + (objData.height * objData.scaleY) / 2,
+    );
+    ctx.rotate(((objData.angle || 0) * Math.PI) / 180);
+    ctx.drawImage(
+      img,
+      (-objData.width * objData.scaleX) / 2,
+      (-objData.height * objData.scaleY) / 2,
+      objData.width * objData.scaleX,
+      objData.height * objData.scaleY,
+    );
+    ctx.restore();
+  };
+
+  // Helper function to draw images on the canvas with clipping
+  const drawImageOnCanvasWithClipping = (
+    img: HTMLImageElement,
+    objData: DesignObject,
+    ctx: CanvasRenderingContext2D,
+    limits: { minX: number; maxX: number; minY: number; maxY: number },
+  ) => {
+    ctx.save();
+
+    // Apply clipping path for this object's view
+    ctx.beginPath();
+    ctx.rect(
+      limits.minX,
+      limits.minY,
+      limits.maxX - limits.minX,
+      limits.maxY - limits.minY,
+    );
+    ctx.clip();
+
+    ctx.translate(
+      objData.left + (objData.width * objData.scaleX) / 2,
+      objData.top + (objData.height * objData.scaleY) / 2,
+    );
+    ctx.rotate(((objData.angle || 0) * Math.PI) / 180);
+    ctx.drawImage(
+      img,
+      (-objData.width * objData.scaleX) / 2,
+      (-objData.height * objData.scaleY) / 2,
+      objData.width * objData.scaleX,
+      objData.height * objData.scaleY,
+    );
+    ctx.restore();
+  };
+
+  // Save current canvas state
+  const saveCurrentDesign = () => {
     if (!fabricCanvasRef.current) return;
 
-    const newTexture = new THREE.CanvasTexture(
-      fabricCanvasRef.current.lowerCanvasEl,
-    );
-    newTexture.flipY = false;
-    newTexture.colorSpace = THREE.SRGBColorSpace;
-    setTexture(newTexture);
+    const objects = fabricCanvasRef.current.getObjects().filter(obj => {
+      // Filter out design zone indicator
+      return obj.get('data')?.type !== 'designZone';
+    });
+
+    const serializedObjects = objects.map(obj => {
+      const base: DesignObject = {
+        type: obj.type || '',
+        left: obj.left || 0,
+        top: obj.top || 0,
+        width: obj.width || 0,
+        height: obj.height || 0,
+        scaleX: obj.scaleX || 1,
+        scaleY: obj.scaleY || 1,
+        angle: obj.angle || 0,
+        view: obj.get('data')?.view || view, // Store the view this object belongs to
+      };
+
+      if (obj instanceof fabric.Image) {
+        const imgElement = obj.getElement() as HTMLImageElement;
+        base.src = imgElement.src;
+        base.type = 'image';
+      } else if (obj instanceof fabric.IText) {
+        base.type = 'textbox';
+        base.text = obj.text || '';
+        base.fontSize = obj.fontSize || 40;
+        base.fill = typeof obj.fill === 'string' ? obj.fill : '#000000';
+        base.fontFamily = obj.fontFamily || 'Arial';
+      }
+
+      return base;
+    });
+
+    // Save to state with explicit typing
+    setDesigns(prev => {
+      const newDesigns: SerializedDesign = {
+        ...prev,
+        [view]: serializedObjects,
+      };
+      return newDesigns;
+    });
   };
+
+  // Update the loadSavedDesign function to ensure clip paths are applied correctly
+  const loadSavedDesign = () => {
+    if (!fabricCanvasRef.current) return;
+
+    const savedDesign = designs[view];
+    if (!savedDesign) return;
+
+    // Clear current objects except design zone
+    const objects = fabricCanvasRef.current.getObjects();
+    objects.forEach(obj => {
+      if (obj.get('data')?.type !== 'designZone') {
+        fabricCanvasRef.current?.remove(obj);
+      }
+    });
+
+    // Load saved objects for the CURRENT view only
+    savedDesign.forEach((objData: DesignObject) => {
+      if (objData.type === 'textbox' && objData.text) {
+        const text = new fabric.IText(objData.text, {
+          left: objData.left,
+          top: objData.top,
+          fontSize: objData.fontSize,
+          fill: objData.fill,
+          fontFamily: objData.fontFamily,
+          scaleX: objData.scaleX,
+          scaleY: objData.scaleY,
+          angle: objData.angle,
+        });
+        // Store the view with the object
+        text.set('data', { view: objData.view || view });
+
+        // Apply clip path for the CURRENT view
+        applyClipPathToObject(text, view);
+        fabricCanvasRef.current?.add(text);
+      } else if (objData.type === 'image' && objData.src) {
+        const imgElement = new Image();
+        imgElement.crossOrigin = 'anonymous';
+        imgElement.onload = () => {
+          const fabricImage = new fabric.Image(imgElement);
+          fabricImage.set({
+            left: objData.left,
+            top: objData.top,
+            scaleX: objData.scaleX,
+            scaleY: objData.scaleY,
+            angle: objData.angle,
+          });
+          // Store the view with the object
+          fabricImage.set('data', { view: objData.view || view });
+
+          // Apply clip path for the CURRENT view
+          applyClipPathToObject(fabricImage, view);
+          fabricCanvasRef.current?.add(fabricImage);
+          fabricCanvasRef.current?.renderAll();
+        };
+        imgElement.src = objData.src;
+      }
+    });
+
+    fabricCanvasRef.current.renderAll();
+    debounceTextureUpdate();
+  };
+
+  // Load saved design when view changes
+  useEffect(() => {
+    loadSavedDesign();
+    // Update the 3D model with all designs after loading the current view
+    setTimeout(() => debounceTextureUpdate(), 100);
+  }, [view]);
+
+  // Add text to canvas
+  const addText = () => {
+    if (!fabricCanvasRef.current) return;
+
+    const limits = getDesignZoneLimits(view);
+    const text = new fabric.IText('Edit this text', {
+      left: limits.minX + (limits.maxX - limits.minX) / 2,
+      top: limits.minY + (limits.maxY - limits.minY) / 2,
+      fontFamily: 'Arial',
+      fontSize: 40,
+      fill: '#000000',
+      originX: 'center',
+      originY: 'center',
+      selectable: true,
+      evented: true,
+    });
+
+    // Store the current view with the text object
+    text.set('data', { view: view });
+
+    // Apply Clipping Path
+    applyClipPathToObject(text, view);
+
+    fabricCanvasRef.current.add(text);
+    fabricCanvasRef.current.setActiveObject(text);
+    fabricCanvasRef.current.renderAll();
+
+    // Save the design and update 3D model
+    saveCurrentDesign();
+    debounceTextureUpdate();
+  };
+
+  // Update 3D model when designs change
+  useEffect(() => {
+    if (Object.keys(designs).length > 0) {
+      debounceTextureUpdate();
+    }
+  }, [designs]);
 
   // Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -374,6 +809,9 @@ export default function ProductDesigner() {
             limits.minY + (maxHeight - (fabricImage.height ?? 0) * scale) / 2,
         });
 
+        // Store the current view with the image
+        fabricImage.set('data', { view: view });
+
         // Apply Clipping Path
         applyClipPathToObject(fabricImage, view);
 
@@ -387,8 +825,9 @@ export default function ProductDesigner() {
         fabricCanvasRef.current?.setActiveObject(fabricImage);
         fabricCanvasRef.current?.renderAll();
 
-        // **Immediately Update Texture on 3D Model**
-        updateTextureOnModel();
+        // Save the design and update the 3D model
+        saveCurrentDesign();
+        debounceTextureUpdate();
       };
     };
 
@@ -405,138 +844,12 @@ export default function ProductDesigner() {
         });
         fabricCanvasRef.current.discardActiveObject();
         fabricCanvasRef.current.renderAll();
-        updateTextureOnModel();
+
+        // Save the design and update 3D model
+        saveCurrentDesign();
+        debounceTextureUpdate();
       }
     }
-  };
-
-  // Save current canvas state
-  const saveCurrentDesign = () => {
-    if (!fabricCanvasRef.current) return;
-
-    const objects = fabricCanvasRef.current.getObjects().filter(obj => {
-      // Filter out design zone indicator
-      return obj.get('data')?.type !== 'designZone';
-    });
-
-    const serializedObjects = objects.map(obj => {
-      const base: DesignObject = {
-        type: obj.type || '',
-        left: obj.left || 0,
-        top: obj.top || 0,
-        width: obj.width || 0,
-        height: obj.height || 0,
-        scaleX: obj.scaleX || 1,
-        scaleY: obj.scaleY || 1,
-        angle: obj.angle || 0,
-      };
-
-      if (obj instanceof fabric.Image) {
-        base.src = (obj as FabricImage).getSrc();
-      } else if (obj instanceof fabric.IText) {
-        base.type = 'textbox';
-        base.text = obj.text || '';
-        base.fontSize = obj.fontSize || 40;
-        base.fill = typeof obj.fill === 'string' ? obj.fill : '#000000';
-        base.fontFamily = obj.fontFamily || 'Arial';
-      }
-
-      return base;
-    });
-
-    // Save to state with explicit typing
-    setDesigns(prev => {
-      const newDesigns: SerializedDesign = {
-        ...prev,
-        [view]: serializedObjects,
-      };
-      return newDesigns;
-    });
-  };
-
-  // Load saved design for current view
-  const loadSavedDesign = () => {
-    if (!fabricCanvasRef.current) return;
-
-    const savedDesign = designs[view];
-    if (!savedDesign) return;
-
-    // Clear current objects except design zone
-    const objects = fabricCanvasRef.current.getObjects();
-    objects.forEach(obj => {
-      if (obj.get('data')?.type !== 'designZone') {
-        fabricCanvasRef.current?.remove(obj);
-      }
-    });
-
-    // Load saved objects
-    savedDesign.forEach((objData: DesignObject) => {
-      if (objData.type === 'textbox' && objData.text) {
-        const text = new fabric.IText(objData.text, {
-          left: objData.left,
-          top: objData.top,
-          fontSize: objData.fontSize,
-          fill: objData.fill,
-          fontFamily: objData.fontFamily,
-          scaleX: objData.scaleX,
-          scaleY: objData.scaleY,
-          angle: objData.angle,
-        });
-        applyClipPathToObject(text, view);
-        fabricCanvasRef.current?.add(text);
-      } else if (objData.type === 'image' && objData.src) {
-        const imgElement = new Image();
-        imgElement.crossOrigin = 'anonymous';
-        imgElement.onload = () => {
-          const fabricImage = new fabric.Image(imgElement);
-          fabricImage.set({
-            left: objData.left,
-            top: objData.top,
-            scaleX: objData.scaleX,
-            scaleY: objData.scaleY,
-            angle: objData.angle,
-          });
-          applyClipPathToObject(fabricImage, view);
-          fabricCanvasRef.current?.add(fabricImage);
-          fabricCanvasRef.current?.renderAll();
-        };
-        imgElement.src = objData.src;
-      }
-    });
-
-    fabricCanvasRef.current.renderAll();
-    updateTextureOnModel();
-  };
-
-  // Load saved design when view changes
-  useEffect(() => {
-    loadSavedDesign();
-  }, [view]);
-
-  // Add text to canvas
-  const addText = () => {
-    if (!fabricCanvasRef.current) return;
-
-    const limits = getDesignZoneLimits(view);
-    const text = new fabric.IText('Edit this text', {
-      left: limits.minX + (limits.maxX - limits.minX) / 2,
-      top: limits.minY + (limits.maxY - limits.minY) / 2,
-      fontFamily: 'Arial',
-      fontSize: 40,
-      fill: '#000000',
-      originX: 'center',
-      originY: 'center',
-      selectable: true,
-      evented: true,
-    });
-
-    // Apply Clipping Path
-    applyClipPathToObject(text, view);
-
-    fabricCanvasRef.current.add(text);
-    fabricCanvasRef.current.setActiveObject(text);
-    fabricCanvasRef.current.renderAll();
-    updateTextureOnModel(); // Update 3D model
   };
 
   return (
@@ -698,25 +1011,30 @@ export default function ProductDesigner() {
                     : view === 'back'
                       ? '-top-190 -left-121.5'
                       : view === 'left-sleeve'
-                        ? '-top-150 -left-155'
-                        : '-top-150 -left-275'
+                        ? '-top-110 -left-110'
+                        : '-top-110 -left-205'
                 } `}
               >
                 <canvas
                   ref={canvasRef}
                   className="p-4"
                   style={{
-                    width: `${CANVAS_SIZE}px`,
-                    height: `${CANVAS_SIZE}px`,
+                    width: `${view === 'front' || view === 'back' ? '1280px' : '1600px'}`,
+                    height: `${view === 'front' || view === 'back' ? '1280px' : '1600px'}`,
+                    transform: 'scale(1)',
+                    transformOrigin: 'top left',
                   }}
                 />
               </div>
 
               {(view === 'left-sleeve' || view === 'right-sleeve') && (
-                <div className="bg-muted absolute bottom-0 left-0 h-[9rem] w-[31rem]" />
+                <div className="absolute bottom-0 left-0 h-[11rem] w-[31rem] bg-muted" />
               )}
               {(view === 'left-sleeve' || view === 'right-sleeve') && (
-                <div className="bg-muted absolute top-0 left-0 h-[6rem] w-[31rem]" />
+                <div className="bg-muted absolute top-0 left-0 h-[22rem] w-[4rem]" />
+              )}
+              {(view === 'left-sleeve' || view === 'right-sleeve') && (
+                <div className="bg-muted absolute top-0 right-0 h-[22rem] w-[4rem]" />
               )}
 
               {view === 'front' && (
