@@ -79,7 +79,7 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
             </div>
           </DialogContent>
         </Dialog>
-        
+
         <div className="relative">
           <Button
             variant="ghost"
@@ -97,7 +97,7 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
             className="hidden"
           />
         </div>
-        
+
         <Button
           variant="ghost"
           className="justify-start gap-2"
@@ -106,22 +106,22 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
           <Type className="h-4 w-4" />
           Text
         </Button>
-        
+
         <Button variant="ghost" className="justify-start gap-2">
           <BookMarked className="h-4 w-4" />
           Saved designs
         </Button>
-        
+
         <Button variant="ghost" className="justify-start gap-2">
           <Smile className="h-4 w-4" />
           Clipart
         </Button>
-        
+
         <Button variant="ghost" className="justify-start gap-2">
           <Wand2 className="h-4 w-4" />
           Quick Designs
         </Button>
-        
+
         <Button variant="ghost" className="justify-start gap-2">
           <Shapes className="h-4 w-4" />
           Shapes
