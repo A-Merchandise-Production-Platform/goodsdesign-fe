@@ -700,8 +700,8 @@ export default function ProductDesigner() {
 
     const limits = getDesignZoneLimits(view);
     const text = new fabric.IText('Edit this text', {
-      left: limits.minX + 20,  // Add some padding from the left edge
-      top: limits.minY + 20,   // Add some padding from the top edge
+      left: limits.minX + 20, // Add some padding from the left edge
+      top: limits.minY + 20, // Add some padding from the top edge
       fontFamily: 'Arial',
       fontSize: 40,
       fill: '#000000',
