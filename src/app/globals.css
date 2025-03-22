@@ -72,6 +72,8 @@
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
 
+  --font-jetbrains-mono: 'JetBrains Mono', monospace;
+
   @keyframes accordion-down {
     from {
       height: 0;
@@ -114,7 +116,13 @@
 
 @layer utilities {
   body {
-    font-family: var(--font-outfit), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family:
+      var(--font-outfit),
+      'Inter',
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      sans-serif;
   }
 
   h1,
@@ -149,11 +157,13 @@
   }
 
   .font-alt-1 {
-    font-family: var(--font-space-grotesk), var(--font-outfit), system-ui, sans-serif;
+    font-family:
+      var(--font-space-grotesk), var(--font-outfit), system-ui, sans-serif;
   }
 
   .font-alt-2 {
-    font-family: var(--font-plus-jakarta-sans), var(--font-outfit), system-ui, sans-serif;
+    font-family:
+      var(--font-plus-jakarta-sans), var(--font-outfit), system-ui, sans-serif;
   }
 }
 
@@ -415,6 +425,10 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.rdp-vhidden {
+  @apply hidden;
 }
 
 .rdp-vhidden {
