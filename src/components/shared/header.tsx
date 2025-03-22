@@ -22,7 +22,7 @@ const menuItems: MenuItem[] = [
 export default function Header() {
   const pathname = usePathname();
   return (
-    <section className="bg-background fixed top-0 right-0 left-0 z-50 flex h-16 w-full items-center justify-center border-b py-2 backdrop-blur-md">
+    <section className="fixed top-0 right-0 left-0 z-50 flex h-16 w-full items-center justify-center border-b bg-transparent py-2 backdrop-blur-md">
       <header className="container flex h-full items-center gap-6">
         <div className="flex flex-1 items-center gap-10">
           <h1 className="font-jetbrains-mono text-2xl font-semibold select-none">
