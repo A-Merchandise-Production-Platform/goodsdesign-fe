@@ -224,7 +224,11 @@ export default function ProfilePage() {
                       <FormItem className="flex-1">
                         <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <PhoneInput {...field} defaultCountry="VN" />
+                          <PhoneInput
+                            {...field}
+                            defaultCountry="VN"
+                            placeholder="Enter your phone number"
+                          />
                         </FormControl>
                         {form.formState.errors.phoneNumber ? (
                           <FormMessage />
