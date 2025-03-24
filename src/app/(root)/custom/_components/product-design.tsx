@@ -345,16 +345,15 @@ export default function ProductDesigner() {
 
           if (objData.type === 'textbox' && objData.text) {
             // For text objects
-            tempCtx.translate(
-              objData.left + (objData.width * objData.scaleX) / 2,
-              objData.top + (objData.height * objData.scaleY) / 2,
-            );
+            tempCtx.save();
+            tempCtx.translate(objData.left, objData.top);
             tempCtx.rotate(((objData.angle || 0) * Math.PI) / 180);
             tempCtx.font = `${objData.fontSize}px ${objData.fontFamily || 'Arial'}`;
             tempCtx.fillStyle = objData.fill || '#000000';
-            tempCtx.textAlign = 'center';
-            tempCtx.textBaseline = 'middle';
+            tempCtx.textAlign = 'left';
+            tempCtx.textBaseline = 'top';
             tempCtx.fillText(objData.text, 0, 0);
+            tempCtx.restore();
           } else if (
             objData.type === 'image' &&
             typeof objData.src === 'string' &&
@@ -701,13 +700,13 @@ export default function ProductDesigner() {
 
     const limits = getDesignZoneLimits(view);
     const text = new fabric.IText('Edit this text', {
-      left: limits.minX + (limits.maxX - limits.minX) / 2,
-      top: limits.minY + (limits.maxY - limits.minY) / 2,
+      left: limits.minX + 20, // Add some padding from the left edge
+      top: limits.minY + 20, // Add some padding from the top edge
       fontFamily: 'Arial',
       fontSize: 40,
       fill: '#000000',
-      originX: 'center',
-      originY: 'center',
+      originX: 'left',
+      originY: 'top',
       selectable: true,
       evented: true,
     });

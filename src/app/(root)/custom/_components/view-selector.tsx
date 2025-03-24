@@ -9,7 +9,7 @@ interface ViewSelectorProps {
 const ViewSelector: React.FC<ViewSelectorProps> = ({ view, onViewChange }) => {
   return (
     <Tabs value={view} onValueChange={onViewChange} className="border-b">
-      <TabsList className="z-50 w-full justify-start rounded-none">
+      <TabsList className="z-40 w-full justify-start rounded-none">
         <TabsTrigger value="front">Front</TabsTrigger>
         <TabsTrigger value="back">Back</TabsTrigger>
         <TabsTrigger value="left-sleeve">Left sleeve</TabsTrigger>
