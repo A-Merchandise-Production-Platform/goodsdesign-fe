@@ -759,25 +759,25 @@ export default function ProductDesigner() {
           designs={designs[view] || []}
           onReorderLayers={(startIndex: number, endIndex: number) => {
             if (!fabricCanvasRef.current) return;
-            
+
             // Get current view's designs
             const currentDesigns = [...(designs[view] || [])];
-            
+
             // Move the layer
             const [removed] = currentDesigns.splice(startIndex, 1);
             currentDesigns.splice(endIndex, 0, removed);
-            
+
             // Update state
             setDesigns(prev => ({
               ...prev,
-              [view]: currentDesigns
+              [view]: currentDesigns,
             }));
 
             // Re-render canvas with new order
             const canvas = fabricCanvasRef.current;
-            const objects = canvas.getObjects().filter(obj =>
-              obj.get('data')?.type !== 'designZone'
-            );
+            const objects = canvas
+              .getObjects()
+              .filter(obj => obj.get('data')?.type !== 'designZone');
 
             // Clear canvas except design zone
             objects.forEach(obj => canvas.remove(obj));

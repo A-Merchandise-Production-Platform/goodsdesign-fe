@@ -37,46 +37,44 @@ export function LayerItem({ id, designObject }: LayerItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-2 rounded-md bg-background px-2 py-2 hover:bg-accent/5 ${
+      className={`bg-background hover:bg-accent/5 flex items-center gap-2 rounded-md px-2 py-2 ${
         isDragging ? 'cursor-grabbing' : ''
       }`}
     >
       <button
         {...attributes}
         {...listeners}
-        className="hover:bg-accent rounded p-2 -ml-1"
+        className="hover:bg-accent -ml-1 rounded p-2"
       >
         <GripVertical className="size-4" />
       </button>
 
       {designObject.type === 'textbox' ? (
-        <div className="flex gap-2 flex-1 min-w-0">
-          <div className="flex items-center flex-1 min-w-0">
-            <div className="size-10 flex-shrink-0 rounded-md bg-secondary/10 flex items-center justify-center">
+        <div className="flex min-w-0 flex-1 gap-2">
+          <div className="flex min-w-0 flex-1 items-center">
+            <div className="bg-secondary/10 flex size-10 flex-shrink-0 items-center justify-center rounded-md">
               <Type className="size-4" />
             </div>
-            <span className="text-xs truncate ml-2">
-              {designObject.text}
-            </span>
+            <span className="ml-2 truncate text-xs">{designObject.text}</span>
           </div>
         </div>
       ) : (
-        <div className="flex gap-2 flex-1 min-w-0">
-          <div className="flex items-center flex-1 min-w-0">
+        <div className="flex min-w-0 flex-1 gap-2">
+          <div className="flex min-w-0 flex-1 items-center">
             {imagePreview ? (
-              <div className="size-10 flex-shrink-0 relative rounded-md overflow-hidden">
+              <div className="relative size-10 flex-shrink-0 overflow-hidden rounded-md">
                 <img
                   src={imagePreview}
                   alt="Layer preview"
-                  className="object-contain w-full h-full bg-secondary/10"
+                  className="bg-secondary/10 h-full w-full object-contain"
                 />
               </div>
             ) : (
-              <div className="size-10 flex-shrink-0 rounded-md bg-secondary/10 flex items-center justify-center">
+              <div className="bg-secondary/10 flex size-10 flex-shrink-0 items-center justify-center rounded-md">
                 <ImageIcon className="size-4" />
               </div>
             )}
-            <span className="text-xs truncate ml-2">Image Layer</span>
+            <span className="ml-2 truncate text-xs">Image Layer</span>
           </div>
         </div>
       )}

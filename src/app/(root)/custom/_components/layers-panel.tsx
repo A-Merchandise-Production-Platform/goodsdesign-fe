@@ -32,7 +32,7 @@ export function LayersPanel({ designs, onReorder }: LayersPanelProps) {
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -57,7 +57,7 @@ export function LayersPanel({ designs, onReorder }: LayersPanelProps) {
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="start">
         <div className="space-y-1 p-2">
-          <div className="text-sm font-medium px-2 py-1">Layers</div>
+          <div className="px-2 py-1 text-sm font-medium">Layers</div>
           <div className="space-y-1">
             <DndContext
               sensors={sensors}
