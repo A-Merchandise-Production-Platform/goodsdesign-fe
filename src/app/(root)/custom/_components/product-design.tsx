@@ -756,6 +756,72 @@ export default function ProductDesigner() {
           onColorChange={handleColorChange}
           onImageUpload={handleImageUpload}
           onAddText={addText}
+          designs={designs[view] || []}
+          onReorderLayers={(startIndex: number, endIndex: number) => {
+            if (!fabricCanvasRef.current) return;
+            
+            // Get current view's designs
+            const currentDesigns = [...(designs[view] || [])];
+            
+            // Move the layer
+            const [removed] = currentDesigns.splice(startIndex, 1);
+            currentDesigns.splice(endIndex, 0, removed);
+            
+            // Update state
+            setDesigns(prev => ({
+              ...prev,
+              [view]: currentDesigns
+            }));
+
+            // Re-render canvas with new order
+            const canvas = fabricCanvasRef.current;
+            const objects = canvas.getObjects().filter(obj =>
+              obj.get('data')?.type !== 'designZone'
+            );
+
+            // Clear canvas except design zone
+            objects.forEach(obj => canvas.remove(obj));
+
+            // Add objects in new order
+            currentDesigns.forEach(design => {
+              if (design.type === 'textbox' && design.text) {
+                const text = new fabric.IText(design.text, {
+                  left: design.left,
+                  top: design.top,
+                  fontSize: design.fontSize,
+                  fill: design.fill,
+                  fontFamily: design.fontFamily,
+                  scaleX: design.scaleX,
+                  scaleY: design.scaleY,
+                  angle: design.angle,
+                });
+                text.set('data', { view: design.view });
+                applyClipPathToObject(text, view);
+                canvas.add(text);
+              } else if (design.type === 'image' && design.src) {
+                const imgElement = new Image();
+                imgElement.crossOrigin = 'anonymous';
+                imgElement.onload = () => {
+                  const fabricImage = new fabric.Image(imgElement);
+                  fabricImage.set({
+                    left: design.left,
+                    top: design.top,
+                    scaleX: design.scaleX,
+                    scaleY: design.scaleY,
+                    angle: design.angle,
+                  });
+                  fabricImage.set('data', { view: design.view });
+                  applyClipPathToObject(fabricImage, view);
+                  canvas.add(fabricImage);
+                  canvas.renderAll();
+                };
+                imgElement.src = design.src;
+              }
+            });
+
+            canvas.renderAll();
+            debounceTextureUpdate();
+          }}
         />
 
         <div className="flex flex-1 flex-col">
