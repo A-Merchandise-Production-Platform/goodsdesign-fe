@@ -22,7 +22,6 @@ export default function Page() {
           <RegisterForm />
         </CardContent>
         <CardFooter className="flex flex-col items-start text-sm">
-          <Separator className="my-4" />
           <div className="flex items-center">
             <span className="text-muted-foreground mr-2 text-sm">
               Already have an account?{' '}

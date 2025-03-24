@@ -1,0 +1,95 @@
+mutation Login($loginInput: LoginDto!) {
+  login(loginInput: $loginInput) {
+    accessToken
+    refreshToken
+    user {
+      createdAt
+      dateOfBirth
+      email
+      gender
+      id
+      imageUrl
+      isActive
+      name
+      phoneNumber
+      role
+      updatedAt
+      factory {
+        name
+        factoryStatus
+      }
+    }
+  }
+}
+
+mutation Register($registerInput: RegisterDto!) {
+  register(registerInput: $registerInput) {
+    accessToken
+    refreshToken
+    user {
+      createdAt
+      dateOfBirth
+      email
+      gender
+      id
+      imageUrl
+      isActive
+      name
+      phoneNumber
+      role
+      updatedAt
+      factory {
+        name
+        factoryStatus
+      }
+    }
+  }
+}
+
+mutation RefreshToken($refreshTokenInput: RefreshTokenDto!) {
+  refreshToken(refreshTokenInput: $refreshTokenInput) {
+    accessToken
+    refreshToken
+    user {
+      createdAt
+      dateOfBirth
+      email
+      gender
+      id
+      imageUrl
+      isActive
+      name
+      phoneNumber
+      role
+      updatedAt
+      factory {
+        name
+        factoryStatus
+      }
+    }
+  }
+}
+
+mutation Logout {
+  logout
+}
+
+query GetMe {
+  getMe {
+    createdAt
+    dateOfBirth
+    email
+    gender
+    id
+    imageUrl
+    isActive
+    name
+    phoneNumber
+    role
+    updatedAt
+    factory {
+      name
+      factoryStatus
+    }
+  }
+}

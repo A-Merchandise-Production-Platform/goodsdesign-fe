@@ -10,9 +10,7 @@ import {
   useTexture,
 } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import { Suspense, useEffect, useState } from 'react';
-
-import { Shirt } from './shirt';
+import { useEffect, useState } from 'react';
 
 interface ModelViewerProps {
   modelUrl: string;

@@ -1,25 +1,93 @@
 import './globals.css';
 
 import type { Metadata } from 'next';
+import {
+  Outfit,
+  JetBrains_Mono,
+  Space_Grotesk,
+  Plus_Jakarta_Sans,
+} from 'next/font/google';
 import localFont from 'next/font/local';
 
 import { Toaster } from '@/components/ui/sonner';
 import AuthProvider from '@/providers/auth-provider';
-import QueryClientProvider from '@/providers/query-client-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import Header from '@/components/shared/header';
 import Footer from '@/components/shared/footer';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import ApolloClientProvider from '@/providers/apollo-client-provider';
 
-const geistSans = localFont({
-  src: './fonts/GeistVF.woff',
-  variable: '--font-geist-sans',
-  weight: '100 900',
+// Primary font - Outfit
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-outfit',
+  display: 'swap',
 });
-const geistMono = localFont({
-  src: './fonts/GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  weight: '100 900',
+
+// Headings font - Onest
+const onest = localFont({
+  src: [
+    {
+      path: '../fonts/Onest-Regular.ttf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Onest-Medium.ttf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/Onest-Bold.ttf',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-onest',
+  display: 'swap',
+});
+
+// Special elements font - Satoshi
+const satoshi = localFont({
+  src: [
+    {
+      path: '../../public/fonts/satoshi/Satoshi-Regular.otf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/satoshi/Satoshi-Medium.otf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/satoshi/Satoshi-Bold.otf',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-satoshi',
+  display: 'swap',
+});
+
+// Code blocks font - JetBrains Mono
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains-mono',
+  display: 'swap',
+});
+
+// Alternative fonts
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-space-grotesk',
+  display: 'swap',
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-plus-jakarta-sans',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -35,15 +103,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-background-secondary antialiased`}
+        className={`${outfit.variable} ${onest.variable} ${satoshi.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable} ${plusJakartaSans.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <QueryClientProvider>
+        <ApolloClientProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
             <AuthProvider>
               <ScrollArea className="h-screen">
                 <main className="container mx-auto pt-16">
@@ -53,9 +121,10 @@ export default function RootLayout({
                 </main>
               </ScrollArea>
             </AuthProvider>
-          </QueryClientProvider>
-          <Toaster richColors />
-        </ThemeProvider>
+
+            <Toaster richColors position="bottom-right" />
+          </ThemeProvider>
+        </ApolloClientProvider>
       </body>
     </html>
   );
