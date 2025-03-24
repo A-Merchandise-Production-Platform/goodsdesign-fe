@@ -1,11 +1,13 @@
 import React from 'react';
+import { DesignObject } from '@/types/design-object';
+import { LayersPanel } from './layers-panel';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ShirtIcon as TShirt, Type, Upload, Layers } from 'lucide-react';
+import { ShirtIcon as TShirt, Type, Upload } from 'lucide-react';
 import { SHIRT_COLORS } from './shirt-colors';
 
 interface DesignSidebarProps {
@@ -15,6 +17,8 @@ interface DesignSidebarProps {
   onColorChange: (texturePath: string) => void;
   onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAddText: () => void;
+  designs: DesignObject[];
+  onReorderLayers: (startIndex: number, endIndex: number) => void;
 }
 
 const DesignSidebar: React.FC<DesignSidebarProps> = ({
@@ -24,6 +28,8 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
   onColorChange,
   onImageUpload,
   onAddText,
+  designs,
+  onReorderLayers,
 }) => {
   const handleUploadClick = () => {
     const input = document.querySelector('#image-upload') as HTMLInputElement;
@@ -101,12 +107,7 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
           </div>
         </button>
 
-        <button className="text-muted-foreground hover:bg-primary/5 dark:hover:bg-muted block w-full cursor-pointer rounded-md px-3 py-2 text-sm">
-          <div className="flex w-full items-center gap-2">
-            <Layers className="size-4" />
-            <div>Layers</div>
-          </div>
-        </button>
+        <LayersPanel designs={designs} onReorder={onReorderLayers} />
       </div>
     </div>
   );

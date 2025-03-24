@@ -3,5 +3,9 @@
 import ProductDesigner from './_components/product-design';
 
 export default function Page() {
-  return <div><ProductDesigner /></div>;
+  return (
+    <div>
+      <ProductDesigner />
+    </div>
+  );
 }
