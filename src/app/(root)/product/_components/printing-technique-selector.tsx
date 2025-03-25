@@ -10,7 +10,9 @@ export interface PrintingTechniqueSelectorProps {
   }>;
 }
 
-export function PrintingTechniqueSelector({ techniques }: PrintingTechniqueSelectorProps) {
+export function PrintingTechniqueSelector({
+  techniques,
+}: PrintingTechniqueSelectorProps) {
   return (
     <div>
       <h3 className="mb-3 text-lg font-medium">Printing Technique</h3>

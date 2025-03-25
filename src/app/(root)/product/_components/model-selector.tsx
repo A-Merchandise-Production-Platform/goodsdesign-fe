@@ -7,11 +7,18 @@ export interface ModelSelectorProps {
   defaultValue?: string;
 }
 
-export function ModelSelector({ sizes, title = 'Size', defaultValue }: ModelSelectorProps) {
+export function ModelSelector({
+  sizes,
+  title = 'Size',
+  defaultValue,
+}: ModelSelectorProps) {
   return (
     <div>
       <h3 className="mb-3 text-lg font-medium">{title}</h3>
-      <RadioGroup defaultValue={defaultValue || sizes[0]} className="flex flex-wrap gap-2">
+      <RadioGroup
+        defaultValue={defaultValue || sizes[0]}
+        className="flex flex-wrap gap-2"
+      >
         {sizes.map(size => (
           <div key={size} className="flex items-center space-x-2">
             <RadioGroupItem

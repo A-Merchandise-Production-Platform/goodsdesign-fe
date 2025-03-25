@@ -2,9 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft, Paintbrush } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import {
-  ProductImageGallery,
-} from '../_components/product-image-gallery';
+import { ProductImageGallery } from '../_components/product-image-gallery';
 import { VolumeDiscount } from '../_components/volume-discount';
 import { ColorSelector } from '../_components/color-selector';
 import { PrintingTechniqueSelector } from '../_components/printing-technique-selector';

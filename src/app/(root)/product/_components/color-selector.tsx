@@ -12,7 +12,10 @@ export function ColorSelector({ colors }: ColorSelectorProps) {
   return (
     <div>
       <h3 className="mb-3 text-lg font-medium">Color</h3>
-      <RadioGroup defaultValue={colors[0].name} className="flex flex-wrap gap-3">
+      <RadioGroup
+        defaultValue={colors[0].name}
+        className="flex flex-wrap gap-3"
+      >
         {colors.map(color => (
           <div key={color.name} className="flex items-center space-x-2">
             <RadioGroupItem

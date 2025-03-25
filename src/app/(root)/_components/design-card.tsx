@@ -12,7 +12,13 @@ interface DesignCardProps {
   category: DesignCategory;
 }
 
-export function DesignCard({ name, price, image, description, category }: DesignCardProps) {
+export function DesignCard({
+  name,
+  price,
+  image,
+  description,
+  category,
+}: DesignCardProps) {
   const categoryStyles: Record<DesignCategory, string> = {
     'T-shirt': 'bg-blue-100 text-blue-800',
     'Phone Case': 'bg-purple-100 text-purple-800',

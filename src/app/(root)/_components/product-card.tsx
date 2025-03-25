@@ -10,8 +10,13 @@ interface ProductCardProps {
   description: string;
 }
 
-
-export function ProductCard({ route, name, price, image, description }: ProductCardProps) {
+export function ProductCard({
+  route,
+  name,
+  price,
+  image,
+  description,
+}: ProductCardProps) {
   return (
     <Link
       href={route}
