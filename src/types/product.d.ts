@@ -5,8 +5,7 @@ export interface Product {
   name: string;
   description: string;
   categoryId: string;
-  imageUrl: string;
-  model3DUrl: string;
+  imageUrl: string[];
   category: Category;
   isDeleted: boolean;
 }
