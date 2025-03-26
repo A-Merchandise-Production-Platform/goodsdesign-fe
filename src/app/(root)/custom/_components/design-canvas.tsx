@@ -28,16 +28,7 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
                   : '-top-110 -left-205'
           }`}
         >
-          <canvas
-            ref={canvasRef}
-            className="p-4"
-            style={{
-              width: `${view === 'front' || view === 'back' ? '1280px' : '1600px'}`,
-              height: `${view === 'front' || view === 'back' ? '1280px' : '1600px'}`,
-              transform: 'scale(1)',
-              transformOrigin: 'top left',
-            }}
-          />
+          <canvas ref={canvasRef} className="p-4" />
         </div>
 
         {/* Mask elements for different views */}
