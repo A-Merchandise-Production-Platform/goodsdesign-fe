@@ -1,5 +1,6 @@
 'use client';
-import React, { useEffect, useRef, useState } from 'react';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import * as fabric from 'fabric';
 import DesignHeader from './design-header';
@@ -10,8 +11,8 @@ import ViewSelector from './view-selector';
 import { SHIRT_COLORS } from './shirt-colors';
 
 // Types
-import { SerializedDesign } from '@/types/shirt';
-import { DesignObject } from '@/types/design-object';
+import type { SerializedDesign } from '@/types/shirt';
+import type { DesignObject } from '@/types/design-object';
 
 export default function ProductDesigner() {
   const [view, setView] = useState('front');
@@ -345,13 +346,21 @@ export default function ProductDesigner() {
 
           if (objData.type === 'textbox' && objData.text) {
             // For text objects
+            // Calculate the center point of the text
+            const centerX = objData.left;
+            const centerY = objData.top;
+
             tempCtx.save();
-            tempCtx.translate(objData.left, objData.top);
+            // Move to the position where the text should be drawn
+            tempCtx.translate(centerX, centerY);
+            // Apply rotation
             tempCtx.rotate(((objData.angle || 0) * Math.PI) / 180);
+            // Set text properties
             tempCtx.font = `${objData.fontSize}px ${objData.fontFamily || 'Arial'}`;
             tempCtx.fillStyle = objData.fill || '#000000';
             tempCtx.textAlign = 'left';
             tempCtx.textBaseline = 'top';
+            // Draw text at origin (0,0) since we've already translated
             tempCtx.fillText(objData.text, 0, 0);
             tempCtx.restore();
           } else if (
@@ -359,21 +368,23 @@ export default function ProductDesigner() {
             typeof objData.src === 'string' &&
             loadedImages[objData.src]
           ) {
-            // For image objects - we've explicitly checked objData.src is a string
+            // For image objects
             const img = loadedImages[objData.src];
 
-            tempCtx.translate(
-              objData.left + (objData.width * objData.scaleX) / 2,
-              objData.top + (objData.height * objData.scaleY) / 2,
-            );
+            // Calculate the center point of the image
+            const centerX = objData.left;
+            const centerY = objData.top;
+            const width = objData.width * objData.scaleX;
+            const height = objData.height * objData.scaleY;
+
+            tempCtx.save();
+            // Move to the position where the image should be drawn
+            tempCtx.translate(centerX, centerY);
+            // Apply rotation around this point
             tempCtx.rotate(((objData.angle || 0) * Math.PI) / 180);
-            tempCtx.drawImage(
-              img,
-              (-objData.width * objData.scaleX) / 2,
-              (-objData.height * objData.scaleY) / 2,
-              objData.width * objData.scaleX,
-              objData.height * objData.scaleY,
-            );
+            // Draw the image with its top-left corner at the origin (0,0)
+            tempCtx.drawImage(img, 0, 0, width, height);
+            tempCtx.restore();
           }
 
           tempCtx.restore();
