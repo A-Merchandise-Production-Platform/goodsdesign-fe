@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, useGLTF } from '@react-three/drei';
+import { Environment, OrbitControls, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Props interface for the Model component
@@ -121,7 +121,7 @@ export default function TshirtModel({
         <Model texture={texture} view={view} color={color} />
       </Suspense>
       <ambientLight intensity={0.5} />
-      <directionalLight position={[2, 5, 2]} intensity={1} />
+      <Environment preset="sunset" />
       <OrbitControls
         enableZoom={true}
         enablePan={false}
