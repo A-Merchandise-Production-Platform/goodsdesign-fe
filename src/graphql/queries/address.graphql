@@ -1,0 +1,21 @@
+query GetAllAddresses {
+  addresses {
+    districtID
+    id
+    provinceID
+    street
+    wardCode
+  }
+}
+
+mutation CreateAddress($createAddressInput: CreateAddressInput!) {
+  createAddress(createAddressInput: $createAddressInput) {
+    districtID
+    id
+    provinceID
+    street
+    wardCode
+    userId
+    factoryId
+  }
+}
