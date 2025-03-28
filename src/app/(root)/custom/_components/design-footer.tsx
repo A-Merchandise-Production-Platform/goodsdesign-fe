@@ -4,7 +4,7 @@ import { ShirtIcon as TShirt } from 'lucide-react';
 
 const DesignFooter: React.FC = () => {
   return (
-    <div className="fixed bottom-0 z-50 container flex w-[100vw] items-center justify-between border-t p-4">
+    <div className="fixed bottom-0 z-50 container flex w-[100vw] items-center justify-between bg-transparent p-4 backdrop-blur-md">
       <div className="flex items-center gap-4">
         <div className="h-16 w-16 bg-gray-100">
           <TShirt className="h-full w-full p-4" />

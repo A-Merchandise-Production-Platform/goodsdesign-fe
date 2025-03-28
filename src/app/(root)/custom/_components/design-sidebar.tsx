@@ -1,20 +1,13 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { DesignObject } from '@/types/design-object';
+import { LayersPanel } from './layers-panel';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  BookMarked,
-  ShirtIcon as TShirt,
-  Smile,
-  Type,
-  Upload,
-  Wand2,
-  Shapes,
-} from 'lucide-react';
+import { ShirtIcon as TShirt, Type, Upload } from 'lucide-react';
 import { SHIRT_COLORS } from './shirt-colors';
 
 interface DesignSidebarProps {
@@ -24,6 +17,8 @@ interface DesignSidebarProps {
   onColorChange: (texturePath: string) => void;
   onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAddText: () => void;
+  designs: DesignObject[];
+  onReorderLayers: (startIndex: number, endIndex: number) => void;
 }
 
 const DesignSidebar: React.FC<DesignSidebarProps> = ({
@@ -33,6 +28,8 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
   onColorChange,
   onImageUpload,
   onAddText,
+  designs,
+  onReorderLayers,
 }) => {
   const handleUploadClick = () => {
     const input = document.querySelector('#image-upload') as HTMLInputElement;
@@ -40,16 +37,17 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
   };
 
   return (
-    <div className="z-40 w-64 border-r">
-      <div className="flex flex-col gap-4 p-4">
-        <Button
-          variant="ghost"
-          className="w-full justify-start gap-2"
+    <div className="z-40 w-[200px] p-4">
+      <div className="bg-background space-y-1 rounded-xl">
+        <button
           onClick={() => setShowColorDialog(true)}
+          className="text-muted-foreground hover:bg-primary/5 dark:hover:bg-muted block w-full cursor-pointer rounded-md px-3 py-2 text-sm"
         >
-          <TShirt className="h-4 w-4" />
-          <span>T-Shirt</span>
-        </Button>
+          <div className="flex w-full items-center gap-2">
+            <TShirt className="size-4" />
+            <div>Product</div>
+          </div>
+        </button>
 
         <Dialog open={showColorDialog} onOpenChange={setShowColorDialog}>
           <DialogContent>
@@ -80,15 +78,16 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
           </DialogContent>
         </Dialog>
 
-        <div className="relative">
-          <Button
-            variant="ghost"
-            className="justify-start gap-2"
+        <div className="relative w-full">
+          <button
             onClick={handleUploadClick}
+            className="text-muted-foreground hover:bg-primary/5 dark:hover:bg-muted block w-full cursor-pointer rounded-md px-3 py-2 text-sm"
           >
-            <Upload className="h-4 w-4" />
-            Uploads
-          </Button>
+            <div className="flex w-full items-center gap-2">
+              <Upload className="size-4" />
+              <div>Uploads</div>
+            </div>
+          </button>
           <input
             id="image-upload"
             type="file"
@@ -98,34 +97,17 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
           />
         </div>
 
-        <Button
-          variant="ghost"
-          className="justify-start gap-2"
+        <button
           onClick={onAddText}
+          className="text-muted-foreground hover:bg-primary/5 dark:hover:bg-muted block w-full cursor-pointer rounded-md px-3 py-2 text-sm"
         >
-          <Type className="h-4 w-4" />
-          Text
-        </Button>
+          <div className="flex w-full items-center gap-2">
+            <Type className="size-4" />
+            <div>Text</div>
+          </div>
+        </button>
 
-        <Button variant="ghost" className="justify-start gap-2">
-          <BookMarked className="h-4 w-4" />
-          Saved designs
-        </Button>
-
-        <Button variant="ghost" className="justify-start gap-2">
-          <Smile className="h-4 w-4" />
-          Clipart
-        </Button>
-
-        <Button variant="ghost" className="justify-start gap-2">
-          <Wand2 className="h-4 w-4" />
-          Quick Designs
-        </Button>
-
-        <Button variant="ghost" className="justify-start gap-2">
-          <Shapes className="h-4 w-4" />
-          Shapes
-        </Button>
+        <LayersPanel designs={designs} onReorder={onReorderLayers} />
       </div>
     </div>
   );

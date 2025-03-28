@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 
 import AuthenMenu from '@/components/shared/authen-menu';
 import { cn } from '@/lib/utils';
-
 type MenuItem = {
   title: string;
   href: Route;
@@ -21,6 +20,7 @@ const menuItems: MenuItem[] = [
 
 export default function Header() {
   const pathname = usePathname();
+
   return (
     <section className="fixed top-0 right-0 left-0 z-50 flex h-16 w-full items-center justify-center border-b bg-transparent py-2 backdrop-blur-md">
       <header className="container flex h-full items-center gap-6">

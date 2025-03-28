@@ -2,7 +2,7 @@ import ProfileUpdateForm from '@/app/(root)/profile/_component/profile-update-fo
 
 export default function Page() {
   return (
-    <div>
+    <div className="space-y-4">
       <ProfileUpdateForm />
     </div>
   );

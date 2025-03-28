@@ -1,0 +1,45 @@
+query GetAllProvinces {
+  provinces {
+    provinceId
+    provinceName
+  }
+}
+
+query GetProvinceById($provinceId: Int!) {
+  province(provinceId: $provinceId) {
+    provinceId
+    provinceName
+  }
+}
+
+query GetAllDistrictsByProvinceId($provinceId: Int!) {
+  districts(provinceId: $provinceId) {
+    districtId
+    districtName
+    provinceId
+  }
+}
+
+query GetDistrictById($districtId: Int!) {
+  district(districtId: $districtId) {
+    districtId
+    districtName
+    provinceId
+  }
+}
+
+query GetAllWardsByDistrictId($districtId: Int!) {
+  wards(districtId: $districtId) {
+    wardCode
+    wardName
+    districtId
+  }
+}
+
+query GetWardByWardCode($wardCode: String!) {
+  ward(wardCode: $wardCode) {
+    districtId
+    wardCode
+    wardName
+  }
+}

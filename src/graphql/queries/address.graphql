@@ -1,0 +1,44 @@
+query Addresses {
+  addresses {
+    id
+    districtID
+    provinceID
+    street
+    wardCode
+  }
+}
+mutation CreateAddress($createAddressInput: CreateAddressInput!) {
+  createAddress(createAddressInput: $createAddressInput) {
+    districtID
+    provinceID
+    street
+    wardCode
+  }
+}
+
+mutation DeleteAddress($deleteAddressId: String!) {
+  deleteAddress(id: $deleteAddressId) {
+    id
+  }
+}
+
+query GetAddressDetails(
+  $provinceId: Int!
+  $districtId: Int!
+  $wardCode: String!
+) {
+  province(provinceId: $provinceId) {
+    provinceId
+    provinceName
+  }
+  district(districtId: $districtId) {
+    districtId
+    districtName
+    provinceId
+  }
+  ward(wardCode: $wardCode) {
+    districtId
+    wardCode
+    wardName
+  }
+}

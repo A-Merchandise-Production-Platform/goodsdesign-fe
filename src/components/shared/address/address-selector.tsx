@@ -1,171 +1,458 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
 import * as React from 'react';
-
-import { ShippingApi } from '@/api/shipping';
-import type { District, Province, Ward } from '@/api/types/shipping';
-import { Input } from '@/components/ui/input';
+import { Check, ChevronsUpDown } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
 
-import { Combobox } from './combobox';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  useGetAllDistrictsByProvinceIdLazyQuery,
+  useGetAllProvincesQuery,
+  useGetAllWardsByDistrictIdLazyQuery,
+} from '@/graphql/generated/graphql';
 import { Textarea } from '@/components/ui/textarea';
 
-export type AddressValue = {
-  provinceId: number;
-  districtId: number;
-  wardId: number;
-  street: string;
+const normalizeVietnamese = (text: string): string => {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
 };
+
+const filterItems = <T extends Record<string, any>>(
+  items: T[],
+  searchTerm: string,
+  nameKey: keyof T,
+) => {
+  const sortedItems = [...items].sort((a, b) =>
+    String(a[nameKey]).localeCompare(String(b[nameKey]), 'vi'),
+  );
+
+  if (!searchTerm) return sortedItems;
+
+  const normalizedSearch = normalizeVietnamese(searchTerm);
+  return sortedItems.filter(item =>
+    normalizeVietnamese(String(item[nameKey])).includes(normalizedSearch),
+  );
+};
+
+interface BaseSelectorProps<T extends Record<string, any>> {
+  items: T[];
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  nameKey: keyof T;
+  idKey: keyof T;
+  placeholder: string;
+  disabled?: boolean;
+  loading?: boolean;
+}
+
+interface NumberSelectorProps<T extends Record<string, any>>
+  extends BaseSelectorProps<T> {
+  selectedId: number | null;
+  onSelect: (id: number | null) => void;
+}
+
+interface StringSelectorProps<T extends Record<string, any>>
+  extends BaseSelectorProps<T> {
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
+}
+
+function NumberSelector<T extends Record<string, any>>({
+  items,
+  selectedId,
+  onSelect,
+  searchTerm,
+  onSearchChange,
+  nameKey,
+  idKey,
+  placeholder,
+  disabled,
+  loading,
+}: NumberSelectorProps<T>) {
+  const [open, setOpen] = React.useState(false);
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  const filteredItems = React.useMemo(() => {
+    return filterItems(items, debouncedSearchTerm, nameKey);
+  }, [items, debouncedSearchTerm, nameKey]);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="justify-between"
+          disabled={disabled || loading}
+        >
+          {selectedId
+            ? String(
+                items.find(item => Number(item[idKey]) === selectedId)?.[
+                  nameKey
+                ],
+              )
+            : placeholder}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-0" align="start">
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder={`Search ${placeholder.toLowerCase()}...`}
+            value={searchTerm}
+            onValueChange={onSearchChange}
+          />
+          <CommandList>
+            <CommandEmpty>No {placeholder.toLowerCase()} found.</CommandEmpty>
+            <CommandGroup>
+              {filteredItems.map(item => (
+                <CommandItem
+                  key={String(item[idKey])}
+                  value={String(item[idKey])}
+                  onSelect={currentValue => {
+                    onSelect(
+                      Number(currentValue) === selectedId
+                        ? null
+                        : Number(currentValue),
+                    );
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      'mr-2 h-4 w-4',
+                      selectedId === Number(item[idKey])
+                        ? 'opacity-100'
+                        : 'opacity-0',
+                    )}
+                  />
+                  {String(item[nameKey])}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function StringSelector<T extends Record<string, any>>({
+  items,
+  selectedId,
+  onSelect,
+  searchTerm,
+  onSearchChange,
+  nameKey,
+  idKey,
+  placeholder,
+  disabled,
+  loading,
+}: StringSelectorProps<T>) {
+  const [open, setOpen] = React.useState(false);
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  const filteredItems = React.useMemo(() => {
+    return filterItems(items, debouncedSearchTerm, nameKey);
+  }, [items, debouncedSearchTerm, nameKey]);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="justify-between"
+          disabled={disabled || loading}
+        >
+          {selectedId
+            ? String(
+                items.find(item => String(item[idKey]) === selectedId)?.[
+                  nameKey
+                ],
+              )
+            : placeholder}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-0" align="start">
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder={`Search ${placeholder.toLowerCase()}...`}
+            value={searchTerm}
+            onValueChange={onSearchChange}
+          />
+          <CommandList>
+            <CommandEmpty>No {placeholder.toLowerCase()} found.</CommandEmpty>
+            <CommandGroup>
+              {filteredItems.map(item => (
+                <CommandItem
+                  key={String(item[idKey])}
+                  value={String(item[idKey])}
+                  onSelect={currentValue => {
+                    onSelect(currentValue === selectedId ? null : currentValue);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      'mr-2 h-4 w-4',
+                      selectedId === String(item[idKey])
+                        ? 'opacity-100'
+                        : 'opacity-0',
+                    )}
+                  />
+                  {String(item[nameKey])}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+export interface AddressValue {
+  provinceId: number | null;
+  districtId: number | null;
+  wardCode: string | null;
+  street: string;
+}
 
 interface AddressSelectorProps {
   value?: AddressValue;
-  onChange: (value: AddressValue) => void;
+  defaultValue?: AddressValue;
+  onChange?: (value: AddressValue) => void;
   disabled?: boolean;
 }
 
 export function AddressSelector({
   value,
+  defaultValue,
   onChange,
   disabled = false,
 }: AddressSelectorProps) {
-  const [selectedProvince, setSelectedProvince] = React.useState<
-    string | undefined
-  >(value?.provinceId ? value.provinceId.toString() : undefined);
-  const [selectedDistrict, setSelectedDistrict] = React.useState<
-    string | undefined
-  >(value?.districtId ? value.districtId.toString() : undefined);
-  const [selectedWard, setSelectedWard] = React.useState<string | undefined>(
-    value?.wardId ? value.wardId.toString() : undefined,
+  // Fix: Properly check if the component is controlled
+  const isControlled = value !== undefined;
+
+  // Initialize state with either controlled value, default value, or empty state
+  const [internalValue, setInternalValue] = React.useState<AddressValue>(
+    isControlled
+      ? value!
+      : defaultValue || {
+          provinceId: null,
+          districtId: null,
+          wardCode: null,
+          street: '',
+        },
   );
-  const [street, setStreet] = React.useState<string | undefined>(
-    value?.street || undefined,
+
+  // Province
+  const [selectedProvinceId, setSelectedProvinceId] = React.useState<
+    number | null
+  >(isControlled ? value!.provinceId : internalValue.provinceId);
+  const [searchTerm, setSearchTerm] = React.useState('');
+
+  const { data, loading } = useGetAllProvincesQuery();
+
+  // District
+  const [selectedDistrictId, setSelectedDistrictId] = React.useState<
+    number | null
+  >(isControlled ? value!.districtId : internalValue.districtId);
+  const [searchDistrictTerm, setSearchDistrictTerm] = React.useState('');
+
+  const [
+    getAllDistrictsByProvinceId,
+    { data: districtData, loading: districtLoading },
+  ] = useGetAllDistrictsByProvinceIdLazyQuery({
+    variables: {
+      provinceId: selectedProvinceId ?? 0,
+    },
+  });
+
+  // Ward
+  const [selectedWardCode, setSelectedWardCode] = React.useState<string | null>(
+    isControlled ? value!.wardCode : internalValue.wardCode,
+  );
+  const [searchWardTerm, setSearchWardTerm] = React.useState('');
+  const [street, setStreet] = React.useState(
+    isControlled ? value!.street : internalValue.street,
   );
 
-  const { data: provinces, isLoading: isLoadingProvinces } = useQuery({
-    queryKey: ['getAllProvinces'],
-    queryFn: ShippingApi.getAllProvinces,
-  });
-
-  const { data: districts, isLoading: isLoadingDistricts } = useQuery({
-    queryKey: ['getAllDistricts', selectedProvince],
-    queryFn: () => ShippingApi.getAllDistricts(Number(selectedProvince)),
-    enabled: !!selectedProvince,
-  });
-
-  const { data: wards, isLoading: isLoadingWards } = useQuery({
-    queryKey: ['getAllWards', selectedDistrict],
-    queryFn: () => ShippingApi.getAllWards(Number(selectedDistrict)),
-    enabled: !!selectedDistrict,
-  });
-
-  const debouncedStreet = useDebounce(street, 500);
-
-  const handleProvinceChange = (value: string) => {
-    setSelectedProvince(value || undefined);
-    setSelectedDistrict(undefined);
-    setSelectedWard(undefined);
+  // Move these declarations up, after all the useState declarations but before the useEffect hooks
+  const currentValue = {
+    provinceId: selectedProvinceId,
+    districtId: selectedDistrictId,
+    wardCode: selectedWardCode,
+    street,
   };
 
-  const handleDistrictChange = (value: string) => {
-    setSelectedDistrict(value || undefined);
-    setSelectedWard(undefined);
-  };
+  const prevValueRef = React.useRef(currentValue);
 
-  const handleWardChange = (value: string) => {
-    setSelectedWard(value || undefined);
-  };
+  const [getAllWardsByDistrictId, { data: wardData, loading: wardLoading }] =
+    useGetAllWardsByDistrictIdLazyQuery({
+      variables: {
+        districtId: selectedDistrictId ?? 0,
+      },
+    });
 
-  const handleStreetChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>,
-  ) => {
-    setStreet(event.target.value);
-  };
+  // Reset district and ward when province changes
+  React.useEffect(() => {
+    if (selectedProvinceId !== prevValueRef.current.provinceId) {
+      setSelectedDistrictId(null);
+      setSelectedWardCode(null);
+      setSearchDistrictTerm('');
+      setSearchWardTerm('');
+    }
+  }, [selectedProvinceId]);
+
+  // Reset ward when district changes
+  React.useEffect(() => {
+    if (selectedDistrictId !== prevValueRef.current.districtId) {
+      setSelectedWardCode(null);
+      setSearchWardTerm('');
+    }
+  }, [selectedDistrictId]);
 
   React.useEffect(() => {
-    onChange({
-      provinceId: selectedProvince ? Number.parseInt(selectedProvince) : 0,
-      districtId: selectedDistrict ? Number.parseInt(selectedDistrict) : 0,
-      wardId: selectedWard ? Number.parseInt(selectedWard) : 0,
-      street: debouncedStreet || '',
-    });
+    if (selectedProvinceId) {
+      getAllDistrictsByProvinceId();
+    }
+  }, [selectedProvinceId, getAllDistrictsByProvinceId]);
+
+  React.useEffect(() => {
+    if (selectedDistrictId) {
+      getAllWardsByDistrictId();
+    }
+  }, [selectedDistrictId, getAllWardsByDistrictId]);
+
+  // Handle value changes - only call onChange when values actually change
+
+  // Use a ref to track previous values to avoid unnecessary onChange calls
+
+  React.useEffect(() => {
+    // Check if values have actually changed
+    const prevValue = prevValueRef.current;
+    const hasChanged =
+      prevValue.provinceId !== currentValue.provinceId ||
+      prevValue.districtId !== currentValue.districtId ||
+      prevValue.wardCode !== currentValue.wardCode ||
+      prevValue.street !== currentValue.street;
+
+    if (hasChanged) {
+      // Update internal state if not controlled
+      if (!isControlled) {
+        setInternalValue(currentValue);
+      }
+
+      // Only call onChange when values actually change
+      onChange?.(currentValue);
+
+      // Update the ref
+      prevValueRef.current = currentValue;
+    }
   }, [
-    selectedProvince,
-    selectedDistrict,
-    selectedWard,
-    debouncedStreet,
+    selectedProvinceId,
+    selectedDistrictId,
+    selectedWardCode,
+    street,
     onChange,
+    isControlled,
   ]);
 
+  // Sync with controlled value - only update local state if external value changes
+  React.useEffect(() => {
+    if (isControlled && value) {
+      const hasChanges =
+        value.provinceId !== selectedProvinceId ||
+        value.districtId !== selectedDistrictId ||
+        value.wardCode !== selectedWardCode ||
+        value.street !== street;
+
+      if (hasChanges) {
+        // Update local state to match controlled value
+        setSelectedProvinceId(value.provinceId);
+        setSelectedDistrictId(value.districtId);
+        setSelectedWardCode(value.wardCode);
+        setStreet(value.street);
+
+        // Also update the ref to prevent triggering onChange again
+        prevValueRef.current = {
+          provinceId: value.provinceId,
+          districtId: value.districtId,
+          wardCode: value.wardCode,
+          street: value.street,
+        };
+      }
+    }
+  }, [isControlled, value]);
+
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col items-center gap-4">
-        <Combobox<Province>
-          data={provinces || []}
-          value={selectedProvince}
-          onValueChange={handleProvinceChange}
-          displayValue={province => province.provinceName}
-          getValue={province => province.provinceID.toString()}
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-3 gap-4">
+        <NumberSelector
+          items={data?.provinces ?? []}
+          selectedId={selectedProvinceId}
+          onSelect={setSelectedProvinceId}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          nameKey="provinceName"
+          idKey="provinceId"
           placeholder="Select province..."
-          emptyText="No province found."
-          isLoading={isLoadingProvinces}
-          disabled={
-            disabled ||
-            isLoadingProvinces ||
-            !provinces ||
-            provinces.length === 0
-          }
+          disabled={loading || disabled}
         />
 
-        <Combobox<District>
-          data={districts || []}
-          value={selectedDistrict}
-          onValueChange={handleDistrictChange}
-          displayValue={district => district.districtName}
-          getValue={district => district.districtID.toString()}
+        <NumberSelector
+          items={districtData?.districts ?? []}
+          selectedId={selectedDistrictId}
+          onSelect={setSelectedDistrictId}
+          searchTerm={searchDistrictTerm}
+          onSearchChange={setSearchDistrictTerm}
+          nameKey="districtName"
+          idKey="districtId"
           placeholder="Select district..."
-          emptyText="No district found."
-          disabled={
-            !selectedProvince ||
-            !provinces ||
-            provinces.length === 0 ||
-            isLoadingProvinces ||
-            !districts ||
-            districts.length === 0 ||
-            isLoadingDistricts ||
-            disabled
-          }
-          isLoading={isLoadingDistricts}
+          disabled={!selectedProvinceId || districtLoading || disabled}
         />
 
-        <Combobox<Ward>
-          data={wards || []}
-          value={selectedWard}
-          onValueChange={handleWardChange}
-          displayValue={ward => ward.wardName}
-          getValue={ward => ward.wardCode.toString()}
+        <StringSelector
+          items={wardData?.wards ?? []}
+          selectedId={selectedWardCode}
+          onSelect={setSelectedWardCode}
+          searchTerm={searchWardTerm}
+          onSearchChange={setSearchWardTerm}
+          nameKey="wardName"
+          idKey="wardCode"
           placeholder="Select ward..."
-          emptyText="No ward found."
-          disabled={
-            !selectedDistrict ||
-            !districts ||
-            districts.length === 0 ||
-            isLoadingDistricts ||
-            !wards ||
-            wards.length === 0 ||
-            isLoadingWards ||
-            disabled
-          }
-          isLoading={isLoadingWards}
+          disabled={!selectedDistrictId || wardLoading || disabled}
         />
       </div>
+
       <Textarea
-        placeholder="Enter address number & street..."
-        id="address"
+        placeholder="Enter street address..."
         value={street}
-        onChange={handleStreetChange}
+        onChange={e => setStreet(e.target.value)}
+        className="w-full"
         disabled={disabled}
-        className="resize-none"
       />
     </div>
   );
