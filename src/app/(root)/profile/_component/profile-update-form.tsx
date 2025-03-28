@@ -40,6 +40,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
+import AddressesUpdateForm from '@/app/(root)/profile/_component/addresses-update-form';
 
 // Define the form schema with validation
 const profileFormSchema = z.object({
@@ -373,6 +374,8 @@ export default function ProfilePage() {
           </Form>
         </Card>
       </div>
+
+      <AddressesUpdateForm />
 
       <Card>
         <CardHeader>
