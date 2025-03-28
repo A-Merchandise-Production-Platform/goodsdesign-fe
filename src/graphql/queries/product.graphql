@@ -42,3 +42,17 @@ mutation DeleteProduct($deleteProductId: String!) {
     description
   }
 }
+
+query GetProductInformationById($productId: String!) {
+  product(id: $productId) {
+    name
+    blankVariances {
+      id
+      blankPrice
+      systemVariant {
+        size
+        color
+      }
+    }
+  }
+}

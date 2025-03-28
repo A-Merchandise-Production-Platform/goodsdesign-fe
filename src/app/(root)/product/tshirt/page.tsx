@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Paintbrush } from 'lucide-react';
 
@@ -9,7 +10,10 @@ import { VolumeDiscount } from '../_components/volume-discount';
 import { ColorSelector } from '../_components/color-selector';
 import { PrintingTechniqueSelector } from '../_components/printing-technique-selector';
 import { ModelSelector } from '../_components/model-selector';
-import { useCreateProductDesignMutation } from '@/graphql/generated/graphql';
+import {
+  useCreateProductDesignMutation,
+  useGetProductInformationByIdQuery,
+} from '@/graphql/generated/graphql';
 import { toast } from 'sonner';
 
 interface TShirtProduct {
@@ -17,7 +21,8 @@ interface TShirtProduct {
   price: number;
   image: string;
   sizes: string[];
-  colors: Array<{
+  colors: string[];
+  galleryColors: Array<{
     name: string;
     hex: string;
   }>;
@@ -30,18 +35,67 @@ interface TShirtProduct {
 }
 
 export default function TShirtPage() {
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [selectedColor, setSelectedColor] = useState<string>('');
+
+  const [createProductDesign, { loading }] = useCreateProductDesignMutation();
+  const { data: infoData, loading: infoLoading } =
+    useGetProductInformationByIdQuery({
+      variables: {
+        productId: 'prod001',
+      },
+    });
+
+  const getBlankVariantId = (size: string, color: string) => {
+    return (
+      infoData?.product.blankVariances?.find(
+        v => v.systemVariant.size === size && v.systemVariant.color === color,
+      )?.id || ''
+    );
+  };
+
   const product: TShirtProduct = {
-    name: 'T-Shirt',
+    name: infoData?.product.name || 'T-Shirt',
     price: 24.99,
     image: '/assets/tshirt-thumbnail.png',
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    colors: [
-      { name: 'White', hex: '#ffffff' },
-      { name: 'Black', hex: '#000000' },
-      { name: 'Gray', hex: '#808080' },
-      { name: 'Blue', hex: '#0066cc' },
-      { name: 'Red', hex: '#cc0000' },
-    ],
+    sizes: infoData?.product.blankVariances
+      ? Array.from(
+          new Set(
+            infoData.product.blankVariances
+              .map(v => v.systemVariant.size)
+              .filter(
+                (size): size is string => size !== null && size !== undefined,
+              ),
+          ),
+        )
+      : [],
+    colors: infoData?.product.blankVariances
+      ? Array.from(
+          new Set(
+            infoData.product.blankVariances
+              .map(v => v.systemVariant.color)
+              .filter(
+                (color): color is string =>
+                  color !== null && color !== undefined,
+              ),
+          ),
+        )
+      : [],
+    galleryColors: infoData?.product.blankVariances
+      ? Array.from(
+          new Set(
+            infoData.product.blankVariances
+              .map(v => v.systemVariant.color)
+              .filter(
+                (color): color is string =>
+                  color !== null && color !== undefined,
+              ),
+          ),
+        ).map(hex => ({
+          name: hex,
+          hex: hex,
+        }))
+      : [],
     printingTechniques: [
       {
         id: 'screen',
@@ -70,21 +124,30 @@ export default function TShirtPage() {
     ],
   };
 
-  const [createProductDesign, { loading }] = useCreateProductDesignMutation();
-
   async function onSubmit() {
+    if (!selectedSize || !selectedColor) {
+      toast.error('Please select size and color');
+      return;
+    }
+
+    const blankVariantId = getBlankVariantId(selectedSize, selectedColor);
+    if (!blankVariantId) {
+      toast.error('Selected combination is not available');
+      return;
+    }
+
     try {
       await createProductDesign({
         variables: {
           input: {
-            blankVariantId: 'bv001',
+            blankVariantId,
             isFinalized: false,
             isPublic: false,
             isTemplate: false,
           },
         },
       });
-      toast.success('Product created successfully.');
+      toast.success('Product design created successfully.');
     } catch (error) {
       toast.error('Something went wrong.');
     }
@@ -101,7 +164,14 @@ export default function TShirtPage() {
       </Link>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <ProductImageGallery {...product} />
+        <ProductImageGallery
+          name={product.name}
+          price={product.price}
+          image={product.image}
+          sizes={product.sizes}
+          colors={product.galleryColors}
+          printingTechniques={product.printingTechniques}
+        />
 
         <div className="space-y-6">
           <div>
@@ -112,8 +182,18 @@ export default function TShirtPage() {
           </div>
 
           <div className="space-y-6">
-            <ModelSelector sizes={product.sizes} />
-            <ColorSelector colors={product.colors} />
+            <ModelSelector
+              sizes={product.sizes}
+              defaultValue={selectedSize}
+              value={selectedSize}
+              onValueChange={setSelectedSize}
+            />
+            <ColorSelector
+              colors={product.colors}
+              defaultValue={selectedColor}
+              value={selectedColor}
+              onValueChange={setSelectedColor}
+            />
             <PrintingTechniqueSelector
               techniques={product.printingTechniques}
             />
@@ -121,7 +201,7 @@ export default function TShirtPage() {
 
           <VolumeDiscount />
 
-          <Button size="lg" className="w-full">
+          <Button onClick={onSubmit} size="lg" className="w-full">
             <Paintbrush className="mr-2 h-5 w-5" />
             Start Designing
           </Button>
