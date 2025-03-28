@@ -33,6 +33,19 @@ export type Scalars = {
   Upload: { input: any; output: any };
 };
 
+export type AddressEntity = {
+  __typename?: 'AddressEntity';
+  districtID: Scalars['Float']['output'];
+  factory?: Maybe<FactoryEntity>;
+  factoryId: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  provinceID: Scalars['Float']['output'];
+  street: Scalars['String']['output'];
+  user?: Maybe<UserEntity>;
+  userId: Scalars['String']['output'];
+  wardCode: Scalars['String']['output'];
+};
+
 /** Authentication response */
 export type AuthResponseDto = {
   __typename?: 'AuthResponseDto';
@@ -67,7 +80,7 @@ export type CalculateShippingFeeDto = {
 export type CartItemEntity = {
   __typename?: 'CartItemEntity';
   createdAt: Scalars['DateTime']['output'];
-  designId: Scalars['String']['output'];
+  design: ProductDesignEntity;
   id: Scalars['ID']['output'];
   quantity: Scalars['Int']['output'];
   userId: Scalars['String']['output'];
@@ -89,6 +102,15 @@ export type CategoryEntity = {
   totalProducts?: Maybe<Scalars['Int']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   updatedBy?: Maybe<Scalars['String']['output']>;
+};
+
+/** Create Address Input */
+export type CreateAddressInput = {
+  districtID: Scalars['Float']['input'];
+  factoryId?: InputMaybe<Scalars['String']['input']>;
+  provinceID: Scalars['Float']['input'];
+  street: Scalars['String']['input'];
+  wardCode: Scalars['String']['input'];
 };
 
 /** Create Blank Variance */
@@ -167,16 +189,11 @@ export type CreateSystemConfigBankDto = {
   shortName: Scalars['String']['input'];
 };
 
-export type CreateSystemConfigColorDto = {
-  code: Scalars['String']['input'];
-  isActive?: Scalars['Boolean']['input'];
+export type CreateSystemConfigDiscountDto = {
+  discountPercent: Scalars['Float']['input'];
+  minQuantity: Scalars['Float']['input'];
   name: Scalars['String']['input'];
-};
-
-export type CreateSystemConfigSizeDto = {
-  code: Scalars['String']['input'];
-  isActive?: Scalars['Boolean']['input'];
-  name: Scalars['String']['input'];
+  productId: Scalars['String']['input'];
 };
 
 /** Create user input */
@@ -291,19 +308,21 @@ export type Mutation = {
   __typename?: 'Mutation';
   calculateShippingFee: ShippingFee;
   clearCart: Scalars['Boolean']['output'];
+  createAddress: AddressEntity;
   createBlankVariance: BlankVariancesEntity;
   createCartItem: CartItemEntity;
   createCategory: CategoryEntity;
   createDesignPosition: DesignPositionEntity;
   createNotification: NotificationEntity;
   createOrder: CustomerOrderEntity;
+  createPayment: Scalars['String']['output'];
   createProduct: ProductEntity;
   createProductDesign: ProductDesignEntity;
   createProductPositionType: ProductPositionTypeEntity;
   createSystemConfigBank: SystemConfigBankEntity;
-  createSystemConfigColor: SystemConfigColorEntity;
-  createSystemConfigSize: SystemConfigSizeEntity;
+  createSystemConfigDiscount: SystemConfigDiscountEntity;
   createUser: UserEntity;
+  deleteAddress: AddressEntity;
   deleteBlankVariance: BlankVariancesEntity;
   deleteCartItem: CartItemEntity;
   deleteCategory: CategoryEntity;
@@ -320,12 +339,13 @@ export type Mutation = {
   removeProductDesign: ProductDesignEntity;
   removeProductPositionType: ProductPositionTypeEntity;
   removeSystemConfigBank: SystemConfigBankEntity;
-  removeSystemConfigColor: SystemConfigColorEntity;
-  removeSystemConfigSize: SystemConfigSizeEntity;
+  removeSystemConfigDiscount: SystemConfigDiscountEntity;
   restoreCategory: CategoryEntity;
   restoreProduct: ProductEntity;
+  sendEmail: Scalars['Boolean']['output'];
   toggleActiveCategory: CategoryEntity;
   toggleActiveProduct: ProductEntity;
+  updateAddress: AddressEntity;
   updateBlankVariance: BlankVariancesEntity;
   updateCartItem: CartItemEntity;
   updateCategory: CategoryEntity;
@@ -336,14 +356,17 @@ export type Mutation = {
   updateProductDesign: ProductDesignEntity;
   updateProductPositionType: ProductPositionTypeEntity;
   updateSystemConfigBank: SystemConfigBankEntity;
-  updateSystemConfigColor: SystemConfigColorEntity;
-  updateSystemConfigSize: SystemConfigSizeEntity;
+  updateSystemConfigDiscount: SystemConfigDiscountEntity;
   updateUser: UserEntity;
   uploadFile: FileUploadResponse;
 };
 
 export type MutationCalculateShippingFeeArgs = {
   input: CalculateShippingFeeDto;
+};
+
+export type MutationCreateAddressArgs = {
+  createAddressInput: CreateAddressInput;
 };
 
 export type MutationCreateBlankVarianceArgs = {
@@ -370,6 +393,11 @@ export type MutationCreateOrderArgs = {
   createOrderInput: CreateOrderDto;
 };
 
+export type MutationCreatePaymentArgs = {
+  gateway: Scalars['String']['input'];
+  paymentId: Scalars['String']['input'];
+};
+
 export type MutationCreateProductArgs = {
   input: CreateProductDto;
 };
@@ -386,16 +414,16 @@ export type MutationCreateSystemConfigBankArgs = {
   input: CreateSystemConfigBankDto;
 };
 
-export type MutationCreateSystemConfigColorArgs = {
-  input: CreateSystemConfigColorDto;
-};
-
-export type MutationCreateSystemConfigSizeArgs = {
-  input: CreateSystemConfigSizeDto;
+export type MutationCreateSystemConfigDiscountArgs = {
+  createDiscountInput: CreateSystemConfigDiscountDto;
 };
 
 export type MutationCreateUserArgs = {
   createUserInput: CreateUserDto;
+};
+
+export type MutationDeleteAddressArgs = {
+  id: Scalars['String']['input'];
 };
 
 export type MutationDeleteBlankVarianceArgs = {
@@ -454,12 +482,8 @@ export type MutationRemoveSystemConfigBankArgs = {
   id: Scalars['ID']['input'];
 };
 
-export type MutationRemoveSystemConfigColorArgs = {
-  id: Scalars['ID']['input'];
-};
-
-export type MutationRemoveSystemConfigSizeArgs = {
-  id: Scalars['ID']['input'];
+export type MutationRemoveSystemConfigDiscountArgs = {
+  id: Scalars['String']['input'];
 };
 
 export type MutationRestoreCategoryArgs = {
@@ -470,12 +494,21 @@ export type MutationRestoreProductArgs = {
   id: Scalars['String']['input'];
 };
 
+export type MutationSendEmailArgs = {
+  to: Scalars['String']['input'];
+};
+
 export type MutationToggleActiveCategoryArgs = {
   id: Scalars['String']['input'];
 };
 
 export type MutationToggleActiveProductArgs = {
   id: Scalars['String']['input'];
+};
+
+export type MutationUpdateAddressArgs = {
+  id: Scalars['String']['input'];
+  updateAddressInput: UpdateAddressInput;
 };
 
 export type MutationUpdateBlankVarianceArgs = {
@@ -522,12 +555,9 @@ export type MutationUpdateSystemConfigBankArgs = {
   input: UpdateSystemConfigBankDto;
 };
 
-export type MutationUpdateSystemConfigColorArgs = {
-  input: UpdateSystemConfigColorDto;
-};
-
-export type MutationUpdateSystemConfigSizeArgs = {
-  input: UpdateSystemConfigSizeDto;
+export type MutationUpdateSystemConfigDiscountArgs = {
+  id: Scalars['String']['input'];
+  updateDiscountInput: UpdateSystemConfigDiscountDto;
 };
 
 export type MutationUpdateUserArgs = {
@@ -578,6 +608,7 @@ export type ProductEntity = {
   deletedAt?: Maybe<Scalars['DateTime']['output']>;
   deletedBy?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  discounts?: Maybe<Array<SystemConfigDiscountEntity>>;
   id: Scalars['ID']['output'];
   imageUrl?: Maybe<Scalars['String']['output']>;
   isActive: Scalars['Boolean']['output'];
@@ -607,17 +638,19 @@ export type Province = {
 
 export type Query = {
   __typename?: 'Query';
-  allCartItems: Array<CartItemEntity>;
+  address: AddressEntity;
+  addresses: Array<AddressEntity>;
   availableServices: Array<ShippingService>;
   blankVariance?: Maybe<BlankVariancesEntity>;
   blankVariances: Array<BlankVariancesEntity>;
-  cartItem: CartItemEntity;
   categories: Array<CategoryEntity>;
   category: CategoryEntity;
   designPosition: DesignPositionEntity;
   designPositions: Array<DesignPositionEntity>;
   district: District;
   districts: Array<District>;
+  getApplicableDiscount: Scalars['Float']['output'];
+  getCartItem: CartItemEntity;
   getMe: UserEntity;
   getMyFactory: FactoryEntity;
   notification: NotificationEntity;
@@ -632,10 +665,8 @@ export type Query = {
   provinces: Array<Province>;
   systemConfigBank: SystemConfigBankEntity;
   systemConfigBanks: Array<SystemConfigBankEntity>;
-  systemConfigColor: SystemConfigColorEntity;
-  systemConfigColors: Array<SystemConfigColorEntity>;
-  systemConfigSize: SystemConfigSizeEntity;
-  systemConfigSizes: Array<SystemConfigSizeEntity>;
+  systemConfigDiscount: SystemConfigDiscountEntity;
+  systemConfigDiscounts: Array<SystemConfigDiscountEntity>;
   user: UserEntity;
   userCartItems: Array<CartItemEntity>;
   userOrder: CustomerOrderEntity;
@@ -645,15 +676,15 @@ export type Query = {
   wards: Array<Ward>;
 };
 
+export type QueryAddressArgs = {
+  id: Scalars['String']['input'];
+};
+
 export type QueryAvailableServicesArgs = {
   servicesInput: GetAvailableServicesDto;
 };
 
 export type QueryBlankVarianceArgs = {
-  id: Scalars['String']['input'];
-};
-
-export type QueryCartItemArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -675,6 +706,15 @@ export type QueryDistrictArgs = {
 
 export type QueryDistrictsArgs = {
   provinceId: Scalars['Int']['input'];
+};
+
+export type QueryGetApplicableDiscountArgs = {
+  productId: Scalars['String']['input'];
+  quantity: Scalars['Float']['input'];
+};
+
+export type QueryGetCartItemArgs = {
+  id: Scalars['String']['input'];
 };
 
 export type QueryNotificationArgs = {
@@ -709,12 +749,8 @@ export type QuerySystemConfigBankArgs = {
   id: Scalars['ID']['input'];
 };
 
-export type QuerySystemConfigColorArgs = {
-  id: Scalars['ID']['input'];
-};
-
-export type QuerySystemConfigSizeArgs = {
-  id: Scalars['ID']['input'];
+export type QuerySystemConfigDiscountArgs = {
+  id: Scalars['String']['input'];
 };
 
 export type QueryUserArgs = {
@@ -780,22 +816,25 @@ export type SystemConfigBankEntity = {
   shortName: Scalars['String']['output'];
 };
 
-export type SystemConfigColorEntity = {
-  __typename?: 'SystemConfigColorEntity';
-  code: Scalars['String']['output'];
+export type SystemConfigDiscountEntity = {
+  __typename?: 'SystemConfigDiscountEntity';
+  createdAt: Scalars['DateTime']['output'];
+  discountPercent: Scalars['Float']['output'];
   id: Scalars['ID']['output'];
   isActive: Scalars['Boolean']['output'];
   isDeleted: Scalars['Boolean']['output'];
+  minQuantity: Scalars['Float']['output'];
   name: Scalars['String']['output'];
+  product: ProductEntity;
+  updatedAt: Scalars['DateTime']['output'];
 };
 
-export type SystemConfigSizeEntity = {
-  __typename?: 'SystemConfigSizeEntity';
-  code: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  isActive: Scalars['Boolean']['output'];
-  isDeleted: Scalars['Boolean']['output'];
-  name: Scalars['String']['output'];
+export type UpdateAddressInput = {
+  districtID?: InputMaybe<Scalars['Float']['input']>;
+  factoryId?: InputMaybe<Scalars['String']['input']>;
+  provinceID?: InputMaybe<Scalars['Float']['input']>;
+  street?: InputMaybe<Scalars['String']['input']>;
+  wardCode?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Update Blank Variance */
@@ -888,18 +927,11 @@ export type UpdateSystemConfigBankDto = {
   shortName?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type UpdateSystemConfigColorDto = {
-  code?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['ID']['input'];
-  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+export type UpdateSystemConfigDiscountDto = {
+  discountPercent?: InputMaybe<Scalars['Float']['input']>;
+  minQuantity?: InputMaybe<Scalars['Float']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type UpdateSystemConfigSizeDto = {
-  code?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['ID']['input'];
-  isActive?: InputMaybe<Scalars['Boolean']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
+  productId?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Update user input */
@@ -941,6 +973,71 @@ export type Ward = {
   districtId: Scalars['Int']['output'];
   wardCode: Scalars['String']['output'];
   wardName: Scalars['String']['output'];
+};
+
+export type AddressesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type AddressesQuery = {
+  __typename?: 'Query';
+  addresses: Array<{
+    __typename?: 'AddressEntity';
+    id: string;
+    districtID: number;
+    provinceID: number;
+    street: string;
+    wardCode: string;
+  }>;
+};
+
+export type CreateAddressMutationVariables = Exact<{
+  createAddressInput: CreateAddressInput;
+}>;
+
+export type CreateAddressMutation = {
+  __typename?: 'Mutation';
+  createAddress: {
+    __typename?: 'AddressEntity';
+    districtID: number;
+    provinceID: number;
+    street: string;
+    wardCode: string;
+  };
+};
+
+export type DeleteAddressMutationVariables = Exact<{
+  deleteAddressId: Scalars['String']['input'];
+}>;
+
+export type DeleteAddressMutation = {
+  __typename?: 'Mutation';
+  deleteAddress: { __typename?: 'AddressEntity'; id: string };
+};
+
+export type GetAddressDetailsQueryVariables = Exact<{
+  provinceId: Scalars['Int']['input'];
+  districtId: Scalars['Int']['input'];
+  wardCode: Scalars['String']['input'];
+}>;
+
+export type GetAddressDetailsQuery = {
+  __typename?: 'Query';
+  province: {
+    __typename?: 'Province';
+    provinceId: number;
+    provinceName: string;
+  };
+  district: {
+    __typename?: 'District';
+    districtId: number;
+    districtName: string;
+    provinceId: number;
+  };
+  ward: {
+    __typename?: 'Ward';
+    districtId: number;
+    wardCode: string;
+    wardName: string;
+  };
 };
 
 export type LoginMutationVariables = Exact<{
@@ -1066,6 +1163,20 @@ export type GetMeQuery = {
       factoryStatus?: FactoryStatus | null;
     } | null;
   };
+};
+
+export type GetUserCartItemsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetUserCartItemsQuery = {
+  __typename?: 'Query';
+  userCartItems: Array<{
+    __typename?: 'CartItemEntity';
+    id: string;
+    quantity: number;
+    userId: string;
+    createdAt: any;
+    design: { __typename?: 'ProductDesignEntity'; id: string };
+  }>;
 };
 
 export type GetAllCategoriesQueryVariables = Exact<{ [key: string]: never }>;
@@ -1207,66 +1318,6 @@ export type UpdateFactoryInfoMutation = {
   };
 };
 
-export type CreateProductDesignMutationVariables = Exact<{
-  input: CreateProductDesignDto;
-}>;
-
-export type CreateProductDesignMutation = {
-  __typename?: 'Mutation';
-  createProductDesign: {
-    __typename?: 'ProductDesignEntity';
-    id: string;
-    blankVariant?: {
-      __typename?: 'BlankVariancesEntity';
-      blankPrice: number;
-      information: any;
-    } | null;
-  };
-};
-
-export type UpdateProductDesignMutationVariables = Exact<{
-  input: UpdateProductDesignDto;
-}>;
-
-export type UpdateProductDesignMutation = {
-  __typename?: 'Mutation';
-  updateProductDesign: {
-    __typename?: 'ProductDesignEntity';
-    blankVariant?: {
-      __typename?: 'BlankVariancesEntity';
-      blankPrice: number;
-      information: any;
-    } | null;
-  };
-};
-
-export type ProductDesignQueryVariables = Exact<{
-  productDesignId: Scalars['ID']['input'];
-}>;
-
-export type ProductDesignQuery = {
-  __typename?: 'Query';
-  productDesign: {
-    __typename?: 'ProductDesignEntity';
-    blankVariant?: {
-      __typename?: 'BlankVariancesEntity';
-      blankPrice: number;
-      information: any;
-    } | null;
-    designPositions?: Array<{
-      __typename?: 'DesignPositionEntity';
-      id: string;
-      designJSON: any;
-      positionType?: {
-        __typename?: 'ProductPositionTypeEntity';
-        id: string;
-        positionName: string;
-        basePrice: number;
-      } | null;
-    }> | null;
-  };
-};
-
 export type GetAllProductsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetAllProductsQuery = {
@@ -1319,6 +1370,86 @@ export type DeleteProductMutation = {
     createdAt: any;
     description?: string | null;
     category?: { __typename?: 'CategoryEntity'; name: string } | null;
+  };
+};
+
+export type GetAllProvincesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetAllProvincesQuery = {
+  __typename?: 'Query';
+  provinces: Array<{
+    __typename?: 'Province';
+    provinceId: number;
+    provinceName: string;
+  }>;
+};
+
+export type GetProvinceByIdQueryVariables = Exact<{
+  provinceId: Scalars['Int']['input'];
+}>;
+
+export type GetProvinceByIdQuery = {
+  __typename?: 'Query';
+  province: {
+    __typename?: 'Province';
+    provinceId: number;
+    provinceName: string;
+  };
+};
+
+export type GetAllDistrictsByProvinceIdQueryVariables = Exact<{
+  provinceId: Scalars['Int']['input'];
+}>;
+
+export type GetAllDistrictsByProvinceIdQuery = {
+  __typename?: 'Query';
+  districts: Array<{
+    __typename?: 'District';
+    districtId: number;
+    districtName: string;
+    provinceId: number;
+  }>;
+};
+
+export type GetDistrictByIdQueryVariables = Exact<{
+  districtId: Scalars['Int']['input'];
+}>;
+
+export type GetDistrictByIdQuery = {
+  __typename?: 'Query';
+  district: {
+    __typename?: 'District';
+    districtId: number;
+    districtName: string;
+    provinceId: number;
+  };
+};
+
+export type GetAllWardsByDistrictIdQueryVariables = Exact<{
+  districtId: Scalars['Int']['input'];
+}>;
+
+export type GetAllWardsByDistrictIdQuery = {
+  __typename?: 'Query';
+  wards: Array<{
+    __typename?: 'Ward';
+    wardCode: string;
+    wardName: string;
+    districtId: number;
+  }>;
+};
+
+export type GetWardByWardCodeQueryVariables = Exact<{
+  wardCode: Scalars['String']['input'];
+}>;
+
+export type GetWardByWardCodeQuery = {
+  __typename?: 'Query';
+  ward: {
+    __typename?: 'Ward';
+    districtId: number;
+    wardCode: string;
+    wardName: string;
   };
 };
 
@@ -1395,134 +1526,6 @@ export type RemoveSystemConfigBankMutation = {
     logo: string;
     name: string;
     shortName: string;
-  };
-};
-
-export type GetAllSystemConfigColorsQueryVariables = Exact<{
-  [key: string]: never;
-}>;
-
-export type GetAllSystemConfigColorsQuery = {
-  __typename?: 'Query';
-  systemConfigColors: Array<{
-    __typename?: 'SystemConfigColorEntity';
-    code: string;
-    id: string;
-    isActive: boolean;
-    isDeleted: boolean;
-    name: string;
-  }>;
-};
-
-export type GetSystemConfigColorByIdQueryVariables = Exact<{
-  systemConfigColorId: Scalars['ID']['input'];
-}>;
-
-export type GetSystemConfigColorByIdQuery = {
-  __typename?: 'Query';
-  systemConfigColor: {
-    __typename?: 'SystemConfigColorEntity';
-    code: string;
-    id: string;
-    isActive: boolean;
-    isDeleted: boolean;
-    name: string;
-  };
-};
-
-export type CreateSystemConfigColorMutationVariables = Exact<{
-  input: CreateSystemConfigColorDto;
-}>;
-
-export type CreateSystemConfigColorMutation = {
-  __typename?: 'Mutation';
-  createSystemConfigColor: {
-    __typename?: 'SystemConfigColorEntity';
-    code: string;
-    id: string;
-    isActive: boolean;
-    isDeleted: boolean;
-    name: string;
-  };
-};
-
-export type RemoveSystemConfigColorMutationVariables = Exact<{
-  removeSystemConfigColorId: Scalars['ID']['input'];
-}>;
-
-export type RemoveSystemConfigColorMutation = {
-  __typename?: 'Mutation';
-  removeSystemConfigColor: {
-    __typename?: 'SystemConfigColorEntity';
-    code: string;
-    id: string;
-    isActive: boolean;
-    isDeleted: boolean;
-    name: string;
-  };
-};
-
-export type GetAllSystemConfigSizesQueryVariables = Exact<{
-  [key: string]: never;
-}>;
-
-export type GetAllSystemConfigSizesQuery = {
-  __typename?: 'Query';
-  systemConfigSizes: Array<{
-    __typename?: 'SystemConfigSizeEntity';
-    code: string;
-    id: string;
-    isActive: boolean;
-    isDeleted: boolean;
-    name: string;
-  }>;
-};
-
-export type GetSystemConfigSizeByIdQueryVariables = Exact<{
-  systemConfigSizeId: Scalars['ID']['input'];
-}>;
-
-export type GetSystemConfigSizeByIdQuery = {
-  __typename?: 'Query';
-  systemConfigSize: {
-    __typename?: 'SystemConfigSizeEntity';
-    code: string;
-    id: string;
-    isActive: boolean;
-    isDeleted: boolean;
-    name: string;
-  };
-};
-
-export type CreateSystemConfigSizeMutationVariables = Exact<{
-  input: CreateSystemConfigSizeDto;
-}>;
-
-export type CreateSystemConfigSizeMutation = {
-  __typename?: 'Mutation';
-  createSystemConfigSize: {
-    __typename?: 'SystemConfigSizeEntity';
-    code: string;
-    id: string;
-    isActive: boolean;
-    isDeleted: boolean;
-    name: string;
-  };
-};
-
-export type RemoveSystemConfigSizeMutationVariables = Exact<{
-  removeSystemConfigSizeId: Scalars['ID']['input'];
-}>;
-
-export type RemoveSystemConfigSizeMutation = {
-  __typename?: 'Mutation';
-  removeSystemConfigSize: {
-    __typename?: 'SystemConfigSizeEntity';
-    code: string;
-    id: string;
-    isActive: boolean;
-    isDeleted: boolean;
-    name: string;
   };
 };
 
@@ -1635,6 +1638,284 @@ export type DeleteUserMutation = {
   };
 };
 
+export const AddressesDocument = gql`
+  query Addresses {
+    addresses {
+      id
+      districtID
+      provinceID
+      street
+      wardCode
+    }
+  }
+`;
+
+/**
+ * __useAddressesQuery__
+ *
+ * To run a query within a React component, call `useAddressesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAddressesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAddressesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAddressesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    AddressesQuery,
+    AddressesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<AddressesQuery, AddressesQueryVariables>(
+    AddressesDocument,
+    options,
+  );
+}
+export function useAddressesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    AddressesQuery,
+    AddressesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<AddressesQuery, AddressesQueryVariables>(
+    AddressesDocument,
+    options,
+  );
+}
+export function useAddressesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<AddressesQuery, AddressesQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<AddressesQuery, AddressesQueryVariables>(
+    AddressesDocument,
+    options,
+  );
+}
+export type AddressesQueryHookResult = ReturnType<typeof useAddressesQuery>;
+export type AddressesLazyQueryHookResult = ReturnType<
+  typeof useAddressesLazyQuery
+>;
+export type AddressesSuspenseQueryHookResult = ReturnType<
+  typeof useAddressesSuspenseQuery
+>;
+export type AddressesQueryResult = Apollo.QueryResult<
+  AddressesQuery,
+  AddressesQueryVariables
+>;
+export const CreateAddressDocument = gql`
+  mutation CreateAddress($createAddressInput: CreateAddressInput!) {
+    createAddress(createAddressInput: $createAddressInput) {
+      districtID
+      provinceID
+      street
+      wardCode
+    }
+  }
+`;
+export type CreateAddressMutationFn = Apollo.MutationFunction<
+  CreateAddressMutation,
+  CreateAddressMutationVariables
+>;
+
+/**
+ * __useCreateAddressMutation__
+ *
+ * To run a mutation, you first call `useCreateAddressMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateAddressMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createAddressMutation, { data, loading, error }] = useCreateAddressMutation({
+ *   variables: {
+ *      createAddressInput: // value for 'createAddressInput'
+ *   },
+ * });
+ */
+export function useCreateAddressMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateAddressMutation,
+    CreateAddressMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateAddressMutation,
+    CreateAddressMutationVariables
+  >(CreateAddressDocument, options);
+}
+export type CreateAddressMutationHookResult = ReturnType<
+  typeof useCreateAddressMutation
+>;
+export type CreateAddressMutationResult =
+  Apollo.MutationResult<CreateAddressMutation>;
+export type CreateAddressMutationOptions = Apollo.BaseMutationOptions<
+  CreateAddressMutation,
+  CreateAddressMutationVariables
+>;
+export const DeleteAddressDocument = gql`
+  mutation DeleteAddress($deleteAddressId: String!) {
+    deleteAddress(id: $deleteAddressId) {
+      id
+    }
+  }
+`;
+export type DeleteAddressMutationFn = Apollo.MutationFunction<
+  DeleteAddressMutation,
+  DeleteAddressMutationVariables
+>;
+
+/**
+ * __useDeleteAddressMutation__
+ *
+ * To run a mutation, you first call `useDeleteAddressMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteAddressMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteAddressMutation, { data, loading, error }] = useDeleteAddressMutation({
+ *   variables: {
+ *      deleteAddressId: // value for 'deleteAddressId'
+ *   },
+ * });
+ */
+export function useDeleteAddressMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DeleteAddressMutation,
+    DeleteAddressMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DeleteAddressMutation,
+    DeleteAddressMutationVariables
+  >(DeleteAddressDocument, options);
+}
+export type DeleteAddressMutationHookResult = ReturnType<
+  typeof useDeleteAddressMutation
+>;
+export type DeleteAddressMutationResult =
+  Apollo.MutationResult<DeleteAddressMutation>;
+export type DeleteAddressMutationOptions = Apollo.BaseMutationOptions<
+  DeleteAddressMutation,
+  DeleteAddressMutationVariables
+>;
+export const GetAddressDetailsDocument = gql`
+  query GetAddressDetails(
+    $provinceId: Int!
+    $districtId: Int!
+    $wardCode: String!
+  ) {
+    province(provinceId: $provinceId) {
+      provinceId
+      provinceName
+    }
+    district(districtId: $districtId) {
+      districtId
+      districtName
+      provinceId
+    }
+    ward(wardCode: $wardCode) {
+      districtId
+      wardCode
+      wardName
+    }
+  }
+`;
+
+/**
+ * __useGetAddressDetailsQuery__
+ *
+ * To run a query within a React component, call `useGetAddressDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAddressDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAddressDetailsQuery({
+ *   variables: {
+ *      provinceId: // value for 'provinceId'
+ *      districtId: // value for 'districtId'
+ *      wardCode: // value for 'wardCode'
+ *   },
+ * });
+ */
+export function useGetAddressDetailsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetAddressDetailsQuery,
+    GetAddressDetailsQueryVariables
+  > &
+    (
+      | { variables: GetAddressDetailsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetAddressDetailsQuery,
+    GetAddressDetailsQueryVariables
+  >(GetAddressDetailsDocument, options);
+}
+export function useGetAddressDetailsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAddressDetailsQuery,
+    GetAddressDetailsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAddressDetailsQuery,
+    GetAddressDetailsQueryVariables
+  >(GetAddressDetailsDocument, options);
+}
+export function useGetAddressDetailsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAddressDetailsQuery,
+        GetAddressDetailsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAddressDetailsQuery,
+    GetAddressDetailsQueryVariables
+  >(GetAddressDetailsDocument, options);
+}
+export type GetAddressDetailsQueryHookResult = ReturnType<
+  typeof useGetAddressDetailsQuery
+>;
+export type GetAddressDetailsLazyQueryHookResult = ReturnType<
+  typeof useGetAddressDetailsLazyQuery
+>;
+export type GetAddressDetailsSuspenseQueryHookResult = ReturnType<
+  typeof useGetAddressDetailsSuspenseQuery
+>;
+export type GetAddressDetailsQueryResult = Apollo.QueryResult<
+  GetAddressDetailsQuery,
+  GetAddressDetailsQueryVariables
+>;
 export const LoginDocument = gql`
   mutation Login($loginInput: LoginDto!) {
     login(loginInput: $loginInput) {
@@ -1954,6 +2235,89 @@ export type GetMeSuspenseQueryHookResult = ReturnType<
 export type GetMeQueryResult = Apollo.QueryResult<
   GetMeQuery,
   GetMeQueryVariables
+>;
+export const GetUserCartItemsDocument = gql`
+  query GetUserCartItems {
+    userCartItems {
+      id
+      quantity
+      userId
+      createdAt
+      design {
+        id
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetUserCartItemsQuery__
+ *
+ * To run a query within a React component, call `useGetUserCartItemsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserCartItemsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserCartItemsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUserCartItemsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetUserCartItemsQuery,
+    GetUserCartItemsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetUserCartItemsQuery, GetUserCartItemsQueryVariables>(
+    GetUserCartItemsDocument,
+    options,
+  );
+}
+export function useGetUserCartItemsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetUserCartItemsQuery,
+    GetUserCartItemsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetUserCartItemsQuery,
+    GetUserCartItemsQueryVariables
+  >(GetUserCartItemsDocument, options);
+}
+export function useGetUserCartItemsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetUserCartItemsQuery,
+        GetUserCartItemsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetUserCartItemsQuery,
+    GetUserCartItemsQueryVariables
+  >(GetUserCartItemsDocument, options);
+}
+export type GetUserCartItemsQueryHookResult = ReturnType<
+  typeof useGetUserCartItemsQuery
+>;
+export type GetUserCartItemsLazyQueryHookResult = ReturnType<
+  typeof useGetUserCartItemsLazyQuery
+>;
+export type GetUserCartItemsSuspenseQueryHookResult = ReturnType<
+  typeof useGetUserCartItemsSuspenseQuery
+>;
+export type GetUserCartItemsQueryResult = Apollo.QueryResult<
+  GetUserCartItemsQuery,
+  GetUserCartItemsQueryVariables
 >;
 export const GetAllCategoriesDocument = gql`
   query GetAllCategories {
@@ -2338,207 +2702,6 @@ export type UpdateFactoryInfoMutationOptions = Apollo.BaseMutationOptions<
   UpdateFactoryInfoMutation,
   UpdateFactoryInfoMutationVariables
 >;
-export const CreateProductDesignDocument = gql`
-  mutation CreateProductDesign($input: CreateProductDesignDto!) {
-    createProductDesign(input: $input) {
-      id
-      blankVariant {
-        blankPrice
-        information
-      }
-    }
-  }
-`;
-export type CreateProductDesignMutationFn = Apollo.MutationFunction<
-  CreateProductDesignMutation,
-  CreateProductDesignMutationVariables
->;
-
-/**
- * __useCreateProductDesignMutation__
- *
- * To run a mutation, you first call `useCreateProductDesignMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateProductDesignMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createProductDesignMutation, { data, loading, error }] = useCreateProductDesignMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateProductDesignMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateProductDesignMutation,
-    CreateProductDesignMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CreateProductDesignMutation,
-    CreateProductDesignMutationVariables
-  >(CreateProductDesignDocument, options);
-}
-export type CreateProductDesignMutationHookResult = ReturnType<
-  typeof useCreateProductDesignMutation
->;
-export type CreateProductDesignMutationResult =
-  Apollo.MutationResult<CreateProductDesignMutation>;
-export type CreateProductDesignMutationOptions = Apollo.BaseMutationOptions<
-  CreateProductDesignMutation,
-  CreateProductDesignMutationVariables
->;
-export const UpdateProductDesignDocument = gql`
-  mutation UpdateProductDesign($input: UpdateProductDesignDto!) {
-    updateProductDesign(input: $input) {
-      blankVariant {
-        blankPrice
-        information
-      }
-    }
-  }
-`;
-export type UpdateProductDesignMutationFn = Apollo.MutationFunction<
-  UpdateProductDesignMutation,
-  UpdateProductDesignMutationVariables
->;
-
-/**
- * __useUpdateProductDesignMutation__
- *
- * To run a mutation, you first call `useUpdateProductDesignMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateProductDesignMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateProductDesignMutation, { data, loading, error }] = useUpdateProductDesignMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUpdateProductDesignMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UpdateProductDesignMutation,
-    UpdateProductDesignMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    UpdateProductDesignMutation,
-    UpdateProductDesignMutationVariables
-  >(UpdateProductDesignDocument, options);
-}
-export type UpdateProductDesignMutationHookResult = ReturnType<
-  typeof useUpdateProductDesignMutation
->;
-export type UpdateProductDesignMutationResult =
-  Apollo.MutationResult<UpdateProductDesignMutation>;
-export type UpdateProductDesignMutationOptions = Apollo.BaseMutationOptions<
-  UpdateProductDesignMutation,
-  UpdateProductDesignMutationVariables
->;
-export const ProductDesignDocument = gql`
-  query ProductDesign($productDesignId: ID!) {
-    productDesign(id: $productDesignId) {
-      blankVariant {
-        blankPrice
-        information
-      }
-      designPositions {
-        id
-        designJSON
-        positionType {
-          id
-          positionName
-          basePrice
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useProductDesignQuery__
- *
- * To run a query within a React component, call `useProductDesignQuery` and pass it any options that fit your needs.
- * When your component renders, `useProductDesignQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useProductDesignQuery({
- *   variables: {
- *      productDesignId: // value for 'productDesignId'
- *   },
- * });
- */
-export function useProductDesignQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ProductDesignQuery,
-    ProductDesignQueryVariables
-  > &
-    (
-      | { variables: ProductDesignQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    ),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ProductDesignQuery, ProductDesignQueryVariables>(
-    ProductDesignDocument,
-    options,
-  );
-}
-export function useProductDesignLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ProductDesignQuery,
-    ProductDesignQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<ProductDesignQuery, ProductDesignQueryVariables>(
-    ProductDesignDocument,
-    options,
-  );
-}
-export function useProductDesignSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ProductDesignQuery,
-        ProductDesignQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ProductDesignQuery,
-    ProductDesignQueryVariables
-  >(ProductDesignDocument, options);
-}
-export type ProductDesignQueryHookResult = ReturnType<
-  typeof useProductDesignQuery
->;
-export type ProductDesignLazyQueryHookResult = ReturnType<
-  typeof useProductDesignLazyQuery
->;
-export type ProductDesignSuspenseQueryHookResult = ReturnType<
-  typeof useProductDesignSuspenseQuery
->;
-export type ProductDesignQueryResult = Apollo.QueryResult<
-  ProductDesignQuery,
-  ProductDesignQueryVariables
->;
 export const GetAllProductsDocument = gql`
   query GetAllProducts {
     products {
@@ -2742,6 +2905,503 @@ export type DeleteProductMutationResult =
 export type DeleteProductMutationOptions = Apollo.BaseMutationOptions<
   DeleteProductMutation,
   DeleteProductMutationVariables
+>;
+export const GetAllProvincesDocument = gql`
+  query GetAllProvinces {
+    provinces {
+      provinceId
+      provinceName
+    }
+  }
+`;
+
+/**
+ * __useGetAllProvincesQuery__
+ *
+ * To run a query within a React component, call `useGetAllProvincesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllProvincesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllProvincesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetAllProvincesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetAllProvincesQuery,
+    GetAllProvincesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetAllProvincesQuery, GetAllProvincesQueryVariables>(
+    GetAllProvincesDocument,
+    options,
+  );
+}
+export function useGetAllProvincesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAllProvincesQuery,
+    GetAllProvincesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAllProvincesQuery,
+    GetAllProvincesQueryVariables
+  >(GetAllProvincesDocument, options);
+}
+export function useGetAllProvincesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAllProvincesQuery,
+        GetAllProvincesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAllProvincesQuery,
+    GetAllProvincesQueryVariables
+  >(GetAllProvincesDocument, options);
+}
+export type GetAllProvincesQueryHookResult = ReturnType<
+  typeof useGetAllProvincesQuery
+>;
+export type GetAllProvincesLazyQueryHookResult = ReturnType<
+  typeof useGetAllProvincesLazyQuery
+>;
+export type GetAllProvincesSuspenseQueryHookResult = ReturnType<
+  typeof useGetAllProvincesSuspenseQuery
+>;
+export type GetAllProvincesQueryResult = Apollo.QueryResult<
+  GetAllProvincesQuery,
+  GetAllProvincesQueryVariables
+>;
+export const GetProvinceByIdDocument = gql`
+  query GetProvinceById($provinceId: Int!) {
+    province(provinceId: $provinceId) {
+      provinceId
+      provinceName
+    }
+  }
+`;
+
+/**
+ * __useGetProvinceByIdQuery__
+ *
+ * To run a query within a React component, call `useGetProvinceByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProvinceByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProvinceByIdQuery({
+ *   variables: {
+ *      provinceId: // value for 'provinceId'
+ *   },
+ * });
+ */
+export function useGetProvinceByIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetProvinceByIdQuery,
+    GetProvinceByIdQueryVariables
+  > &
+    (
+      | { variables: GetProvinceByIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetProvinceByIdQuery, GetProvinceByIdQueryVariables>(
+    GetProvinceByIdDocument,
+    options,
+  );
+}
+export function useGetProvinceByIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetProvinceByIdQuery,
+    GetProvinceByIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetProvinceByIdQuery,
+    GetProvinceByIdQueryVariables
+  >(GetProvinceByIdDocument, options);
+}
+export function useGetProvinceByIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetProvinceByIdQuery,
+        GetProvinceByIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetProvinceByIdQuery,
+    GetProvinceByIdQueryVariables
+  >(GetProvinceByIdDocument, options);
+}
+export type GetProvinceByIdQueryHookResult = ReturnType<
+  typeof useGetProvinceByIdQuery
+>;
+export type GetProvinceByIdLazyQueryHookResult = ReturnType<
+  typeof useGetProvinceByIdLazyQuery
+>;
+export type GetProvinceByIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetProvinceByIdSuspenseQuery
+>;
+export type GetProvinceByIdQueryResult = Apollo.QueryResult<
+  GetProvinceByIdQuery,
+  GetProvinceByIdQueryVariables
+>;
+export const GetAllDistrictsByProvinceIdDocument = gql`
+  query GetAllDistrictsByProvinceId($provinceId: Int!) {
+    districts(provinceId: $provinceId) {
+      districtId
+      districtName
+      provinceId
+    }
+  }
+`;
+
+/**
+ * __useGetAllDistrictsByProvinceIdQuery__
+ *
+ * To run a query within a React component, call `useGetAllDistrictsByProvinceIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllDistrictsByProvinceIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllDistrictsByProvinceIdQuery({
+ *   variables: {
+ *      provinceId: // value for 'provinceId'
+ *   },
+ * });
+ */
+export function useGetAllDistrictsByProvinceIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetAllDistrictsByProvinceIdQuery,
+    GetAllDistrictsByProvinceIdQueryVariables
+  > &
+    (
+      | { variables: GetAllDistrictsByProvinceIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetAllDistrictsByProvinceIdQuery,
+    GetAllDistrictsByProvinceIdQueryVariables
+  >(GetAllDistrictsByProvinceIdDocument, options);
+}
+export function useGetAllDistrictsByProvinceIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAllDistrictsByProvinceIdQuery,
+    GetAllDistrictsByProvinceIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAllDistrictsByProvinceIdQuery,
+    GetAllDistrictsByProvinceIdQueryVariables
+  >(GetAllDistrictsByProvinceIdDocument, options);
+}
+export function useGetAllDistrictsByProvinceIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAllDistrictsByProvinceIdQuery,
+        GetAllDistrictsByProvinceIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAllDistrictsByProvinceIdQuery,
+    GetAllDistrictsByProvinceIdQueryVariables
+  >(GetAllDistrictsByProvinceIdDocument, options);
+}
+export type GetAllDistrictsByProvinceIdQueryHookResult = ReturnType<
+  typeof useGetAllDistrictsByProvinceIdQuery
+>;
+export type GetAllDistrictsByProvinceIdLazyQueryHookResult = ReturnType<
+  typeof useGetAllDistrictsByProvinceIdLazyQuery
+>;
+export type GetAllDistrictsByProvinceIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetAllDistrictsByProvinceIdSuspenseQuery
+>;
+export type GetAllDistrictsByProvinceIdQueryResult = Apollo.QueryResult<
+  GetAllDistrictsByProvinceIdQuery,
+  GetAllDistrictsByProvinceIdQueryVariables
+>;
+export const GetDistrictByIdDocument = gql`
+  query GetDistrictById($districtId: Int!) {
+    district(districtId: $districtId) {
+      districtId
+      districtName
+      provinceId
+    }
+  }
+`;
+
+/**
+ * __useGetDistrictByIdQuery__
+ *
+ * To run a query within a React component, call `useGetDistrictByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDistrictByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDistrictByIdQuery({
+ *   variables: {
+ *      districtId: // value for 'districtId'
+ *   },
+ * });
+ */
+export function useGetDistrictByIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetDistrictByIdQuery,
+    GetDistrictByIdQueryVariables
+  > &
+    (
+      | { variables: GetDistrictByIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetDistrictByIdQuery, GetDistrictByIdQueryVariables>(
+    GetDistrictByIdDocument,
+    options,
+  );
+}
+export function useGetDistrictByIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetDistrictByIdQuery,
+    GetDistrictByIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetDistrictByIdQuery,
+    GetDistrictByIdQueryVariables
+  >(GetDistrictByIdDocument, options);
+}
+export function useGetDistrictByIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetDistrictByIdQuery,
+        GetDistrictByIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetDistrictByIdQuery,
+    GetDistrictByIdQueryVariables
+  >(GetDistrictByIdDocument, options);
+}
+export type GetDistrictByIdQueryHookResult = ReturnType<
+  typeof useGetDistrictByIdQuery
+>;
+export type GetDistrictByIdLazyQueryHookResult = ReturnType<
+  typeof useGetDistrictByIdLazyQuery
+>;
+export type GetDistrictByIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetDistrictByIdSuspenseQuery
+>;
+export type GetDistrictByIdQueryResult = Apollo.QueryResult<
+  GetDistrictByIdQuery,
+  GetDistrictByIdQueryVariables
+>;
+export const GetAllWardsByDistrictIdDocument = gql`
+  query GetAllWardsByDistrictId($districtId: Int!) {
+    wards(districtId: $districtId) {
+      wardCode
+      wardName
+      districtId
+    }
+  }
+`;
+
+/**
+ * __useGetAllWardsByDistrictIdQuery__
+ *
+ * To run a query within a React component, call `useGetAllWardsByDistrictIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllWardsByDistrictIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllWardsByDistrictIdQuery({
+ *   variables: {
+ *      districtId: // value for 'districtId'
+ *   },
+ * });
+ */
+export function useGetAllWardsByDistrictIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetAllWardsByDistrictIdQuery,
+    GetAllWardsByDistrictIdQueryVariables
+  > &
+    (
+      | { variables: GetAllWardsByDistrictIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetAllWardsByDistrictIdQuery,
+    GetAllWardsByDistrictIdQueryVariables
+  >(GetAllWardsByDistrictIdDocument, options);
+}
+export function useGetAllWardsByDistrictIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAllWardsByDistrictIdQuery,
+    GetAllWardsByDistrictIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAllWardsByDistrictIdQuery,
+    GetAllWardsByDistrictIdQueryVariables
+  >(GetAllWardsByDistrictIdDocument, options);
+}
+export function useGetAllWardsByDistrictIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAllWardsByDistrictIdQuery,
+        GetAllWardsByDistrictIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAllWardsByDistrictIdQuery,
+    GetAllWardsByDistrictIdQueryVariables
+  >(GetAllWardsByDistrictIdDocument, options);
+}
+export type GetAllWardsByDistrictIdQueryHookResult = ReturnType<
+  typeof useGetAllWardsByDistrictIdQuery
+>;
+export type GetAllWardsByDistrictIdLazyQueryHookResult = ReturnType<
+  typeof useGetAllWardsByDistrictIdLazyQuery
+>;
+export type GetAllWardsByDistrictIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetAllWardsByDistrictIdSuspenseQuery
+>;
+export type GetAllWardsByDistrictIdQueryResult = Apollo.QueryResult<
+  GetAllWardsByDistrictIdQuery,
+  GetAllWardsByDistrictIdQueryVariables
+>;
+export const GetWardByWardCodeDocument = gql`
+  query GetWardByWardCode($wardCode: String!) {
+    ward(wardCode: $wardCode) {
+      districtId
+      wardCode
+      wardName
+    }
+  }
+`;
+
+/**
+ * __useGetWardByWardCodeQuery__
+ *
+ * To run a query within a React component, call `useGetWardByWardCodeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWardByWardCodeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWardByWardCodeQuery({
+ *   variables: {
+ *      wardCode: // value for 'wardCode'
+ *   },
+ * });
+ */
+export function useGetWardByWardCodeQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetWardByWardCodeQuery,
+    GetWardByWardCodeQueryVariables
+  > &
+    (
+      | { variables: GetWardByWardCodeQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetWardByWardCodeQuery,
+    GetWardByWardCodeQueryVariables
+  >(GetWardByWardCodeDocument, options);
+}
+export function useGetWardByWardCodeLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetWardByWardCodeQuery,
+    GetWardByWardCodeQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetWardByWardCodeQuery,
+    GetWardByWardCodeQueryVariables
+  >(GetWardByWardCodeDocument, options);
+}
+export function useGetWardByWardCodeSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetWardByWardCodeQuery,
+        GetWardByWardCodeQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetWardByWardCodeQuery,
+    GetWardByWardCodeQueryVariables
+  >(GetWardByWardCodeDocument, options);
+}
+export type GetWardByWardCodeQueryHookResult = ReturnType<
+  typeof useGetWardByWardCodeQuery
+>;
+export type GetWardByWardCodeLazyQueryHookResult = ReturnType<
+  typeof useGetWardByWardCodeLazyQuery
+>;
+export type GetWardByWardCodeSuspenseQueryHookResult = ReturnType<
+  typeof useGetWardByWardCodeSuspenseQuery
+>;
+export type GetWardByWardCodeQueryResult = Apollo.QueryResult<
+  GetWardByWardCodeQuery,
+  GetWardByWardCodeQueryVariables
 >;
 export const GetAllSystemConfigBanksDocument = gql`
   query GetAllSystemConfigBanks {
@@ -3029,556 +3689,6 @@ export type RemoveSystemConfigBankMutationResult =
 export type RemoveSystemConfigBankMutationOptions = Apollo.BaseMutationOptions<
   RemoveSystemConfigBankMutation,
   RemoveSystemConfigBankMutationVariables
->;
-export const GetAllSystemConfigColorsDocument = gql`
-  query GetAllSystemConfigColors {
-    systemConfigColors {
-      code
-      id
-      isActive
-      isDeleted
-      name
-    }
-  }
-`;
-
-/**
- * __useGetAllSystemConfigColorsQuery__
- *
- * To run a query within a React component, call `useGetAllSystemConfigColorsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetAllSystemConfigColorsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetAllSystemConfigColorsQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetAllSystemConfigColorsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GetAllSystemConfigColorsQuery,
-    GetAllSystemConfigColorsQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GetAllSystemConfigColorsQuery,
-    GetAllSystemConfigColorsQueryVariables
-  >(GetAllSystemConfigColorsDocument, options);
-}
-export function useGetAllSystemConfigColorsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetAllSystemConfigColorsQuery,
-    GetAllSystemConfigColorsQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GetAllSystemConfigColorsQuery,
-    GetAllSystemConfigColorsQueryVariables
-  >(GetAllSystemConfigColorsDocument, options);
-}
-export function useGetAllSystemConfigColorsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GetAllSystemConfigColorsQuery,
-        GetAllSystemConfigColorsQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GetAllSystemConfigColorsQuery,
-    GetAllSystemConfigColorsQueryVariables
-  >(GetAllSystemConfigColorsDocument, options);
-}
-export type GetAllSystemConfigColorsQueryHookResult = ReturnType<
-  typeof useGetAllSystemConfigColorsQuery
->;
-export type GetAllSystemConfigColorsLazyQueryHookResult = ReturnType<
-  typeof useGetAllSystemConfigColorsLazyQuery
->;
-export type GetAllSystemConfigColorsSuspenseQueryHookResult = ReturnType<
-  typeof useGetAllSystemConfigColorsSuspenseQuery
->;
-export type GetAllSystemConfigColorsQueryResult = Apollo.QueryResult<
-  GetAllSystemConfigColorsQuery,
-  GetAllSystemConfigColorsQueryVariables
->;
-export const GetSystemConfigColorByIdDocument = gql`
-  query GetSystemConfigColorById($systemConfigColorId: ID!) {
-    systemConfigColor(id: $systemConfigColorId) {
-      code
-      id
-      isActive
-      isDeleted
-      name
-    }
-  }
-`;
-
-/**
- * __useGetSystemConfigColorByIdQuery__
- *
- * To run a query within a React component, call `useGetSystemConfigColorByIdQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetSystemConfigColorByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetSystemConfigColorByIdQuery({
- *   variables: {
- *      systemConfigColorId: // value for 'systemConfigColorId'
- *   },
- * });
- */
-export function useGetSystemConfigColorByIdQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GetSystemConfigColorByIdQuery,
-    GetSystemConfigColorByIdQueryVariables
-  > &
-    (
-      | { variables: GetSystemConfigColorByIdQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    ),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GetSystemConfigColorByIdQuery,
-    GetSystemConfigColorByIdQueryVariables
-  >(GetSystemConfigColorByIdDocument, options);
-}
-export function useGetSystemConfigColorByIdLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetSystemConfigColorByIdQuery,
-    GetSystemConfigColorByIdQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GetSystemConfigColorByIdQuery,
-    GetSystemConfigColorByIdQueryVariables
-  >(GetSystemConfigColorByIdDocument, options);
-}
-export function useGetSystemConfigColorByIdSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GetSystemConfigColorByIdQuery,
-        GetSystemConfigColorByIdQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GetSystemConfigColorByIdQuery,
-    GetSystemConfigColorByIdQueryVariables
-  >(GetSystemConfigColorByIdDocument, options);
-}
-export type GetSystemConfigColorByIdQueryHookResult = ReturnType<
-  typeof useGetSystemConfigColorByIdQuery
->;
-export type GetSystemConfigColorByIdLazyQueryHookResult = ReturnType<
-  typeof useGetSystemConfigColorByIdLazyQuery
->;
-export type GetSystemConfigColorByIdSuspenseQueryHookResult = ReturnType<
-  typeof useGetSystemConfigColorByIdSuspenseQuery
->;
-export type GetSystemConfigColorByIdQueryResult = Apollo.QueryResult<
-  GetSystemConfigColorByIdQuery,
-  GetSystemConfigColorByIdQueryVariables
->;
-export const CreateSystemConfigColorDocument = gql`
-  mutation CreateSystemConfigColor($input: CreateSystemConfigColorDto!) {
-    createSystemConfigColor(input: $input) {
-      code
-      id
-      isActive
-      isDeleted
-      name
-    }
-  }
-`;
-export type CreateSystemConfigColorMutationFn = Apollo.MutationFunction<
-  CreateSystemConfigColorMutation,
-  CreateSystemConfigColorMutationVariables
->;
-
-/**
- * __useCreateSystemConfigColorMutation__
- *
- * To run a mutation, you first call `useCreateSystemConfigColorMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateSystemConfigColorMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createSystemConfigColorMutation, { data, loading, error }] = useCreateSystemConfigColorMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateSystemConfigColorMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateSystemConfigColorMutation,
-    CreateSystemConfigColorMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CreateSystemConfigColorMutation,
-    CreateSystemConfigColorMutationVariables
-  >(CreateSystemConfigColorDocument, options);
-}
-export type CreateSystemConfigColorMutationHookResult = ReturnType<
-  typeof useCreateSystemConfigColorMutation
->;
-export type CreateSystemConfigColorMutationResult =
-  Apollo.MutationResult<CreateSystemConfigColorMutation>;
-export type CreateSystemConfigColorMutationOptions = Apollo.BaseMutationOptions<
-  CreateSystemConfigColorMutation,
-  CreateSystemConfigColorMutationVariables
->;
-export const RemoveSystemConfigColorDocument = gql`
-  mutation RemoveSystemConfigColor($removeSystemConfigColorId: ID!) {
-    removeSystemConfigColor(id: $removeSystemConfigColorId) {
-      code
-      id
-      isActive
-      isDeleted
-      name
-    }
-  }
-`;
-export type RemoveSystemConfigColorMutationFn = Apollo.MutationFunction<
-  RemoveSystemConfigColorMutation,
-  RemoveSystemConfigColorMutationVariables
->;
-
-/**
- * __useRemoveSystemConfigColorMutation__
- *
- * To run a mutation, you first call `useRemoveSystemConfigColorMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRemoveSystemConfigColorMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [removeSystemConfigColorMutation, { data, loading, error }] = useRemoveSystemConfigColorMutation({
- *   variables: {
- *      removeSystemConfigColorId: // value for 'removeSystemConfigColorId'
- *   },
- * });
- */
-export function useRemoveSystemConfigColorMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RemoveSystemConfigColorMutation,
-    RemoveSystemConfigColorMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    RemoveSystemConfigColorMutation,
-    RemoveSystemConfigColorMutationVariables
-  >(RemoveSystemConfigColorDocument, options);
-}
-export type RemoveSystemConfigColorMutationHookResult = ReturnType<
-  typeof useRemoveSystemConfigColorMutation
->;
-export type RemoveSystemConfigColorMutationResult =
-  Apollo.MutationResult<RemoveSystemConfigColorMutation>;
-export type RemoveSystemConfigColorMutationOptions = Apollo.BaseMutationOptions<
-  RemoveSystemConfigColorMutation,
-  RemoveSystemConfigColorMutationVariables
->;
-export const GetAllSystemConfigSizesDocument = gql`
-  query GetAllSystemConfigSizes {
-    systemConfigSizes {
-      code
-      id
-      isActive
-      isDeleted
-      name
-    }
-  }
-`;
-
-/**
- * __useGetAllSystemConfigSizesQuery__
- *
- * To run a query within a React component, call `useGetAllSystemConfigSizesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetAllSystemConfigSizesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetAllSystemConfigSizesQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetAllSystemConfigSizesQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GetAllSystemConfigSizesQuery,
-    GetAllSystemConfigSizesQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GetAllSystemConfigSizesQuery,
-    GetAllSystemConfigSizesQueryVariables
-  >(GetAllSystemConfigSizesDocument, options);
-}
-export function useGetAllSystemConfigSizesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetAllSystemConfigSizesQuery,
-    GetAllSystemConfigSizesQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GetAllSystemConfigSizesQuery,
-    GetAllSystemConfigSizesQueryVariables
-  >(GetAllSystemConfigSizesDocument, options);
-}
-export function useGetAllSystemConfigSizesSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GetAllSystemConfigSizesQuery,
-        GetAllSystemConfigSizesQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GetAllSystemConfigSizesQuery,
-    GetAllSystemConfigSizesQueryVariables
-  >(GetAllSystemConfigSizesDocument, options);
-}
-export type GetAllSystemConfigSizesQueryHookResult = ReturnType<
-  typeof useGetAllSystemConfigSizesQuery
->;
-export type GetAllSystemConfigSizesLazyQueryHookResult = ReturnType<
-  typeof useGetAllSystemConfigSizesLazyQuery
->;
-export type GetAllSystemConfigSizesSuspenseQueryHookResult = ReturnType<
-  typeof useGetAllSystemConfigSizesSuspenseQuery
->;
-export type GetAllSystemConfigSizesQueryResult = Apollo.QueryResult<
-  GetAllSystemConfigSizesQuery,
-  GetAllSystemConfigSizesQueryVariables
->;
-export const GetSystemConfigSizeByIdDocument = gql`
-  query GetSystemConfigSizeById($systemConfigSizeId: ID!) {
-    systemConfigSize(id: $systemConfigSizeId) {
-      code
-      id
-      isActive
-      isDeleted
-      name
-    }
-  }
-`;
-
-/**
- * __useGetSystemConfigSizeByIdQuery__
- *
- * To run a query within a React component, call `useGetSystemConfigSizeByIdQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetSystemConfigSizeByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetSystemConfigSizeByIdQuery({
- *   variables: {
- *      systemConfigSizeId: // value for 'systemConfigSizeId'
- *   },
- * });
- */
-export function useGetSystemConfigSizeByIdQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GetSystemConfigSizeByIdQuery,
-    GetSystemConfigSizeByIdQueryVariables
-  > &
-    (
-      | { variables: GetSystemConfigSizeByIdQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    ),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GetSystemConfigSizeByIdQuery,
-    GetSystemConfigSizeByIdQueryVariables
-  >(GetSystemConfigSizeByIdDocument, options);
-}
-export function useGetSystemConfigSizeByIdLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetSystemConfigSizeByIdQuery,
-    GetSystemConfigSizeByIdQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GetSystemConfigSizeByIdQuery,
-    GetSystemConfigSizeByIdQueryVariables
-  >(GetSystemConfigSizeByIdDocument, options);
-}
-export function useGetSystemConfigSizeByIdSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GetSystemConfigSizeByIdQuery,
-        GetSystemConfigSizeByIdQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GetSystemConfigSizeByIdQuery,
-    GetSystemConfigSizeByIdQueryVariables
-  >(GetSystemConfigSizeByIdDocument, options);
-}
-export type GetSystemConfigSizeByIdQueryHookResult = ReturnType<
-  typeof useGetSystemConfigSizeByIdQuery
->;
-export type GetSystemConfigSizeByIdLazyQueryHookResult = ReturnType<
-  typeof useGetSystemConfigSizeByIdLazyQuery
->;
-export type GetSystemConfigSizeByIdSuspenseQueryHookResult = ReturnType<
-  typeof useGetSystemConfigSizeByIdSuspenseQuery
->;
-export type GetSystemConfigSizeByIdQueryResult = Apollo.QueryResult<
-  GetSystemConfigSizeByIdQuery,
-  GetSystemConfigSizeByIdQueryVariables
->;
-export const CreateSystemConfigSizeDocument = gql`
-  mutation CreateSystemConfigSize($input: CreateSystemConfigSizeDto!) {
-    createSystemConfigSize(input: $input) {
-      code
-      id
-      isActive
-      isDeleted
-      name
-    }
-  }
-`;
-export type CreateSystemConfigSizeMutationFn = Apollo.MutationFunction<
-  CreateSystemConfigSizeMutation,
-  CreateSystemConfigSizeMutationVariables
->;
-
-/**
- * __useCreateSystemConfigSizeMutation__
- *
- * To run a mutation, you first call `useCreateSystemConfigSizeMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateSystemConfigSizeMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createSystemConfigSizeMutation, { data, loading, error }] = useCreateSystemConfigSizeMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateSystemConfigSizeMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateSystemConfigSizeMutation,
-    CreateSystemConfigSizeMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CreateSystemConfigSizeMutation,
-    CreateSystemConfigSizeMutationVariables
-  >(CreateSystemConfigSizeDocument, options);
-}
-export type CreateSystemConfigSizeMutationHookResult = ReturnType<
-  typeof useCreateSystemConfigSizeMutation
->;
-export type CreateSystemConfigSizeMutationResult =
-  Apollo.MutationResult<CreateSystemConfigSizeMutation>;
-export type CreateSystemConfigSizeMutationOptions = Apollo.BaseMutationOptions<
-  CreateSystemConfigSizeMutation,
-  CreateSystemConfigSizeMutationVariables
->;
-export const RemoveSystemConfigSizeDocument = gql`
-  mutation RemoveSystemConfigSize($removeSystemConfigSizeId: ID!) {
-    removeSystemConfigSize(id: $removeSystemConfigSizeId) {
-      code
-      id
-      isActive
-      isDeleted
-      name
-    }
-  }
-`;
-export type RemoveSystemConfigSizeMutationFn = Apollo.MutationFunction<
-  RemoveSystemConfigSizeMutation,
-  RemoveSystemConfigSizeMutationVariables
->;
-
-/**
- * __useRemoveSystemConfigSizeMutation__
- *
- * To run a mutation, you first call `useRemoveSystemConfigSizeMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRemoveSystemConfigSizeMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [removeSystemConfigSizeMutation, { data, loading, error }] = useRemoveSystemConfigSizeMutation({
- *   variables: {
- *      removeSystemConfigSizeId: // value for 'removeSystemConfigSizeId'
- *   },
- * });
- */
-export function useRemoveSystemConfigSizeMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RemoveSystemConfigSizeMutation,
-    RemoveSystemConfigSizeMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    RemoveSystemConfigSizeMutation,
-    RemoveSystemConfigSizeMutationVariables
-  >(RemoveSystemConfigSizeDocument, options);
-}
-export type RemoveSystemConfigSizeMutationHookResult = ReturnType<
-  typeof useRemoveSystemConfigSizeMutation
->;
-export type RemoveSystemConfigSizeMutationResult =
-  Apollo.MutationResult<RemoveSystemConfigSizeMutation>;
-export type RemoveSystemConfigSizeMutationOptions = Apollo.BaseMutationOptions<
-  RemoveSystemConfigSizeMutation,
-  RemoveSystemConfigSizeMutationVariables
 >;
 export const GetUsersDocument = gql`
   query GetUsers {

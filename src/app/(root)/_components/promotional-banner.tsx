@@ -18,7 +18,7 @@ export function PromotionalBanner() {
                 Choose from accessories, drinkware, home decor, and apparel
                 pieces.
               </p>
-              <div className="relative mt-auto h-40">
+              <div className="relative mt-auto h-40 rounded-xl bg-[#0d756e]">
                 <Image
                   src="/assets/step-1.svg"
                   alt="Product selection"
@@ -33,7 +33,7 @@ export function PromotionalBanner() {
               <p className="mb-4 text-sm">
                 Upload designs or make your own with our free tools
               </p>
-              <div className="relative mt-auto h-40">
+              <div className="relative mt-auto h-40 rounded-xl bg-[#0d756e]">
                 <Image
                   src="/assets/step-2.svg"
                   alt="Design creation"
@@ -49,7 +49,7 @@ export function PromotionalBanner() {
                 Simply order more items to automatically receive bigger
                 discounts at checkout.
               </p>
-              <div className="relative mt-auto h-40">
+              <div className="relative mt-auto h-40 rounded-xl bg-[#0d756e]">
                 <Image
                   src="/assets/step-3.svg"
                   alt="Order and save"

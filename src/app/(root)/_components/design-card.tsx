@@ -32,7 +32,7 @@ export function DesignCard({
             src={image || '/placeholder.svg'}
             alt={name}
             fill
-            className="object-cover"
+            className="object-cover dark:invert"
           />
           <div className="bg-muted/60 absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
             <Button variant="default" size="sm" className="font-medium">

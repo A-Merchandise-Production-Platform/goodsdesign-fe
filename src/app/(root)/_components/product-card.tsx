@@ -29,7 +29,15 @@ export function ProductCard({
               src={image || '/placeholder.svg'}
               alt={name}
               fill
-              className="object-cover"
+              className="object-cover dark:hidden"
+            />
+            <Image
+              src={
+                'https://s3.ap-southeast-1.amazonaws.com/cdn.vntre.vn/default/an-ba-to-com-2-1725471597.jpg'
+              }
+              alt={name}
+              fill
+              className="hidden object-cover invert dark:block"
             />
           </div>
           <div className="flex flex-grow flex-col p-6">

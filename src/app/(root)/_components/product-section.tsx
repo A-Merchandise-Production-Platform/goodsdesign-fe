@@ -27,7 +27,7 @@ export function ProductSection() {
       />
 
       <ProductCard
-        route="product/phonecase"
+        route="/assets/tshirt-thumbnail.png"
         name="Phone Case"
         price={19.99}
         image="/assets/phonecase-thumbnail.png"
