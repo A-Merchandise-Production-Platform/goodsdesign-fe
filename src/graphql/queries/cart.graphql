@@ -2,10 +2,13 @@ query GetUserCartItems {
   userCartItems {
     id
     quantity
-    userId
     createdAt
     design {
       id
     }
   }
+}
+
+query GetCartItemCount {
+  getCartItemCount
 }
