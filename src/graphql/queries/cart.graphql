@@ -1,10 +1,36 @@
 query GetUserCartItems {
   userCartItems {
-    id
+    userId
     quantity
-    createdAt
+    id
     design {
-      id
+      isTemplate
+      isPublic
+      isFinalized
+      blankVariant {
+        blankPrice
+        systemVariant {
+          size
+          model
+          color
+        }
+        product {
+          name
+          imageUrl
+          discounts {
+            minQuantity
+            name
+            discountPercent
+          }
+          id
+        }
+      }
+      designPositions {
+        positionType {
+          positionName
+          basePrice
+        }
+      }
     }
   }
 }
