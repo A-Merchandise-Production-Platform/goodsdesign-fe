@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { ArrowLeft, Paintbrush } from 'lucide-react';
 
@@ -7,6 +9,8 @@ import { VolumeDiscount } from '../_components/volume-discount';
 import { ColorSelector } from '../_components/color-selector';
 import { PrintingTechniqueSelector } from '../_components/printing-technique-selector';
 import { ModelSelector } from '../_components/model-selector';
+import { useCreateProductDesignMutation } from '@/graphql/generated/graphql';
+import { toast } from 'sonner';
 
 interface TShirtProduct {
   name: string;
@@ -65,6 +69,26 @@ export default function TShirtPage() {
       },
     ],
   };
+
+  const [createProductDesign, { loading }] = useCreateProductDesignMutation();
+
+  async function onSubmit() {
+    try {
+      await createProductDesign({
+        variables: {
+          input: {
+            blankVariantId: 'bv001',
+            isFinalized: false,
+            isPublic: false,
+            isTemplate: false,
+          },
+        },
+      });
+      toast.success('Product created successfully.');
+    } catch (error) {
+      toast.error('Something went wrong.');
+    }
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">

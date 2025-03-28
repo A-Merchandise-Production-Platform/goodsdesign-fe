@@ -1,0 +1,33 @@
+mutation CreateProductDesign($input: CreateProductDesignDto!) {
+  createProductDesign(input: $input) {
+    id
+    blankVariant {
+      blankPrice
+    }
+  }
+}
+
+mutation UpdateProductDesign($updateProductDesignId: String!, $input: UpdateProductDesignDto!) {
+  updateProductDesign(id: $updateProductDesignId, input: $input) {
+    blankVariant {
+      blankPrice
+    }
+  }
+}
+
+query ProductDesign($productDesignId: ID!) {
+  productDesign(id: $productDesignId) {
+    blankVariant {
+      blankPrice
+    }
+    designPositions {
+      id
+      designJSON
+      positionType {
+        id
+        positionName
+        basePrice
+      }
+    }
+  }
+}
