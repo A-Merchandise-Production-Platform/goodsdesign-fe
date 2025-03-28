@@ -8,7 +8,12 @@ export interface ColorSelectorProps {
   defaultValue?: string;
 }
 
-export function ColorSelector({ colors, value, onValueChange, defaultValue }: ColorSelectorProps) {
+export function ColorSelector({
+  colors,
+  value,
+  onValueChange,
+  defaultValue,
+}: ColorSelectorProps) {
   return (
     <div>
       <h3 className="mb-3 text-lg font-medium">Color</h3>
