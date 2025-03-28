@@ -651,6 +651,7 @@ export type Query = {
   districts: Array<District>;
   getApplicableDiscount: Scalars['Float']['output'];
   getCartItem: CartItemEntity;
+  getCartItemCount: Scalars['Float']['output'];
   getMe: UserEntity;
   getMyFactory: FactoryEntity;
   notification: NotificationEntity;
@@ -1177,6 +1178,13 @@ export type GetUserCartItemsQuery = {
     createdAt: any;
     design: { __typename?: 'ProductDesignEntity'; id: string };
   }>;
+};
+
+export type GetCartItemCountQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetCartItemCountQuery = {
+  __typename?: 'Query';
+  getCartItemCount: number;
 };
 
 export type GetAllCategoriesQueryVariables = Exact<{ [key: string]: never }>;
@@ -2318,6 +2326,81 @@ export type GetUserCartItemsSuspenseQueryHookResult = ReturnType<
 export type GetUserCartItemsQueryResult = Apollo.QueryResult<
   GetUserCartItemsQuery,
   GetUserCartItemsQueryVariables
+>;
+export const GetCartItemCountDocument = gql`
+  query GetCartItemCount {
+    getCartItemCount
+  }
+`;
+
+/**
+ * __useGetCartItemCountQuery__
+ *
+ * To run a query within a React component, call `useGetCartItemCountQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCartItemCountQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCartItemCountQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCartItemCountQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetCartItemCountQuery,
+    GetCartItemCountQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetCartItemCountQuery, GetCartItemCountQueryVariables>(
+    GetCartItemCountDocument,
+    options,
+  );
+}
+export function useGetCartItemCountLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetCartItemCountQuery,
+    GetCartItemCountQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetCartItemCountQuery,
+    GetCartItemCountQueryVariables
+  >(GetCartItemCountDocument, options);
+}
+export function useGetCartItemCountSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetCartItemCountQuery,
+        GetCartItemCountQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetCartItemCountQuery,
+    GetCartItemCountQueryVariables
+  >(GetCartItemCountDocument, options);
+}
+export type GetCartItemCountQueryHookResult = ReturnType<
+  typeof useGetCartItemCountQuery
+>;
+export type GetCartItemCountLazyQueryHookResult = ReturnType<
+  typeof useGetCartItemCountLazyQuery
+>;
+export type GetCartItemCountSuspenseQueryHookResult = ReturnType<
+  typeof useGetCartItemCountSuspenseQuery
+>;
+export type GetCartItemCountQueryResult = Apollo.QueryResult<
+  GetCartItemCountQuery,
+  GetCartItemCountQueryVariables
 >;
 export const GetAllCategoriesDocument = gql`
   query GetAllCategories {
