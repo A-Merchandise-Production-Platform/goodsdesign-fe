@@ -7,7 +7,10 @@ mutation CreateProductDesign($input: CreateProductDesignDto!) {
   }
 }
 
-mutation UpdateProductDesign($updateProductDesignId: String!, $input: UpdateProductDesignDto!) {
+mutation UpdateProductDesign(
+  $updateProductDesignId: String!
+  $input: UpdateProductDesignDto!
+) {
   updateProductDesign(id: $updateProductDesignId, input: $input) {
     blankVariant {
       blankPrice
