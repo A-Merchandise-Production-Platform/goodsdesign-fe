@@ -10,7 +10,7 @@ const DesignHeader: React.FC<HeaderProps> = ({ onSave }) => {
   return (
     <header className="z-40 flex h-14 items-center justify-between px-6">
       <div className="flex items-center gap-4">
-        <h1 className="text-lg font-semibold">White T-Shirt</h1>
+        <h1 className="text-lg font-semibold">T-Shirt</h1>
       </div>
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon">

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Paintbrush } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -22,10 +23,6 @@ interface TShirtProduct {
   image: string;
   sizes: string[];
   colors: string[];
-  galleryColors: Array<{
-    name: string;
-    hex: string;
-  }>;
   printingTechniques: Array<{
     id: string;
     name: string;
@@ -35,10 +32,12 @@ interface TShirtProduct {
 }
 
 export default function TShirtPage() {
+  const router = useRouter();
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
 
-  const [createProductDesign, { loading }] = useCreateProductDesignMutation();
+  const [createProductDesign, { data: proData, loading: proLoading }] =
+    useCreateProductDesignMutation();
   const { data: infoData, loading: infoLoading } =
     useGetProductInformationByIdQuery({
       variables: {
@@ -46,7 +45,7 @@ export default function TShirtPage() {
       },
     });
 
-  const getBlankVariantId = (size: string, color: string) => {
+  const getSystemConfigVariantId = (size: string, color: string) => {
     return (
       infoData?.product.blankVariances?.find(
         v => v.systemVariant.size === size && v.systemVariant.color === color,
@@ -81,21 +80,7 @@ export default function TShirtPage() {
           ),
         )
       : [],
-    galleryColors: infoData?.product.blankVariances
-      ? Array.from(
-          new Set(
-            infoData.product.blankVariances
-              .map(v => v.systemVariant.color)
-              .filter(
-                (color): color is string =>
-                  color !== null && color !== undefined,
-              ),
-          ),
-        ).map(hex => ({
-          name: hex,
-          hex: hex,
-        }))
-      : [],
+
     printingTechniques: [
       {
         id: 'screen',
@@ -130,24 +115,33 @@ export default function TShirtPage() {
       return;
     }
 
-    const blankVariantId = getBlankVariantId(selectedSize, selectedColor);
-    if (!blankVariantId) {
+    const systemConfigVariantId = getSystemConfigVariantId(
+      selectedSize,
+      selectedColor,
+    );
+    if (!systemConfigVariantId) {
       toast.error('Selected combination is not available');
       return;
     }
 
     try {
-      await createProductDesign({
+      const response = await createProductDesign({
         variables: {
           input: {
-            blankVariantId,
+            systemConfigVariantId,
             isFinalized: false,
             isPublic: false,
             isTemplate: false,
           },
         },
       });
-      toast.success('Product design created successfully.');
+
+      if (proData?.createProductDesign.id) {
+        toast.success('Product design created successfully.');
+        router.push(`/product/tshirt/${proData.createProductDesign.id}`);
+      } else {
+        toast.error('Failed to create product design.');
+      }
     } catch (error) {
       toast.error('Something went wrong.');
     }
@@ -169,7 +163,7 @@ export default function TShirtPage() {
           price={product.price}
           image={product.image}
           sizes={product.sizes}
-          colors={product.galleryColors}
+          colors={product.colors}
           printingTechniques={product.printingTechniques}
         />
 

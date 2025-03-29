@@ -20,12 +20,7 @@ export default function PhoneCasePage() {
       'Samsung S22',
       'Samsung S23',
     ],
-    colors: [
-      { name: 'Clear', hex: '#f8f9fa' },
-      { name: 'Black', hex: '#000000' },
-      { name: 'White', hex: '#ffffff' },
-      { name: 'Blue', hex: '#0066cc' },
-    ],
+    colors: ['#f8f9fa', '#000000', '#ffffff', '#0066cc'],
     printingTechniques: [
       {
         id: 'uv-printing',

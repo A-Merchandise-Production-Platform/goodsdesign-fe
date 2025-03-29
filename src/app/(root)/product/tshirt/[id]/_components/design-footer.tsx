@@ -10,7 +10,7 @@ const DesignFooter: React.FC = () => {
           <TShirt className="h-full w-full p-4" />
         </div>
         <div>
-          <h3 className="font-semibold">White T-Shirt</h3>
+          <h3 className="font-semibold">T-Shirt</h3>
           <p className="text-sm text-gray-500">$25.00</p>
         </div>
       </div>

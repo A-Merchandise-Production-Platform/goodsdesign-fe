@@ -1,9 +1,25 @@
+query ProductDesignById($productDesignId: ID!) {
+  productDesign(id: $productDesignId) {
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+    }
+    designPositions {
+      positionType {
+        positionName
+        basePrice
+      }
+      designJSON
+    }
+  }
+}
+
 mutation CreateProductDesign($input: CreateProductDesignDto!) {
   createProductDesign(input: $input) {
     id
-    blankVariant {
-      blankPrice
-    }
   }
 }
 
@@ -12,25 +28,19 @@ mutation UpdateProductDesign(
   $input: UpdateProductDesignDto!
 ) {
   updateProductDesign(id: $updateProductDesignId, input: $input) {
-    blankVariant {
-      blankPrice
-    }
-  }
-}
-
-query ProductDesign($productDesignId: ID!) {
-  productDesign(id: $productDesignId) {
-    blankVariant {
-      blankPrice
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
     }
     designPositions {
-      id
-      designJSON
       positionType {
-        id
         positionName
         basePrice
       }
+      designJSON
     }
   }
 }

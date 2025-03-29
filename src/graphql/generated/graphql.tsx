@@ -1459,6 +1459,12 @@ export type CreateProductDesignMutation = {
     blankVariant?: {
       __typename?: 'BlankVariancesEntity';
       blankPrice: number;
+      systemVariant: {
+        __typename?: 'SystemConfigVariant';
+        color?: string | null;
+        size?: string | null;
+        model?: string | null;
+      };
     } | null;
   };
 };
@@ -1472,9 +1478,16 @@ export type UpdateProductDesignMutation = {
   __typename?: 'Mutation';
   updateProductDesign: {
     __typename?: 'ProductDesignEntity';
+    id: string;
     blankVariant?: {
       __typename?: 'BlankVariancesEntity';
       blankPrice: number;
+      systemVariant: {
+        __typename?: 'SystemConfigVariant';
+        color?: string | null;
+        size?: string | null;
+        model?: string | null;
+      };
     } | null;
   };
 };
@@ -3140,6 +3153,11 @@ export const CreateProductDesignDocument = gql`
       id
       blankVariant {
         blankPrice
+        systemVariant {
+          color
+          size
+          model
+        }
       }
     }
   }
@@ -3193,8 +3211,14 @@ export const UpdateProductDesignDocument = gql`
     $input: UpdateProductDesignDto!
   ) {
     updateProductDesign(id: $updateProductDesignId, input: $input) {
+      id
       blankVariant {
         blankPrice
+        systemVariant {
+          color
+          size
+          model
+        }
       }
     }
   }

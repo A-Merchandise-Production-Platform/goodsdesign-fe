@@ -46,13 +46,11 @@ mutation DeleteProduct($deleteProductId: String!) {
 query GetProductInformationById($productId: String!) {
   product(id: $productId) {
     name
-    blankVariances {
+    variants {
       id
-      blankPrice
-      systemVariant {
-        size
-        color
-      }
+      color
+      size
+      model
     }
   }
 }
