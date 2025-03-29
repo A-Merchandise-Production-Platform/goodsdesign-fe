@@ -12,6 +12,7 @@ export interface NavItem {
   href: string;
   label: string;
   icon?: React.ReactNode;
+  isActive?: boolean;
 }
 
 export function MySidebar({ navItems, children }: MySidebarProps) {
@@ -21,7 +22,7 @@ export function MySidebar({ navItems, children }: MySidebarProps) {
     <div className="grid grid-cols-1 gap-4 pt-4 pb-2 md:grid-cols-[200px_1fr]">
       <nav className="bg-background space-y-1 rounded-xl">
         {navItems.map(item => {
-          const isActive = pathname === item.href;
+          const isActive = item.isActive ?? item.href === pathname;
           return (
             <Link
               key={item.label}

@@ -14,7 +14,9 @@ import { useGetCartItemCountQuery } from '@/graphql/generated/graphql';
 export default function AuthenMenu() {
   const { isAuth, user } = useAuthStore();
 
-  const { data: cartItemCount } = useGetCartItemCountQuery();
+  const { data: cartItemCount } = useGetCartItemCountQuery({
+    fetchPolicy: 'no-cache',
+  });
 
   return (
     <div className="flex items-center gap-2">
@@ -26,16 +28,16 @@ export default function AuthenMenu() {
             <Button variant="outline" className="relative">
               <ShoppingCartIcon />
               {cartItemCount?.getCartItemCount &&
-                cartItemCount.getCartItemCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-2 -right-2 h-5 min-w-5 rounded-full px-1.5 text-xs"
-                  >
-                    {cartItemCount.getCartItemCount > 99
-                      ? '99+'
-                      : cartItemCount.getCartItemCount}
-                  </Badge>
-                )}
+              cartItemCount.getCartItemCount > 0 ? (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-2 -right-2 h-5 min-w-5 rounded-full px-1.5 text-xs"
+                >
+                  {cartItemCount.getCartItemCount > 99
+                    ? '99+'
+                    : cartItemCount.getCartItemCount}
+                </Badge>
+              ) : undefined}
             </Button>
           </Link>
           <div className="flex items-center gap-4">

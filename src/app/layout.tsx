@@ -121,7 +121,6 @@ export default function RootLayout({
                 </main>
               </ScrollArea>
             </AuthProvider>
-
             <Toaster richColors position="bottom-right" />
           </ThemeProvider>
         </ApolloClientProvider>
