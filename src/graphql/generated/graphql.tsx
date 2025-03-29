@@ -54,17 +54,6 @@ export type AuthResponseDto = {
   user: UserEntity;
 };
 
-/** Blank Variances */
-export type BlankVariancesEntity = {
-  __typename?: 'BlankVariancesEntity';
-  blankPrice: Scalars['Int']['output'];
-  id: Scalars['ID']['output'];
-  product: ProductEntity;
-  productId: Scalars['String']['output'];
-  systemVariant: SystemConfigVariant;
-  systemVariantId: Scalars['String']['output'];
-};
-
 export type CalculateShippingFeeDto = {
   fromDistrictId: Scalars['Int']['input'];
   fromWardCode: Scalars['String']['input'];
@@ -114,13 +103,6 @@ export type CreateAddressInput = {
   wardCode: Scalars['String']['input'];
 };
 
-/** Create Blank Variance */
-export type CreateBlankVarianceDto = {
-  blankPrice: Scalars['Float']['input'];
-  productId: Scalars['String']['input'];
-  systemVariantId: Scalars['String']['input'];
-};
-
 export type CreateCartItemDto = {
   designId: Scalars['String']['input'];
   quantity: Scalars['Int']['input'];
@@ -158,10 +140,10 @@ export type CreateOrderDto = {
 };
 
 export type CreateProductDesignDto = {
-  blankVariantId: Scalars['String']['input'];
   isFinalized?: Scalars['Boolean']['input'];
   isPublic?: Scalars['Boolean']['input'];
   isTemplate?: Scalars['Boolean']['input'];
+  systemConfigVariantId: Scalars['String']['input'];
   userId?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -316,7 +298,6 @@ export type Mutation = {
   calculateShippingFee: ShippingFee;
   clearCart: Scalars['Boolean']['output'];
   createAddress: AddressEntity;
-  createBlankVariance: BlankVariancesEntity;
   createCartItem: CartItemEntity;
   createCategory: CategoryEntity;
   createDesignPosition: DesignPositionEntity;
@@ -328,10 +309,9 @@ export type Mutation = {
   createProductPositionType: ProductPositionTypeEntity;
   createSystemConfigBank: SystemConfigBankEntity;
   createSystemConfigDiscount: SystemConfigDiscountEntity;
-  createSystemConfigVariant: SystemConfigVariant;
+  createSystemConfigVariant: SystemConfigVariantEntity;
   createUser: UserEntity;
   deleteAddress: AddressEntity;
-  deleteBlankVariance: BlankVariancesEntity;
   deleteCartItem: CartItemEntity;
   deleteCategory: CategoryEntity;
   deleteProduct: ProductEntity;
@@ -348,14 +328,13 @@ export type Mutation = {
   removeProductPositionType: ProductPositionTypeEntity;
   removeSystemConfigBank: SystemConfigBankEntity;
   removeSystemConfigDiscount: SystemConfigDiscountEntity;
-  removeSystemConfigVariant: SystemConfigVariant;
+  removeSystemConfigVariant: SystemConfigVariantEntity;
   restoreCategory: CategoryEntity;
   restoreProduct: ProductEntity;
   sendEmail: Scalars['Boolean']['output'];
   toggleActiveCategory: CategoryEntity;
   toggleActiveProduct: ProductEntity;
   updateAddress: AddressEntity;
-  updateBlankVariance: BlankVariancesEntity;
   updateCartItem: CartItemEntity;
   updateCategory: CategoryEntity;
   updateDesignPosition: DesignPositionEntity;
@@ -366,7 +345,7 @@ export type Mutation = {
   updateProductPositionType: ProductPositionTypeEntity;
   updateSystemConfigBank: SystemConfigBankEntity;
   updateSystemConfigDiscount: SystemConfigDiscountEntity;
-  updateSystemConfigVariant: SystemConfigVariant;
+  updateSystemConfigVariant: SystemConfigVariantEntity;
   updateUser: UserEntity;
   uploadFile: FileUploadResponse;
 };
@@ -377,10 +356,6 @@ export type MutationCalculateShippingFeeArgs = {
 
 export type MutationCreateAddressArgs = {
   createAddressInput: CreateAddressInput;
-};
-
-export type MutationCreateBlankVarianceArgs = {
-  createBlankVarianceInput: CreateBlankVarianceDto;
 };
 
 export type MutationCreateCartItemArgs = {
@@ -437,10 +412,6 @@ export type MutationCreateUserArgs = {
 };
 
 export type MutationDeleteAddressArgs = {
-  id: Scalars['String']['input'];
-};
-
-export type MutationDeleteBlankVarianceArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -529,11 +500,6 @@ export type MutationUpdateAddressArgs = {
   updateAddressInput: UpdateAddressInput;
 };
 
-export type MutationUpdateBlankVarianceArgs = {
-  id: Scalars['String']['input'];
-  updateBlankVarianceInput: UpdateBlankVarianceDto;
-};
-
 export type MutationUpdateCartItemArgs = {
   id: Scalars['String']['input'];
   updateCartItemInput: UpdateCartItemDto;
@@ -607,14 +573,14 @@ export type NotificationEntity = {
 
 export type ProductDesignEntity = {
   __typename?: 'ProductDesignEntity';
-  blankVariant?: Maybe<BlankVariancesEntity>;
-  blankVariantId: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
   designPositions?: Maybe<Array<DesignPositionEntity>>;
   id: Scalars['ID']['output'];
   isFinalized: Scalars['Boolean']['output'];
   isPublic: Scalars['Boolean']['output'];
   isTemplate: Scalars['Boolean']['output'];
+  systemConfigVariant: SystemConfigVariantEntity;
+  systemConfigVariantId: Scalars['String']['output'];
   user?: Maybe<UserEntity>;
   userId: Scalars['String']['output'];
 };
@@ -622,7 +588,6 @@ export type ProductDesignEntity = {
 /** Product */
 export type ProductEntity = {
   __typename?: 'ProductEntity';
-  blankVariances?: Maybe<Array<BlankVariancesEntity>>;
   category?: Maybe<CategoryEntity>;
   categoryId: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
@@ -640,6 +605,7 @@ export type ProductEntity = {
   positionTypes?: Maybe<Array<ProductPositionTypeEntity>>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   updatedBy?: Maybe<Scalars['String']['output']>;
+  variants?: Maybe<Array<SystemConfigVariantEntity>>;
 };
 
 export type ProductPositionTypeEntity = {
@@ -663,8 +629,6 @@ export type Query = {
   address: AddressEntity;
   addresses: Array<AddressEntity>;
   availableServices: Array<ShippingService>;
-  blankVariance?: Maybe<BlankVariancesEntity>;
-  blankVariances: Array<BlankVariancesEntity>;
   categories: Array<CategoryEntity>;
   category: CategoryEntity;
   designPosition: DesignPositionEntity;
@@ -691,9 +655,9 @@ export type Query = {
   systemConfigBanks: Array<SystemConfigBankEntity>;
   systemConfigDiscount: SystemConfigDiscountEntity;
   systemConfigDiscounts: Array<SystemConfigDiscountEntity>;
-  systemConfigVariant: SystemConfigVariant;
-  systemConfigVariants: Array<SystemConfigVariant>;
-  systemConfigVariantsByProduct: Array<SystemConfigVariant>;
+  systemConfigVariant: SystemConfigVariantEntity;
+  systemConfigVariants: Array<SystemConfigVariantEntity>;
+  systemConfigVariantsByProduct: Array<SystemConfigVariantEntity>;
   user: UserEntity;
   userCartItems: Array<CartItemEntity>;
   userOrder: CustomerOrderEntity;
@@ -709,10 +673,6 @@ export type QueryAddressArgs = {
 
 export type QueryAvailableServicesArgs = {
   servicesInput: GetAvailableServicesDto;
-};
-
-export type QueryBlankVarianceArgs = {
-  id: Scalars['String']['input'];
 };
 
 export type QueryCategoryArgs = {
@@ -864,14 +824,14 @@ export type SystemConfigDiscountEntity = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
-export type SystemConfigVariant = {
-  __typename?: 'SystemConfigVariant';
-  blankVariances: Array<BlankVariancesEntity>;
+export type SystemConfigVariantEntity = {
+  __typename?: 'SystemConfigVariantEntity';
   color?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   isActive: Scalars['Boolean']['output'];
   isDeleted: Scalars['Boolean']['output'];
   model?: Maybe<Scalars['String']['output']>;
+  price?: Maybe<Scalars['Float']['output']>;
   product: ProductEntity;
   productId: Scalars['String']['output'];
   size?: Maybe<Scalars['String']['output']>;
@@ -883,13 +843,6 @@ export type UpdateAddressInput = {
   provinceID?: InputMaybe<Scalars['Float']['input']>;
   street?: InputMaybe<Scalars['String']['input']>;
   wardCode?: InputMaybe<Scalars['String']['input']>;
-};
-
-/** Update Blank Variance */
-export type UpdateBlankVarianceDto = {
-  blankPrice?: InputMaybe<Scalars['Float']['input']>;
-  productId?: InputMaybe<Scalars['String']['input']>;
-  systemVariantId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateCartItemDto = {
@@ -942,10 +895,10 @@ export type UpdateNotificationDto = {
 };
 
 export type UpdateProductDesignDto = {
-  blankVariantId?: InputMaybe<Scalars['String']['input']>;
   isFinalized?: InputMaybe<Scalars['Boolean']['input']>;
   isPublic?: InputMaybe<Scalars['Boolean']['input']>;
   isTemplate?: InputMaybe<Scalars['Boolean']['input']>;
+  systemConfigVariantId?: InputMaybe<Scalars['String']['input']>;
   userId?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1243,15 +1196,16 @@ export type GetUserCartItemsQuery = {
       isTemplate: boolean;
       isPublic: boolean;
       isFinalized: boolean;
-      blankVariant?: {
-        __typename?: 'BlankVariancesEntity';
-        blankPrice: number;
-        systemVariant: {
-          __typename?: 'SystemConfigVariant';
-          size?: string | null;
-          model?: string | null;
-          color?: string | null;
-        };
+      systemConfigVariant: {
+        __typename?: 'SystemConfigVariantEntity';
+        color?: string | null;
+        id: string;
+        isActive: boolean;
+        isDeleted: boolean;
+        model?: string | null;
+        price?: number | null;
+        productId: string;
+        size?: string | null;
         product: {
           __typename?: 'ProductEntity';
           name: string;
@@ -1264,7 +1218,7 @@ export type GetUserCartItemsQuery = {
             discountPercent: number;
           }> | null;
         };
-      } | null;
+      };
       designPositions?: Array<{
         __typename?: 'DesignPositionEntity';
         positionType?: {
@@ -2482,13 +2436,13 @@ export const GetUserCartItemsDocument = gql`
         isTemplate
         isPublic
         isFinalized
-        blankVariant {
-          blankPrice
-          systemVariant {
-            size
-            model
-            color
-          }
+        systemConfigVariant {
+          color
+          id
+          isActive
+          isDeleted
+          model
+          price
           product {
             name
             imageUrl
@@ -2499,6 +2453,8 @@ export const GetUserCartItemsDocument = gql`
             }
             id
           }
+          productId
+          size
         }
         designPositions {
           positionType {
