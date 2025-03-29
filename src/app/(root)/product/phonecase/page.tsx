@@ -72,7 +72,7 @@ export default function PhoneCasePage() {
             />
           </div>
 
-          <VolumeDiscount />
+          {/* <VolumeDiscount /> */}
 
           <Button size="lg" className="w-full">
             <Paintbrush className="mr-2 h-5 w-5" />

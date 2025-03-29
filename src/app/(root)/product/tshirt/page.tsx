@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Paintbrush } from 'lucide-react';
+import { ArrowLeft, Loader2, Paintbrush } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { ProductImageGallery } from '../_components/product-image-gallery';
@@ -13,9 +13,11 @@ import { PrintingTechniqueSelector } from '../_components/printing-technique-sel
 import { ModelSelector } from '../_components/model-selector';
 import {
   useCreateProductDesignMutation,
+  useGetAllDiscountByProductIdQuery,
   useGetProductInformationByIdQuery,
 } from '@/graphql/generated/graphql';
 import { toast } from 'sonner';
+import { formatPrice } from '@/lib/utils';
 
 interface TShirtProduct {
   name: string;
@@ -35,6 +37,7 @@ export default function TShirtPage() {
   const router = useRouter();
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedVariantPrice, setSelectedVariantPrice] = useState<number>(0);
 
   const [createProductDesign, { data: proData, loading: proLoading }] =
     useCreateProductDesignMutation();
@@ -45,34 +48,73 @@ export default function TShirtPage() {
       },
     });
 
-  const getSystemConfigVariantId = (size: string, color: string) => {
-    return (
-      infoData?.product.blankVariances?.find(
-        v => v.systemVariant.size === size && v.systemVariant.color === color,
-      )?.id || ''
+  const { data: discountData, loading: discountLoading } =
+    useGetAllDiscountByProductIdQuery({
+      variables: {
+        productId: 'prod001',
+      },
+    });
+
+  // Set initial size and color from first variant when data loads
+  useEffect(() => {
+    if (infoData?.product.variants && infoData.product.variants.length > 0) {
+      const firstVariant = infoData.product.variants[0];
+      if (firstVariant.size) setSelectedSize(firstVariant.size);
+      if (firstVariant.color) setSelectedColor(firstVariant.color);
+    }
+  }, [infoData]);
+  const getVariant = (size: string, color: string) => {
+    return infoData?.product.variants?.find(
+      v => v.size === size && v.color === color,
     );
   };
 
+  const getSystemConfigVariantId = (size: string, color: string) => {
+    return getVariant(size, color)?.id || '';
+  };
+
+  // Update price when size or color changes
+  useEffect(() => {
+    if (selectedSize && selectedColor) {
+      const variant = getVariant(selectedSize, selectedColor);
+      if (variant?.price) {
+        setSelectedVariantPrice(variant?.price);
+      }
+    }
+  }, [selectedSize, selectedColor, infoData]);
+
+  // Handle product design creation result
+  useEffect(() => {
+    if (!proLoading && proData) {
+      if (proData.createProductDesign.id) {
+        toast.success('Product design created successfully.');
+        router.push(`/product/tshirt/${proData.createProductDesign.id}`);
+      } else {
+        toast.error('Failed to create product design.');
+      }
+    }
+  }, [proLoading, proData, router]);
+
   const product: TShirtProduct = {
     name: infoData?.product.name || 'T-Shirt',
-    price: 24.99,
+    price: selectedVariantPrice,
     image: '/assets/tshirt-thumbnail.png',
-    sizes: infoData?.product.blankVariances
+    sizes: infoData?.product.variants
       ? Array.from(
           new Set(
-            infoData.product.blankVariances
-              .map(v => v.systemVariant.size)
+            infoData.product.variants
+              .map(v => v.size)
               .filter(
                 (size): size is string => size !== null && size !== undefined,
               ),
           ),
         )
       : [],
-    colors: infoData?.product.blankVariances
+    colors: infoData?.product.variants
       ? Array.from(
           new Set(
-            infoData.product.blankVariances
-              .map(v => v.systemVariant.color)
+            infoData.product.variants
+              .map(v => v.color)
               .filter(
                 (color): color is string =>
                   color !== null && color !== undefined,
@@ -125,7 +167,7 @@ export default function TShirtPage() {
     }
 
     try {
-      const response = await createProductDesign({
+      await createProductDesign({
         variables: {
           input: {
             systemConfigVariantId,
@@ -135,13 +177,6 @@ export default function TShirtPage() {
           },
         },
       });
-
-      if (proData?.createProductDesign.id) {
-        toast.success('Product design created successfully.');
-        router.push(`/product/tshirt/${proData.createProductDesign.id}`);
-      } else {
-        toast.error('Failed to create product design.');
-      }
     } catch (error) {
       toast.error('Something went wrong.');
     }
@@ -171,7 +206,7 @@ export default function TShirtPage() {
           <div>
             <h1 className="text-3xl font-bold">{product.name}</h1>
             <p className="mt-2 text-2xl font-semibold">
-              ${product.price.toFixed(2)}
+              {formatPrice(product.price)}
             </p>
           </div>
 
@@ -193,10 +228,22 @@ export default function TShirtPage() {
             />
           </div>
 
-          <VolumeDiscount />
+          <VolumeDiscount
+            discounts={discountData?.getAllDiscountByProductId || []}
+            loading={discountLoading}
+          />
 
-          <Button onClick={onSubmit} size="lg" className="w-full">
-            <Paintbrush className="mr-2 h-5 w-5" />
+          <Button
+            onClick={onSubmit}
+            size="lg"
+            className="w-full"
+            disabled={proLoading}
+          >
+            {proLoading ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <Paintbrush className="mr-2 h-5 w-5" />
+            )}
             Start Designing
           </Button>
         </div>

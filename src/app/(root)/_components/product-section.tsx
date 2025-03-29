@@ -1,6 +1,26 @@
 import { ProductCard } from './product-card';
 
-export function ProductSection() {
+interface ProductSectionProps {
+  products?: {
+    category?: { name: string } | null;
+    id: string;
+    imageUrl?: string | null;
+    isActive: boolean;
+    name: string;
+    description?: string | null;
+    variants?: { price?: number | null }[] | null;
+  }[];
+}
+
+export function ProductSection({ products = [] }: ProductSectionProps) {
+  const getMinPrice = (variants?: { price?: number | null }[] | null) => {
+    if (!variants?.length) return 0;
+    const prices = variants
+      .map(v => v.price)
+      .filter((price): price is number => typeof price === 'number');
+    return prices.length ? Math.min(...prices) : 0;
+  };
+
   return (
     <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3">
       <div className="bg-accent/80 flex flex-col justify-center rounded-xl p-6">
@@ -18,21 +38,16 @@ export function ProductSection() {
         </p>
       </div>
 
-      <ProductCard
-        route="product/tshirt"
-        name="T-Shirt"
-        price={24.99}
-        image="/assets/tshirt-thumbnail.png"
-        description="100% cotton premium t-shirt available in multiple sizes and colors"
-      />
-
-      <ProductCard
-        route="product/phonecase"
-        name="Phone Case"
-        price={19.99}
-        image="/assets/phonecase-thumbnail.png"
-        description="Durable phone case available for various phone models"
-      />
+      {products.map(product => (
+        <ProductCard
+          key={product.id}
+          route={`product/${product.id}`}
+          name={product.name}
+          price={getMinPrice(product.variants) / 1000}
+          image={product.imageUrl || ''}
+          description={product.description || ''}
+        />
+      ))}
     </div>
   );
 }
