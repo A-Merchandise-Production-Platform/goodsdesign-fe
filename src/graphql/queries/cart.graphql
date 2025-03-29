@@ -7,13 +7,13 @@ query GetUserCartItems {
       isTemplate
       isPublic
       isFinalized
-      blankVariant {
-        blankPrice
-        systemVariant {
-          size
-          model
-          color
-        }
+      systemConfigVariant {
+        color
+        id
+        isActive
+        isDeleted
+        model
+        price
         product {
           name
           imageUrl
@@ -24,6 +24,8 @@ query GetUserCartItems {
           }
           id
         }
+        productId
+        size
       }
       designPositions {
         positionType {
@@ -31,6 +33,7 @@ query GetUserCartItems {
           basePrice
         }
       }
+      
     }
   }
 }
