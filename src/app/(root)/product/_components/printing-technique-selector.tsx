@@ -1,5 +1,6 @@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { formatPrice } from '@/lib/utils';
 
 export interface PrintingTechniqueSelectorProps {
   techniques: Array<{
@@ -30,7 +31,7 @@ export function PrintingTechniqueSelector({
             >
               <span className="font-medium">{technique.name}</span>
               <span className="text-primary font-medium">
-                ${technique.price.toFixed(2)}
+                {formatPrice(technique.price)}
               </span>
               <span className="text-muted-foreground col-span-3 text-sm">
                 {technique.description}

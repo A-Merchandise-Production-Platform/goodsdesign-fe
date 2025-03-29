@@ -42,8 +42,7 @@ export default function ModelViewer({ modelUrl, decalUrl }: ModelViewerProps) {
     <div className="bg-muted h-full w-full">
       <Canvas>
         {/* <Float> */}
-        {/* <Model modelUrl={modelUrl} decalUrl={modelUrl} /> */}
-        <Shirt decalUrl={decalUrl} />
+        <Model modelUrl={modelUrl} decalUrl={modelUrl} />
         {/* </Float> */}
         <ContactShadows position-y={-2.5} opacity={0.4} blur={3} />
         <Environment preset="sunset" />

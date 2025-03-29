@@ -1,5 +1,9 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Paintbrush } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Loader2, Paintbrush } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { ProductImageGallery } from '../_components/product-image-gallery';
@@ -7,16 +11,20 @@ import { VolumeDiscount } from '../_components/volume-discount';
 import { ColorSelector } from '../_components/color-selector';
 import { PrintingTechniqueSelector } from '../_components/printing-technique-selector';
 import { ModelSelector } from '../_components/model-selector';
+import {
+  useCreateProductDesignMutation,
+  useGetAllDiscountByProductIdQuery,
+  useGetProductInformationByIdQuery,
+} from '@/graphql/generated/graphql';
+import { toast } from 'sonner';
+import { formatPrice } from '@/lib/utils';
 
 interface TShirtProduct {
   name: string;
   price: number;
   image: string;
   sizes: string[];
-  colors: Array<{
-    name: string;
-    hex: string;
-  }>;
+  colors: string[];
   printingTechniques: Array<{
     id: string;
     name: string;
@@ -26,18 +34,95 @@ interface TShirtProduct {
 }
 
 export default function TShirtPage() {
+  const router = useRouter();
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedVariantPrice, setSelectedVariantPrice] = useState<number>(0);
+
+  const [createProductDesign, { data: proData, loading: proLoading }] =
+    useCreateProductDesignMutation();
+  const { data: infoData, loading: infoLoading } =
+    useGetProductInformationByIdQuery({
+      variables: {
+        productId: 'prod001',
+      },
+    });
+
+  const { data: discountData, loading: discountLoading } =
+    useGetAllDiscountByProductIdQuery({
+      variables: {
+        productId: 'prod001',
+      },
+    });
+
+  // Set initial size and color from first variant when data loads
+  useEffect(() => {
+    if (infoData?.product.variants && infoData.product.variants.length > 0) {
+      const firstVariant = infoData.product.variants[0];
+      if (firstVariant.size) setSelectedSize(firstVariant.size);
+      if (firstVariant.color) setSelectedColor(firstVariant.color);
+    }
+  }, [infoData]);
+  const getVariant = (size: string, color: string) => {
+    return infoData?.product.variants?.find(
+      v => v.size === size && v.color === color,
+    );
+  };
+
+  const getSystemConfigVariantId = (size: string, color: string) => {
+    return getVariant(size, color)?.id || '';
+  };
+
+  // Update price when size or color changes
+  useEffect(() => {
+    if (selectedSize && selectedColor) {
+      const variant = getVariant(selectedSize, selectedColor);
+      if (variant?.price) {
+        setSelectedVariantPrice(variant?.price);
+      }
+    }
+  }, [selectedSize, selectedColor, infoData]);
+
+  // Handle product design creation result
+  useEffect(() => {
+    if (!proLoading && proData) {
+      if (proData.createProductDesign.id) {
+        toast.success('Product design created successfully.');
+        router.push(`/product/tshirt/${proData.createProductDesign.id}`);
+      } else {
+        toast.error('Failed to create product design.');
+      }
+    }
+  }, [proLoading, proData, router]);
+
   const product: TShirtProduct = {
-    name: 'T-Shirt',
-    price: 24.99,
+    name: infoData?.product.name || 'T-Shirt',
+    price: selectedVariantPrice,
     image: '/assets/tshirt-thumbnail.png',
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    colors: [
-      { name: 'White', hex: '#ffffff' },
-      { name: 'Black', hex: '#000000' },
-      { name: 'Gray', hex: '#808080' },
-      { name: 'Blue', hex: '#0066cc' },
-      { name: 'Red', hex: '#cc0000' },
-    ],
+    sizes: infoData?.product.variants
+      ? Array.from(
+          new Set(
+            infoData.product.variants
+              .map(v => v.size)
+              .filter(
+                (size): size is string => size !== null && size !== undefined,
+              ),
+          ),
+        )
+      : [],
+    colors: infoData?.product.variants
+      ? Array.from(
+          new Set(
+            infoData.product.variants
+              .map(v => v.color)
+              .filter(
+                (color): color is string =>
+                  color !== null && color !== undefined,
+              ),
+          ),
+        )
+      : [],
+
     printingTechniques: [
       {
         id: 'screen',
@@ -66,6 +151,37 @@ export default function TShirtPage() {
     ],
   };
 
+  async function onSubmit() {
+    if (!selectedSize || !selectedColor) {
+      toast.error('Please select size and color');
+      return;
+    }
+
+    const systemConfigVariantId = getSystemConfigVariantId(
+      selectedSize,
+      selectedColor,
+    );
+    if (!systemConfigVariantId) {
+      toast.error('Selected combination is not available');
+      return;
+    }
+
+    try {
+      await createProductDesign({
+        variables: {
+          input: {
+            systemConfigVariantId,
+            isFinalized: false,
+            isPublic: false,
+            isTemplate: false,
+          },
+        },
+      });
+    } catch (error) {
+      toast.error('Something went wrong.');
+    }
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Link
@@ -77,28 +193,57 @@ export default function TShirtPage() {
       </Link>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <ProductImageGallery {...product} />
+        <ProductImageGallery
+          name={product.name}
+          price={product.price}
+          image={product.image}
+          sizes={product.sizes}
+          colors={product.colors}
+          printingTechniques={product.printingTechniques}
+        />
 
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold">{product.name}</h1>
             <p className="mt-2 text-2xl font-semibold">
-              ${product.price.toFixed(2)}
+              {formatPrice(product.price)}
             </p>
           </div>
 
           <div className="space-y-6">
-            <ModelSelector sizes={product.sizes} />
-            <ColorSelector colors={product.colors} />
+            <ModelSelector
+              sizes={product.sizes}
+              defaultValue={selectedSize}
+              value={selectedSize}
+              onValueChange={setSelectedSize}
+            />
+            <ColorSelector
+              colors={product.colors}
+              defaultValue={selectedColor}
+              value={selectedColor}
+              onValueChange={setSelectedColor}
+            />
             <PrintingTechniqueSelector
               techniques={product.printingTechniques}
             />
           </div>
 
-          <VolumeDiscount />
+          <VolumeDiscount
+            discounts={discountData?.getAllDiscountByProductId || []}
+            loading={discountLoading}
+          />
 
-          <Button size="lg" className="w-full">
-            <Paintbrush className="mr-2 h-5 w-5" />
+          <Button
+            onClick={onSubmit}
+            size="lg"
+            className="w-full"
+            disabled={proLoading}
+          >
+            {proLoading ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <Paintbrush className="mr-2 h-5 w-5" />
+            )}
             Start Designing
           </Button>
         </div>

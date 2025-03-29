@@ -10,6 +10,9 @@ query GetAllProducts {
     updatedAt
     createdAt
     description
+    variants {
+      price
+    }
   }
 }
 
@@ -40,5 +43,18 @@ mutation DeleteProduct($deleteProductId: String!) {
     updatedAt
     createdAt
     description
+  }
+}
+
+query GetProductInformationById($productId: String!) {
+  product(id: $productId) {
+    name
+    variants {
+      id
+      price
+      color
+      size
+      model
+    }
   }
 }
