@@ -1,11 +1,60 @@
 query GetUserCartItems {
   userCartItems {
-    id
-    quantity
     userId
-    createdAt
+    quantity
+    id
     design {
-      id
+      isTemplate
+      isPublic
+      isFinalized
+      blankVariant {
+        blankPrice
+        systemVariant {
+          size
+          model
+          color
+        }
+        product {
+          name
+          imageUrl
+          discounts {
+            minQuantity
+            name
+            discountPercent
+          }
+          id
+        }
+      }
+      designPositions {
+        positionType {
+          positionName
+          basePrice
+        }
+      }
     }
+  }
+}
+
+query GetCartItemCount {
+  getCartItemCount
+}
+
+mutation UpdateCartItem(
+  $updateCartItemId: String!
+  $updateCartItemInput: UpdateCartItemDto!
+) {
+  updateCartItem(
+    id: $updateCartItemId
+    updateCartItemInput: $updateCartItemInput
+  ) {
+    userId
+    quantity
+    id
+  }
+}
+
+mutation CalculateShippingFee($input: CalculateShippingFeeDto!) {
+  calculateShippingFee(input: $input) {
+    total
   }
 }
