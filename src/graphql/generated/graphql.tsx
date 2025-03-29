@@ -59,9 +59,10 @@ export type BlankVariancesEntity = {
   __typename?: 'BlankVariancesEntity';
   blankPrice: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
-  information: Scalars['JSON']['output'];
-  product?: Maybe<ProductEntity>;
+  product: ProductEntity;
   productId: Scalars['String']['output'];
+  systemVariant: SystemConfigVariant;
+  systemVariantId: Scalars['String']['output'];
 };
 
 export type CalculateShippingFeeDto = {
@@ -115,9 +116,9 @@ export type CreateAddressInput = {
 
 /** Create Blank Variance */
 export type CreateBlankVarianceDto = {
-  blankPrice: Scalars['Int']['input'];
-  information: Scalars['JSON']['input'];
+  blankPrice: Scalars['Float']['input'];
   productId: Scalars['String']['input'];
+  systemVariantId: Scalars['String']['input'];
 };
 
 export type CreateCartItemDto = {
@@ -161,8 +162,7 @@ export type CreateProductDesignDto = {
   isFinalized?: Scalars['Boolean']['input'];
   isPublic?: Scalars['Boolean']['input'];
   isTemplate?: Scalars['Boolean']['input'];
-  saved3DPreviewUrl: Scalars['String']['input'];
-  userId: Scalars['String']['input'];
+  userId?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Create Product */
@@ -194,6 +194,13 @@ export type CreateSystemConfigDiscountDto = {
   minQuantity: Scalars['Float']['input'];
   name: Scalars['String']['input'];
   productId: Scalars['String']['input'];
+};
+
+export type CreateSystemConfigVariantInput = {
+  color?: InputMaybe<Scalars['String']['input']>;
+  model?: InputMaybe<Scalars['String']['input']>;
+  productId: Scalars['String']['input'];
+  size?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Create user input */
@@ -321,6 +328,7 @@ export type Mutation = {
   createProductPositionType: ProductPositionTypeEntity;
   createSystemConfigBank: SystemConfigBankEntity;
   createSystemConfigDiscount: SystemConfigDiscountEntity;
+  createSystemConfigVariant: SystemConfigVariant;
   createUser: UserEntity;
   deleteAddress: AddressEntity;
   deleteBlankVariance: BlankVariancesEntity;
@@ -340,6 +348,7 @@ export type Mutation = {
   removeProductPositionType: ProductPositionTypeEntity;
   removeSystemConfigBank: SystemConfigBankEntity;
   removeSystemConfigDiscount: SystemConfigDiscountEntity;
+  removeSystemConfigVariant: SystemConfigVariant;
   restoreCategory: CategoryEntity;
   restoreProduct: ProductEntity;
   sendEmail: Scalars['Boolean']['output'];
@@ -357,6 +366,7 @@ export type Mutation = {
   updateProductPositionType: ProductPositionTypeEntity;
   updateSystemConfigBank: SystemConfigBankEntity;
   updateSystemConfigDiscount: SystemConfigDiscountEntity;
+  updateSystemConfigVariant: SystemConfigVariant;
   updateUser: UserEntity;
   uploadFile: FileUploadResponse;
 };
@@ -416,6 +426,10 @@ export type MutationCreateSystemConfigBankArgs = {
 
 export type MutationCreateSystemConfigDiscountArgs = {
   createDiscountInput: CreateSystemConfigDiscountDto;
+};
+
+export type MutationCreateSystemConfigVariantArgs = {
+  createSystemConfigVariantInput: CreateSystemConfigVariantInput;
 };
 
 export type MutationCreateUserArgs = {
@@ -486,6 +500,10 @@ export type MutationRemoveSystemConfigDiscountArgs = {
   id: Scalars['String']['input'];
 };
 
+export type MutationRemoveSystemConfigVariantArgs = {
+  id: Scalars['String']['input'];
+};
+
 export type MutationRestoreCategoryArgs = {
   id: Scalars['String']['input'];
 };
@@ -544,6 +562,7 @@ export type MutationUpdateProductArgs = {
 };
 
 export type MutationUpdateProductDesignArgs = {
+  id: Scalars['String']['input'];
   input: UpdateProductDesignDto;
 };
 
@@ -558,6 +577,10 @@ export type MutationUpdateSystemConfigBankArgs = {
 export type MutationUpdateSystemConfigDiscountArgs = {
   id: Scalars['String']['input'];
   updateDiscountInput: UpdateSystemConfigDiscountDto;
+};
+
+export type MutationUpdateSystemConfigVariantArgs = {
+  updateSystemConfigVariantInput: UpdateSystemConfigVariantInput;
 };
 
 export type MutationUpdateUserArgs = {
@@ -592,7 +615,6 @@ export type ProductDesignEntity = {
   isFinalized: Scalars['Boolean']['output'];
   isPublic: Scalars['Boolean']['output'];
   isTemplate: Scalars['Boolean']['output'];
-  saved3DPreviewUrl: Scalars['String']['output'];
   user?: Maybe<UserEntity>;
   userId: Scalars['String']['output'];
 };
@@ -647,6 +669,7 @@ export type Query = {
   category: CategoryEntity;
   designPosition: DesignPositionEntity;
   designPositions: Array<DesignPositionEntity>;
+  distinctVariantAttributes: VariantAttributes;
   district: District;
   districts: Array<District>;
   getApplicableDiscount: Scalars['Float']['output'];
@@ -668,6 +691,9 @@ export type Query = {
   systemConfigBanks: Array<SystemConfigBankEntity>;
   systemConfigDiscount: SystemConfigDiscountEntity;
   systemConfigDiscounts: Array<SystemConfigDiscountEntity>;
+  systemConfigVariant: SystemConfigVariant;
+  systemConfigVariants: Array<SystemConfigVariant>;
+  systemConfigVariantsByProduct: Array<SystemConfigVariant>;
   user: UserEntity;
   userCartItems: Array<CartItemEntity>;
   userOrder: CustomerOrderEntity;
@@ -701,6 +727,10 @@ export type QueryDesignPositionsArgs = {
   designId?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type QueryDistinctVariantAttributesArgs = {
+  productId: Scalars['String']['input'];
+};
+
 export type QueryDistrictArgs = {
   districtId: Scalars['Int']['input'];
 };
@@ -730,10 +760,6 @@ export type QueryProductDesignArgs = {
   id: Scalars['ID']['input'];
 };
 
-export type QueryProductDesignsArgs = {
-  userId?: InputMaybe<Scalars['String']['input']>;
-};
-
 export type QueryProductPositionTypeArgs = {
   id: Scalars['ID']['input'];
 };
@@ -752,6 +778,14 @@ export type QuerySystemConfigBankArgs = {
 
 export type QuerySystemConfigDiscountArgs = {
   id: Scalars['String']['input'];
+};
+
+export type QuerySystemConfigVariantArgs = {
+  id: Scalars['String']['input'];
+};
+
+export type QuerySystemConfigVariantsByProductArgs = {
+  productId: Scalars['String']['input'];
 };
 
 export type QueryUserArgs = {
@@ -830,6 +864,19 @@ export type SystemConfigDiscountEntity = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type SystemConfigVariant = {
+  __typename?: 'SystemConfigVariant';
+  blankVariances: Array<BlankVariancesEntity>;
+  color?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  isDeleted: Scalars['Boolean']['output'];
+  model?: Maybe<Scalars['String']['output']>;
+  product: ProductEntity;
+  productId: Scalars['String']['output'];
+  size?: Maybe<Scalars['String']['output']>;
+};
+
 export type UpdateAddressInput = {
   districtID?: InputMaybe<Scalars['Float']['input']>;
   factoryId?: InputMaybe<Scalars['String']['input']>;
@@ -840,9 +887,9 @@ export type UpdateAddressInput = {
 
 /** Update Blank Variance */
 export type UpdateBlankVarianceDto = {
-  blankPrice?: InputMaybe<Scalars['Int']['input']>;
-  information?: InputMaybe<Scalars['JSON']['input']>;
+  blankPrice?: InputMaybe<Scalars['Float']['input']>;
   productId?: InputMaybe<Scalars['String']['input']>;
+  systemVariantId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateCartItemDto = {
@@ -895,11 +942,11 @@ export type UpdateNotificationDto = {
 };
 
 export type UpdateProductDesignDto = {
-  id: Scalars['ID']['input'];
+  blankVariantId?: InputMaybe<Scalars['String']['input']>;
   isFinalized?: InputMaybe<Scalars['Boolean']['input']>;
   isPublic?: InputMaybe<Scalars['Boolean']['input']>;
   isTemplate?: InputMaybe<Scalars['Boolean']['input']>;
-  saved3DPreviewUrl?: InputMaybe<Scalars['String']['input']>;
+  userId?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Update Product */
@@ -935,6 +982,15 @@ export type UpdateSystemConfigDiscountDto = {
   productId?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateSystemConfigVariantInput = {
+  color?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['String']['input'];
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  model?: InputMaybe<Scalars['String']['input']>;
+  productId?: InputMaybe<Scalars['String']['input']>;
+  size?: InputMaybe<Scalars['String']['input']>;
+};
+
 /** Update user input */
 export type UpdateUserDto = {
   dateOfBirth?: InputMaybe<Scalars['String']['input']>;
@@ -967,6 +1023,13 @@ export type UserEntity = {
   role: Roles;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   updatedBy?: Maybe<Scalars['String']['output']>;
+};
+
+export type VariantAttributes = {
+  __typename?: 'VariantAttributes';
+  colors: Array<Scalars['String']['output']>;
+  models: Array<Scalars['String']['output']>;
+  sizes: Array<Scalars['String']['output']>;
 };
 
 export type Ward = {
@@ -1172,11 +1235,45 @@ export type GetUserCartItemsQuery = {
   __typename?: 'Query';
   userCartItems: Array<{
     __typename?: 'CartItemEntity';
-    id: string;
-    quantity: number;
     userId: string;
-    createdAt: any;
-    design: { __typename?: 'ProductDesignEntity'; id: string };
+    quantity: number;
+    id: string;
+    design: {
+      __typename?: 'ProductDesignEntity';
+      isTemplate: boolean;
+      isPublic: boolean;
+      isFinalized: boolean;
+      blankVariant?: {
+        __typename?: 'BlankVariancesEntity';
+        blankPrice: number;
+        systemVariant: {
+          __typename?: 'SystemConfigVariant';
+          size?: string | null;
+          model?: string | null;
+          color?: string | null;
+        };
+        product: {
+          __typename?: 'ProductEntity';
+          name: string;
+          imageUrl?: string | null;
+          id: string;
+          discounts?: Array<{
+            __typename?: 'SystemConfigDiscountEntity';
+            minQuantity: number;
+            name: string;
+            discountPercent: number;
+          }> | null;
+        };
+      } | null;
+      designPositions?: Array<{
+        __typename?: 'DesignPositionEntity';
+        positionType?: {
+          __typename?: 'ProductPositionTypeEntity';
+          positionName: string;
+          basePrice: number;
+        } | null;
+      }> | null;
+    };
   }>;
 };
 
@@ -1185,6 +1282,30 @@ export type GetCartItemCountQueryVariables = Exact<{ [key: string]: never }>;
 export type GetCartItemCountQuery = {
   __typename?: 'Query';
   getCartItemCount: number;
+};
+
+export type UpdateCartItemMutationVariables = Exact<{
+  updateCartItemId: Scalars['String']['input'];
+  updateCartItemInput: UpdateCartItemDto;
+}>;
+
+export type UpdateCartItemMutation = {
+  __typename?: 'Mutation';
+  updateCartItem: {
+    __typename?: 'CartItemEntity';
+    userId: string;
+    quantity: number;
+    id: string;
+  };
+};
+
+export type CalculateShippingFeeMutationVariables = Exact<{
+  input: CalculateShippingFeeDto;
+}>;
+
+export type CalculateShippingFeeMutation = {
+  __typename?: 'Mutation';
+  calculateShippingFee: { __typename?: 'ShippingFee'; total: number };
 };
 
 export type GetAllCategoriesQueryVariables = Exact<{ [key: string]: never }>;
@@ -1459,6 +1580,20 @@ export type GetWardByWardCodeQuery = {
     wardCode: string;
     wardName: string;
   };
+};
+
+export type GetAvailableServiceQueryVariables = Exact<{
+  servicesInput: GetAvailableServicesDto;
+}>;
+
+export type GetAvailableServiceQuery = {
+  __typename?: 'Query';
+  availableServices: Array<{
+    __typename?: 'ShippingService';
+    shortName: string;
+    serviceTypeId: number;
+    serviceId: number;
+  }>;
 };
 
 export type GetAllSystemConfigBanksQueryVariables = Exact<{
@@ -2247,12 +2382,37 @@ export type GetMeQueryResult = Apollo.QueryResult<
 export const GetUserCartItemsDocument = gql`
   query GetUserCartItems {
     userCartItems {
-      id
-      quantity
       userId
-      createdAt
+      quantity
+      id
       design {
-        id
+        isTemplate
+        isPublic
+        isFinalized
+        blankVariant {
+          blankPrice
+          systemVariant {
+            size
+            model
+            color
+          }
+          product {
+            name
+            imageUrl
+            discounts {
+              minQuantity
+              name
+              discountPercent
+            }
+            id
+          }
+        }
+        designPositions {
+          positionType {
+            positionName
+            basePrice
+          }
+        }
       }
     }
   }
@@ -2401,6 +2561,115 @@ export type GetCartItemCountSuspenseQueryHookResult = ReturnType<
 export type GetCartItemCountQueryResult = Apollo.QueryResult<
   GetCartItemCountQuery,
   GetCartItemCountQueryVariables
+>;
+export const UpdateCartItemDocument = gql`
+  mutation UpdateCartItem(
+    $updateCartItemId: String!
+    $updateCartItemInput: UpdateCartItemDto!
+  ) {
+    updateCartItem(
+      id: $updateCartItemId
+      updateCartItemInput: $updateCartItemInput
+    ) {
+      userId
+      quantity
+      id
+    }
+  }
+`;
+export type UpdateCartItemMutationFn = Apollo.MutationFunction<
+  UpdateCartItemMutation,
+  UpdateCartItemMutationVariables
+>;
+
+/**
+ * __useUpdateCartItemMutation__
+ *
+ * To run a mutation, you first call `useUpdateCartItemMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCartItemMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCartItemMutation, { data, loading, error }] = useUpdateCartItemMutation({
+ *   variables: {
+ *      updateCartItemId: // value for 'updateCartItemId'
+ *      updateCartItemInput: // value for 'updateCartItemInput'
+ *   },
+ * });
+ */
+export function useUpdateCartItemMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateCartItemMutation,
+    UpdateCartItemMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateCartItemMutation,
+    UpdateCartItemMutationVariables
+  >(UpdateCartItemDocument, options);
+}
+export type UpdateCartItemMutationHookResult = ReturnType<
+  typeof useUpdateCartItemMutation
+>;
+export type UpdateCartItemMutationResult =
+  Apollo.MutationResult<UpdateCartItemMutation>;
+export type UpdateCartItemMutationOptions = Apollo.BaseMutationOptions<
+  UpdateCartItemMutation,
+  UpdateCartItemMutationVariables
+>;
+export const CalculateShippingFeeDocument = gql`
+  mutation CalculateShippingFee($input: CalculateShippingFeeDto!) {
+    calculateShippingFee(input: $input) {
+      total
+    }
+  }
+`;
+export type CalculateShippingFeeMutationFn = Apollo.MutationFunction<
+  CalculateShippingFeeMutation,
+  CalculateShippingFeeMutationVariables
+>;
+
+/**
+ * __useCalculateShippingFeeMutation__
+ *
+ * To run a mutation, you first call `useCalculateShippingFeeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCalculateShippingFeeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [calculateShippingFeeMutation, { data, loading, error }] = useCalculateShippingFeeMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCalculateShippingFeeMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CalculateShippingFeeMutation,
+    CalculateShippingFeeMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CalculateShippingFeeMutation,
+    CalculateShippingFeeMutationVariables
+  >(CalculateShippingFeeDocument, options);
+}
+export type CalculateShippingFeeMutationHookResult = ReturnType<
+  typeof useCalculateShippingFeeMutation
+>;
+export type CalculateShippingFeeMutationResult =
+  Apollo.MutationResult<CalculateShippingFeeMutation>;
+export type CalculateShippingFeeMutationOptions = Apollo.BaseMutationOptions<
+  CalculateShippingFeeMutation,
+  CalculateShippingFeeMutationVariables
 >;
 export const GetAllCategoriesDocument = gql`
   query GetAllCategories {
@@ -3485,6 +3754,90 @@ export type GetWardByWardCodeSuspenseQueryHookResult = ReturnType<
 export type GetWardByWardCodeQueryResult = Apollo.QueryResult<
   GetWardByWardCodeQuery,
   GetWardByWardCodeQueryVariables
+>;
+export const GetAvailableServiceDocument = gql`
+  query GetAvailableService($servicesInput: GetAvailableServicesDto!) {
+    availableServices(servicesInput: $servicesInput) {
+      shortName
+      serviceTypeId
+      serviceId
+    }
+  }
+`;
+
+/**
+ * __useGetAvailableServiceQuery__
+ *
+ * To run a query within a React component, call `useGetAvailableServiceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAvailableServiceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAvailableServiceQuery({
+ *   variables: {
+ *      servicesInput: // value for 'servicesInput'
+ *   },
+ * });
+ */
+export function useGetAvailableServiceQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetAvailableServiceQuery,
+    GetAvailableServiceQueryVariables
+  > &
+    (
+      | { variables: GetAvailableServiceQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetAvailableServiceQuery,
+    GetAvailableServiceQueryVariables
+  >(GetAvailableServiceDocument, options);
+}
+export function useGetAvailableServiceLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAvailableServiceQuery,
+    GetAvailableServiceQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAvailableServiceQuery,
+    GetAvailableServiceQueryVariables
+  >(GetAvailableServiceDocument, options);
+}
+export function useGetAvailableServiceSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAvailableServiceQuery,
+        GetAvailableServiceQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAvailableServiceQuery,
+    GetAvailableServiceQueryVariables
+  >(GetAvailableServiceDocument, options);
+}
+export type GetAvailableServiceQueryHookResult = ReturnType<
+  typeof useGetAvailableServiceQuery
+>;
+export type GetAvailableServiceLazyQueryHookResult = ReturnType<
+  typeof useGetAvailableServiceLazyQuery
+>;
+export type GetAvailableServiceSuspenseQueryHookResult = ReturnType<
+  typeof useGetAvailableServiceSuspenseQuery
+>;
+export type GetAvailableServiceQueryResult = Apollo.QueryResult<
+  GetAvailableServiceQuery,
+  GetAvailableServiceQueryVariables
 >;
 export const GetAllSystemConfigBanksDocument = gql`
   query GetAllSystemConfigBanks {
