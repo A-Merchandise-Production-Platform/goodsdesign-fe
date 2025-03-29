@@ -2,22 +2,35 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
+export type MakeEmpty<
+  T extends { [key: string]: unknown },
+  K extends keyof T,
+> = { [_ in K]?: never };
+export type Incremental<T> =
+  | T
+  | {
+      [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never;
+    };
 const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
-  DateTime: { input: any; output: any; }
-  JSON: { input: any; output: any; }
-  Upload: { input: any; output: any; }
+  ID: { input: string; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
+  DateTime: { input: any; output: any };
+  JSON: { input: any; output: any };
+  Upload: { input: any; output: any };
 };
 
 export type AddressEntity = {
@@ -279,7 +292,7 @@ export enum FactoryStatus {
   Approved = 'APPROVED',
   PendingApproval = 'PENDING_APPROVAL',
   Rejected = 'REJECTED',
-  Suspended = 'SUSPENDED'
+  Suspended = 'SUSPENDED',
 }
 
 export type FileUploadResponse = {
@@ -358,275 +371,222 @@ export type Mutation = {
   uploadFile: FileUploadResponse;
 };
 
-
 export type MutationCalculateShippingFeeArgs = {
   input: CalculateShippingFeeDto;
 };
-
 
 export type MutationCreateAddressArgs = {
   createAddressInput: CreateAddressInput;
 };
 
-
 export type MutationCreateBlankVarianceArgs = {
   createBlankVarianceInput: CreateBlankVarianceDto;
 };
-
 
 export type MutationCreateCartItemArgs = {
   createCartItemInput: CreateCartItemDto;
 };
 
-
 export type MutationCreateCategoryArgs = {
   createCategoryInput: CreateCategoryDto;
 };
-
 
 export type MutationCreateDesignPositionArgs = {
   input: CreateDesignPositionDto;
 };
 
-
 export type MutationCreateNotificationArgs = {
   input: CreateNotificationDto;
 };
 
-
 export type MutationCreateOrderArgs = {
   createOrderInput: CreateOrderDto;
 };
-
 
 export type MutationCreatePaymentArgs = {
   gateway: Scalars['String']['input'];
   paymentId: Scalars['String']['input'];
 };
 
-
 export type MutationCreateProductArgs = {
   input: CreateProductDto;
 };
-
 
 export type MutationCreateProductDesignArgs = {
   input: CreateProductDesignDto;
 };
 
-
 export type MutationCreateProductPositionTypeArgs = {
   input: CreateProductPositionTypeDto;
 };
-
 
 export type MutationCreateSystemConfigBankArgs = {
   input: CreateSystemConfigBankDto;
 };
 
-
 export type MutationCreateSystemConfigDiscountArgs = {
   createDiscountInput: CreateSystemConfigDiscountDto;
 };
-
 
 export type MutationCreateSystemConfigVariantArgs = {
   createSystemConfigVariantInput: CreateSystemConfigVariantInput;
 };
 
-
 export type MutationCreateUserArgs = {
   createUserInput: CreateUserDto;
 };
-
 
 export type MutationDeleteAddressArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type MutationDeleteBlankVarianceArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type MutationDeleteCartItemArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type MutationDeleteCategoryArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type MutationDeleteProductArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type MutationDeleteUserArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type MutationLoginArgs = {
   loginInput: LoginDto;
 };
 
-
 export type MutationMarkNotificationAsReadArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationRefreshTokenArgs = {
   refreshTokenInput: RefreshTokenDto;
 };
 
-
 export type MutationRegisterArgs = {
   registerInput: RegisterDto;
 };
-
 
 export type MutationRemoveDesignPositionArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type MutationRemoveNotificationArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationRemoveProductDesignArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type MutationRemoveProductPositionTypeArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type MutationRemoveSystemConfigBankArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type MutationRemoveSystemConfigDiscountArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type MutationRemoveSystemConfigVariantArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type MutationRestoreCategoryArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type MutationRestoreProductArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type MutationSendEmailArgs = {
   to: Scalars['String']['input'];
 };
-
 
 export type MutationToggleActiveCategoryArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type MutationToggleActiveProductArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type MutationUpdateAddressArgs = {
   id: Scalars['String']['input'];
   updateAddressInput: UpdateAddressInput;
 };
 
-
 export type MutationUpdateBlankVarianceArgs = {
   id: Scalars['String']['input'];
   updateBlankVarianceInput: UpdateBlankVarianceDto;
 };
-
 
 export type MutationUpdateCartItemArgs = {
   id: Scalars['String']['input'];
   updateCartItemInput: UpdateCartItemDto;
 };
 
-
 export type MutationUpdateCategoryArgs = {
   id: Scalars['String']['input'];
   updateCategoryInput: UpdateCategoryDto;
 };
 
-
 export type MutationUpdateDesignPositionArgs = {
   input: UpdateDesignPositionDto;
 };
-
 
 export type MutationUpdateFactoryInfoArgs = {
   updateFactoryInfoInput: UpdateFactoryInfoDto;
 };
 
-
 export type MutationUpdateNotificationArgs = {
   input: UpdateNotificationDto;
 };
-
 
 export type MutationUpdateProductArgs = {
   id: Scalars['String']['input'];
   input: UpdateProductDto;
 };
 
-
 export type MutationUpdateProductDesignArgs = {
   id: Scalars['String']['input'];
   input: UpdateProductDesignDto;
 };
 
-
 export type MutationUpdateProductPositionTypeArgs = {
   input: UpdateProductPositionTypeDto;
 };
 
-
 export type MutationUpdateSystemConfigBankArgs = {
   input: UpdateSystemConfigBankDto;
 };
-
 
 export type MutationUpdateSystemConfigDiscountArgs = {
   id: Scalars['String']['input'];
   updateDiscountInput: UpdateSystemConfigDiscountDto;
 };
 
-
 export type MutationUpdateSystemConfigVariantArgs = {
   updateSystemConfigVariantInput: UpdateSystemConfigVariantInput;
 };
-
 
 export type MutationUpdateUserArgs = {
   id: Scalars['String']['input'];
   updateUserInput: UpdateUserDto;
 };
-
 
 export type MutationUploadFileArgs = {
   file: Scalars['Upload']['input'];
@@ -743,127 +703,102 @@ export type Query = {
   wards: Array<Ward>;
 };
 
-
 export type QueryAddressArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type QueryAvailableServicesArgs = {
   servicesInput: GetAvailableServicesDto;
 };
 
-
 export type QueryBlankVarianceArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type QueryCategoryArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type QueryDesignPositionArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryDesignPositionsArgs = {
   designId?: InputMaybe<Scalars['String']['input']>;
 };
 
-
 export type QueryDistinctVariantAttributesArgs = {
   productId: Scalars['String']['input'];
 };
-
 
 export type QueryDistrictArgs = {
   districtId: Scalars['Int']['input'];
 };
 
-
 export type QueryDistrictsArgs = {
   provinceId: Scalars['Int']['input'];
 };
-
 
 export type QueryGetApplicableDiscountArgs = {
   productId: Scalars['String']['input'];
   quantity: Scalars['Float']['input'];
 };
 
-
 export type QueryGetCartItemArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type QueryNotificationArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type QueryProductArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type QueryProductDesignArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type QueryProductPositionTypeArgs = {
   id: Scalars['ID']['input'];
 };
-
 
 export type QueryProductPositionTypesArgs = {
   productId: Scalars['String']['input'];
 };
 
-
 export type QueryProvinceArgs = {
   provinceId: Scalars['Int']['input'];
 };
-
 
 export type QuerySystemConfigBankArgs = {
   id: Scalars['ID']['input'];
 };
 
-
 export type QuerySystemConfigDiscountArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type QuerySystemConfigVariantArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type QuerySystemConfigVariantsByProductArgs = {
   productId: Scalars['String']['input'];
 };
-
 
 export type QueryUserArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type QueryUserOrderArgs = {
   id: Scalars['String']['input'];
 };
 
-
 export type QueryWardArgs = {
   wardCode: Scalars['String']['input'];
 };
-
 
 export type QueryWardsArgs = {
   districtId: Scalars['Int']['input'];
@@ -889,7 +824,7 @@ export enum Roles {
   Customer = 'CUSTOMER',
   Factoryowner = 'FACTORYOWNER',
   Manager = 'MANAGER',
-  Staff = 'STAFF'
+  Staff = 'STAFF',
 }
 
 export type ShippingFee = {
@@ -1104,24 +1039,43 @@ export type Ward = {
   wardName: Scalars['String']['output'];
 };
 
-export type AddressesQueryVariables = Exact<{ [key: string]: never; }>;
+export type AddressesQueryVariables = Exact<{ [key: string]: never }>;
 
-
-export type AddressesQuery = { __typename?: 'Query', addresses: Array<{ __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string }> };
+export type AddressesQuery = {
+  __typename?: 'Query';
+  addresses: Array<{
+    __typename?: 'AddressEntity';
+    id: string;
+    districtID: number;
+    provinceID: number;
+    street: string;
+    wardCode: string;
+  }>;
+};
 
 export type CreateAddressMutationVariables = Exact<{
   createAddressInput: CreateAddressInput;
 }>;
 
-
-export type CreateAddressMutation = { __typename?: 'Mutation', createAddress: { __typename?: 'AddressEntity', districtID: number, provinceID: number, street: string, wardCode: string } };
+export type CreateAddressMutation = {
+  __typename?: 'Mutation';
+  createAddress: {
+    __typename?: 'AddressEntity';
+    districtID: number;
+    provinceID: number;
+    street: string;
+    wardCode: string;
+  };
+};
 
 export type DeleteAddressMutationVariables = Exact<{
   deleteAddressId: Scalars['String']['input'];
 }>;
 
-
-export type DeleteAddressMutation = { __typename?: 'Mutation', deleteAddress: { __typename?: 'AddressEntity', id: string } };
+export type DeleteAddressMutation = {
+  __typename?: 'Mutation';
+  deleteAddress: { __typename?: 'AddressEntity'; id: string };
+};
 
 export type GetAddressDetailsQueryVariables = Exact<{
   provinceId: Scalars['Int']['input'];
@@ -1129,234 +1083,715 @@ export type GetAddressDetailsQueryVariables = Exact<{
   wardCode: Scalars['String']['input'];
 }>;
 
-
-export type GetAddressDetailsQuery = { __typename?: 'Query', province: { __typename?: 'Province', provinceId: number, provinceName: string }, district: { __typename?: 'District', districtId: number, districtName: string, provinceId: number }, ward: { __typename?: 'Ward', districtId: number, wardCode: string, wardName: string } };
+export type GetAddressDetailsQuery = {
+  __typename?: 'Query';
+  province: {
+    __typename?: 'Province';
+    provinceId: number;
+    provinceName: string;
+  };
+  district: {
+    __typename?: 'District';
+    districtId: number;
+    districtName: string;
+    provinceId: number;
+  };
+  ward: {
+    __typename?: 'Ward';
+    districtId: number;
+    wardCode: string;
+    wardName: string;
+  };
+};
 
 export type LoginMutationVariables = Exact<{
   loginInput: LoginDto;
 }>;
 
-
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthResponseDto', accessToken: string, refreshToken: string, user: { __typename?: 'UserEntity', createdAt: any, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, factory?: { __typename?: 'FactoryEntity', name: string, factoryStatus?: FactoryStatus | null } | null } } };
+export type LoginMutation = {
+  __typename?: 'Mutation';
+  login: {
+    __typename?: 'AuthResponseDto';
+    accessToken: string;
+    refreshToken: string;
+    user: {
+      __typename?: 'UserEntity';
+      createdAt: any;
+      dateOfBirth?: any | null;
+      email?: string | null;
+      gender: boolean;
+      id: string;
+      imageUrl?: string | null;
+      isActive: boolean;
+      name?: string | null;
+      phoneNumber?: string | null;
+      role: Roles;
+      updatedAt?: any | null;
+      factory?: {
+        __typename?: 'FactoryEntity';
+        name: string;
+        factoryStatus?: FactoryStatus | null;
+      } | null;
+    };
+  };
+};
 
 export type RegisterMutationVariables = Exact<{
   registerInput: RegisterDto;
 }>;
 
-
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'AuthResponseDto', accessToken: string, refreshToken: string, user: { __typename?: 'UserEntity', createdAt: any, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, factory?: { __typename?: 'FactoryEntity', name: string, factoryStatus?: FactoryStatus | null } | null } } };
+export type RegisterMutation = {
+  __typename?: 'Mutation';
+  register: {
+    __typename?: 'AuthResponseDto';
+    accessToken: string;
+    refreshToken: string;
+    user: {
+      __typename?: 'UserEntity';
+      createdAt: any;
+      dateOfBirth?: any | null;
+      email?: string | null;
+      gender: boolean;
+      id: string;
+      imageUrl?: string | null;
+      isActive: boolean;
+      name?: string | null;
+      phoneNumber?: string | null;
+      role: Roles;
+      updatedAt?: any | null;
+      factory?: {
+        __typename?: 'FactoryEntity';
+        name: string;
+        factoryStatus?: FactoryStatus | null;
+      } | null;
+    };
+  };
+};
 
 export type RefreshTokenMutationVariables = Exact<{
   refreshTokenInput: RefreshTokenDto;
 }>;
 
+export type RefreshTokenMutation = {
+  __typename?: 'Mutation';
+  refreshToken: {
+    __typename?: 'AuthResponseDto';
+    accessToken: string;
+    refreshToken: string;
+    user: {
+      __typename?: 'UserEntity';
+      createdAt: any;
+      dateOfBirth?: any | null;
+      email?: string | null;
+      gender: boolean;
+      id: string;
+      imageUrl?: string | null;
+      isActive: boolean;
+      name?: string | null;
+      phoneNumber?: string | null;
+      role: Roles;
+      updatedAt?: any | null;
+      factory?: {
+        __typename?: 'FactoryEntity';
+        name: string;
+        factoryStatus?: FactoryStatus | null;
+      } | null;
+    };
+  };
+};
 
-export type RefreshTokenMutation = { __typename?: 'Mutation', refreshToken: { __typename?: 'AuthResponseDto', accessToken: string, refreshToken: string, user: { __typename?: 'UserEntity', createdAt: any, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, factory?: { __typename?: 'FactoryEntity', name: string, factoryStatus?: FactoryStatus | null } | null } } };
+export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
 
-export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+export type LogoutMutation = { __typename?: 'Mutation'; logout: string };
 
+export type GetMeQueryVariables = Exact<{ [key: string]: never }>;
 
-export type LogoutMutation = { __typename?: 'Mutation', logout: string };
+export type GetMeQuery = {
+  __typename?: 'Query';
+  getMe: {
+    __typename?: 'UserEntity';
+    createdAt: any;
+    dateOfBirth?: any | null;
+    email?: string | null;
+    gender: boolean;
+    id: string;
+    imageUrl?: string | null;
+    isActive: boolean;
+    name?: string | null;
+    phoneNumber?: string | null;
+    role: Roles;
+    updatedAt?: any | null;
+    factory?: {
+      __typename?: 'FactoryEntity';
+      name: string;
+      factoryStatus?: FactoryStatus | null;
+    } | null;
+  };
+};
 
-export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetUserCartItemsQueryVariables = Exact<{ [key: string]: never }>;
 
+export type GetUserCartItemsQuery = {
+  __typename?: 'Query';
+  userCartItems: Array<{
+    __typename?: 'CartItemEntity';
+    userId: string;
+    quantity: number;
+    id: string;
+    design: {
+      __typename?: 'ProductDesignEntity';
+      isTemplate: boolean;
+      isPublic: boolean;
+      isFinalized: boolean;
+      blankVariant?: {
+        __typename?: 'BlankVariancesEntity';
+        blankPrice: number;
+        systemVariant: {
+          __typename?: 'SystemConfigVariant';
+          size?: string | null;
+          model?: string | null;
+          color?: string | null;
+        };
+        product: {
+          __typename?: 'ProductEntity';
+          name: string;
+          imageUrl?: string | null;
+          id: string;
+          discounts?: Array<{
+            __typename?: 'SystemConfigDiscountEntity';
+            minQuantity: number;
+            name: string;
+            discountPercent: number;
+          }> | null;
+        };
+      } | null;
+      designPositions?: Array<{
+        __typename?: 'DesignPositionEntity';
+        positionType?: {
+          __typename?: 'ProductPositionTypeEntity';
+          positionName: string;
+          basePrice: number;
+        } | null;
+      }> | null;
+    };
+  }>;
+};
 
-export type GetMeQuery = { __typename?: 'Query', getMe: { __typename?: 'UserEntity', createdAt: any, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, factory?: { __typename?: 'FactoryEntity', name: string, factoryStatus?: FactoryStatus | null } | null } };
+export type GetCartItemCountQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetUserCartItemsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetUserCartItemsQuery = { __typename?: 'Query', userCartItems: Array<{ __typename?: 'CartItemEntity', userId: string, quantity: number, id: string, design: { __typename?: 'ProductDesignEntity', isTemplate: boolean, isPublic: boolean, isFinalized: boolean, blankVariant?: { __typename?: 'BlankVariancesEntity', blankPrice: number, systemVariant: { __typename?: 'SystemConfigVariant', size?: string | null, model?: string | null, color?: string | null }, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null, id: string, discounts?: Array<{ __typename?: 'SystemConfigDiscountEntity', minQuantity: number, name: string, discountPercent: number }> | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } }> };
-
-export type GetCartItemCountQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetCartItemCountQuery = { __typename?: 'Query', getCartItemCount: number };
+export type GetCartItemCountQuery = {
+  __typename?: 'Query';
+  getCartItemCount: number;
+};
 
 export type UpdateCartItemMutationVariables = Exact<{
   updateCartItemId: Scalars['String']['input'];
   updateCartItemInput: UpdateCartItemDto;
 }>;
 
-
-export type UpdateCartItemMutation = { __typename?: 'Mutation', updateCartItem: { __typename?: 'CartItemEntity', userId: string, quantity: number, id: string } };
+export type UpdateCartItemMutation = {
+  __typename?: 'Mutation';
+  updateCartItem: {
+    __typename?: 'CartItemEntity';
+    userId: string;
+    quantity: number;
+    id: string;
+  };
+};
 
 export type CalculateShippingFeeMutationVariables = Exact<{
   input: CalculateShippingFeeDto;
 }>;
 
+export type CalculateShippingFeeMutation = {
+  __typename?: 'Mutation';
+  calculateShippingFee: { __typename?: 'ShippingFee'; total: number };
+};
 
-export type CalculateShippingFeeMutation = { __typename?: 'Mutation', calculateShippingFee: { __typename?: 'ShippingFee', total: number } };
+export type GetAllCategoriesQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetAllCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetAllCategoriesQuery = { __typename?: 'Query', categories: Array<{ __typename?: 'CategoryEntity', createdAt: any, description?: string | null, id: string, imageUrl?: string | null, isActive: boolean, name: string, totalProducts?: number | null, updatedAt?: any | null }> };
+export type GetAllCategoriesQuery = {
+  __typename?: 'Query';
+  categories: Array<{
+    __typename?: 'CategoryEntity';
+    createdAt: any;
+    description?: string | null;
+    id: string;
+    imageUrl?: string | null;
+    isActive: boolean;
+    name: string;
+    totalProducts?: number | null;
+    updatedAt?: any | null;
+  }>;
+};
 
 export type CreateCategoryMutationVariables = Exact<{
   createCategoryInput: CreateCategoryDto;
 }>;
 
-
-export type CreateCategoryMutation = { __typename?: 'Mutation', createCategory: { __typename?: 'CategoryEntity', createdAt: any, description?: string | null, id: string, imageUrl?: string | null, isActive: boolean, name: string, totalProducts?: number | null, updatedAt?: any | null } };
+export type CreateCategoryMutation = {
+  __typename?: 'Mutation';
+  createCategory: {
+    __typename?: 'CategoryEntity';
+    createdAt: any;
+    description?: string | null;
+    id: string;
+    imageUrl?: string | null;
+    isActive: boolean;
+    name: string;
+    totalProducts?: number | null;
+    updatedAt?: any | null;
+  };
+};
 
 export type DeleteCategoryMutationVariables = Exact<{
   deleteCategoryId: Scalars['String']['input'];
 }>;
 
+export type DeleteCategoryMutation = {
+  __typename?: 'Mutation';
+  deleteCategory: {
+    __typename?: 'CategoryEntity';
+    createdAt: any;
+    description?: string | null;
+    id: string;
+    imageUrl?: string | null;
+    isActive: boolean;
+    name: string;
+    totalProducts?: number | null;
+    updatedAt?: any | null;
+  };
+};
 
-export type DeleteCategoryMutation = { __typename?: 'Mutation', deleteCategory: { __typename?: 'CategoryEntity', createdAt: any, description?: string | null, id: string, imageUrl?: string | null, isActive: boolean, name: string, totalProducts?: number | null, updatedAt?: any | null } };
+export type GetMyFactoryQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetMyFactoryQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetMyFactoryQuery = { __typename?: 'Query', getMyFactory: { __typename?: 'FactoryEntity', addressId?: string | null, businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, owner: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null }, products: Array<{ __typename?: 'ProductEntity', id: string, imageUrl?: string | null, name: string }> } };
+export type GetMyFactoryQuery = {
+  __typename?: 'Query';
+  getMyFactory: {
+    __typename?: 'FactoryEntity';
+    addressId?: string | null;
+    businessLicenseUrl?: string | null;
+    contactPersonName?: string | null;
+    contactPersonPhone?: string | null;
+    contractUrl?: string | null;
+    description?: string | null;
+    establishedDate?: any | null;
+    factoryStatus?: FactoryStatus | null;
+    isSubmitted?: boolean | null;
+    leadTime?: number | null;
+    maxPrintingCapacity?: number | null;
+    minimumOrderQuantity?: number | null;
+    name: string;
+    operationalHours?: string | null;
+    printingMethods: Array<string>;
+    qualityCertifications?: string | null;
+    specializations: Array<string>;
+    taxIdentificationNumber?: string | null;
+    totalEmployees?: number | null;
+    website?: string | null;
+    owner: {
+      __typename?: 'UserEntity';
+      email?: string | null;
+      name?: string | null;
+      imageUrl?: string | null;
+    };
+    products: Array<{
+      __typename?: 'ProductEntity';
+      id: string;
+      imageUrl?: string | null;
+      name: string;
+    }>;
+  };
+};
 
 export type UpdateFactoryInfoMutationVariables = Exact<{
   updateFactoryInfoInput: UpdateFactoryInfoDto;
 }>;
 
+export type UpdateFactoryInfoMutation = {
+  __typename?: 'Mutation';
+  updateFactoryInfo: {
+    __typename?: 'FactoryEntity';
+    addressId?: string | null;
+    businessLicenseUrl?: string | null;
+    contactPersonName?: string | null;
+    contactPersonPhone?: string | null;
+    contractUrl?: string | null;
+    description?: string | null;
+    establishedDate?: any | null;
+    factoryStatus?: FactoryStatus | null;
+    isSubmitted?: boolean | null;
+    leadTime?: number | null;
+    maxPrintingCapacity?: number | null;
+    minimumOrderQuantity?: number | null;
+    name: string;
+    operationalHours?: string | null;
+    printingMethods: Array<string>;
+    qualityCertifications?: string | null;
+    specializations: Array<string>;
+    taxIdentificationNumber?: string | null;
+    totalEmployees?: number | null;
+    website?: string | null;
+    owner: {
+      __typename?: 'UserEntity';
+      email?: string | null;
+      name?: string | null;
+      imageUrl?: string | null;
+    };
+    products: Array<{
+      __typename?: 'ProductEntity';
+      id: string;
+      imageUrl?: string | null;
+      name: string;
+    }>;
+  };
+};
 
-export type UpdateFactoryInfoMutation = { __typename?: 'Mutation', updateFactoryInfo: { __typename?: 'FactoryEntity', addressId?: string | null, businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, owner: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null }, products: Array<{ __typename?: 'ProductEntity', id: string, imageUrl?: string | null, name: string }> } };
+export type GetAllProductsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetAllProductsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetAllProductsQuery = { __typename?: 'Query', products: Array<{ __typename?: 'ProductEntity', id: string, imageUrl?: string | null, isActive: boolean, name: string, updatedAt?: any | null, createdAt: any, description?: string | null, category?: { __typename?: 'CategoryEntity', name: string } | null }> };
+export type GetAllProductsQuery = {
+  __typename?: 'Query';
+  products: Array<{
+    __typename?: 'ProductEntity';
+    id: string;
+    imageUrl?: string | null;
+    isActive: boolean;
+    name: string;
+    updatedAt?: any | null;
+    createdAt: any;
+    description?: string | null;
+    category?: { __typename?: 'CategoryEntity'; name: string } | null;
+  }>;
+};
 
 export type CreateProductMutationVariables = Exact<{
   input: CreateProductDto;
 }>;
 
-
-export type CreateProductMutation = { __typename?: 'Mutation', createProduct: { __typename?: 'ProductEntity', id: string, imageUrl?: string | null, isActive: boolean, name: string, updatedAt?: any | null, createdAt: any, description?: string | null, category?: { __typename?: 'CategoryEntity', name: string } | null } };
+export type CreateProductMutation = {
+  __typename?: 'Mutation';
+  createProduct: {
+    __typename?: 'ProductEntity';
+    id: string;
+    imageUrl?: string | null;
+    isActive: boolean;
+    name: string;
+    updatedAt?: any | null;
+    createdAt: any;
+    description?: string | null;
+    category?: { __typename?: 'CategoryEntity'; name: string } | null;
+  };
+};
 
 export type DeleteProductMutationVariables = Exact<{
   deleteProductId: Scalars['String']['input'];
 }>;
 
+export type DeleteProductMutation = {
+  __typename?: 'Mutation';
+  deleteProduct: {
+    __typename?: 'ProductEntity';
+    id: string;
+    imageUrl?: string | null;
+    isActive: boolean;
+    name: string;
+    updatedAt?: any | null;
+    createdAt: any;
+    description?: string | null;
+    category?: { __typename?: 'CategoryEntity'; name: string } | null;
+  };
+};
 
-export type DeleteProductMutation = { __typename?: 'Mutation', deleteProduct: { __typename?: 'ProductEntity', id: string, imageUrl?: string | null, isActive: boolean, name: string, updatedAt?: any | null, createdAt: any, description?: string | null, category?: { __typename?: 'CategoryEntity', name: string } | null } };
+export type GetAllProvincesQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetAllProvincesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetAllProvincesQuery = { __typename?: 'Query', provinces: Array<{ __typename?: 'Province', provinceId: number, provinceName: string }> };
+export type GetAllProvincesQuery = {
+  __typename?: 'Query';
+  provinces: Array<{
+    __typename?: 'Province';
+    provinceId: number;
+    provinceName: string;
+  }>;
+};
 
 export type GetProvinceByIdQueryVariables = Exact<{
   provinceId: Scalars['Int']['input'];
 }>;
 
-
-export type GetProvinceByIdQuery = { __typename?: 'Query', province: { __typename?: 'Province', provinceId: number, provinceName: string } };
+export type GetProvinceByIdQuery = {
+  __typename?: 'Query';
+  province: {
+    __typename?: 'Province';
+    provinceId: number;
+    provinceName: string;
+  };
+};
 
 export type GetAllDistrictsByProvinceIdQueryVariables = Exact<{
   provinceId: Scalars['Int']['input'];
 }>;
 
-
-export type GetAllDistrictsByProvinceIdQuery = { __typename?: 'Query', districts: Array<{ __typename?: 'District', districtId: number, districtName: string, provinceId: number }> };
+export type GetAllDistrictsByProvinceIdQuery = {
+  __typename?: 'Query';
+  districts: Array<{
+    __typename?: 'District';
+    districtId: number;
+    districtName: string;
+    provinceId: number;
+  }>;
+};
 
 export type GetDistrictByIdQueryVariables = Exact<{
   districtId: Scalars['Int']['input'];
 }>;
 
-
-export type GetDistrictByIdQuery = { __typename?: 'Query', district: { __typename?: 'District', districtId: number, districtName: string, provinceId: number } };
+export type GetDistrictByIdQuery = {
+  __typename?: 'Query';
+  district: {
+    __typename?: 'District';
+    districtId: number;
+    districtName: string;
+    provinceId: number;
+  };
+};
 
 export type GetAllWardsByDistrictIdQueryVariables = Exact<{
   districtId: Scalars['Int']['input'];
 }>;
 
-
-export type GetAllWardsByDistrictIdQuery = { __typename?: 'Query', wards: Array<{ __typename?: 'Ward', wardCode: string, wardName: string, districtId: number }> };
+export type GetAllWardsByDistrictIdQuery = {
+  __typename?: 'Query';
+  wards: Array<{
+    __typename?: 'Ward';
+    wardCode: string;
+    wardName: string;
+    districtId: number;
+  }>;
+};
 
 export type GetWardByWardCodeQueryVariables = Exact<{
   wardCode: Scalars['String']['input'];
 }>;
 
-
-export type GetWardByWardCodeQuery = { __typename?: 'Query', ward: { __typename?: 'Ward', districtId: number, wardCode: string, wardName: string } };
+export type GetWardByWardCodeQuery = {
+  __typename?: 'Query';
+  ward: {
+    __typename?: 'Ward';
+    districtId: number;
+    wardCode: string;
+    wardName: string;
+  };
+};
 
 export type GetAvailableServiceQueryVariables = Exact<{
   servicesInput: GetAvailableServicesDto;
 }>;
 
+export type GetAvailableServiceQuery = {
+  __typename?: 'Query';
+  availableServices: Array<{
+    __typename?: 'ShippingService';
+    shortName: string;
+    serviceTypeId: number;
+    serviceId: number;
+  }>;
+};
 
-export type GetAvailableServiceQuery = { __typename?: 'Query', availableServices: Array<{ __typename?: 'ShippingService', shortName: string, serviceTypeId: number, serviceId: number }> };
+export type GetAllSystemConfigBanksQueryVariables = Exact<{
+  [key: string]: never;
+}>;
 
-export type GetAllSystemConfigBanksQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetAllSystemConfigBanksQuery = { __typename?: 'Query', systemConfigBanks: Array<{ __typename?: 'SystemConfigBankEntity', bin: string, code: string, id: string, isActive: boolean, isDeleted: boolean, logo: string, name: string, shortName: string }> };
+export type GetAllSystemConfigBanksQuery = {
+  __typename?: 'Query';
+  systemConfigBanks: Array<{
+    __typename?: 'SystemConfigBankEntity';
+    bin: string;
+    code: string;
+    id: string;
+    isActive: boolean;
+    isDeleted: boolean;
+    logo: string;
+    name: string;
+    shortName: string;
+  }>;
+};
 
 export type GetSystemConfigBankByIdQueryVariables = Exact<{
   systemConfigBankId: Scalars['ID']['input'];
 }>;
 
-
-export type GetSystemConfigBankByIdQuery = { __typename?: 'Query', systemConfigBank: { __typename?: 'SystemConfigBankEntity', bin: string, code: string, id: string, isActive: boolean, isDeleted: boolean, logo: string, name: string, shortName: string } };
+export type GetSystemConfigBankByIdQuery = {
+  __typename?: 'Query';
+  systemConfigBank: {
+    __typename?: 'SystemConfigBankEntity';
+    bin: string;
+    code: string;
+    id: string;
+    isActive: boolean;
+    isDeleted: boolean;
+    logo: string;
+    name: string;
+    shortName: string;
+  };
+};
 
 export type CreateSystemConfigBankMutationVariables = Exact<{
   input: CreateSystemConfigBankDto;
 }>;
 
-
-export type CreateSystemConfigBankMutation = { __typename?: 'Mutation', createSystemConfigBank: { __typename?: 'SystemConfigBankEntity', bin: string, code: string, id: string, isActive: boolean, isDeleted: boolean, logo: string, name: string, shortName: string } };
+export type CreateSystemConfigBankMutation = {
+  __typename?: 'Mutation';
+  createSystemConfigBank: {
+    __typename?: 'SystemConfigBankEntity';
+    bin: string;
+    code: string;
+    id: string;
+    isActive: boolean;
+    isDeleted: boolean;
+    logo: string;
+    name: string;
+    shortName: string;
+  };
+};
 
 export type RemoveSystemConfigBankMutationVariables = Exact<{
   removeSystemConfigBankId: Scalars['ID']['input'];
 }>;
 
+export type RemoveSystemConfigBankMutation = {
+  __typename?: 'Mutation';
+  removeSystemConfigBank: {
+    __typename?: 'SystemConfigBankEntity';
+    bin: string;
+    id: string;
+    code: string;
+    isActive: boolean;
+    isDeleted: boolean;
+    logo: string;
+    name: string;
+    shortName: string;
+  };
+};
 
-export type RemoveSystemConfigBankMutation = { __typename?: 'Mutation', removeSystemConfigBank: { __typename?: 'SystemConfigBankEntity', bin: string, id: string, code: string, isActive: boolean, isDeleted: boolean, logo: string, name: string, shortName: string } };
+export type GetUsersQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetUsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null }> };
+export type GetUsersQuery = {
+  __typename?: 'Query';
+  users: Array<{
+    __typename?: 'UserEntity';
+    id: string;
+    imageUrl?: string | null;
+    gender: boolean;
+    email?: string | null;
+    dateOfBirth?: any | null;
+    createdAt: any;
+    isActive: boolean;
+    name?: string | null;
+    phoneNumber?: string | null;
+    role: Roles;
+    updatedAt?: any | null;
+  }>;
+};
 
 export type GetUserQueryVariables = Exact<{
   userId: Scalars['String']['input'];
 }>;
 
-
-export type GetUserQuery = { __typename?: 'Query', user: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null } };
+export type GetUserQuery = {
+  __typename?: 'Query';
+  user: {
+    __typename?: 'UserEntity';
+    id: string;
+    imageUrl?: string | null;
+    gender: boolean;
+    email?: string | null;
+    dateOfBirth?: any | null;
+    createdAt: any;
+    isActive: boolean;
+    name?: string | null;
+    phoneNumber?: string | null;
+    role: Roles;
+    updatedAt?: any | null;
+  };
+};
 
 export type CreateUserMutationVariables = Exact<{
   createUserInput: CreateUserDto;
 }>;
 
-
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null } };
+export type CreateUserMutation = {
+  __typename?: 'Mutation';
+  createUser: {
+    __typename?: 'UserEntity';
+    id: string;
+    imageUrl?: string | null;
+    gender: boolean;
+    email?: string | null;
+    dateOfBirth?: any | null;
+    createdAt: any;
+    isActive: boolean;
+    name?: string | null;
+    phoneNumber?: string | null;
+    role: Roles;
+    updatedAt?: any | null;
+  };
+};
 
 export type UpdateUserMutationVariables = Exact<{
   updateUserInput: UpdateUserDto;
   updateUserId: Scalars['String']['input'];
 }>;
 
-
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null } };
+export type UpdateUserMutation = {
+  __typename?: 'Mutation';
+  updateUser: {
+    __typename?: 'UserEntity';
+    id: string;
+    imageUrl?: string | null;
+    gender: boolean;
+    email?: string | null;
+    dateOfBirth?: any | null;
+    createdAt: any;
+    isActive: boolean;
+    name?: string | null;
+    phoneNumber?: string | null;
+    role: Roles;
+    updatedAt?: any | null;
+  };
+};
 
 export type DeleteUserMutationVariables = Exact<{
   deleteUserId: Scalars['String']['input'];
 }>;
 
-
-export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null } };
-
+export type DeleteUserMutation = {
+  __typename?: 'Mutation';
+  deleteUser: {
+    __typename?: 'UserEntity';
+    id: string;
+    imageUrl?: string | null;
+    gender: boolean;
+    email?: string | null;
+    dateOfBirth?: any | null;
+    createdAt: any;
+    isActive: boolean;
+    name?: string | null;
+    phoneNumber?: string | null;
+    role: Roles;
+    updatedAt?: any | null;
+  };
+};
 
 export const AddressesDocument = gql`
-    query Addresses {
-  addresses {
-    id
-    districtID
-    provinceID
-    street
-    wardCode
+  query Addresses {
+    addresses {
+      id
+      districtID
+      provinceID
+      street
+      wardCode
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useAddressesQuery__
@@ -1373,33 +1808,69 @@ export const AddressesDocument = gql`
  *   },
  * });
  */
-export function useAddressesQuery(baseOptions?: Apollo.QueryHookOptions<AddressesQuery, AddressesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<AddressesQuery, AddressesQueryVariables>(AddressesDocument, options);
-      }
-export function useAddressesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AddressesQuery, AddressesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<AddressesQuery, AddressesQueryVariables>(AddressesDocument, options);
-        }
-export function useAddressesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AddressesQuery, AddressesQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<AddressesQuery, AddressesQueryVariables>(AddressesDocument, options);
-        }
-export type AddressesQueryHookResult = ReturnType<typeof useAddressesQuery>;
-export type AddressesLazyQueryHookResult = ReturnType<typeof useAddressesLazyQuery>;
-export type AddressesSuspenseQueryHookResult = ReturnType<typeof useAddressesSuspenseQuery>;
-export type AddressesQueryResult = Apollo.QueryResult<AddressesQuery, AddressesQueryVariables>;
-export const CreateAddressDocument = gql`
-    mutation CreateAddress($createAddressInput: CreateAddressInput!) {
-  createAddress(createAddressInput: $createAddressInput) {
-    districtID
-    provinceID
-    street
-    wardCode
-  }
+export function useAddressesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    AddressesQuery,
+    AddressesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<AddressesQuery, AddressesQueryVariables>(
+    AddressesDocument,
+    options,
+  );
 }
-    `;
-export type CreateAddressMutationFn = Apollo.MutationFunction<CreateAddressMutation, CreateAddressMutationVariables>;
+export function useAddressesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    AddressesQuery,
+    AddressesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<AddressesQuery, AddressesQueryVariables>(
+    AddressesDocument,
+    options,
+  );
+}
+export function useAddressesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<AddressesQuery, AddressesQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<AddressesQuery, AddressesQueryVariables>(
+    AddressesDocument,
+    options,
+  );
+}
+export type AddressesQueryHookResult = ReturnType<typeof useAddressesQuery>;
+export type AddressesLazyQueryHookResult = ReturnType<
+  typeof useAddressesLazyQuery
+>;
+export type AddressesSuspenseQueryHookResult = ReturnType<
+  typeof useAddressesSuspenseQuery
+>;
+export type AddressesQueryResult = Apollo.QueryResult<
+  AddressesQuery,
+  AddressesQueryVariables
+>;
+export const CreateAddressDocument = gql`
+  mutation CreateAddress($createAddressInput: CreateAddressInput!) {
+    createAddress(createAddressInput: $createAddressInput) {
+      districtID
+      provinceID
+      street
+      wardCode
+    }
+  }
+`;
+export type CreateAddressMutationFn = Apollo.MutationFunction<
+  CreateAddressMutation,
+  CreateAddressMutationVariables
+>;
 
 /**
  * __useCreateAddressMutation__
@@ -1418,21 +1889,38 @@ export type CreateAddressMutationFn = Apollo.MutationFunction<CreateAddressMutat
  *   },
  * });
  */
-export function useCreateAddressMutation(baseOptions?: Apollo.MutationHookOptions<CreateAddressMutation, CreateAddressMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateAddressMutation, CreateAddressMutationVariables>(CreateAddressDocument, options);
-      }
-export type CreateAddressMutationHookResult = ReturnType<typeof useCreateAddressMutation>;
-export type CreateAddressMutationResult = Apollo.MutationResult<CreateAddressMutation>;
-export type CreateAddressMutationOptions = Apollo.BaseMutationOptions<CreateAddressMutation, CreateAddressMutationVariables>;
-export const DeleteAddressDocument = gql`
-    mutation DeleteAddress($deleteAddressId: String!) {
-  deleteAddress(id: $deleteAddressId) {
-    id
-  }
+export function useCreateAddressMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateAddressMutation,
+    CreateAddressMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateAddressMutation,
+    CreateAddressMutationVariables
+  >(CreateAddressDocument, options);
 }
-    `;
-export type DeleteAddressMutationFn = Apollo.MutationFunction<DeleteAddressMutation, DeleteAddressMutationVariables>;
+export type CreateAddressMutationHookResult = ReturnType<
+  typeof useCreateAddressMutation
+>;
+export type CreateAddressMutationResult =
+  Apollo.MutationResult<CreateAddressMutation>;
+export type CreateAddressMutationOptions = Apollo.BaseMutationOptions<
+  CreateAddressMutation,
+  CreateAddressMutationVariables
+>;
+export const DeleteAddressDocument = gql`
+  mutation DeleteAddress($deleteAddressId: String!) {
+    deleteAddress(id: $deleteAddressId) {
+      id
+    }
+  }
+`;
+export type DeleteAddressMutationFn = Apollo.MutationFunction<
+  DeleteAddressMutation,
+  DeleteAddressMutationVariables
+>;
 
 /**
  * __useDeleteAddressMutation__
@@ -1451,31 +1939,49 @@ export type DeleteAddressMutationFn = Apollo.MutationFunction<DeleteAddressMutat
  *   },
  * });
  */
-export function useDeleteAddressMutation(baseOptions?: Apollo.MutationHookOptions<DeleteAddressMutation, DeleteAddressMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteAddressMutation, DeleteAddressMutationVariables>(DeleteAddressDocument, options);
-      }
-export type DeleteAddressMutationHookResult = ReturnType<typeof useDeleteAddressMutation>;
-export type DeleteAddressMutationResult = Apollo.MutationResult<DeleteAddressMutation>;
-export type DeleteAddressMutationOptions = Apollo.BaseMutationOptions<DeleteAddressMutation, DeleteAddressMutationVariables>;
-export const GetAddressDetailsDocument = gql`
-    query GetAddressDetails($provinceId: Int!, $districtId: Int!, $wardCode: String!) {
-  province(provinceId: $provinceId) {
-    provinceId
-    provinceName
-  }
-  district(districtId: $districtId) {
-    districtId
-    districtName
-    provinceId
-  }
-  ward(wardCode: $wardCode) {
-    districtId
-    wardCode
-    wardName
-  }
+export function useDeleteAddressMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DeleteAddressMutation,
+    DeleteAddressMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DeleteAddressMutation,
+    DeleteAddressMutationVariables
+  >(DeleteAddressDocument, options);
 }
-    `;
+export type DeleteAddressMutationHookResult = ReturnType<
+  typeof useDeleteAddressMutation
+>;
+export type DeleteAddressMutationResult =
+  Apollo.MutationResult<DeleteAddressMutation>;
+export type DeleteAddressMutationOptions = Apollo.BaseMutationOptions<
+  DeleteAddressMutation,
+  DeleteAddressMutationVariables
+>;
+export const GetAddressDetailsDocument = gql`
+  query GetAddressDetails(
+    $provinceId: Int!
+    $districtId: Int!
+    $wardCode: String!
+  ) {
+    province(provinceId: $provinceId) {
+      provinceId
+      provinceName
+    }
+    district(districtId: $districtId) {
+      districtId
+      districtName
+      provinceId
+    }
+    ward(wardCode: $wardCode) {
+      districtId
+      wardCode
+      wardName
+    }
+  }
+`;
 
 /**
  * __useGetAddressDetailsQuery__
@@ -1495,48 +2001,93 @@ export const GetAddressDetailsDocument = gql`
  *   },
  * });
  */
-export function useGetAddressDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetAddressDetailsQuery, GetAddressDetailsQueryVariables> & ({ variables: GetAddressDetailsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetAddressDetailsQuery, GetAddressDetailsQueryVariables>(GetAddressDetailsDocument, options);
-      }
-export function useGetAddressDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAddressDetailsQuery, GetAddressDetailsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetAddressDetailsQuery, GetAddressDetailsQueryVariables>(GetAddressDetailsDocument, options);
-        }
-export function useGetAddressDetailsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAddressDetailsQuery, GetAddressDetailsQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetAddressDetailsQuery, GetAddressDetailsQueryVariables>(GetAddressDetailsDocument, options);
-        }
-export type GetAddressDetailsQueryHookResult = ReturnType<typeof useGetAddressDetailsQuery>;
-export type GetAddressDetailsLazyQueryHookResult = ReturnType<typeof useGetAddressDetailsLazyQuery>;
-export type GetAddressDetailsSuspenseQueryHookResult = ReturnType<typeof useGetAddressDetailsSuspenseQuery>;
-export type GetAddressDetailsQueryResult = Apollo.QueryResult<GetAddressDetailsQuery, GetAddressDetailsQueryVariables>;
+export function useGetAddressDetailsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetAddressDetailsQuery,
+    GetAddressDetailsQueryVariables
+  > &
+    (
+      | { variables: GetAddressDetailsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetAddressDetailsQuery,
+    GetAddressDetailsQueryVariables
+  >(GetAddressDetailsDocument, options);
+}
+export function useGetAddressDetailsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAddressDetailsQuery,
+    GetAddressDetailsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAddressDetailsQuery,
+    GetAddressDetailsQueryVariables
+  >(GetAddressDetailsDocument, options);
+}
+export function useGetAddressDetailsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAddressDetailsQuery,
+        GetAddressDetailsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAddressDetailsQuery,
+    GetAddressDetailsQueryVariables
+  >(GetAddressDetailsDocument, options);
+}
+export type GetAddressDetailsQueryHookResult = ReturnType<
+  typeof useGetAddressDetailsQuery
+>;
+export type GetAddressDetailsLazyQueryHookResult = ReturnType<
+  typeof useGetAddressDetailsLazyQuery
+>;
+export type GetAddressDetailsSuspenseQueryHookResult = ReturnType<
+  typeof useGetAddressDetailsSuspenseQuery
+>;
+export type GetAddressDetailsQueryResult = Apollo.QueryResult<
+  GetAddressDetailsQuery,
+  GetAddressDetailsQueryVariables
+>;
 export const LoginDocument = gql`
-    mutation Login($loginInput: LoginDto!) {
-  login(loginInput: $loginInput) {
-    accessToken
-    refreshToken
-    user {
-      createdAt
-      dateOfBirth
-      email
-      gender
-      id
-      imageUrl
-      isActive
-      name
-      phoneNumber
-      role
-      updatedAt
-      factory {
+  mutation Login($loginInput: LoginDto!) {
+    login(loginInput: $loginInput) {
+      accessToken
+      refreshToken
+      user {
+        createdAt
+        dateOfBirth
+        email
+        gender
+        id
+        imageUrl
+        isActive
         name
-        factoryStatus
+        phoneNumber
+        role
+        updatedAt
+        factory {
+          name
+          factoryStatus
+        }
       }
     }
   }
-}
-    `;
-export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
+`;
+export type LoginMutationFn = Apollo.MutationFunction<
+  LoginMutation,
+  LoginMutationVariables
+>;
 
 /**
  * __useLoginMutation__
@@ -1555,39 +2106,53 @@ export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutati
  *   },
  * });
  */
-export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
-      }
+export function useLoginMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    LoginMutation,
+    LoginMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<LoginMutation, LoginMutationVariables>(
+    LoginDocument,
+    options,
+  );
+}
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<
+  LoginMutation,
+  LoginMutationVariables
+>;
 export const RegisterDocument = gql`
-    mutation Register($registerInput: RegisterDto!) {
-  register(registerInput: $registerInput) {
-    accessToken
-    refreshToken
-    user {
-      createdAt
-      dateOfBirth
-      email
-      gender
-      id
-      imageUrl
-      isActive
-      name
-      phoneNumber
-      role
-      updatedAt
-      factory {
+  mutation Register($registerInput: RegisterDto!) {
+    register(registerInput: $registerInput) {
+      accessToken
+      refreshToken
+      user {
+        createdAt
+        dateOfBirth
+        email
+        gender
+        id
+        imageUrl
+        isActive
         name
-        factoryStatus
+        phoneNumber
+        role
+        updatedAt
+        factory {
+          name
+          factoryStatus
+        }
       }
     }
   }
-}
-    `;
-export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
+`;
+export type RegisterMutationFn = Apollo.MutationFunction<
+  RegisterMutation,
+  RegisterMutationVariables
+>;
 
 /**
  * __useRegisterMutation__
@@ -1606,39 +2171,53 @@ export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, Regis
  *   },
  * });
  */
-export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<RegisterMutation, RegisterMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument, options);
-      }
+export function useRegisterMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RegisterMutation,
+    RegisterMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(
+    RegisterDocument,
+    options,
+  );
+}
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
-export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export type RegisterMutationOptions = Apollo.BaseMutationOptions<
+  RegisterMutation,
+  RegisterMutationVariables
+>;
 export const RefreshTokenDocument = gql`
-    mutation RefreshToken($refreshTokenInput: RefreshTokenDto!) {
-  refreshToken(refreshTokenInput: $refreshTokenInput) {
-    accessToken
-    refreshToken
-    user {
-      createdAt
-      dateOfBirth
-      email
-      gender
-      id
-      imageUrl
-      isActive
-      name
-      phoneNumber
-      role
-      updatedAt
-      factory {
+  mutation RefreshToken($refreshTokenInput: RefreshTokenDto!) {
+    refreshToken(refreshTokenInput: $refreshTokenInput) {
+      accessToken
+      refreshToken
+      user {
+        createdAt
+        dateOfBirth
+        email
+        gender
+        id
+        imageUrl
+        isActive
         name
-        factoryStatus
+        phoneNumber
+        role
+        updatedAt
+        factory {
+          name
+          factoryStatus
+        }
       }
     }
   }
-}
-    `;
-export type RefreshTokenMutationFn = Apollo.MutationFunction<RefreshTokenMutation, RefreshTokenMutationVariables>;
+`;
+export type RefreshTokenMutationFn = Apollo.MutationFunction<
+  RefreshTokenMutation,
+  RefreshTokenMutationVariables
+>;
 
 /**
  * __useRefreshTokenMutation__
@@ -1657,19 +2236,36 @@ export type RefreshTokenMutationFn = Apollo.MutationFunction<RefreshTokenMutatio
  *   },
  * });
  */
-export function useRefreshTokenMutation(baseOptions?: Apollo.MutationHookOptions<RefreshTokenMutation, RefreshTokenMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RefreshTokenMutation, RefreshTokenMutationVariables>(RefreshTokenDocument, options);
-      }
-export type RefreshTokenMutationHookResult = ReturnType<typeof useRefreshTokenMutation>;
-export type RefreshTokenMutationResult = Apollo.MutationResult<RefreshTokenMutation>;
-export type RefreshTokenMutationOptions = Apollo.BaseMutationOptions<RefreshTokenMutation, RefreshTokenMutationVariables>;
-export const LogoutDocument = gql`
-    mutation Logout {
-  logout
+export function useRefreshTokenMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RefreshTokenMutation,
+    RefreshTokenMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RefreshTokenMutation,
+    RefreshTokenMutationVariables
+  >(RefreshTokenDocument, options);
 }
-    `;
-export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
+export type RefreshTokenMutationHookResult = ReturnType<
+  typeof useRefreshTokenMutation
+>;
+export type RefreshTokenMutationResult =
+  Apollo.MutationResult<RefreshTokenMutation>;
+export type RefreshTokenMutationOptions = Apollo.BaseMutationOptions<
+  RefreshTokenMutation,
+  RefreshTokenMutationVariables
+>;
+export const LogoutDocument = gql`
+  mutation Logout {
+    logout
+  }
+`;
+export type LogoutMutationFn = Apollo.MutationFunction<
+  LogoutMutation,
+  LogoutMutationVariables
+>;
 
 /**
  * __useLogoutMutation__
@@ -1687,34 +2283,45 @@ export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMut
  *   },
  * });
  */
-export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
-      }
+export function useLogoutMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    LogoutMutation,
+    LogoutMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(
+    LogoutDocument,
+    options,
+  );
+}
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
-export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export type LogoutMutationOptions = Apollo.BaseMutationOptions<
+  LogoutMutation,
+  LogoutMutationVariables
+>;
 export const GetMeDocument = gql`
-    query GetMe {
-  getMe {
-    createdAt
-    dateOfBirth
-    email
-    gender
-    id
-    imageUrl
-    isActive
-    name
-    phoneNumber
-    role
-    updatedAt
-    factory {
+  query GetMe {
+    getMe {
+      createdAt
+      dateOfBirth
+      email
+      gender
+      id
+      imageUrl
+      isActive
       name
-      factoryStatus
+      phoneNumber
+      role
+      updatedAt
+      factory {
+        name
+        factoryStatus
+      }
     }
   }
-}
-    `;
+`;
 
 /**
  * __useGetMeQuery__
@@ -1731,60 +2338,85 @@ export const GetMeDocument = gql`
  *   },
  * });
  */
-export function useGetMeQuery(baseOptions?: Apollo.QueryHookOptions<GetMeQuery, GetMeQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetMeQuery, GetMeQueryVariables>(GetMeDocument, options);
-      }
-export function useGetMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMeQuery, GetMeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetMeQuery, GetMeQueryVariables>(GetMeDocument, options);
-        }
-export function useGetMeSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMeQuery, GetMeQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetMeQuery, GetMeQueryVariables>(GetMeDocument, options);
-        }
+export function useGetMeQuery(
+  baseOptions?: Apollo.QueryHookOptions<GetMeQuery, GetMeQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetMeQuery, GetMeQueryVariables>(
+    GetMeDocument,
+    options,
+  );
+}
+export function useGetMeLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GetMeQuery, GetMeQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetMeQuery, GetMeQueryVariables>(
+    GetMeDocument,
+    options,
+  );
+}
+export function useGetMeSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GetMeQuery, GetMeQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetMeQuery, GetMeQueryVariables>(
+    GetMeDocument,
+    options,
+  );
+}
 export type GetMeQueryHookResult = ReturnType<typeof useGetMeQuery>;
 export type GetMeLazyQueryHookResult = ReturnType<typeof useGetMeLazyQuery>;
-export type GetMeSuspenseQueryHookResult = ReturnType<typeof useGetMeSuspenseQuery>;
-export type GetMeQueryResult = Apollo.QueryResult<GetMeQuery, GetMeQueryVariables>;
+export type GetMeSuspenseQueryHookResult = ReturnType<
+  typeof useGetMeSuspenseQuery
+>;
+export type GetMeQueryResult = Apollo.QueryResult<
+  GetMeQuery,
+  GetMeQueryVariables
+>;
 export const GetUserCartItemsDocument = gql`
-    query GetUserCartItems {
-  userCartItems {
-    userId
-    quantity
-    id
-    design {
-      isTemplate
-      isPublic
-      isFinalized
-      blankVariant {
-        blankPrice
-        systemVariant {
-          size
-          model
-          color
-        }
-        product {
-          name
-          imageUrl
-          discounts {
-            minQuantity
-            name
-            discountPercent
+  query GetUserCartItems {
+    userCartItems {
+      userId
+      quantity
+      id
+      design {
+        isTemplate
+        isPublic
+        isFinalized
+        blankVariant {
+          blankPrice
+          systemVariant {
+            size
+            model
+            color
           }
-          id
+          product {
+            name
+            imageUrl
+            discounts {
+              minQuantity
+              name
+              discountPercent
+            }
+            id
+          }
         }
-      }
-      designPositions {
-        positionType {
-          positionName
-          basePrice
+        designPositions {
+          positionType {
+            positionName
+            basePrice
+          }
         }
       }
     }
   }
-}
-    `;
+`;
 
 /**
  * __useGetUserCartItemsQuery__
@@ -1801,27 +2433,65 @@ export const GetUserCartItemsDocument = gql`
  *   },
  * });
  */
-export function useGetUserCartItemsQuery(baseOptions?: Apollo.QueryHookOptions<GetUserCartItemsQuery, GetUserCartItemsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetUserCartItemsQuery, GetUserCartItemsQueryVariables>(GetUserCartItemsDocument, options);
-      }
-export function useGetUserCartItemsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserCartItemsQuery, GetUserCartItemsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetUserCartItemsQuery, GetUserCartItemsQueryVariables>(GetUserCartItemsDocument, options);
-        }
-export function useGetUserCartItemsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetUserCartItemsQuery, GetUserCartItemsQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetUserCartItemsQuery, GetUserCartItemsQueryVariables>(GetUserCartItemsDocument, options);
-        }
-export type GetUserCartItemsQueryHookResult = ReturnType<typeof useGetUserCartItemsQuery>;
-export type GetUserCartItemsLazyQueryHookResult = ReturnType<typeof useGetUserCartItemsLazyQuery>;
-export type GetUserCartItemsSuspenseQueryHookResult = ReturnType<typeof useGetUserCartItemsSuspenseQuery>;
-export type GetUserCartItemsQueryResult = Apollo.QueryResult<GetUserCartItemsQuery, GetUserCartItemsQueryVariables>;
-export const GetCartItemCountDocument = gql`
-    query GetCartItemCount {
-  getCartItemCount
+export function useGetUserCartItemsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetUserCartItemsQuery,
+    GetUserCartItemsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetUserCartItemsQuery, GetUserCartItemsQueryVariables>(
+    GetUserCartItemsDocument,
+    options,
+  );
 }
-    `;
+export function useGetUserCartItemsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetUserCartItemsQuery,
+    GetUserCartItemsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetUserCartItemsQuery,
+    GetUserCartItemsQueryVariables
+  >(GetUserCartItemsDocument, options);
+}
+export function useGetUserCartItemsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetUserCartItemsQuery,
+        GetUserCartItemsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetUserCartItemsQuery,
+    GetUserCartItemsQueryVariables
+  >(GetUserCartItemsDocument, options);
+}
+export type GetUserCartItemsQueryHookResult = ReturnType<
+  typeof useGetUserCartItemsQuery
+>;
+export type GetUserCartItemsLazyQueryHookResult = ReturnType<
+  typeof useGetUserCartItemsLazyQuery
+>;
+export type GetUserCartItemsSuspenseQueryHookResult = ReturnType<
+  typeof useGetUserCartItemsSuspenseQuery
+>;
+export type GetUserCartItemsQueryResult = Apollo.QueryResult<
+  GetUserCartItemsQuery,
+  GetUserCartItemsQueryVariables
+>;
+export const GetCartItemCountDocument = gql`
+  query GetCartItemCount {
+    getCartItemCount
+  }
+`;
 
 /**
  * __useGetCartItemCountQuery__
@@ -1838,32 +2508,79 @@ export const GetCartItemCountDocument = gql`
  *   },
  * });
  */
-export function useGetCartItemCountQuery(baseOptions?: Apollo.QueryHookOptions<GetCartItemCountQuery, GetCartItemCountQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetCartItemCountQuery, GetCartItemCountQueryVariables>(GetCartItemCountDocument, options);
-      }
-export function useGetCartItemCountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCartItemCountQuery, GetCartItemCountQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetCartItemCountQuery, GetCartItemCountQueryVariables>(GetCartItemCountDocument, options);
-        }
-export function useGetCartItemCountSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetCartItemCountQuery, GetCartItemCountQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetCartItemCountQuery, GetCartItemCountQueryVariables>(GetCartItemCountDocument, options);
-        }
-export type GetCartItemCountQueryHookResult = ReturnType<typeof useGetCartItemCountQuery>;
-export type GetCartItemCountLazyQueryHookResult = ReturnType<typeof useGetCartItemCountLazyQuery>;
-export type GetCartItemCountSuspenseQueryHookResult = ReturnType<typeof useGetCartItemCountSuspenseQuery>;
-export type GetCartItemCountQueryResult = Apollo.QueryResult<GetCartItemCountQuery, GetCartItemCountQueryVariables>;
-export const UpdateCartItemDocument = gql`
-    mutation UpdateCartItem($updateCartItemId: String!, $updateCartItemInput: UpdateCartItemDto!) {
-  updateCartItem(id: $updateCartItemId, updateCartItemInput: $updateCartItemInput) {
-    userId
-    quantity
-    id
-  }
+export function useGetCartItemCountQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetCartItemCountQuery,
+    GetCartItemCountQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetCartItemCountQuery, GetCartItemCountQueryVariables>(
+    GetCartItemCountDocument,
+    options,
+  );
 }
-    `;
-export type UpdateCartItemMutationFn = Apollo.MutationFunction<UpdateCartItemMutation, UpdateCartItemMutationVariables>;
+export function useGetCartItemCountLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetCartItemCountQuery,
+    GetCartItemCountQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetCartItemCountQuery,
+    GetCartItemCountQueryVariables
+  >(GetCartItemCountDocument, options);
+}
+export function useGetCartItemCountSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetCartItemCountQuery,
+        GetCartItemCountQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetCartItemCountQuery,
+    GetCartItemCountQueryVariables
+  >(GetCartItemCountDocument, options);
+}
+export type GetCartItemCountQueryHookResult = ReturnType<
+  typeof useGetCartItemCountQuery
+>;
+export type GetCartItemCountLazyQueryHookResult = ReturnType<
+  typeof useGetCartItemCountLazyQuery
+>;
+export type GetCartItemCountSuspenseQueryHookResult = ReturnType<
+  typeof useGetCartItemCountSuspenseQuery
+>;
+export type GetCartItemCountQueryResult = Apollo.QueryResult<
+  GetCartItemCountQuery,
+  GetCartItemCountQueryVariables
+>;
+export const UpdateCartItemDocument = gql`
+  mutation UpdateCartItem(
+    $updateCartItemId: String!
+    $updateCartItemInput: UpdateCartItemDto!
+  ) {
+    updateCartItem(
+      id: $updateCartItemId
+      updateCartItemInput: $updateCartItemInput
+    ) {
+      userId
+      quantity
+      id
+    }
+  }
+`;
+export type UpdateCartItemMutationFn = Apollo.MutationFunction<
+  UpdateCartItemMutation,
+  UpdateCartItemMutationVariables
+>;
 
 /**
  * __useUpdateCartItemMutation__
@@ -1883,21 +2600,38 @@ export type UpdateCartItemMutationFn = Apollo.MutationFunction<UpdateCartItemMut
  *   },
  * });
  */
-export function useUpdateCartItemMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCartItemMutation, UpdateCartItemMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateCartItemMutation, UpdateCartItemMutationVariables>(UpdateCartItemDocument, options);
-      }
-export type UpdateCartItemMutationHookResult = ReturnType<typeof useUpdateCartItemMutation>;
-export type UpdateCartItemMutationResult = Apollo.MutationResult<UpdateCartItemMutation>;
-export type UpdateCartItemMutationOptions = Apollo.BaseMutationOptions<UpdateCartItemMutation, UpdateCartItemMutationVariables>;
-export const CalculateShippingFeeDocument = gql`
-    mutation CalculateShippingFee($input: CalculateShippingFeeDto!) {
-  calculateShippingFee(input: $input) {
-    total
-  }
+export function useUpdateCartItemMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateCartItemMutation,
+    UpdateCartItemMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateCartItemMutation,
+    UpdateCartItemMutationVariables
+  >(UpdateCartItemDocument, options);
 }
-    `;
-export type CalculateShippingFeeMutationFn = Apollo.MutationFunction<CalculateShippingFeeMutation, CalculateShippingFeeMutationVariables>;
+export type UpdateCartItemMutationHookResult = ReturnType<
+  typeof useUpdateCartItemMutation
+>;
+export type UpdateCartItemMutationResult =
+  Apollo.MutationResult<UpdateCartItemMutation>;
+export type UpdateCartItemMutationOptions = Apollo.BaseMutationOptions<
+  UpdateCartItemMutation,
+  UpdateCartItemMutationVariables
+>;
+export const CalculateShippingFeeDocument = gql`
+  mutation CalculateShippingFee($input: CalculateShippingFeeDto!) {
+    calculateShippingFee(input: $input) {
+      total
+    }
+  }
+`;
+export type CalculateShippingFeeMutationFn = Apollo.MutationFunction<
+  CalculateShippingFeeMutation,
+  CalculateShippingFeeMutationVariables
+>;
 
 /**
  * __useCalculateShippingFeeMutation__
@@ -1916,27 +2650,41 @@ export type CalculateShippingFeeMutationFn = Apollo.MutationFunction<CalculateSh
  *   },
  * });
  */
-export function useCalculateShippingFeeMutation(baseOptions?: Apollo.MutationHookOptions<CalculateShippingFeeMutation, CalculateShippingFeeMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CalculateShippingFeeMutation, CalculateShippingFeeMutationVariables>(CalculateShippingFeeDocument, options);
-      }
-export type CalculateShippingFeeMutationHookResult = ReturnType<typeof useCalculateShippingFeeMutation>;
-export type CalculateShippingFeeMutationResult = Apollo.MutationResult<CalculateShippingFeeMutation>;
-export type CalculateShippingFeeMutationOptions = Apollo.BaseMutationOptions<CalculateShippingFeeMutation, CalculateShippingFeeMutationVariables>;
-export const GetAllCategoriesDocument = gql`
-    query GetAllCategories {
-  categories {
-    createdAt
-    description
-    id
-    imageUrl
-    isActive
-    name
-    totalProducts
-    updatedAt
-  }
+export function useCalculateShippingFeeMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CalculateShippingFeeMutation,
+    CalculateShippingFeeMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CalculateShippingFeeMutation,
+    CalculateShippingFeeMutationVariables
+  >(CalculateShippingFeeDocument, options);
 }
-    `;
+export type CalculateShippingFeeMutationHookResult = ReturnType<
+  typeof useCalculateShippingFeeMutation
+>;
+export type CalculateShippingFeeMutationResult =
+  Apollo.MutationResult<CalculateShippingFeeMutation>;
+export type CalculateShippingFeeMutationOptions = Apollo.BaseMutationOptions<
+  CalculateShippingFeeMutation,
+  CalculateShippingFeeMutationVariables
+>;
+export const GetAllCategoriesDocument = gql`
+  query GetAllCategories {
+    categories {
+      createdAt
+      description
+      id
+      imageUrl
+      isActive
+      name
+      totalProducts
+      updatedAt
+    }
+  }
+`;
 
 /**
  * __useGetAllCategoriesQuery__
@@ -1953,37 +2701,78 @@ export const GetAllCategoriesDocument = gql`
  *   },
  * });
  */
-export function useGetAllCategoriesQuery(baseOptions?: Apollo.QueryHookOptions<GetAllCategoriesQuery, GetAllCategoriesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetAllCategoriesQuery, GetAllCategoriesQueryVariables>(GetAllCategoriesDocument, options);
-      }
-export function useGetAllCategoriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllCategoriesQuery, GetAllCategoriesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetAllCategoriesQuery, GetAllCategoriesQueryVariables>(GetAllCategoriesDocument, options);
-        }
-export function useGetAllCategoriesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllCategoriesQuery, GetAllCategoriesQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetAllCategoriesQuery, GetAllCategoriesQueryVariables>(GetAllCategoriesDocument, options);
-        }
-export type GetAllCategoriesQueryHookResult = ReturnType<typeof useGetAllCategoriesQuery>;
-export type GetAllCategoriesLazyQueryHookResult = ReturnType<typeof useGetAllCategoriesLazyQuery>;
-export type GetAllCategoriesSuspenseQueryHookResult = ReturnType<typeof useGetAllCategoriesSuspenseQuery>;
-export type GetAllCategoriesQueryResult = Apollo.QueryResult<GetAllCategoriesQuery, GetAllCategoriesQueryVariables>;
-export const CreateCategoryDocument = gql`
-    mutation CreateCategory($createCategoryInput: CreateCategoryDto!) {
-  createCategory(createCategoryInput: $createCategoryInput) {
-    createdAt
-    description
-    id
-    imageUrl
-    isActive
-    name
-    totalProducts
-    updatedAt
-  }
+export function useGetAllCategoriesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetAllCategoriesQuery,
+    GetAllCategoriesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetAllCategoriesQuery, GetAllCategoriesQueryVariables>(
+    GetAllCategoriesDocument,
+    options,
+  );
 }
-    `;
-export type CreateCategoryMutationFn = Apollo.MutationFunction<CreateCategoryMutation, CreateCategoryMutationVariables>;
+export function useGetAllCategoriesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAllCategoriesQuery,
+    GetAllCategoriesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAllCategoriesQuery,
+    GetAllCategoriesQueryVariables
+  >(GetAllCategoriesDocument, options);
+}
+export function useGetAllCategoriesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAllCategoriesQuery,
+        GetAllCategoriesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAllCategoriesQuery,
+    GetAllCategoriesQueryVariables
+  >(GetAllCategoriesDocument, options);
+}
+export type GetAllCategoriesQueryHookResult = ReturnType<
+  typeof useGetAllCategoriesQuery
+>;
+export type GetAllCategoriesLazyQueryHookResult = ReturnType<
+  typeof useGetAllCategoriesLazyQuery
+>;
+export type GetAllCategoriesSuspenseQueryHookResult = ReturnType<
+  typeof useGetAllCategoriesSuspenseQuery
+>;
+export type GetAllCategoriesQueryResult = Apollo.QueryResult<
+  GetAllCategoriesQuery,
+  GetAllCategoriesQueryVariables
+>;
+export const CreateCategoryDocument = gql`
+  mutation CreateCategory($createCategoryInput: CreateCategoryDto!) {
+    createCategory(createCategoryInput: $createCategoryInput) {
+      createdAt
+      description
+      id
+      imageUrl
+      isActive
+      name
+      totalProducts
+      updatedAt
+    }
+  }
+`;
+export type CreateCategoryMutationFn = Apollo.MutationFunction<
+  CreateCategoryMutation,
+  CreateCategoryMutationVariables
+>;
 
 /**
  * __useCreateCategoryMutation__
@@ -2002,28 +2791,45 @@ export type CreateCategoryMutationFn = Apollo.MutationFunction<CreateCategoryMut
  *   },
  * });
  */
-export function useCreateCategoryMutation(baseOptions?: Apollo.MutationHookOptions<CreateCategoryMutation, CreateCategoryMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateCategoryMutation, CreateCategoryMutationVariables>(CreateCategoryDocument, options);
-      }
-export type CreateCategoryMutationHookResult = ReturnType<typeof useCreateCategoryMutation>;
-export type CreateCategoryMutationResult = Apollo.MutationResult<CreateCategoryMutation>;
-export type CreateCategoryMutationOptions = Apollo.BaseMutationOptions<CreateCategoryMutation, CreateCategoryMutationVariables>;
-export const DeleteCategoryDocument = gql`
-    mutation DeleteCategory($deleteCategoryId: String!) {
-  deleteCategory(id: $deleteCategoryId) {
-    createdAt
-    description
-    id
-    imageUrl
-    isActive
-    name
-    totalProducts
-    updatedAt
-  }
+export function useCreateCategoryMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateCategoryMutation,
+    CreateCategoryMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateCategoryMutation,
+    CreateCategoryMutationVariables
+  >(CreateCategoryDocument, options);
 }
-    `;
-export type DeleteCategoryMutationFn = Apollo.MutationFunction<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
+export type CreateCategoryMutationHookResult = ReturnType<
+  typeof useCreateCategoryMutation
+>;
+export type CreateCategoryMutationResult =
+  Apollo.MutationResult<CreateCategoryMutation>;
+export type CreateCategoryMutationOptions = Apollo.BaseMutationOptions<
+  CreateCategoryMutation,
+  CreateCategoryMutationVariables
+>;
+export const DeleteCategoryDocument = gql`
+  mutation DeleteCategory($deleteCategoryId: String!) {
+    deleteCategory(id: $deleteCategoryId) {
+      createdAt
+      description
+      id
+      imageUrl
+      isActive
+      name
+      totalProducts
+      updatedAt
+    }
+  }
+`;
+export type DeleteCategoryMutationFn = Apollo.MutationFunction<
+  DeleteCategoryMutation,
+  DeleteCategoryMutationVariables
+>;
 
 /**
  * __useDeleteCategoryMutation__
@@ -2042,49 +2848,63 @@ export type DeleteCategoryMutationFn = Apollo.MutationFunction<DeleteCategoryMut
  *   },
  * });
  */
-export function useDeleteCategoryMutation(baseOptions?: Apollo.MutationHookOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteCategoryMutation, DeleteCategoryMutationVariables>(DeleteCategoryDocument, options);
-      }
-export type DeleteCategoryMutationHookResult = ReturnType<typeof useDeleteCategoryMutation>;
-export type DeleteCategoryMutationResult = Apollo.MutationResult<DeleteCategoryMutation>;
-export type DeleteCategoryMutationOptions = Apollo.BaseMutationOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
-export const GetMyFactoryDocument = gql`
-    query GetMyFactory {
-  getMyFactory {
-    addressId
-    businessLicenseUrl
-    contactPersonName
-    contactPersonPhone
-    contractUrl
-    description
-    establishedDate
-    factoryStatus
-    isSubmitted
-    leadTime
-    maxPrintingCapacity
-    minimumOrderQuantity
-    name
-    operationalHours
-    owner {
-      email
-      name
-      imageUrl
-    }
-    printingMethods
-    products {
-      id
-      imageUrl
-      name
-    }
-    qualityCertifications
-    specializations
-    taxIdentificationNumber
-    totalEmployees
-    website
-  }
+export function useDeleteCategoryMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DeleteCategoryMutation,
+    DeleteCategoryMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DeleteCategoryMutation,
+    DeleteCategoryMutationVariables
+  >(DeleteCategoryDocument, options);
 }
-    `;
+export type DeleteCategoryMutationHookResult = ReturnType<
+  typeof useDeleteCategoryMutation
+>;
+export type DeleteCategoryMutationResult =
+  Apollo.MutationResult<DeleteCategoryMutation>;
+export type DeleteCategoryMutationOptions = Apollo.BaseMutationOptions<
+  DeleteCategoryMutation,
+  DeleteCategoryMutationVariables
+>;
+export const GetMyFactoryDocument = gql`
+  query GetMyFactory {
+    getMyFactory {
+      addressId
+      businessLicenseUrl
+      contactPersonName
+      contactPersonPhone
+      contractUrl
+      description
+      establishedDate
+      factoryStatus
+      isSubmitted
+      leadTime
+      maxPrintingCapacity
+      minimumOrderQuantity
+      name
+      operationalHours
+      owner {
+        email
+        name
+        imageUrl
+      }
+      printingMethods
+      products {
+        id
+        imageUrl
+        name
+      }
+      qualityCertifications
+      specializations
+      taxIdentificationNumber
+      totalEmployees
+      website
+    }
+  }
+`;
 
 /**
  * __useGetMyFactoryQuery__
@@ -2101,59 +2921,100 @@ export const GetMyFactoryDocument = gql`
  *   },
  * });
  */
-export function useGetMyFactoryQuery(baseOptions?: Apollo.QueryHookOptions<GetMyFactoryQuery, GetMyFactoryQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetMyFactoryQuery, GetMyFactoryQueryVariables>(GetMyFactoryDocument, options);
-      }
-export function useGetMyFactoryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMyFactoryQuery, GetMyFactoryQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetMyFactoryQuery, GetMyFactoryQueryVariables>(GetMyFactoryDocument, options);
-        }
-export function useGetMyFactorySuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMyFactoryQuery, GetMyFactoryQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetMyFactoryQuery, GetMyFactoryQueryVariables>(GetMyFactoryDocument, options);
-        }
-export type GetMyFactoryQueryHookResult = ReturnType<typeof useGetMyFactoryQuery>;
-export type GetMyFactoryLazyQueryHookResult = ReturnType<typeof useGetMyFactoryLazyQuery>;
-export type GetMyFactorySuspenseQueryHookResult = ReturnType<typeof useGetMyFactorySuspenseQuery>;
-export type GetMyFactoryQueryResult = Apollo.QueryResult<GetMyFactoryQuery, GetMyFactoryQueryVariables>;
-export const UpdateFactoryInfoDocument = gql`
-    mutation UpdateFactoryInfo($updateFactoryInfoInput: UpdateFactoryInfoDto!) {
-  updateFactoryInfo(updateFactoryInfoInput: $updateFactoryInfoInput) {
-    addressId
-    businessLicenseUrl
-    contactPersonName
-    contactPersonPhone
-    contractUrl
-    description
-    establishedDate
-    factoryStatus
-    isSubmitted
-    leadTime
-    maxPrintingCapacity
-    minimumOrderQuantity
-    name
-    operationalHours
-    owner {
-      email
-      name
-      imageUrl
-    }
-    printingMethods
-    products {
-      id
-      imageUrl
-      name
-    }
-    qualityCertifications
-    specializations
-    taxIdentificationNumber
-    totalEmployees
-    website
-  }
+export function useGetMyFactoryQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetMyFactoryQuery,
+    GetMyFactoryQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetMyFactoryQuery, GetMyFactoryQueryVariables>(
+    GetMyFactoryDocument,
+    options,
+  );
 }
-    `;
-export type UpdateFactoryInfoMutationFn = Apollo.MutationFunction<UpdateFactoryInfoMutation, UpdateFactoryInfoMutationVariables>;
+export function useGetMyFactoryLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetMyFactoryQuery,
+    GetMyFactoryQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetMyFactoryQuery, GetMyFactoryQueryVariables>(
+    GetMyFactoryDocument,
+    options,
+  );
+}
+export function useGetMyFactorySuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetMyFactoryQuery,
+        GetMyFactoryQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetMyFactoryQuery, GetMyFactoryQueryVariables>(
+    GetMyFactoryDocument,
+    options,
+  );
+}
+export type GetMyFactoryQueryHookResult = ReturnType<
+  typeof useGetMyFactoryQuery
+>;
+export type GetMyFactoryLazyQueryHookResult = ReturnType<
+  typeof useGetMyFactoryLazyQuery
+>;
+export type GetMyFactorySuspenseQueryHookResult = ReturnType<
+  typeof useGetMyFactorySuspenseQuery
+>;
+export type GetMyFactoryQueryResult = Apollo.QueryResult<
+  GetMyFactoryQuery,
+  GetMyFactoryQueryVariables
+>;
+export const UpdateFactoryInfoDocument = gql`
+  mutation UpdateFactoryInfo($updateFactoryInfoInput: UpdateFactoryInfoDto!) {
+    updateFactoryInfo(updateFactoryInfoInput: $updateFactoryInfoInput) {
+      addressId
+      businessLicenseUrl
+      contactPersonName
+      contactPersonPhone
+      contractUrl
+      description
+      establishedDate
+      factoryStatus
+      isSubmitted
+      leadTime
+      maxPrintingCapacity
+      minimumOrderQuantity
+      name
+      operationalHours
+      owner {
+        email
+        name
+        imageUrl
+      }
+      printingMethods
+      products {
+        id
+        imageUrl
+        name
+      }
+      qualityCertifications
+      specializations
+      taxIdentificationNumber
+      totalEmployees
+      website
+    }
+  }
+`;
+export type UpdateFactoryInfoMutationFn = Apollo.MutationFunction<
+  UpdateFactoryInfoMutation,
+  UpdateFactoryInfoMutationVariables
+>;
 
 /**
  * __useUpdateFactoryInfoMutation__
@@ -2172,29 +3033,43 @@ export type UpdateFactoryInfoMutationFn = Apollo.MutationFunction<UpdateFactoryI
  *   },
  * });
  */
-export function useUpdateFactoryInfoMutation(baseOptions?: Apollo.MutationHookOptions<UpdateFactoryInfoMutation, UpdateFactoryInfoMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateFactoryInfoMutation, UpdateFactoryInfoMutationVariables>(UpdateFactoryInfoDocument, options);
-      }
-export type UpdateFactoryInfoMutationHookResult = ReturnType<typeof useUpdateFactoryInfoMutation>;
-export type UpdateFactoryInfoMutationResult = Apollo.MutationResult<UpdateFactoryInfoMutation>;
-export type UpdateFactoryInfoMutationOptions = Apollo.BaseMutationOptions<UpdateFactoryInfoMutation, UpdateFactoryInfoMutationVariables>;
-export const GetAllProductsDocument = gql`
-    query GetAllProducts {
-  products {
-    category {
-      name
-    }
-    id
-    imageUrl
-    isActive
-    name
-    updatedAt
-    createdAt
-    description
-  }
+export function useUpdateFactoryInfoMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateFactoryInfoMutation,
+    UpdateFactoryInfoMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateFactoryInfoMutation,
+    UpdateFactoryInfoMutationVariables
+  >(UpdateFactoryInfoDocument, options);
 }
-    `;
+export type UpdateFactoryInfoMutationHookResult = ReturnType<
+  typeof useUpdateFactoryInfoMutation
+>;
+export type UpdateFactoryInfoMutationResult =
+  Apollo.MutationResult<UpdateFactoryInfoMutation>;
+export type UpdateFactoryInfoMutationOptions = Apollo.BaseMutationOptions<
+  UpdateFactoryInfoMutation,
+  UpdateFactoryInfoMutationVariables
+>;
+export const GetAllProductsDocument = gql`
+  query GetAllProducts {
+    products {
+      category {
+        name
+      }
+      id
+      imageUrl
+      isActive
+      name
+      updatedAt
+      createdAt
+      description
+    }
+  }
+`;
 
 /**
  * __useGetAllProductsQuery__
@@ -2211,39 +3086,80 @@ export const GetAllProductsDocument = gql`
  *   },
  * });
  */
-export function useGetAllProductsQuery(baseOptions?: Apollo.QueryHookOptions<GetAllProductsQuery, GetAllProductsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetAllProductsQuery, GetAllProductsQueryVariables>(GetAllProductsDocument, options);
-      }
-export function useGetAllProductsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllProductsQuery, GetAllProductsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetAllProductsQuery, GetAllProductsQueryVariables>(GetAllProductsDocument, options);
-        }
-export function useGetAllProductsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllProductsQuery, GetAllProductsQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetAllProductsQuery, GetAllProductsQueryVariables>(GetAllProductsDocument, options);
-        }
-export type GetAllProductsQueryHookResult = ReturnType<typeof useGetAllProductsQuery>;
-export type GetAllProductsLazyQueryHookResult = ReturnType<typeof useGetAllProductsLazyQuery>;
-export type GetAllProductsSuspenseQueryHookResult = ReturnType<typeof useGetAllProductsSuspenseQuery>;
-export type GetAllProductsQueryResult = Apollo.QueryResult<GetAllProductsQuery, GetAllProductsQueryVariables>;
-export const CreateProductDocument = gql`
-    mutation CreateProduct($input: CreateProductDto!) {
-  createProduct(input: $input) {
-    category {
-      name
-    }
-    id
-    imageUrl
-    isActive
-    name
-    updatedAt
-    createdAt
-    description
-  }
+export function useGetAllProductsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetAllProductsQuery,
+    GetAllProductsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetAllProductsQuery, GetAllProductsQueryVariables>(
+    GetAllProductsDocument,
+    options,
+  );
 }
-    `;
-export type CreateProductMutationFn = Apollo.MutationFunction<CreateProductMutation, CreateProductMutationVariables>;
+export function useGetAllProductsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAllProductsQuery,
+    GetAllProductsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetAllProductsQuery, GetAllProductsQueryVariables>(
+    GetAllProductsDocument,
+    options,
+  );
+}
+export function useGetAllProductsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAllProductsQuery,
+        GetAllProductsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAllProductsQuery,
+    GetAllProductsQueryVariables
+  >(GetAllProductsDocument, options);
+}
+export type GetAllProductsQueryHookResult = ReturnType<
+  typeof useGetAllProductsQuery
+>;
+export type GetAllProductsLazyQueryHookResult = ReturnType<
+  typeof useGetAllProductsLazyQuery
+>;
+export type GetAllProductsSuspenseQueryHookResult = ReturnType<
+  typeof useGetAllProductsSuspenseQuery
+>;
+export type GetAllProductsQueryResult = Apollo.QueryResult<
+  GetAllProductsQuery,
+  GetAllProductsQueryVariables
+>;
+export const CreateProductDocument = gql`
+  mutation CreateProduct($input: CreateProductDto!) {
+    createProduct(input: $input) {
+      category {
+        name
+      }
+      id
+      imageUrl
+      isActive
+      name
+      updatedAt
+      createdAt
+      description
+    }
+  }
+`;
+export type CreateProductMutationFn = Apollo.MutationFunction<
+  CreateProductMutation,
+  CreateProductMutationVariables
+>;
 
 /**
  * __useCreateProductMutation__
@@ -2262,30 +3178,47 @@ export type CreateProductMutationFn = Apollo.MutationFunction<CreateProductMutat
  *   },
  * });
  */
-export function useCreateProductMutation(baseOptions?: Apollo.MutationHookOptions<CreateProductMutation, CreateProductMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateProductMutation, CreateProductMutationVariables>(CreateProductDocument, options);
-      }
-export type CreateProductMutationHookResult = ReturnType<typeof useCreateProductMutation>;
-export type CreateProductMutationResult = Apollo.MutationResult<CreateProductMutation>;
-export type CreateProductMutationOptions = Apollo.BaseMutationOptions<CreateProductMutation, CreateProductMutationVariables>;
-export const DeleteProductDocument = gql`
-    mutation DeleteProduct($deleteProductId: String!) {
-  deleteProduct(id: $deleteProductId) {
-    category {
-      name
-    }
-    id
-    imageUrl
-    isActive
-    name
-    updatedAt
-    createdAt
-    description
-  }
+export function useCreateProductMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateProductMutation,
+    CreateProductMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateProductMutation,
+    CreateProductMutationVariables
+  >(CreateProductDocument, options);
 }
-    `;
-export type DeleteProductMutationFn = Apollo.MutationFunction<DeleteProductMutation, DeleteProductMutationVariables>;
+export type CreateProductMutationHookResult = ReturnType<
+  typeof useCreateProductMutation
+>;
+export type CreateProductMutationResult =
+  Apollo.MutationResult<CreateProductMutation>;
+export type CreateProductMutationOptions = Apollo.BaseMutationOptions<
+  CreateProductMutation,
+  CreateProductMutationVariables
+>;
+export const DeleteProductDocument = gql`
+  mutation DeleteProduct($deleteProductId: String!) {
+    deleteProduct(id: $deleteProductId) {
+      category {
+        name
+      }
+      id
+      imageUrl
+      isActive
+      name
+      updatedAt
+      createdAt
+      description
+    }
+  }
+`;
+export type DeleteProductMutationFn = Apollo.MutationFunction<
+  DeleteProductMutation,
+  DeleteProductMutationVariables
+>;
 
 /**
  * __useDeleteProductMutation__
@@ -2304,21 +3237,35 @@ export type DeleteProductMutationFn = Apollo.MutationFunction<DeleteProductMutat
  *   },
  * });
  */
-export function useDeleteProductMutation(baseOptions?: Apollo.MutationHookOptions<DeleteProductMutation, DeleteProductMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteProductMutation, DeleteProductMutationVariables>(DeleteProductDocument, options);
-      }
-export type DeleteProductMutationHookResult = ReturnType<typeof useDeleteProductMutation>;
-export type DeleteProductMutationResult = Apollo.MutationResult<DeleteProductMutation>;
-export type DeleteProductMutationOptions = Apollo.BaseMutationOptions<DeleteProductMutation, DeleteProductMutationVariables>;
-export const GetAllProvincesDocument = gql`
-    query GetAllProvinces {
-  provinces {
-    provinceId
-    provinceName
-  }
+export function useDeleteProductMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DeleteProductMutation,
+    DeleteProductMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DeleteProductMutation,
+    DeleteProductMutationVariables
+  >(DeleteProductDocument, options);
 }
-    `;
+export type DeleteProductMutationHookResult = ReturnType<
+  typeof useDeleteProductMutation
+>;
+export type DeleteProductMutationResult =
+  Apollo.MutationResult<DeleteProductMutation>;
+export type DeleteProductMutationOptions = Apollo.BaseMutationOptions<
+  DeleteProductMutation,
+  DeleteProductMutationVariables
+>;
+export const GetAllProvincesDocument = gql`
+  query GetAllProvinces {
+    provinces {
+      provinceId
+      provinceName
+    }
+  }
+`;
 
 /**
  * __useGetAllProvincesQuery__
@@ -2335,30 +3282,68 @@ export const GetAllProvincesDocument = gql`
  *   },
  * });
  */
-export function useGetAllProvincesQuery(baseOptions?: Apollo.QueryHookOptions<GetAllProvincesQuery, GetAllProvincesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetAllProvincesQuery, GetAllProvincesQueryVariables>(GetAllProvincesDocument, options);
-      }
-export function useGetAllProvincesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllProvincesQuery, GetAllProvincesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetAllProvincesQuery, GetAllProvincesQueryVariables>(GetAllProvincesDocument, options);
-        }
-export function useGetAllProvincesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllProvincesQuery, GetAllProvincesQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetAllProvincesQuery, GetAllProvincesQueryVariables>(GetAllProvincesDocument, options);
-        }
-export type GetAllProvincesQueryHookResult = ReturnType<typeof useGetAllProvincesQuery>;
-export type GetAllProvincesLazyQueryHookResult = ReturnType<typeof useGetAllProvincesLazyQuery>;
-export type GetAllProvincesSuspenseQueryHookResult = ReturnType<typeof useGetAllProvincesSuspenseQuery>;
-export type GetAllProvincesQueryResult = Apollo.QueryResult<GetAllProvincesQuery, GetAllProvincesQueryVariables>;
-export const GetProvinceByIdDocument = gql`
-    query GetProvinceById($provinceId: Int!) {
-  province(provinceId: $provinceId) {
-    provinceId
-    provinceName
-  }
+export function useGetAllProvincesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetAllProvincesQuery,
+    GetAllProvincesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetAllProvincesQuery, GetAllProvincesQueryVariables>(
+    GetAllProvincesDocument,
+    options,
+  );
 }
-    `;
+export function useGetAllProvincesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAllProvincesQuery,
+    GetAllProvincesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAllProvincesQuery,
+    GetAllProvincesQueryVariables
+  >(GetAllProvincesDocument, options);
+}
+export function useGetAllProvincesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAllProvincesQuery,
+        GetAllProvincesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAllProvincesQuery,
+    GetAllProvincesQueryVariables
+  >(GetAllProvincesDocument, options);
+}
+export type GetAllProvincesQueryHookResult = ReturnType<
+  typeof useGetAllProvincesQuery
+>;
+export type GetAllProvincesLazyQueryHookResult = ReturnType<
+  typeof useGetAllProvincesLazyQuery
+>;
+export type GetAllProvincesSuspenseQueryHookResult = ReturnType<
+  typeof useGetAllProvincesSuspenseQuery
+>;
+export type GetAllProvincesQueryResult = Apollo.QueryResult<
+  GetAllProvincesQuery,
+  GetAllProvincesQueryVariables
+>;
+export const GetProvinceByIdDocument = gql`
+  query GetProvinceById($provinceId: Int!) {
+    province(provinceId: $provinceId) {
+      provinceId
+      provinceName
+    }
+  }
+`;
 
 /**
  * __useGetProvinceByIdQuery__
@@ -2376,31 +3361,73 @@ export const GetProvinceByIdDocument = gql`
  *   },
  * });
  */
-export function useGetProvinceByIdQuery(baseOptions: Apollo.QueryHookOptions<GetProvinceByIdQuery, GetProvinceByIdQueryVariables> & ({ variables: GetProvinceByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetProvinceByIdQuery, GetProvinceByIdQueryVariables>(GetProvinceByIdDocument, options);
-      }
-export function useGetProvinceByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProvinceByIdQuery, GetProvinceByIdQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetProvinceByIdQuery, GetProvinceByIdQueryVariables>(GetProvinceByIdDocument, options);
-        }
-export function useGetProvinceByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetProvinceByIdQuery, GetProvinceByIdQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetProvinceByIdQuery, GetProvinceByIdQueryVariables>(GetProvinceByIdDocument, options);
-        }
-export type GetProvinceByIdQueryHookResult = ReturnType<typeof useGetProvinceByIdQuery>;
-export type GetProvinceByIdLazyQueryHookResult = ReturnType<typeof useGetProvinceByIdLazyQuery>;
-export type GetProvinceByIdSuspenseQueryHookResult = ReturnType<typeof useGetProvinceByIdSuspenseQuery>;
-export type GetProvinceByIdQueryResult = Apollo.QueryResult<GetProvinceByIdQuery, GetProvinceByIdQueryVariables>;
-export const GetAllDistrictsByProvinceIdDocument = gql`
-    query GetAllDistrictsByProvinceId($provinceId: Int!) {
-  districts(provinceId: $provinceId) {
-    districtId
-    districtName
-    provinceId
-  }
+export function useGetProvinceByIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetProvinceByIdQuery,
+    GetProvinceByIdQueryVariables
+  > &
+    (
+      | { variables: GetProvinceByIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetProvinceByIdQuery, GetProvinceByIdQueryVariables>(
+    GetProvinceByIdDocument,
+    options,
+  );
 }
-    `;
+export function useGetProvinceByIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetProvinceByIdQuery,
+    GetProvinceByIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetProvinceByIdQuery,
+    GetProvinceByIdQueryVariables
+  >(GetProvinceByIdDocument, options);
+}
+export function useGetProvinceByIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetProvinceByIdQuery,
+        GetProvinceByIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetProvinceByIdQuery,
+    GetProvinceByIdQueryVariables
+  >(GetProvinceByIdDocument, options);
+}
+export type GetProvinceByIdQueryHookResult = ReturnType<
+  typeof useGetProvinceByIdQuery
+>;
+export type GetProvinceByIdLazyQueryHookResult = ReturnType<
+  typeof useGetProvinceByIdLazyQuery
+>;
+export type GetProvinceByIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetProvinceByIdSuspenseQuery
+>;
+export type GetProvinceByIdQueryResult = Apollo.QueryResult<
+  GetProvinceByIdQuery,
+  GetProvinceByIdQueryVariables
+>;
+export const GetAllDistrictsByProvinceIdDocument = gql`
+  query GetAllDistrictsByProvinceId($provinceId: Int!) {
+    districts(provinceId: $provinceId) {
+      districtId
+      districtName
+      provinceId
+    }
+  }
+`;
 
 /**
  * __useGetAllDistrictsByProvinceIdQuery__
@@ -2418,31 +3445,73 @@ export const GetAllDistrictsByProvinceIdDocument = gql`
  *   },
  * });
  */
-export function useGetAllDistrictsByProvinceIdQuery(baseOptions: Apollo.QueryHookOptions<GetAllDistrictsByProvinceIdQuery, GetAllDistrictsByProvinceIdQueryVariables> & ({ variables: GetAllDistrictsByProvinceIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetAllDistrictsByProvinceIdQuery, GetAllDistrictsByProvinceIdQueryVariables>(GetAllDistrictsByProvinceIdDocument, options);
-      }
-export function useGetAllDistrictsByProvinceIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllDistrictsByProvinceIdQuery, GetAllDistrictsByProvinceIdQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetAllDistrictsByProvinceIdQuery, GetAllDistrictsByProvinceIdQueryVariables>(GetAllDistrictsByProvinceIdDocument, options);
-        }
-export function useGetAllDistrictsByProvinceIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllDistrictsByProvinceIdQuery, GetAllDistrictsByProvinceIdQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetAllDistrictsByProvinceIdQuery, GetAllDistrictsByProvinceIdQueryVariables>(GetAllDistrictsByProvinceIdDocument, options);
-        }
-export type GetAllDistrictsByProvinceIdQueryHookResult = ReturnType<typeof useGetAllDistrictsByProvinceIdQuery>;
-export type GetAllDistrictsByProvinceIdLazyQueryHookResult = ReturnType<typeof useGetAllDistrictsByProvinceIdLazyQuery>;
-export type GetAllDistrictsByProvinceIdSuspenseQueryHookResult = ReturnType<typeof useGetAllDistrictsByProvinceIdSuspenseQuery>;
-export type GetAllDistrictsByProvinceIdQueryResult = Apollo.QueryResult<GetAllDistrictsByProvinceIdQuery, GetAllDistrictsByProvinceIdQueryVariables>;
-export const GetDistrictByIdDocument = gql`
-    query GetDistrictById($districtId: Int!) {
-  district(districtId: $districtId) {
-    districtId
-    districtName
-    provinceId
-  }
+export function useGetAllDistrictsByProvinceIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetAllDistrictsByProvinceIdQuery,
+    GetAllDistrictsByProvinceIdQueryVariables
+  > &
+    (
+      | { variables: GetAllDistrictsByProvinceIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetAllDistrictsByProvinceIdQuery,
+    GetAllDistrictsByProvinceIdQueryVariables
+  >(GetAllDistrictsByProvinceIdDocument, options);
 }
-    `;
+export function useGetAllDistrictsByProvinceIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAllDistrictsByProvinceIdQuery,
+    GetAllDistrictsByProvinceIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAllDistrictsByProvinceIdQuery,
+    GetAllDistrictsByProvinceIdQueryVariables
+  >(GetAllDistrictsByProvinceIdDocument, options);
+}
+export function useGetAllDistrictsByProvinceIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAllDistrictsByProvinceIdQuery,
+        GetAllDistrictsByProvinceIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAllDistrictsByProvinceIdQuery,
+    GetAllDistrictsByProvinceIdQueryVariables
+  >(GetAllDistrictsByProvinceIdDocument, options);
+}
+export type GetAllDistrictsByProvinceIdQueryHookResult = ReturnType<
+  typeof useGetAllDistrictsByProvinceIdQuery
+>;
+export type GetAllDistrictsByProvinceIdLazyQueryHookResult = ReturnType<
+  typeof useGetAllDistrictsByProvinceIdLazyQuery
+>;
+export type GetAllDistrictsByProvinceIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetAllDistrictsByProvinceIdSuspenseQuery
+>;
+export type GetAllDistrictsByProvinceIdQueryResult = Apollo.QueryResult<
+  GetAllDistrictsByProvinceIdQuery,
+  GetAllDistrictsByProvinceIdQueryVariables
+>;
+export const GetDistrictByIdDocument = gql`
+  query GetDistrictById($districtId: Int!) {
+    district(districtId: $districtId) {
+      districtId
+      districtName
+      provinceId
+    }
+  }
+`;
 
 /**
  * __useGetDistrictByIdQuery__
@@ -2460,31 +3529,73 @@ export const GetDistrictByIdDocument = gql`
  *   },
  * });
  */
-export function useGetDistrictByIdQuery(baseOptions: Apollo.QueryHookOptions<GetDistrictByIdQuery, GetDistrictByIdQueryVariables> & ({ variables: GetDistrictByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetDistrictByIdQuery, GetDistrictByIdQueryVariables>(GetDistrictByIdDocument, options);
-      }
-export function useGetDistrictByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDistrictByIdQuery, GetDistrictByIdQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetDistrictByIdQuery, GetDistrictByIdQueryVariables>(GetDistrictByIdDocument, options);
-        }
-export function useGetDistrictByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetDistrictByIdQuery, GetDistrictByIdQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetDistrictByIdQuery, GetDistrictByIdQueryVariables>(GetDistrictByIdDocument, options);
-        }
-export type GetDistrictByIdQueryHookResult = ReturnType<typeof useGetDistrictByIdQuery>;
-export type GetDistrictByIdLazyQueryHookResult = ReturnType<typeof useGetDistrictByIdLazyQuery>;
-export type GetDistrictByIdSuspenseQueryHookResult = ReturnType<typeof useGetDistrictByIdSuspenseQuery>;
-export type GetDistrictByIdQueryResult = Apollo.QueryResult<GetDistrictByIdQuery, GetDistrictByIdQueryVariables>;
-export const GetAllWardsByDistrictIdDocument = gql`
-    query GetAllWardsByDistrictId($districtId: Int!) {
-  wards(districtId: $districtId) {
-    wardCode
-    wardName
-    districtId
-  }
+export function useGetDistrictByIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetDistrictByIdQuery,
+    GetDistrictByIdQueryVariables
+  > &
+    (
+      | { variables: GetDistrictByIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetDistrictByIdQuery, GetDistrictByIdQueryVariables>(
+    GetDistrictByIdDocument,
+    options,
+  );
 }
-    `;
+export function useGetDistrictByIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetDistrictByIdQuery,
+    GetDistrictByIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetDistrictByIdQuery,
+    GetDistrictByIdQueryVariables
+  >(GetDistrictByIdDocument, options);
+}
+export function useGetDistrictByIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetDistrictByIdQuery,
+        GetDistrictByIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetDistrictByIdQuery,
+    GetDistrictByIdQueryVariables
+  >(GetDistrictByIdDocument, options);
+}
+export type GetDistrictByIdQueryHookResult = ReturnType<
+  typeof useGetDistrictByIdQuery
+>;
+export type GetDistrictByIdLazyQueryHookResult = ReturnType<
+  typeof useGetDistrictByIdLazyQuery
+>;
+export type GetDistrictByIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetDistrictByIdSuspenseQuery
+>;
+export type GetDistrictByIdQueryResult = Apollo.QueryResult<
+  GetDistrictByIdQuery,
+  GetDistrictByIdQueryVariables
+>;
+export const GetAllWardsByDistrictIdDocument = gql`
+  query GetAllWardsByDistrictId($districtId: Int!) {
+    wards(districtId: $districtId) {
+      wardCode
+      wardName
+      districtId
+    }
+  }
+`;
 
 /**
  * __useGetAllWardsByDistrictIdQuery__
@@ -2502,31 +3613,73 @@ export const GetAllWardsByDistrictIdDocument = gql`
  *   },
  * });
  */
-export function useGetAllWardsByDistrictIdQuery(baseOptions: Apollo.QueryHookOptions<GetAllWardsByDistrictIdQuery, GetAllWardsByDistrictIdQueryVariables> & ({ variables: GetAllWardsByDistrictIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetAllWardsByDistrictIdQuery, GetAllWardsByDistrictIdQueryVariables>(GetAllWardsByDistrictIdDocument, options);
-      }
-export function useGetAllWardsByDistrictIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllWardsByDistrictIdQuery, GetAllWardsByDistrictIdQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetAllWardsByDistrictIdQuery, GetAllWardsByDistrictIdQueryVariables>(GetAllWardsByDistrictIdDocument, options);
-        }
-export function useGetAllWardsByDistrictIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllWardsByDistrictIdQuery, GetAllWardsByDistrictIdQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetAllWardsByDistrictIdQuery, GetAllWardsByDistrictIdQueryVariables>(GetAllWardsByDistrictIdDocument, options);
-        }
-export type GetAllWardsByDistrictIdQueryHookResult = ReturnType<typeof useGetAllWardsByDistrictIdQuery>;
-export type GetAllWardsByDistrictIdLazyQueryHookResult = ReturnType<typeof useGetAllWardsByDistrictIdLazyQuery>;
-export type GetAllWardsByDistrictIdSuspenseQueryHookResult = ReturnType<typeof useGetAllWardsByDistrictIdSuspenseQuery>;
-export type GetAllWardsByDistrictIdQueryResult = Apollo.QueryResult<GetAllWardsByDistrictIdQuery, GetAllWardsByDistrictIdQueryVariables>;
-export const GetWardByWardCodeDocument = gql`
-    query GetWardByWardCode($wardCode: String!) {
-  ward(wardCode: $wardCode) {
-    districtId
-    wardCode
-    wardName
-  }
+export function useGetAllWardsByDistrictIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetAllWardsByDistrictIdQuery,
+    GetAllWardsByDistrictIdQueryVariables
+  > &
+    (
+      | { variables: GetAllWardsByDistrictIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetAllWardsByDistrictIdQuery,
+    GetAllWardsByDistrictIdQueryVariables
+  >(GetAllWardsByDistrictIdDocument, options);
 }
-    `;
+export function useGetAllWardsByDistrictIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAllWardsByDistrictIdQuery,
+    GetAllWardsByDistrictIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAllWardsByDistrictIdQuery,
+    GetAllWardsByDistrictIdQueryVariables
+  >(GetAllWardsByDistrictIdDocument, options);
+}
+export function useGetAllWardsByDistrictIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAllWardsByDistrictIdQuery,
+        GetAllWardsByDistrictIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAllWardsByDistrictIdQuery,
+    GetAllWardsByDistrictIdQueryVariables
+  >(GetAllWardsByDistrictIdDocument, options);
+}
+export type GetAllWardsByDistrictIdQueryHookResult = ReturnType<
+  typeof useGetAllWardsByDistrictIdQuery
+>;
+export type GetAllWardsByDistrictIdLazyQueryHookResult = ReturnType<
+  typeof useGetAllWardsByDistrictIdLazyQuery
+>;
+export type GetAllWardsByDistrictIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetAllWardsByDistrictIdSuspenseQuery
+>;
+export type GetAllWardsByDistrictIdQueryResult = Apollo.QueryResult<
+  GetAllWardsByDistrictIdQuery,
+  GetAllWardsByDistrictIdQueryVariables
+>;
+export const GetWardByWardCodeDocument = gql`
+  query GetWardByWardCode($wardCode: String!) {
+    ward(wardCode: $wardCode) {
+      districtId
+      wardCode
+      wardName
+    }
+  }
+`;
 
 /**
  * __useGetWardByWardCodeQuery__
@@ -2544,31 +3697,73 @@ export const GetWardByWardCodeDocument = gql`
  *   },
  * });
  */
-export function useGetWardByWardCodeQuery(baseOptions: Apollo.QueryHookOptions<GetWardByWardCodeQuery, GetWardByWardCodeQueryVariables> & ({ variables: GetWardByWardCodeQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetWardByWardCodeQuery, GetWardByWardCodeQueryVariables>(GetWardByWardCodeDocument, options);
-      }
-export function useGetWardByWardCodeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWardByWardCodeQuery, GetWardByWardCodeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetWardByWardCodeQuery, GetWardByWardCodeQueryVariables>(GetWardByWardCodeDocument, options);
-        }
-export function useGetWardByWardCodeSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetWardByWardCodeQuery, GetWardByWardCodeQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetWardByWardCodeQuery, GetWardByWardCodeQueryVariables>(GetWardByWardCodeDocument, options);
-        }
-export type GetWardByWardCodeQueryHookResult = ReturnType<typeof useGetWardByWardCodeQuery>;
-export type GetWardByWardCodeLazyQueryHookResult = ReturnType<typeof useGetWardByWardCodeLazyQuery>;
-export type GetWardByWardCodeSuspenseQueryHookResult = ReturnType<typeof useGetWardByWardCodeSuspenseQuery>;
-export type GetWardByWardCodeQueryResult = Apollo.QueryResult<GetWardByWardCodeQuery, GetWardByWardCodeQueryVariables>;
-export const GetAvailableServiceDocument = gql`
-    query GetAvailableService($servicesInput: GetAvailableServicesDto!) {
-  availableServices(servicesInput: $servicesInput) {
-    shortName
-    serviceTypeId
-    serviceId
-  }
+export function useGetWardByWardCodeQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetWardByWardCodeQuery,
+    GetWardByWardCodeQueryVariables
+  > &
+    (
+      | { variables: GetWardByWardCodeQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetWardByWardCodeQuery,
+    GetWardByWardCodeQueryVariables
+  >(GetWardByWardCodeDocument, options);
 }
-    `;
+export function useGetWardByWardCodeLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetWardByWardCodeQuery,
+    GetWardByWardCodeQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetWardByWardCodeQuery,
+    GetWardByWardCodeQueryVariables
+  >(GetWardByWardCodeDocument, options);
+}
+export function useGetWardByWardCodeSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetWardByWardCodeQuery,
+        GetWardByWardCodeQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetWardByWardCodeQuery,
+    GetWardByWardCodeQueryVariables
+  >(GetWardByWardCodeDocument, options);
+}
+export type GetWardByWardCodeQueryHookResult = ReturnType<
+  typeof useGetWardByWardCodeQuery
+>;
+export type GetWardByWardCodeLazyQueryHookResult = ReturnType<
+  typeof useGetWardByWardCodeLazyQuery
+>;
+export type GetWardByWardCodeSuspenseQueryHookResult = ReturnType<
+  typeof useGetWardByWardCodeSuspenseQuery
+>;
+export type GetWardByWardCodeQueryResult = Apollo.QueryResult<
+  GetWardByWardCodeQuery,
+  GetWardByWardCodeQueryVariables
+>;
+export const GetAvailableServiceDocument = gql`
+  query GetAvailableService($servicesInput: GetAvailableServicesDto!) {
+    availableServices(servicesInput: $servicesInput) {
+      shortName
+      serviceTypeId
+      serviceId
+    }
+  }
+`;
 
 /**
  * __useGetAvailableServiceQuery__
@@ -2586,36 +3781,78 @@ export const GetAvailableServiceDocument = gql`
  *   },
  * });
  */
-export function useGetAvailableServiceQuery(baseOptions: Apollo.QueryHookOptions<GetAvailableServiceQuery, GetAvailableServiceQueryVariables> & ({ variables: GetAvailableServiceQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetAvailableServiceQuery, GetAvailableServiceQueryVariables>(GetAvailableServiceDocument, options);
-      }
-export function useGetAvailableServiceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAvailableServiceQuery, GetAvailableServiceQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetAvailableServiceQuery, GetAvailableServiceQueryVariables>(GetAvailableServiceDocument, options);
-        }
-export function useGetAvailableServiceSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAvailableServiceQuery, GetAvailableServiceQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetAvailableServiceQuery, GetAvailableServiceQueryVariables>(GetAvailableServiceDocument, options);
-        }
-export type GetAvailableServiceQueryHookResult = ReturnType<typeof useGetAvailableServiceQuery>;
-export type GetAvailableServiceLazyQueryHookResult = ReturnType<typeof useGetAvailableServiceLazyQuery>;
-export type GetAvailableServiceSuspenseQueryHookResult = ReturnType<typeof useGetAvailableServiceSuspenseQuery>;
-export type GetAvailableServiceQueryResult = Apollo.QueryResult<GetAvailableServiceQuery, GetAvailableServiceQueryVariables>;
-export const GetAllSystemConfigBanksDocument = gql`
-    query GetAllSystemConfigBanks {
-  systemConfigBanks {
-    bin
-    code
-    id
-    isActive
-    isDeleted
-    logo
-    name
-    shortName
-  }
+export function useGetAvailableServiceQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetAvailableServiceQuery,
+    GetAvailableServiceQueryVariables
+  > &
+    (
+      | { variables: GetAvailableServiceQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetAvailableServiceQuery,
+    GetAvailableServiceQueryVariables
+  >(GetAvailableServiceDocument, options);
 }
-    `;
+export function useGetAvailableServiceLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAvailableServiceQuery,
+    GetAvailableServiceQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAvailableServiceQuery,
+    GetAvailableServiceQueryVariables
+  >(GetAvailableServiceDocument, options);
+}
+export function useGetAvailableServiceSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAvailableServiceQuery,
+        GetAvailableServiceQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAvailableServiceQuery,
+    GetAvailableServiceQueryVariables
+  >(GetAvailableServiceDocument, options);
+}
+export type GetAvailableServiceQueryHookResult = ReturnType<
+  typeof useGetAvailableServiceQuery
+>;
+export type GetAvailableServiceLazyQueryHookResult = ReturnType<
+  typeof useGetAvailableServiceLazyQuery
+>;
+export type GetAvailableServiceSuspenseQueryHookResult = ReturnType<
+  typeof useGetAvailableServiceSuspenseQuery
+>;
+export type GetAvailableServiceQueryResult = Apollo.QueryResult<
+  GetAvailableServiceQuery,
+  GetAvailableServiceQueryVariables
+>;
+export const GetAllSystemConfigBanksDocument = gql`
+  query GetAllSystemConfigBanks {
+    systemConfigBanks {
+      bin
+      code
+      id
+      isActive
+      isDeleted
+      logo
+      name
+      shortName
+    }
+  }
+`;
 
 /**
  * __useGetAllSystemConfigBanksQuery__
@@ -2632,36 +3869,74 @@ export const GetAllSystemConfigBanksDocument = gql`
  *   },
  * });
  */
-export function useGetAllSystemConfigBanksQuery(baseOptions?: Apollo.QueryHookOptions<GetAllSystemConfigBanksQuery, GetAllSystemConfigBanksQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetAllSystemConfigBanksQuery, GetAllSystemConfigBanksQueryVariables>(GetAllSystemConfigBanksDocument, options);
-      }
-export function useGetAllSystemConfigBanksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllSystemConfigBanksQuery, GetAllSystemConfigBanksQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetAllSystemConfigBanksQuery, GetAllSystemConfigBanksQueryVariables>(GetAllSystemConfigBanksDocument, options);
-        }
-export function useGetAllSystemConfigBanksSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllSystemConfigBanksQuery, GetAllSystemConfigBanksQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetAllSystemConfigBanksQuery, GetAllSystemConfigBanksQueryVariables>(GetAllSystemConfigBanksDocument, options);
-        }
-export type GetAllSystemConfigBanksQueryHookResult = ReturnType<typeof useGetAllSystemConfigBanksQuery>;
-export type GetAllSystemConfigBanksLazyQueryHookResult = ReturnType<typeof useGetAllSystemConfigBanksLazyQuery>;
-export type GetAllSystemConfigBanksSuspenseQueryHookResult = ReturnType<typeof useGetAllSystemConfigBanksSuspenseQuery>;
-export type GetAllSystemConfigBanksQueryResult = Apollo.QueryResult<GetAllSystemConfigBanksQuery, GetAllSystemConfigBanksQueryVariables>;
-export const GetSystemConfigBankByIdDocument = gql`
-    query GetSystemConfigBankById($systemConfigBankId: ID!) {
-  systemConfigBank(id: $systemConfigBankId) {
-    bin
-    code
-    id
-    isActive
-    isDeleted
-    logo
-    name
-    shortName
-  }
+export function useGetAllSystemConfigBanksQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetAllSystemConfigBanksQuery,
+    GetAllSystemConfigBanksQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetAllSystemConfigBanksQuery,
+    GetAllSystemConfigBanksQueryVariables
+  >(GetAllSystemConfigBanksDocument, options);
 }
-    `;
+export function useGetAllSystemConfigBanksLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAllSystemConfigBanksQuery,
+    GetAllSystemConfigBanksQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAllSystemConfigBanksQuery,
+    GetAllSystemConfigBanksQueryVariables
+  >(GetAllSystemConfigBanksDocument, options);
+}
+export function useGetAllSystemConfigBanksSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAllSystemConfigBanksQuery,
+        GetAllSystemConfigBanksQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAllSystemConfigBanksQuery,
+    GetAllSystemConfigBanksQueryVariables
+  >(GetAllSystemConfigBanksDocument, options);
+}
+export type GetAllSystemConfigBanksQueryHookResult = ReturnType<
+  typeof useGetAllSystemConfigBanksQuery
+>;
+export type GetAllSystemConfigBanksLazyQueryHookResult = ReturnType<
+  typeof useGetAllSystemConfigBanksLazyQuery
+>;
+export type GetAllSystemConfigBanksSuspenseQueryHookResult = ReturnType<
+  typeof useGetAllSystemConfigBanksSuspenseQuery
+>;
+export type GetAllSystemConfigBanksQueryResult = Apollo.QueryResult<
+  GetAllSystemConfigBanksQuery,
+  GetAllSystemConfigBanksQueryVariables
+>;
+export const GetSystemConfigBankByIdDocument = gql`
+  query GetSystemConfigBankById($systemConfigBankId: ID!) {
+    systemConfigBank(id: $systemConfigBankId) {
+      bin
+      code
+      id
+      isActive
+      isDeleted
+      logo
+      name
+      shortName
+    }
+  }
+`;
 
 /**
  * __useGetSystemConfigBankByIdQuery__
@@ -2679,37 +3954,82 @@ export const GetSystemConfigBankByIdDocument = gql`
  *   },
  * });
  */
-export function useGetSystemConfigBankByIdQuery(baseOptions: Apollo.QueryHookOptions<GetSystemConfigBankByIdQuery, GetSystemConfigBankByIdQueryVariables> & ({ variables: GetSystemConfigBankByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetSystemConfigBankByIdQuery, GetSystemConfigBankByIdQueryVariables>(GetSystemConfigBankByIdDocument, options);
-      }
-export function useGetSystemConfigBankByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSystemConfigBankByIdQuery, GetSystemConfigBankByIdQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetSystemConfigBankByIdQuery, GetSystemConfigBankByIdQueryVariables>(GetSystemConfigBankByIdDocument, options);
-        }
-export function useGetSystemConfigBankByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetSystemConfigBankByIdQuery, GetSystemConfigBankByIdQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetSystemConfigBankByIdQuery, GetSystemConfigBankByIdQueryVariables>(GetSystemConfigBankByIdDocument, options);
-        }
-export type GetSystemConfigBankByIdQueryHookResult = ReturnType<typeof useGetSystemConfigBankByIdQuery>;
-export type GetSystemConfigBankByIdLazyQueryHookResult = ReturnType<typeof useGetSystemConfigBankByIdLazyQuery>;
-export type GetSystemConfigBankByIdSuspenseQueryHookResult = ReturnType<typeof useGetSystemConfigBankByIdSuspenseQuery>;
-export type GetSystemConfigBankByIdQueryResult = Apollo.QueryResult<GetSystemConfigBankByIdQuery, GetSystemConfigBankByIdQueryVariables>;
-export const CreateSystemConfigBankDocument = gql`
-    mutation CreateSystemConfigBank($input: CreateSystemConfigBankDto!) {
-  createSystemConfigBank(input: $input) {
-    bin
-    code
-    id
-    isActive
-    isDeleted
-    logo
-    name
-    shortName
-  }
+export function useGetSystemConfigBankByIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetSystemConfigBankByIdQuery,
+    GetSystemConfigBankByIdQueryVariables
+  > &
+    (
+      | { variables: GetSystemConfigBankByIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetSystemConfigBankByIdQuery,
+    GetSystemConfigBankByIdQueryVariables
+  >(GetSystemConfigBankByIdDocument, options);
 }
-    `;
-export type CreateSystemConfigBankMutationFn = Apollo.MutationFunction<CreateSystemConfigBankMutation, CreateSystemConfigBankMutationVariables>;
+export function useGetSystemConfigBankByIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetSystemConfigBankByIdQuery,
+    GetSystemConfigBankByIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetSystemConfigBankByIdQuery,
+    GetSystemConfigBankByIdQueryVariables
+  >(GetSystemConfigBankByIdDocument, options);
+}
+export function useGetSystemConfigBankByIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetSystemConfigBankByIdQuery,
+        GetSystemConfigBankByIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetSystemConfigBankByIdQuery,
+    GetSystemConfigBankByIdQueryVariables
+  >(GetSystemConfigBankByIdDocument, options);
+}
+export type GetSystemConfigBankByIdQueryHookResult = ReturnType<
+  typeof useGetSystemConfigBankByIdQuery
+>;
+export type GetSystemConfigBankByIdLazyQueryHookResult = ReturnType<
+  typeof useGetSystemConfigBankByIdLazyQuery
+>;
+export type GetSystemConfigBankByIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetSystemConfigBankByIdSuspenseQuery
+>;
+export type GetSystemConfigBankByIdQueryResult = Apollo.QueryResult<
+  GetSystemConfigBankByIdQuery,
+  GetSystemConfigBankByIdQueryVariables
+>;
+export const CreateSystemConfigBankDocument = gql`
+  mutation CreateSystemConfigBank($input: CreateSystemConfigBankDto!) {
+    createSystemConfigBank(input: $input) {
+      bin
+      code
+      id
+      isActive
+      isDeleted
+      logo
+      name
+      shortName
+    }
+  }
+`;
+export type CreateSystemConfigBankMutationFn = Apollo.MutationFunction<
+  CreateSystemConfigBankMutation,
+  CreateSystemConfigBankMutationVariables
+>;
 
 /**
  * __useCreateSystemConfigBankMutation__
@@ -2728,28 +4048,45 @@ export type CreateSystemConfigBankMutationFn = Apollo.MutationFunction<CreateSys
  *   },
  * });
  */
-export function useCreateSystemConfigBankMutation(baseOptions?: Apollo.MutationHookOptions<CreateSystemConfigBankMutation, CreateSystemConfigBankMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateSystemConfigBankMutation, CreateSystemConfigBankMutationVariables>(CreateSystemConfigBankDocument, options);
-      }
-export type CreateSystemConfigBankMutationHookResult = ReturnType<typeof useCreateSystemConfigBankMutation>;
-export type CreateSystemConfigBankMutationResult = Apollo.MutationResult<CreateSystemConfigBankMutation>;
-export type CreateSystemConfigBankMutationOptions = Apollo.BaseMutationOptions<CreateSystemConfigBankMutation, CreateSystemConfigBankMutationVariables>;
-export const RemoveSystemConfigBankDocument = gql`
-    mutation RemoveSystemConfigBank($removeSystemConfigBankId: ID!) {
-  removeSystemConfigBank(id: $removeSystemConfigBankId) {
-    bin
-    id
-    code
-    isActive
-    isDeleted
-    logo
-    name
-    shortName
-  }
+export function useCreateSystemConfigBankMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateSystemConfigBankMutation,
+    CreateSystemConfigBankMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateSystemConfigBankMutation,
+    CreateSystemConfigBankMutationVariables
+  >(CreateSystemConfigBankDocument, options);
 }
-    `;
-export type RemoveSystemConfigBankMutationFn = Apollo.MutationFunction<RemoveSystemConfigBankMutation, RemoveSystemConfigBankMutationVariables>;
+export type CreateSystemConfigBankMutationHookResult = ReturnType<
+  typeof useCreateSystemConfigBankMutation
+>;
+export type CreateSystemConfigBankMutationResult =
+  Apollo.MutationResult<CreateSystemConfigBankMutation>;
+export type CreateSystemConfigBankMutationOptions = Apollo.BaseMutationOptions<
+  CreateSystemConfigBankMutation,
+  CreateSystemConfigBankMutationVariables
+>;
+export const RemoveSystemConfigBankDocument = gql`
+  mutation RemoveSystemConfigBank($removeSystemConfigBankId: ID!) {
+    removeSystemConfigBank(id: $removeSystemConfigBankId) {
+      bin
+      id
+      code
+      isActive
+      isDeleted
+      logo
+      name
+      shortName
+    }
+  }
+`;
+export type RemoveSystemConfigBankMutationFn = Apollo.MutationFunction<
+  RemoveSystemConfigBankMutation,
+  RemoveSystemConfigBankMutationVariables
+>;
 
 /**
  * __useRemoveSystemConfigBankMutation__
@@ -2768,30 +4105,44 @@ export type RemoveSystemConfigBankMutationFn = Apollo.MutationFunction<RemoveSys
  *   },
  * });
  */
-export function useRemoveSystemConfigBankMutation(baseOptions?: Apollo.MutationHookOptions<RemoveSystemConfigBankMutation, RemoveSystemConfigBankMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RemoveSystemConfigBankMutation, RemoveSystemConfigBankMutationVariables>(RemoveSystemConfigBankDocument, options);
-      }
-export type RemoveSystemConfigBankMutationHookResult = ReturnType<typeof useRemoveSystemConfigBankMutation>;
-export type RemoveSystemConfigBankMutationResult = Apollo.MutationResult<RemoveSystemConfigBankMutation>;
-export type RemoveSystemConfigBankMutationOptions = Apollo.BaseMutationOptions<RemoveSystemConfigBankMutation, RemoveSystemConfigBankMutationVariables>;
-export const GetUsersDocument = gql`
-    query GetUsers {
-  users {
-    id
-    imageUrl
-    gender
-    email
-    dateOfBirth
-    createdAt
-    isActive
-    name
-    phoneNumber
-    role
-    updatedAt
-  }
+export function useRemoveSystemConfigBankMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RemoveSystemConfigBankMutation,
+    RemoveSystemConfigBankMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RemoveSystemConfigBankMutation,
+    RemoveSystemConfigBankMutationVariables
+  >(RemoveSystemConfigBankDocument, options);
 }
-    `;
+export type RemoveSystemConfigBankMutationHookResult = ReturnType<
+  typeof useRemoveSystemConfigBankMutation
+>;
+export type RemoveSystemConfigBankMutationResult =
+  Apollo.MutationResult<RemoveSystemConfigBankMutation>;
+export type RemoveSystemConfigBankMutationOptions = Apollo.BaseMutationOptions<
+  RemoveSystemConfigBankMutation,
+  RemoveSystemConfigBankMutationVariables
+>;
+export const GetUsersDocument = gql`
+  query GetUsers {
+    users {
+      id
+      imageUrl
+      gender
+      email
+      dateOfBirth
+      createdAt
+      isActive
+      name
+      phoneNumber
+      role
+      updatedAt
+    }
+  }
+`;
 
 /**
  * __useGetUsersQuery__
@@ -2808,39 +4159,69 @@ export const GetUsersDocument = gql`
  *   },
  * });
  */
-export function useGetUsersQuery(baseOptions?: Apollo.QueryHookOptions<GetUsersQuery, GetUsersQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
-      }
-export function useGetUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUsersQuery, GetUsersQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
-        }
-export function useGetUsersSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetUsersQuery, GetUsersQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
-        }
-export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
-export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery>;
-export type GetUsersSuspenseQueryHookResult = ReturnType<typeof useGetUsersSuspenseQuery>;
-export type GetUsersQueryResult = Apollo.QueryResult<GetUsersQuery, GetUsersQueryVariables>;
-export const GetUserDocument = gql`
-    query GetUser($userId: String!) {
-  user(id: $userId) {
-    id
-    imageUrl
-    gender
-    email
-    dateOfBirth
-    createdAt
-    isActive
-    name
-    phoneNumber
-    role
-    updatedAt
-  }
+export function useGetUsersQuery(
+  baseOptions?: Apollo.QueryHookOptions<GetUsersQuery, GetUsersQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetUsersQuery, GetUsersQueryVariables>(
+    GetUsersDocument,
+    options,
+  );
 }
-    `;
+export function useGetUsersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetUsersQuery,
+    GetUsersQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetUsersQuery, GetUsersQueryVariables>(
+    GetUsersDocument,
+    options,
+  );
+}
+export function useGetUsersSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GetUsersQuery, GetUsersQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetUsersQuery, GetUsersQueryVariables>(
+    GetUsersDocument,
+    options,
+  );
+}
+export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
+export type GetUsersLazyQueryHookResult = ReturnType<
+  typeof useGetUsersLazyQuery
+>;
+export type GetUsersSuspenseQueryHookResult = ReturnType<
+  typeof useGetUsersSuspenseQuery
+>;
+export type GetUsersQueryResult = Apollo.QueryResult<
+  GetUsersQuery,
+  GetUsersQueryVariables
+>;
+export const GetUserDocument = gql`
+  query GetUser($userId: String!) {
+    user(id: $userId) {
+      id
+      imageUrl
+      gender
+      email
+      dateOfBirth
+      createdAt
+      isActive
+      name
+      phoneNumber
+      role
+      updatedAt
+    }
+  }
+`;
 
 /**
  * __useGetUserQuery__
@@ -2858,40 +4239,72 @@ export const GetUserDocument = gql`
  *   },
  * });
  */
-export function useGetUserQuery(baseOptions: Apollo.QueryHookOptions<GetUserQuery, GetUserQueryVariables> & ({ variables: GetUserQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, options);
-      }
-export function useGetUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserQuery, GetUserQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, options);
-        }
-export function useGetUserSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetUserQuery, GetUserQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, options);
-        }
+export function useGetUserQuery(
+  baseOptions: Apollo.QueryHookOptions<GetUserQuery, GetUserQueryVariables> &
+    ({ variables: GetUserQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetUserQuery, GetUserQueryVariables>(
+    GetUserDocument,
+    options,
+  );
+}
+export function useGetUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetUserQuery,
+    GetUserQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetUserQuery, GetUserQueryVariables>(
+    GetUserDocument,
+    options,
+  );
+}
+export function useGetUserSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GetUserQuery, GetUserQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetUserQuery, GetUserQueryVariables>(
+    GetUserDocument,
+    options,
+  );
+}
 export type GetUserQueryHookResult = ReturnType<typeof useGetUserQuery>;
 export type GetUserLazyQueryHookResult = ReturnType<typeof useGetUserLazyQuery>;
-export type GetUserSuspenseQueryHookResult = ReturnType<typeof useGetUserSuspenseQuery>;
-export type GetUserQueryResult = Apollo.QueryResult<GetUserQuery, GetUserQueryVariables>;
+export type GetUserSuspenseQueryHookResult = ReturnType<
+  typeof useGetUserSuspenseQuery
+>;
+export type GetUserQueryResult = Apollo.QueryResult<
+  GetUserQuery,
+  GetUserQueryVariables
+>;
 export const CreateUserDocument = gql`
-    mutation CreateUser($createUserInput: CreateUserDto!) {
-  createUser(createUserInput: $createUserInput) {
-    id
-    imageUrl
-    gender
-    email
-    dateOfBirth
-    createdAt
-    isActive
-    name
-    phoneNumber
-    role
-    updatedAt
+  mutation CreateUser($createUserInput: CreateUserDto!) {
+    createUser(createUserInput: $createUserInput) {
+      id
+      imageUrl
+      gender
+      email
+      dateOfBirth
+      createdAt
+      isActive
+      name
+      phoneNumber
+      role
+      updatedAt
+    }
   }
-}
-    `;
-export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, CreateUserMutationVariables>;
+`;
+export type CreateUserMutationFn = Apollo.MutationFunction<
+  CreateUserMutation,
+  CreateUserMutationVariables
+>;
 
 /**
  * __useCreateUserMutation__
@@ -2910,31 +4323,51 @@ export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, C
  *   },
  * });
  */
-export function useCreateUserMutation(baseOptions?: Apollo.MutationHookOptions<CreateUserMutation, CreateUserMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, options);
-      }
-export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
-export type CreateUserMutationResult = Apollo.MutationResult<CreateUserMutation>;
-export type CreateUserMutationOptions = Apollo.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
-export const UpdateUserDocument = gql`
-    mutation UpdateUser($updateUserInput: UpdateUserDto!, $updateUserId: String!) {
-  updateUser(updateUserInput: $updateUserInput, id: $updateUserId) {
-    id
-    imageUrl
-    gender
-    email
-    dateOfBirth
-    createdAt
-    isActive
-    name
-    phoneNumber
-    role
-    updatedAt
-  }
+export function useCreateUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateUserMutation,
+    CreateUserMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<CreateUserMutation, CreateUserMutationVariables>(
+    CreateUserDocument,
+    options,
+  );
 }
-    `;
-export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
+export type CreateUserMutationHookResult = ReturnType<
+  typeof useCreateUserMutation
+>;
+export type CreateUserMutationResult =
+  Apollo.MutationResult<CreateUserMutation>;
+export type CreateUserMutationOptions = Apollo.BaseMutationOptions<
+  CreateUserMutation,
+  CreateUserMutationVariables
+>;
+export const UpdateUserDocument = gql`
+  mutation UpdateUser(
+    $updateUserInput: UpdateUserDto!
+    $updateUserId: String!
+  ) {
+    updateUser(updateUserInput: $updateUserInput, id: $updateUserId) {
+      id
+      imageUrl
+      gender
+      email
+      dateOfBirth
+      createdAt
+      isActive
+      name
+      phoneNumber
+      role
+      updatedAt
+    }
+  }
+`;
+export type UpdateUserMutationFn = Apollo.MutationFunction<
+  UpdateUserMutation,
+  UpdateUserMutationVariables
+>;
 
 /**
  * __useUpdateUserMutation__
@@ -2954,31 +4387,48 @@ export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, U
  *   },
  * });
  */
-export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserMutation, UpdateUserMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, options);
-      }
-export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
-export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
-export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
-export const DeleteUserDocument = gql`
-    mutation DeleteUser($deleteUserId: String!) {
-  deleteUser(id: $deleteUserId) {
-    id
-    imageUrl
-    gender
-    email
-    dateOfBirth
-    createdAt
-    isActive
-    name
-    phoneNumber
-    role
-    updatedAt
-  }
+export function useUpdateUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateUserMutation,
+    UpdateUserMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(
+    UpdateUserDocument,
+    options,
+  );
 }
-    `;
-export type DeleteUserMutationFn = Apollo.MutationFunction<DeleteUserMutation, DeleteUserMutationVariables>;
+export type UpdateUserMutationHookResult = ReturnType<
+  typeof useUpdateUserMutation
+>;
+export type UpdateUserMutationResult =
+  Apollo.MutationResult<UpdateUserMutation>;
+export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<
+  UpdateUserMutation,
+  UpdateUserMutationVariables
+>;
+export const DeleteUserDocument = gql`
+  mutation DeleteUser($deleteUserId: String!) {
+    deleteUser(id: $deleteUserId) {
+      id
+      imageUrl
+      gender
+      email
+      dateOfBirth
+      createdAt
+      isActive
+      name
+      phoneNumber
+      role
+      updatedAt
+    }
+  }
+`;
+export type DeleteUserMutationFn = Apollo.MutationFunction<
+  DeleteUserMutation,
+  DeleteUserMutationVariables
+>;
 
 /**
  * __useDeleteUserMutation__
@@ -2997,10 +4447,24 @@ export type DeleteUserMutationFn = Apollo.MutationFunction<DeleteUserMutation, D
  *   },
  * });
  */
-export function useDeleteUserMutation(baseOptions?: Apollo.MutationHookOptions<DeleteUserMutation, DeleteUserMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteUserMutation, DeleteUserMutationVariables>(DeleteUserDocument, options);
-      }
-export type DeleteUserMutationHookResult = ReturnType<typeof useDeleteUserMutation>;
-export type DeleteUserMutationResult = Apollo.MutationResult<DeleteUserMutation>;
-export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<DeleteUserMutation, DeleteUserMutationVariables>;
+export function useDeleteUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DeleteUserMutation,
+    DeleteUserMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<DeleteUserMutation, DeleteUserMutationVariables>(
+    DeleteUserDocument,
+    options,
+  );
+}
+export type DeleteUserMutationHookResult = ReturnType<
+  typeof useDeleteUserMutation
+>;
+export type DeleteUserMutationResult =
+  Apollo.MutationResult<DeleteUserMutation>;
+export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<
+  DeleteUserMutation,
+  DeleteUserMutationVariables
+>;

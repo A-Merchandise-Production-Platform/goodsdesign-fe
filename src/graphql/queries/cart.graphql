@@ -39,8 +39,14 @@ query GetCartItemCount {
   getCartItemCount
 }
 
-mutation UpdateCartItem($updateCartItemId: String!, $updateCartItemInput: UpdateCartItemDto!) {
-  updateCartItem(id: $updateCartItemId, updateCartItemInput: $updateCartItemInput) {
+mutation UpdateCartItem(
+  $updateCartItemId: String!
+  $updateCartItemInput: UpdateCartItemDto!
+) {
+  updateCartItem(
+    id: $updateCartItemId
+    updateCartItemInput: $updateCartItemInput
+  ) {
     userId
     quantity
     id
