@@ -43,3 +43,11 @@ query GetWardByWardCode($wardCode: String!) {
     wardName
   }
 }
+
+query GetAvailableService($servicesInput: GetAvailableServicesDto!) {
+  availableServices(servicesInput: $servicesInput) {
+    shortName
+    serviceTypeId
+    serviceId
+  }
+}
