@@ -83,7 +83,6 @@ query GetUserOrder($userOrderId: String!) {
   }
 }
 
-
 mutation CreatePaymentGatewayUrl($gateway: String!, $paymentId: String!) {
   createPayment(gateway: $gateway, paymentId: $paymentId)
 }
