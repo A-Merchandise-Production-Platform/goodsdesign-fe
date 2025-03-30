@@ -1606,6 +1606,8 @@ export type ProductDesignByIdQuery = {
     };
     designPositions?: Array<{
       __typename?: 'DesignPositionEntity';
+      designId: string;
+      productPositionTypeId: string;
       designJSON?: any | null;
       positionType?: {
         __typename?: 'ProductPositionTypeEntity';
@@ -3873,6 +3875,8 @@ export const ProductDesignByIdDocument = gql`
         model
       }
       designPositions {
+        designId
+        productPositionTypeId
         positionType {
           positionName
           basePrice
