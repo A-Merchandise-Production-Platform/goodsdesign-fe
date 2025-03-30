@@ -1,51 +1,22 @@
 'use client';
 
-import {
-  AddressSelector,
-  AddressValue,
-} from '@/components/shared/address/address-selector';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import {
-  AddressEntity,
   CartItemEntity,
   DesignPositionEntity,
-  useAddressesQuery,
-  useCalculateShippingFeeMutation,
-  useCreateAddressMutation,
-  useGetAddressDetailsQuery,
-  useGetAvailableServiceQuery,
+  useCreateOrderMutation,
   useGetUserCartItemsQuery,
   useUpdateCartItemMutation,
 } from '@/graphql/generated/graphql';
 import { useToast } from '@/hooks/use-toast';
 import { formatPrice } from '@/lib/utils';
-import {
-  MapPin,
-  MinusCircle,
-  PlusCircle,
-  ShoppingCart,
-  Trash2,
-} from 'lucide-react';
+import { MinusCircle, PlusCircle, ShoppingCart, Trash2 } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 // Interface for price calculation return values
 interface ItemPriceCalculation {
@@ -55,84 +26,13 @@ interface ItemPriceCalculation {
   discountPercent: number;
 }
 
-// Interface for shipping information
-interface ShippingInfo {
-  fee: number;
-  service: {
-    id: number;
-    serviceTypeId: number;
-    name: string;
-  } | null;
-}
-
-interface AvailableService {
-  shortName: string;
-  serviceTypeId: number;
-  serviceId: number;
-}
-
 export default function CartPage() {
-  const systemDistrict = 1463;
-  const systemWard = '21801';
-
-  const {
-    data: addressData,
-    loading: addressLoading,
-    refetch: addressRefetch,
-  } = useAddressesQuery();
-  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
-    null,
-  );
-  const [shipping, setShipping] = useState<ShippingInfo>({
-    fee: 0,
-    service: null,
-  });
-  const [isAddingAddress, setIsAddingAddress] = useState<boolean>(false);
-  const [newAddress, setNewAddress] = useState<AddressValue | undefined>(
-    undefined,
-  );
-
   const { data, loading, refetch } = useGetUserCartItemsQuery();
   const { toast } = useToast();
   const [isCheckingOut, setIsCheckingOut] = useState<boolean>(false);
-
-  const addresses = addressData?.addresses || [];
-  const selectedAddress = addresses.find(
-    addr => addr.id === selectedAddressId,
-  ) as AddressEntity | undefined;
-
-  // Set the first address as default when addresses load
-  useEffect(() => {
-    if (addresses.length > 0 && !selectedAddressId) {
-      setSelectedAddressId(addresses[0].id);
-      serviceFetch();
-    }
-  }, [addresses, selectedAddressId]);
-
-  // Get detailed address information for selected address
-  const { data: selectedAddressDetails } = useGetAddressDetailsQuery({
-    variables: {
-      provinceId: selectedAddress?.provinceID || 0,
-      districtId: selectedAddress?.districtID || 0,
-      wardCode: selectedAddress?.wardCode || '',
-    },
-    skip: !selectedAddress,
-  });
-
-  // Get available shipping services
-  const {
-    data: availableService,
-    loading: serviceLoading,
-    refetch: serviceFetch,
-  } = useGetAvailableServiceQuery({
-    variables: {
-      servicesInput: {
-        fromDistrict: systemDistrict,
-        toDistrict: selectedAddress?.districtID || 0,
-      },
-    },
-    skip: !selectedAddress,
-  });
+  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>(
+    {},
+  );
 
   const [updateCartItem, { loading: updateCartItemLoading }] =
     useUpdateCartItemMutation({
@@ -149,104 +49,26 @@ export default function CartPage() {
       },
     });
 
-  const [calculateShippingFee, { loading: shippingFeeLoading }] =
-    useCalculateShippingFeeMutation({
+  const [createOrder, { loading: createOrderLoading }] = useCreateOrderMutation(
+    {
       onCompleted: data => {
-        setShipping({
-          ...shipping,
-          fee: data.calculateShippingFee.total || 0,
+        toast({
+          title: 'Order created',
+          description: 'Your order has been placed successfully!',
         });
+        setIsCheckingOut(false);
+        refetch();
       },
       onError: error => {
         toast({
-          title: 'Error calculating shipping',
+          title: 'Checkout failed',
           description: error.message,
           variant: 'destructive',
         });
+        setIsCheckingOut(false);
       },
-    });
-
-  const [createAddress, { loading: createAddressLoading }] =
-    useCreateAddressMutation({
-      onCompleted: () => {
-        toast({
-          title: 'Address added',
-          description: 'Your new address has been added successfully',
-        });
-        setIsAddingAddress(false);
-        // Refetch addresses after adding a new one
-        addressRefetch();
-      },
-      onError: error => {
-        toast({
-          title: 'Error adding address',
-          description: error.message,
-          variant: 'destructive',
-        });
-      },
-      refetchQueries: ['Addresses'],
-    });
-
-  const handleAddAddress = (): void => {
-    if (!newAddress) return;
-    createAddress({
-      variables: {
-        createAddressInput: {
-          provinceID: newAddress.provinceId || 0,
-          districtID: newAddress.districtId || 0,
-          wardCode: newAddress.wardCode || '',
-          street: newAddress.street || '',
-        },
-      },
-    });
-  };
-
-  const handleCalculateShippingFee = (): void => {
-    if (!selectedAddress || !shipping.service) {
-      toast({
-        title: 'Missing information',
-        description: 'Please select both an address and shipping method',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    calculateShippingFee({
-      variables: {
-        input: {
-          fromDistrictId: systemDistrict, // Default district - update with actual value
-          fromWardCode: systemWard, // Default ward - update with actual value
-          toDistrictId: selectedAddress.districtID,
-          toWardCode: selectedAddress.wardCode,
-          serviceId: shipping.service.id,
-          serviceTypeId: shipping.service.serviceTypeId,
-          height: 50,
-          length: 20,
-          weight: 1000,
-          width: 20,
-        },
-      },
-    });
-  };
-
-  const handleServiceChange = (serviceId: string): void => {
-    if (!availableService?.availableServices) return;
-
-    const selectedService = availableService.availableServices.find(
-      s => s.serviceId === parseInt(serviceId),
-    );
-
-    if (selectedService) {
-      setShipping({
-        ...shipping,
-        service: {
-          id: selectedService.serviceId,
-          serviceTypeId: selectedService.serviceTypeId,
-          name: selectedService.shortName,
-        },
-      });
-    }
-  };
+    },
+  );
 
   const cartItems = (data?.userCartItems || []) as CartItemEntity[];
 
@@ -294,12 +116,16 @@ export default function CartPage() {
     };
   };
 
-  // Calculate cart totals
-  const cartTotal = cartItems.reduce((total: number, item: CartItemEntity) => {
-    return total + calculateItemPrice(item).totalPrice;
-  }, 0);
+  // Get only selected cart items
+  const selectedCartItems = cartItems.filter(item => selectedItems[item.id]);
 
-  const finalTotal = cartTotal + shipping.fee;
+  // Calculate cart totals for selected items only
+  const cartTotal = selectedCartItems.reduce(
+    (total: number, item: CartItemEntity) => {
+      return total + calculateItemPrice(item).totalPrice;
+    },
+    0,
+  );
 
   // Handle quantity changes
   const handleQuantityChange = (id: string, newQuantity: number): void => {
@@ -326,26 +152,51 @@ export default function CartPage() {
     // refetch();
   };
 
+  // Handle item selection
+  const handleItemSelect = (id: string, isChecked: boolean): void => {
+    setSelectedItems(prev => ({
+      ...prev,
+      [id]: isChecked,
+    }));
+  };
+
+  // Toggle all items
+  const handleToggleAll = (check: boolean): void => {
+    const newSelection: Record<string, boolean> = {};
+    cartItems.forEach(item => {
+      newSelection[item.id] = check;
+    });
+    setSelectedItems(newSelection);
+  };
+
+  // Check if all items are selected
+  const areAllItemsSelected =
+    cartItems.length > 0 && cartItems.every(item => selectedItems[item.id]);
+
   // Handle checkout
   const handleCheckout = (): void => {
-    if (!selectedAddress) {
+    if (selectedCartItems.length === 0) {
       toast({
-        title: 'Address required',
-        description: 'Please select a shipping address before checkout',
+        title: 'No items selected',
+        description: 'Please select items to checkout',
         variant: 'destructive',
       });
       return;
     }
 
     setIsCheckingOut(true);
-    // Simulate checkout process
-    setTimeout(() => {
-      toast({
-        title: 'Checkout successful',
-        description: 'Your order has been placed successfully!',
-      });
-      setIsCheckingOut(false);
-    }, 2000);
+
+    createOrder({
+      variables: {
+        createOrderInput: {
+          orderDetails: selectedCartItems.map(item => {
+            return {
+              cartItemId: item.id,
+            };
+          }),
+        },
+      },
+    });
   };
 
   if (loading) {
@@ -375,12 +226,6 @@ export default function CartPage() {
     );
   }
 
-  // Format address for display
-  const formatAddress = (address: AddressEntity | undefined): string => {
-    if (!address || !selectedAddressDetails) return 'Select an address';
-    return `${address.street}, ${selectedAddressDetails.ward?.wardName}, ${selectedAddressDetails.district?.districtName}, ${selectedAddressDetails.province?.provinceName}`;
-  };
-
   return (
     <div className="container mx-auto px-4 py-10">
       <h1 className="mb-6 text-2xl font-bold">
@@ -389,6 +234,17 @@ export default function CartPage() {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
+          <div className="mb-4 flex items-center">
+            <Checkbox
+              id="select-all"
+              checked={areAllItemsSelected}
+              onCheckedChange={handleToggleAll}
+            />
+            <label htmlFor="select-all" className="ml-2 cursor-pointer">
+              Select All Items
+            </label>
+          </div>
+
           {cartItems.map(item => {
             const { unitPrice, totalPrice, discountApplied, discountPercent } =
               calculateItemPrice(item);
@@ -404,6 +260,17 @@ export default function CartPage() {
             return (
               <Card key={item.id} className="mb-4 overflow-hidden">
                 <div className="flex flex-col gap-4 p-4 sm:flex-row sm:p-6">
+                  <div className="flex items-center">
+                    <Checkbox
+                      id={`item-${item.id}`}
+                      checked={selectedItems[item.id] || false}
+                      onCheckedChange={checked =>
+                        handleItemSelect(item.id, !!checked)
+                      }
+                      className="border-white"
+                    />
+                  </div>
+
                   <div className="bg-muted relative mx-auto h-32 w-32 flex-shrink-0 rounded-md sm:mx-0">
                     <Image
                       src={
@@ -412,7 +279,7 @@ export default function CartPage() {
                       }
                       alt={product?.name || 'Product image'}
                       fill
-                      className="object-cover"
+                      className="rounded-xl object-cover"
                     />
                   </div>
 
@@ -505,189 +372,18 @@ export default function CartPage() {
           <Card className="sticky top-4 p-6">
             <h2 className="mb-4 text-xl font-semibold">Order Summary</h2>
 
-            {/* Address Selection Section */}
-            <div className="mb-6">
-              <h3 className="mb-2 font-medium">Shipping Address</h3>
-              {addressLoading ? (
-                <div className="h-10 animate-pulse rounded bg-gray-200"></div>
-              ) : addresses.length > 0 ? (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Select
-                      value={selectedAddressId || ''}
-                      onValueChange={setSelectedAddressId}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select an address" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {addresses.map(
-                          (address: {
-                            id: string;
-                            street: string;
-                            districtID: number;
-                            provinceID: number;
-                            wardCode: string;
-                          }) => (
-                            <SelectItem key={address.id} value={address.id}>
-                              {address.street}
-                            </SelectItem>
-                          ),
-                        )}
-                      </SelectContent>
-                    </Select>
-
-                    <Dialog
-                      open={isAddingAddress}
-                      onOpenChange={setIsAddingAddress}
-                    >
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="icon">
-                          <PlusCircle className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Add New Address</DialogTitle>
-                          <DialogDescription>
-                            Enter your new shipping address details
-                          </DialogDescription>
-                        </DialogHeader>
-                        <AddressSelector
-                          value={newAddress}
-                          onChange={setNewAddress}
-                          disabled={createAddressLoading}
-                        />
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            onClick={() => setIsAddingAddress(false)}
-                            disabled={createAddressLoading}
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            onClick={handleAddAddress}
-                            disabled={createAddressLoading || !newAddress}
-                          >
-                            {createAddressLoading ? 'Adding...' : 'Add Address'}
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-
-                  {selectedAddress && (
-                    <div className="rounded-md border p-3 text-sm">
-                      <div className="flex items-start gap-2">
-                        <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0" />
-                        <div>{formatAddress(selectedAddress)}</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Shipping Service Selection */}
-                  {selectedAddress && (
-                    <div className="mt-4">
-                      <h3 className="mb-2 font-medium">Shipping Method</h3>
-                      <Select
-                        value={shipping.service?.id?.toString() || ''}
-                        onValueChange={handleServiceChange}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select shipping method" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {availableService?.availableServices.map(service => (
-                            <SelectItem
-                              key={service.shortName}
-                              value={service.serviceId.toString()}
-                            >
-                              {service.shortName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-
-                      <Button
-                        onClick={handleCalculateShippingFee}
-                        className="mt-2 w-full"
-                        disabled={!shipping.service || shippingFeeLoading}
-                        variant="outline"
-                      >
-                        {shippingFeeLoading
-                          ? 'Calculating...'
-                          : 'Calculate Shipping'}
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="py-3 text-center">
-                  <p className="text-muted-foreground mb-2">
-                    No addresses found
-                  </p>
-                  <Dialog
-                    open={isAddingAddress}
-                    onOpenChange={setIsAddingAddress}
-                  >
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm">
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Add Address
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Add New Address</DialogTitle>
-                        <DialogDescription>
-                          Enter your shipping address details
-                        </DialogDescription>
-                      </DialogHeader>
-                      <AddressSelector
-                        value={newAddress}
-                        onChange={setNewAddress}
-                        disabled={createAddressLoading}
-                      />
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          onClick={() => setIsAddingAddress(false)}
-                          disabled={createAddressLoading}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          onClick={handleAddAddress}
-                          disabled={createAddressLoading || !newAddress}
-                        >
-                          {createAddressLoading ? 'Adding...' : 'Add Address'}
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              )}
-            </div>
-
             <Separator className="my-4" />
 
             <div className="mb-4 space-y-2">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-muted-foreground">
+                  Subtotal ({selectedCartItems.length} items)
+                </span>
                 <span>{formatPrice(cartTotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Shipping</span>
-                <span>
-                  {shipping.fee > 0
-                    ? `${formatPrice(shipping.fee)}`
-                    : 'Calculated at checkout'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Tax</span>
-                <span>Calculated at checkout</span>
+                <span className="text-muted-foreground">Shipping Cost</span>
+                <span>Calculated when finished production</span>
               </div>
             </div>
 
@@ -695,18 +391,16 @@ export default function CartPage() {
 
             <div className="mb-6 flex justify-between text-lg font-semibold">
               <span>Total</span>
-              <span>
-                {formatPrice(shipping.fee > 0 ? finalTotal : cartTotal)}
-              </span>
+              <span>{formatPrice(cartTotal)}</span>
             </div>
 
             <Button
               className="w-full"
               size="lg"
               onClick={handleCheckout}
-              disabled={isCheckingOut || !selectedAddress}
+              disabled={createOrderLoading || selectedCartItems.length === 0}
             >
-              {isCheckingOut ? (
+              {createOrderLoading ? (
                 <>
                   <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
                   Processing...
@@ -717,7 +411,7 @@ export default function CartPage() {
             </Button>
 
             <p className="text-muted-foreground mt-4 text-center text-xs">
-              Shipping, taxes, and discounts calculated at checkout
+              Taxes and discounts calculated at checkout
             </p>
           </Card>
         </div>
