@@ -5,18 +5,24 @@ export interface ModelSelectorProps {
   sizes: string[];
   title?: string;
   defaultValue?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
 }
 
 export function ModelSelector({
   sizes,
   title = 'Size',
   defaultValue,
+  value,
+  onValueChange,
 }: ModelSelectorProps) {
   return (
     <div>
       <h3 className="mb-3 text-lg font-medium">{title}</h3>
       <RadioGroup
+        value={value}
         defaultValue={defaultValue || sizes[0]}
+        onValueChange={onValueChange}
         className="flex flex-wrap gap-2"
       >
         {sizes.map(size => (

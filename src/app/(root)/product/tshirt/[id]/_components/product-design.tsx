@@ -516,6 +516,8 @@ export default function ProductDesigner() {
 
   // Initialize Fabric.js canvas
   useEffect(() => {
+    console.log(designs);
+
     if (!canvasRef.current) return;
 
     // Clean up previous canvas if it exists

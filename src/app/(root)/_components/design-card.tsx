@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { formatPrice } from '@/lib/utils';
 
 type DesignCategory = 'T-shirt' | 'Phone Case';
 
@@ -50,7 +51,7 @@ export function DesignCard({
         <div className="flex flex-grow flex-col p-4">
           <div className="mb-2 flex items-start justify-between">
             <h3 className="font-semibold">{name}</h3>
-            <p className="text-primary font-medium">${price.toFixed(2)}</p>
+            <p className="text-primary font-medium">{formatPrice(price)}</p>
           </div>
           <p className="text-muted-foreground text-sm">{description}</p>
         </div>

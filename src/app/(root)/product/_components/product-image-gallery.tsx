@@ -4,7 +4,7 @@ export interface ProductImageGalleryProps {
   name: string;
   price: number;
   image: string;
-  colors: { name: string; hex: string }[];
+  colors: string[];
   sizes: string[];
   printingTechniques: { name: string; description: string; price: number }[];
 }

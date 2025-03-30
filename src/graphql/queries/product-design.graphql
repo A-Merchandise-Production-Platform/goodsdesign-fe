@@ -1,0 +1,46 @@
+query ProductDesignById($productDesignId: ID!) {
+  productDesign(id: $productDesignId) {
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+    }
+    designPositions {
+      positionType {
+        positionName
+        basePrice
+      }
+      designJSON
+    }
+  }
+}
+
+mutation CreateProductDesign($input: CreateProductDesignDto!) {
+  createProductDesign(input: $input) {
+    id
+  }
+}
+
+mutation UpdateProductDesign(
+  $updateProductDesignId: String!
+  $input: UpdateProductDesignDto!
+) {
+  updateProductDesign(id: $updateProductDesignId, input: $input) {
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+    }
+    designPositions {
+      positionType {
+        positionName
+        basePrice
+      }
+      designJSON
+    }
+  }
+}

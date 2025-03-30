@@ -252,7 +252,7 @@ export default function CartPage() {
 
   // Function to calculate price for a single cart item
   const calculateItemPrice = (item: CartItemEntity): ItemPriceCalculation => {
-    if (!item.design?.blankVariant || !item.design.designPositions) {
+    if (!item.design?.systemConfigVariant || !item.design.designPositions) {
       return {
         unitPrice: 0,
         totalPrice: 0,
@@ -260,7 +260,7 @@ export default function CartPage() {
         discountPercent: 0,
       };
     }
-    const blankPrice = item.design.blankVariant.blankPrice;
+    const blankPrice = item.design.systemConfigVariant.price || 0;
     const positionPrices = item.design.designPositions.reduce(
       (total: number, position: DesignPositionEntity) =>
         total + (position?.positionType?.basePrice || 0),
@@ -271,7 +271,7 @@ export default function CartPage() {
     const basePrice = blankPrice + positionPrices;
 
     // Check for applicable discounts
-    const discounts = item.design.blankVariant.product.discounts || [];
+    const discounts = item.design.systemConfigVariant.product.discounts || [];
     let discountPercent = 0;
 
     for (const discount of discounts) {
@@ -392,8 +392,8 @@ export default function CartPage() {
           {cartItems.map(item => {
             const { unitPrice, totalPrice, discountApplied, discountPercent } =
               calculateItemPrice(item);
-            const product = item?.design?.blankVariant?.product;
-            const variant = item?.design?.blankVariant?.systemVariant;
+            const product = item?.design?.systemConfigVariant?.product;
+            const variant = item?.design?.systemConfigVariant;
 
             const positions = item?.design?.designPositions
               ?.map(
