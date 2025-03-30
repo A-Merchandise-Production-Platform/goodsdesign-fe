@@ -19,3 +19,11 @@ export function removeVietnameseTones(str: string): string {
     .replace(/đ/g, 'd')
     .replace(/Đ/g, 'D');
 }
+
+export const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  })
+}

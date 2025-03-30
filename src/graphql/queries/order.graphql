@@ -1,0 +1,84 @@
+mutation CreateOrder($createOrderInput: CreateOrderDto!) {
+  createOrder(createOrderInput: $createOrderInput) {
+    id
+  }
+}
+query GetMyOrders {
+  userOrders {
+    customerId
+    depositPaid
+    id
+    orderDate
+    orderDetails {
+      designId
+      id
+      orderId
+      price
+      qualityCheckStatus
+      quantity
+      reworkStatus
+      status
+    }
+    shippingPrice
+    status
+    totalPrice
+  }
+}
+
+query GetUserOrder($userOrderId: String!) {
+  userOrder(userOrderId: $userOrderId) {
+    customerId
+    depositPaid
+    id
+    orderDate
+    orderDetails {
+      designId
+      id
+      orderId
+      price
+      qualityCheckStatus
+      quantity
+      reworkStatus
+      status
+    }
+    shippingPrice
+    status
+    totalPrice
+    customer {
+      createdAt
+      createdBy
+      dateOfBirth
+      deletedAt
+      deletedBy
+      email
+      gender
+      id
+      imageUrl
+      name
+      phoneNumber
+      role
+    }
+    payments {
+      amount
+      createdAt
+      customerId
+      id
+      orderId
+      paymentLog
+      status
+      transactions {
+        amount
+        createdAt
+        customerId
+        id
+        paymentGatewayTransactionId
+        paymentId
+        paymentMethod
+        status
+        transactionLog
+        type
+      }
+      type
+    }  
+  }
+}
