@@ -8,6 +8,10 @@ import { useGetAllProductsQuery } from '@/graphql/generated/graphql';
 export default function Home() {
   const { data: proData, loading: proLoading } = useGetAllProductsQuery();
 
+  const sortedProducts = proData?.products
+    ?.slice()
+    .sort((a, b) => (a.id ?? '').localeCompare(b.id ?? ''));
+
   return (
     <div className="container mx-auto px-4 py-8">
       <PromotionalBanner />
@@ -17,7 +21,7 @@ export default function Home() {
         Select a product to customize with our available designs
       </p>
 
-      <ProductSection products={proData?.products} />
+      <ProductSection products={sortedProducts} />
 
       <DesignSection />
     </div>

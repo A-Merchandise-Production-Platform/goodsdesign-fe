@@ -41,7 +41,13 @@ export function ProductSection({ products = [] }: ProductSectionProps) {
       {products.map(product => (
         <ProductCard
           key={product.id}
-          route={`product/${product.id}`}
+          route={`product/${
+            product.id === 'prod001'
+              ? 'tshirt'
+              : product.id === 'prod002'
+                ? 'phonecase'
+                : product.id
+          }`}
           name={product.name}
           price={getMinPrice(product.variants) / 1000}
           image={product.imageUrl || ''}
