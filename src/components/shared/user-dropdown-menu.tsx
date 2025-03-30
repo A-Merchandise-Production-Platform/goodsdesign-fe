@@ -1,6 +1,12 @@
 'use client';
 
-import { LockKeyholeIcon, LogOut, Settings, ShoppingBag, User } from 'lucide-react';
+import {
+  LockKeyholeIcon,
+  LogOut,
+  Settings,
+  ShoppingBag,
+  User,
+} from 'lucide-react';
 import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

@@ -79,6 +79,6 @@ query GetUserOrder($userOrderId: String!) {
         type
       }
       type
-    }  
+    }
   }
 }

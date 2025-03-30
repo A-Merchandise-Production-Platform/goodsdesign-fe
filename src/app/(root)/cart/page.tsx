@@ -14,12 +14,7 @@ import {
 } from '@/graphql/generated/graphql';
 import { useToast } from '@/hooks/use-toast';
 import { formatPrice } from '@/lib/utils';
-import {
-  MinusCircle,
-  PlusCircle,
-  ShoppingCart,
-  Trash2,
-} from 'lucide-react';
+import { MinusCircle, PlusCircle, ShoppingCart, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -35,7 +30,9 @@ export default function CartPage() {
   const { data, loading, refetch } = useGetUserCartItemsQuery();
   const { toast } = useToast();
   const [isCheckingOut, setIsCheckingOut] = useState<boolean>(false);
-  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>({});
+  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>(
+    {},
+  );
 
   const [updateCartItem, { loading: updateCartItemLoading }] =
     useUpdateCartItemMutation({
@@ -52,24 +49,26 @@ export default function CartPage() {
       },
     });
 
-  const [createOrder, { loading: createOrderLoading }] = useCreateOrderMutation({
-    onCompleted: data => {
-      toast({
-        title: 'Order created',
-        description: 'Your order has been placed successfully!',
-      });
-      setIsCheckingOut(false);
-      refetch();
+  const [createOrder, { loading: createOrderLoading }] = useCreateOrderMutation(
+    {
+      onCompleted: data => {
+        toast({
+          title: 'Order created',
+          description: 'Your order has been placed successfully!',
+        });
+        setIsCheckingOut(false);
+        refetch();
+      },
+      onError: error => {
+        toast({
+          title: 'Checkout failed',
+          description: error.message,
+          variant: 'destructive',
+        });
+        setIsCheckingOut(false);
+      },
     },
-    onError: error => {
-      toast({
-        title: 'Checkout failed',
-        description: error.message,
-        variant: 'destructive',
-      });
-      setIsCheckingOut(false);
-    }
-  });
+  );
 
   const cartItems = (data?.userCartItems || []) as CartItemEntity[];
 
@@ -121,9 +120,12 @@ export default function CartPage() {
   const selectedCartItems = cartItems.filter(item => selectedItems[item.id]);
 
   // Calculate cart totals for selected items only
-  const cartTotal = selectedCartItems.reduce((total: number, item: CartItemEntity) => {
-    return total + calculateItemPrice(item).totalPrice;
-  }, 0);
+  const cartTotal = selectedCartItems.reduce(
+    (total: number, item: CartItemEntity) => {
+      return total + calculateItemPrice(item).totalPrice;
+    },
+    0,
+  );
 
   // Handle quantity changes
   const handleQuantityChange = (id: string, newQuantity: number): void => {
@@ -168,8 +170,8 @@ export default function CartPage() {
   };
 
   // Check if all items are selected
-  const areAllItemsSelected = cartItems.length > 0 && 
-    cartItems.every(item => selectedItems[item.id]);
+  const areAllItemsSelected =
+    cartItems.length > 0 && cartItems.every(item => selectedItems[item.id]);
 
   // Handle checkout
   const handleCheckout = (): void => {
@@ -183,17 +185,17 @@ export default function CartPage() {
     }
 
     setIsCheckingOut(true);
-    
+
     createOrder({
       variables: {
         createOrderInput: {
           orderDetails: selectedCartItems.map(item => {
             return {
-              cartItemId: item.id
-            }
+              cartItemId: item.id,
+            };
           }),
-        }
-      }
+        },
+      },
     });
   };
 
@@ -233,8 +235,8 @@ export default function CartPage() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <div className="mb-4 flex items-center">
-            <Checkbox 
-              id="select-all" 
+            <Checkbox
+              id="select-all"
               checked={areAllItemsSelected}
               onCheckedChange={handleToggleAll}
             />
@@ -259,14 +261,16 @@ export default function CartPage() {
               <Card key={item.id} className="mb-4 overflow-hidden">
                 <div className="flex flex-col gap-4 p-4 sm:flex-row sm:p-6">
                   <div className="flex items-center">
-                    <Checkbox 
+                    <Checkbox
                       id={`item-${item.id}`}
                       checked={selectedItems[item.id] || false}
-                      onCheckedChange={(checked) => handleItemSelect(item.id, !!checked)}
-                      className='border-white'
+                      onCheckedChange={checked =>
+                        handleItemSelect(item.id, !!checked)
+                      }
+                      className="border-white"
                     />
                   </div>
-                  
+
                   <div className="bg-muted relative mx-auto h-32 w-32 flex-shrink-0 rounded-md sm:mx-0">
                     <Image
                       src={
@@ -275,7 +279,7 @@ export default function CartPage() {
                       }
                       alt={product?.name || 'Product image'}
                       fill
-                      className="object-cover rounded-xl"
+                      className="rounded-xl object-cover"
                     />
                   </div>
 
@@ -372,7 +376,9 @@ export default function CartPage() {
 
             <div className="mb-4 space-y-2">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Subtotal ({selectedCartItems.length} items)</span>
+                <span className="text-muted-foreground">
+                  Subtotal ({selectedCartItems.length} items)
+                </span>
                 <span>{formatPrice(cartTotal)}</span>
               </div>
               <div className="flex justify-between">
