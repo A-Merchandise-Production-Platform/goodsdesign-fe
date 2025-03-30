@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProductOverview from '@/app/(root)/admin/products/[id]/_components/product-overview';
 import ProductDiscount from '@/app/(root)/admin/products/[id]/_components/product-discount';
+import ProductVariants from '@/app/(root)/admin/products/[id]/_components/product-variants';
 
 export default function ProductAdminConfig() {
   const { id } = useParams();
@@ -51,7 +52,9 @@ export default function ProductAdminConfig() {
         <TabsContent value="discounts">
           <ProductDiscount />
         </TabsContent>
-        <TabsContent value="variants">Change your password here.</TabsContent>
+        <TabsContent value="variants">
+          <ProductVariants />
+        </TabsContent>
       </Tabs>
     </div>
   );
