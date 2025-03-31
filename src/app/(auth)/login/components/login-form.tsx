@@ -44,17 +44,17 @@ export default function LoginForm() {
         refreshToken: data.login.refreshToken,
         user: data.login.user,
       });
-      const role = data.login.user.role
-      if(role == "ADMIN"){
+      const role = data.login.user.role;
+      if (role == 'ADMIN') {
         router.push('/admin');
-      }else if(role == "MANAGER"){
-        router.push("/manager")
-      }else if(role == "STAFF"){
-        router.push("/staff")
-      }else if(role == "FACTORYOWNER"){
-        router.push("/factory")
-      }else{
-        router.push("/")
+      } else if (role == 'MANAGER') {
+        router.push('/manager');
+      } else if (role == 'STAFF') {
+        router.push('/staff');
+      } else if (role == 'FACTORYOWNER') {
+        router.push('/factory');
+      } else {
+        router.push('/');
       }
     },
     onError: error => {
