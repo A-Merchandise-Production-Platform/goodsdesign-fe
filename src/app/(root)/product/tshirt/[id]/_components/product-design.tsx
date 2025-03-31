@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import type React from 'react';
 
 import * as THREE from 'three';
-import * as fabric  from 'fabric';
+import * as fabric from 'fabric';
 import { SHIRT_COLORS } from './shirt-colors';
 import DesignHeader from './design-header';
 import DesignSidebar from './design-sidebar';
