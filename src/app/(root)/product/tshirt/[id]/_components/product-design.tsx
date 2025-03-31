@@ -26,7 +26,9 @@ interface DesignPosition {
 
 interface ProductDesignerComponentProps {
   initialDesigns?: DesignPosition[] | null;
-  onUpload?: (event: React.ChangeEvent<HTMLInputElement>) => Promise<string | null | undefined>;
+  onUpload?: (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => Promise<string | null | undefined>;
 }
 
 type ProductDesignerProps = SerializedDesign;
@@ -697,8 +699,9 @@ export default function ProductDesigner({
       // Fallback to local handling
       const file = e.target.files[0];
       const reader = new FileReader();
-      imageUrl = await new Promise((resolve) => {
-        reader.onload = event => resolve(event.target?.result?.toString() || '');
+      imageUrl = await new Promise(resolve => {
+        reader.onload = event =>
+          resolve(event.target?.result?.toString() || '');
         reader.readAsDataURL(file);
       });
     }
@@ -723,8 +726,7 @@ export default function ProductDesigner({
         scaleX: scale,
         scaleY: scale,
         left: limits.minX + (maxWidth - (fabricImage.width ?? 0) * scale) / 2,
-        top:
-          limits.minY + (maxHeight - (fabricImage.height ?? 0) * scale) / 2,
+        top: limits.minY + (maxHeight - (fabricImage.height ?? 0) * scale) / 2,
       });
 
       // Store the current view with the image
