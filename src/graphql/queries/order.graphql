@@ -1,0 +1,142 @@
+mutation CreateOrder($createOrderInput: CreateOrderDto!) {
+  createOrder(createOrderInput: $createOrderInput) {
+    id
+  }
+}
+query GetMyOrders {
+  userOrders {
+    customerId
+    depositPaid
+    id
+    orderDate
+    orderDetails {
+      designId
+      id
+      orderId
+      price
+      qualityCheckStatus
+      quantity
+      reworkStatus
+      status
+    }
+    shippingPrice
+    status
+    totalPrice
+  }
+}
+
+query GetUserOrder($userOrderId: String!) {
+  userOrder(userOrderId: $userOrderId) {
+    customerId
+    depositPaid
+    id
+    orderDate
+    orderDetails {
+      designId
+      id
+      orderId
+      price
+      qualityCheckStatus
+      quantity
+      reworkStatus
+      status
+    }
+    shippingPrice
+    status
+    totalPrice
+    customer {
+      createdAt
+      createdBy
+      dateOfBirth
+      deletedAt
+      deletedBy
+      email
+      gender
+      id
+      imageUrl
+      name
+      phoneNumber
+      role
+    }
+    payments {
+      amount
+      createdAt
+      customerId
+      id
+      orderId
+      paymentLog
+      status
+      transactions {
+        amount
+        createdAt
+        customerId
+        id
+        paymentGatewayTransactionId
+        paymentId
+        paymentMethod
+        status
+        transactionLog
+        type
+      }
+      type
+    }
+  }
+}
+
+mutation CreatePaymentGatewayUrl($gateway: String!, $paymentId: String!) {
+  createPayment(gateway: $gateway, paymentId: $paymentId)
+}
+
+query GetCurrentFactoryOrders {
+  factoryOrdersByFactory {
+    acceptanceDeadline
+    factoryId
+    id
+    status
+    createdAt
+    updatedAt
+    customerOrder {
+      id
+      orderDate
+      orderDetails {
+        design {
+          designPositions {
+            designId
+            designJSON
+            positionType {
+              positionName
+            }
+            productPositionTypeId
+          }
+        }
+      }
+    }
+  }
+}
+
+query GetFactoryOrder($factoryOrderId: ID!) {
+  factoryOrder(id: $factoryOrderId) {
+    acceptanceDeadline
+    factoryId
+    id
+    status
+    createdAt
+    updatedAt
+    customerOrder {
+      id
+      orderDate
+      orderDetails {
+        design {
+          designPositions {
+            designId
+            designJSON
+            positionType {
+              positionName
+            }
+            productPositionTypeId
+          }
+        }
+      }
+    }
+  }
+}

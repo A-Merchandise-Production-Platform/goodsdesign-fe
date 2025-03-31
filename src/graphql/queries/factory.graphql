@@ -22,8 +22,6 @@ query GetMyFactory {
     printingMethods
     products {
       id
-      imageUrl
-      name
     }
     qualityCertifications
     specializations
@@ -57,13 +55,20 @@ mutation UpdateFactoryInfo($updateFactoryInfoInput: UpdateFactoryInfoDto!) {
     printingMethods
     products {
       id
-      imageUrl
-      name
     }
     qualityCertifications
     specializations
     taxIdentificationNumber
     totalEmployees
     website
+  }
+}
+
+mutation UpdateFactoryOrderStatus(
+  $updateFactoryOrderStatusId: ID!
+  $status: String!
+) {
+  updateFactoryOrderStatus(id: $updateFactoryOrderStatusId, status: $status) {
+    id
   }
 }
