@@ -10,6 +10,7 @@ import DesignSidebar from './design-sidebar';
 import DesignCanvas from './design-canvas';
 import DesignFooter from './design-footer';
 import ViewSelector from './view-selector';
+import { toast } from 'sonner';
 
 // Types
 interface DesignObject {
@@ -60,9 +61,13 @@ interface ProductDesignerComponentProps {
   }) => void;
   onCreateCartItem?: (options: {
     variables: {
-      input: { designId: string; quantity: number };
+      createCartItemInput: {
+        designId: string;
+        quantity: number;
+      };
     };
   }) => void;
+  cartLoading?: boolean;
   designId?: string;
 }
 
@@ -71,6 +76,7 @@ export default function ProductDesigner({
   onUpload,
   onUpdatePosition,
   onCreateCartItem,
+  cartLoading,
   designId,
 }: ProductDesignerComponentProps) {
   const [view, setView] = useState('front');
@@ -80,6 +86,7 @@ export default function ProductDesigner({
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
   const [showColorDialog, setShowColorDialog] = useState(false);
   const [designsInitialized, setDesignsInitialized] = useState(false);
+  const [cartQuantity, setCartQuantity] = useState(1);
   const [designs, setDesigns] = useState<SerializedDesign>(() => {
     if (!initialDesigns) return {};
 
@@ -976,7 +983,29 @@ export default function ProductDesigner({
         </div>
       </div>
 
-      <DesignFooter />
+      <DesignFooter
+        quantity={cartQuantity}
+        onIncrement={() => setCartQuantity(prev => Math.min(prev + 1, 99))}
+        onDecrement={() => setCartQuantity(prev => Math.max(prev - 1, 1))}
+        onCreateCartItem={() => {
+          try {
+            if (onCreateCartItem && designId) {
+              onCreateCartItem({
+                variables: {
+                  createCartItemInput: {
+                    designId,
+                    quantity: cartQuantity,
+                  },
+                },
+              });
+            }
+            toast.success(`Product has been added to cart`);
+          } catch (error) {
+            toast.error(`Failed to add product to cart`);
+          }
+        }}
+        loading={cartLoading}
+      />
     </div>
   );
 }

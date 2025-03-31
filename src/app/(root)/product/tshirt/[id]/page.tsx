@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
+  useCreateCartItemMutation,
   useProductDesignByIdQuery,
   useUpdateCartItemMutation,
   useUpdateDesignPositionMutation,
@@ -24,13 +25,8 @@ export default function Page() {
     });
   const [uploadFile, { loading: uploadFileloading }] = useUploadFileMutation();
   const [updateDesignPosition] = useUpdateDesignPositionMutation();
-  const [createCartItem, { data: cartData, loading: cartLoading }] =
-    useCreateCartItemMutation({
-      variables: {
-        designId: id,
-        quantity: 1,
-      },
-    });
+  const [createCartItem, { loading: cartLoading }] =
+    useCreateCartItemMutation();
 
   const handleUploadFile = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -84,6 +80,7 @@ export default function Page() {
         onUpload={handleUploadFile}
         onUpdatePosition={updateDesignPosition}
         onCreateCartItem={createCartItem}
+        cartLoading={cartLoading}
         designId={id}
       />
     </div>
