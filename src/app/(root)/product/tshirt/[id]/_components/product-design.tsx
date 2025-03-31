@@ -58,6 +58,11 @@ interface ProductDesignerComponentProps {
       };
     };
   }) => void;
+  onCreateCartItem?: (options: {
+    variables: {
+      input: { designId: string; quantity: number };
+    };
+  }) => void;
   designId?: string;
 }
 
@@ -65,6 +70,7 @@ export default function ProductDesigner({
   initialDesigns = [],
   onUpload,
   onUpdatePosition,
+  onCreateCartItem,
   designId,
 }: ProductDesignerComponentProps) {
   const [view, setView] = useState('front');
