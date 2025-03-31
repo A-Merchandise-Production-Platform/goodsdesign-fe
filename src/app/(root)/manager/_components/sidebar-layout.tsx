@@ -1,7 +1,13 @@
 'use client';
 
 import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
-import { HomeIcon, HouseIcon, PenSquareIcon, ShoppingBag, User2Icon } from 'lucide-react';
+import {
+  HomeIcon,
+  HouseIcon,
+  PenSquareIcon,
+  ShoppingBag,
+  User2Icon,
+} from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function ManagerSidebarLayout({

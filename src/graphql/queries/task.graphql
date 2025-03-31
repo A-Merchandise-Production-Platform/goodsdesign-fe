@@ -90,7 +90,6 @@ query GetMyStaffTasks {
   }
 }
 
-
 query GetStaffTaskDetail($staffTaskId: ID!) {
   staffTask(id: $staffTaskId) {
     status

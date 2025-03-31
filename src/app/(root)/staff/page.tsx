@@ -1,7 +1,5 @@
-import MyStaffTasksPage from "./tasks/page";
+import MyStaffTasksPage from './tasks/page';
 
 export default function AdminPage() {
-  return (
-    <MyStaffTasksPage />
-  );
+  return <MyStaffTasksPage />;
 }

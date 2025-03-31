@@ -41,6 +41,14 @@ query GetCartItemCount {
   getCartItemCount
 }
 
+mutation CreateCartItem($createCartItemInput: CreateCartItemDto!) {
+  createCartItem(createCartItemInput: $createCartItemInput) {
+    userId
+    id
+    quantity
+  }
+}
+
 mutation UpdateCartItem(
   $updateCartItemId: String!
   $updateCartItemInput: UpdateCartItemDto!
@@ -50,8 +58,8 @@ mutation UpdateCartItem(
     updateCartItemInput: $updateCartItemInput
   ) {
     userId
-    quantity
     id
+    quantity
   }
 }
 
