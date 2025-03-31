@@ -52,13 +52,13 @@ export default function ProductDesigner() {
         minY: 870 * scaleFactor,
         maxY: 1180 * scaleFactor,
       },
-      'left-sleeve': {
+      'left sleeve': {
         minX: 650 * scaleFactor,
         maxX: 760 * scaleFactor,
         minY: 620 * scaleFactor,
         maxY: 720 * scaleFactor,
       },
-      'right-sleeve': {
+      'rgiht sleeve': {
         minX: 1030 * scaleFactor,
         maxX: 1140 * scaleFactor,
         minY: 620 * scaleFactor,
@@ -280,7 +280,7 @@ export default function ProductDesigner() {
     }
 
     // Get all views
-    const allViews = ['front', 'back', 'left-sleeve', 'right-sleeve'];
+    const allViews = ['front', 'back', 'left sleeve', 'rgiht sleeve'];
 
     // Prepare all images first to avoid async issues
     const imagePromises: Promise<void>[] = [];

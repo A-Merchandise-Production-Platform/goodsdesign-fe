@@ -23,7 +23,7 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
               ? '-top-190 -left-10'
               : view === 'back'
                 ? '-top-190 -left-121.5'
-                : view === 'left-sleeve'
+                : view === 'left sleeve'
                   ? '-top-110 -left-110'
                   : '-top-110 -left-205'
           }`}
@@ -32,13 +32,13 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
         </div>
 
         {/* Mask elements for different views */}
-        {(view === 'left-sleeve' || view === 'right-sleeve') && (
+        {(view === 'left sleeve' || view === 'rgiht sleeve') && (
           <div className="bg-muted absolute bottom-0 left-0 h-[11rem] w-[31rem]" />
         )}
-        {(view === 'left-sleeve' || view === 'right-sleeve') && (
+        {(view === 'left sleeve' || view === 'rgiht sleeve') && (
           <div className="bg-muted absolute top-0 left-0 h-[22rem] w-[4rem]" />
         )}
-        {(view === 'left-sleeve' || view === 'right-sleeve') && (
+        {(view === 'left sleeve' || view === 'rgiht sleeve') && (
           <div className="bg-muted absolute top-0 right-0 h-[22rem] w-[4rem]" />
         )}
 

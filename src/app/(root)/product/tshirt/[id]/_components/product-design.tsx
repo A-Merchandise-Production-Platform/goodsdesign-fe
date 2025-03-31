@@ -12,112 +12,67 @@ import { SHIRT_COLORS } from './shirt-colors';
 
 // Types
 import type { SerializedDesign } from '@/types/shirt';
-
-interface DesignObject {
-  type: string;
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-  scaleX: number;
-  scaleY: number;
-  angle: number;
-  view: string;
-  layer?: string;
-  src?: string;
-  text?: string;
-  fontSize?: number;
-  fill?: string;
-  fontFamily?: string;
-}
+import type { DesignObject } from '@/types/design-object';
 
 interface DesignPosition {
-  designId: string;
-  productPositionTypeId: string;
+  __typename?: 'DesignPositionEntity';
+  designJSON?: any[] | null;
   positionType?: {
+    __typename?: 'ProductPositionTypeEntity';
     positionName: string;
     basePrice: number;
   } | null;
-  designJSON?: any[] | null;
 }
 
-interface ProductDesignerProps {
+interface ProductDesignerComponentProps {
   initialDesigns?: DesignPosition[] | null;
 }
 
-export default function ProductDesigner({ initialDesigns }: ProductDesignerProps) {
+type ProductDesignerProps = SerializedDesign;
+
+export default function ProductDesigner({
+  initialDesigns = [],
+}: ProductDesignerComponentProps) {
   const [view, setView] = useState('front');
   const [currentTexture, setCurrentTexture] = useState<string>(
     SHIRT_COLORS[0].path,
   );
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
   const [showColorDialog, setShowColorDialog] = useState(false);
-  const [designs, setDesigns] = useState<SerializedDesign>({});
+  const [designs, setDesigns] = useState<ProductDesignerProps>(() => {
+    // Transform initialDesigns into the component's expected format
+    if (!initialDesigns) return {};
 
-  // Debug log when designs or view changes
-  useEffect(() => {
-    console.log('Current view:', view);
-    console.log('Current designs:', designs);
-  }, [designs, view]);
+    const transformedDesigns: ProductDesignerProps = {};
 
-  // Initialize designs from initialDesigns prop
-  useEffect(() => {
-    if (initialDesigns) {
-      const convertedDesigns: SerializedDesign = {};
-      let firstDesignView: string | null = null;
-      
-      initialDesigns.forEach(position => {
-        if (position.positionType && position.designJSON) {
-          // Map position names to match our view names
-          const viewNameMap: Record<string, string> = {
-            'Front': 'front',
-            'Back': 'back',
-            'Left Sleeve': 'left-sleeve',
-            'Right Sleeve': 'right-sleeve'
-          };
-          const viewName = viewNameMap[position.positionType.positionName] || position.positionType.positionName.toLowerCase();
-          // Store the first view that has designs
-          if (!firstDesignView && position.designJSON.length > 0) {
-            firstDesignView = viewName;
-          }
-          
-          // Sort designs by layer and map properties
-          const sortedDesigns = [...position.designJSON].sort((a, b) =>
-            parseInt(a.layer || '0') - parseInt(b.layer || '0')
-          );
+    initialDesigns.forEach(position => {
+      const viewName = position.positionType?.positionName.toLowerCase() || '';
+      if (!position.designJSON) return;
 
-          convertedDesigns[viewName] = sortedDesigns.map(design => ({
-            type: design.type,
-            left: design.left,
-            top: design.top,
-            width: design.width,
-            height: design.height,
-            scaleX: design.scaleX,
-            scaleY: design.scaleY,
-            angle: design.angle,
-            layer: design.layer,
-            view: viewName, // We add the view based on positionName
-            ...(design.type === 'image' && { src: design.src }),
-            ...(design.type === 'textbox' && {
-              text: design.text,
-              fontSize: design.fontSize,
-              fill: design.fill,
-              fontFamily: design.fontFamily,
-            }),
-          }));
-        }
-      });
+      const designs = position.designJSON.map(design => ({
+        type: design.type || '',
+        left: design.left || 0,
+        top: design.top || 0,
+        width: design.width || 0,
+        height: design.height || 0,
+        scaleX: design.scaleX || 1,
+        scaleY: design.scaleY || 1,
+        angle: design.angle || 0,
+        view: viewName,
+        ...(design.type === 'image' && { src: design.src }),
+        ...(design.type === 'textbox' && {
+          text: design.text || '',
+          fontSize: design.fontSize || 40,
+          fill: design.fill || '#000000',
+          fontFamily: design.fontFamily || 'Arial',
+        }),
+      })) as DesignObject[];
 
-      console.log('Converted designs:', convertedDesigns); // Debug log
-      setDesigns(convertedDesigns);
-      
-      // Set initial view to the first view that has designs
-      if (firstDesignView) {
-        console.log('Setting initial view to:', firstDesignView); // Debug log
-        setView(firstDesignView);
-      }
-    }
-  }, [initialDesigns]);
+      transformedDesigns[viewName] = designs;
+    });
+
+    return transformedDesigns;
+  });
 
   // Refs for canvas management
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -148,13 +103,13 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
         minY: 870 * scaleFactor,
         maxY: 1180 * scaleFactor,
       },
-      'left-sleeve': {
+      'left sleeve': {
         minX: 650 * scaleFactor,
         maxX: 760 * scaleFactor,
         minY: 620 * scaleFactor,
         maxY: 720 * scaleFactor,
       },
-      'right-sleeve': {
+      'rgiht sleeve': {
         minX: 1030 * scaleFactor,
         maxX: 1140 * scaleFactor,
         minY: 620 * scaleFactor,
@@ -376,7 +331,7 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
     }
 
     // Get all views
-    const allViews = ['front', 'back', 'left-sleeve', 'right-sleeve'];
+    const allViews = ['front', 'back', 'left sleeve', 'rgiht sleeve'];
 
     // Prepare all images first to avoid async issues
     const imagePromises: Promise<void>[] = [];
@@ -504,12 +459,12 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
   // Save current canvas state
   const saveCurrentDesign = () => {
     if (!fabricCanvasRef.current) return;
-  
+
     const objects = fabricCanvasRef.current.getObjects().filter(obj => {
       // Filter out design zone indicator
       return obj.get('data')?.type !== 'designZone';
     });
-  
+
     const serializedObjects = objects.map(obj => {
       const base: DesignObject = {
         type: obj.type || '',
@@ -520,10 +475,9 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
         scaleX: obj.scaleX || 1,
         scaleY: obj.scaleY || 1,
         angle: obj.angle || 0,
-        layer: obj.get('data')?.layer || '0', // Get layer from object data
-        view: obj.get('data')?.view || view,
+        view: obj.get('data')?.view || view, // Store the view this object belongs to
       };
-  
+
       if (obj instanceof fabric.Image) {
         const imgElement = obj.getElement() as HTMLImageElement;
         base.src = imgElement.src;
@@ -535,20 +489,15 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
         base.fill = typeof obj.fill === 'string' ? obj.fill : '#000000';
         base.fontFamily = obj.fontFamily || 'Arial';
       }
-  
+
       return base;
     });
-  
-    // Sort objects by layer before saving
-    const sortedObjects = serializedObjects.sort((a, b) =>
-      parseInt(a.layer || '0') - parseInt(b.layer || '0')
-    );
-  
+
     // Save to state with explicit typing
     setDesigns(prev => {
-      const newDesigns: SerializedDesign = {
+      const newDesigns: ProductDesignerProps = {
         ...prev,
-        [view]: sortedObjects,
+        [view]: serializedObjects,
       };
       return newDesigns;
     });
@@ -558,13 +507,8 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
   const loadSavedDesign = () => {
     if (!fabricCanvasRef.current) return;
 
-    console.log('Loading designs for view:', view);
     const savedDesign = designs[view];
-    if (!savedDesign) {
-      console.log('No designs found for view:', view);
-      return;
-    }
-    console.log('Found designs:', savedDesign);
+    if (!savedDesign) return;
 
     // Clear current objects except design zone
     const objects = fabricCanvasRef.current.getObjects();
@@ -574,29 +518,12 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
       }
     });
 
-    // Sort objects by layer before loading
-    const sortedDesigns = [...savedDesign].sort((a, b) =>
-      parseInt(a.layer || '0') - parseInt(b.layer || '0')
-    );
-
-    // Get design zone limits for validation
-    const limits = getDesignZoneLimits(view);
-    console.log('Design zone limits:', limits);
-
     // Load saved objects for the CURRENT view only
-    sortedDesigns.forEach((objData: DesignObject) => {
-      console.log('Loading object:', objData);
-
+    savedDesign.forEach((objData: DesignObject) => {
       if (objData.type === 'textbox' && objData.text) {
-        // Convert coordinates if needed (e.g., if they're percentages or need scaling)
-        const left = objData.left;
-        const top = objData.top;
-
-        console.log('Creating text object at:', { left, top });
-        
         const text = new fabric.IText(objData.text, {
-          left,
-          top,
+          left: objData.left,
+          top: objData.top,
           fontSize: objData.fontSize,
           fill: objData.fill,
           fontFamily: objData.fontFamily,
@@ -604,11 +531,8 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
           scaleY: objData.scaleY,
           angle: objData.angle,
         });
-        // Store the view and layer with the object
-        text.set('data', {
-          view: objData.view || view,
-          layer: objData.layer || '0'
-        });
+        // Store the view with the object
+        text.set('data', { view: objData.view || view });
 
         // Apply clip path for the CURRENT view
         applyClipPathToObject(text, view);
@@ -625,11 +549,8 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
             scaleY: objData.scaleY,
             angle: objData.angle,
           });
-          // Store the view and layer with the object
-          fabricImage.set('data', {
-            view: objData.view || view,
-            layer: objData.layer || '0'
-          });
+          // Store the view with the object
+          fabricImage.set('data', { view: objData.view || view });
 
           // Apply clip path for the CURRENT view
           applyClipPathToObject(fabricImage, view);
@@ -646,8 +567,6 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
 
   // Initialize Fabric.js canvas
   useEffect(() => {
-    console.log(designs);
-
     if (!canvasRef.current) return;
 
     // Clean up previous canvas if it exists
@@ -729,16 +648,12 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
     };
   }, [view, currentTexture]);
 
-  // Load saved design when view changes or designs are updated
+  // Load saved design when view changes
   useEffect(() => {
-    console.log('Loading designs for view:', view);
-    console.log('Available designs:', designs);
-    if (fabricCanvasRef.current && designs[view]) {
-      loadSavedDesign();
-      // Update the 3D model with all designs after loading the current view
-      setTimeout(() => debounceTextureUpdate(), 100);
-    }
-  }, [view, designs]);
+    loadSavedDesign();
+    // Update the 3D model with all designs after loading the current view
+    setTimeout(() => debounceTextureUpdate(), 100);
+  }, [view]);
 
   // Update canvas when view changes
   useEffect(() => {
@@ -797,14 +712,9 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
             limits.minY + (maxHeight - (fabricImage.height ?? 0) * scale) / 2,
         });
 
-        // Get the highest layer number from existing designs
-        const currentDesigns = designs[view] || [];
-        const highestLayer = Math.max(0, ...currentDesigns.map(d => parseInt(d.layer || '0')));
-        const newLayer = (highestLayer + 1).toString();
-    
-        // Store the current view and layer with the image
-        fabricImage.set('data', { view: view, layer: newLayer });
-    
+        // Store the current view with the image
+        fabricImage.set('data', { view: view });
+
         // Apply Clipping Path
         applyClipPathToObject(fabricImage, view);
 
@@ -863,13 +773,8 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
       evented: true,
     });
 
-    // Get the highest layer number from existing designs
-    const currentDesigns = designs[view] || [];
-    const highestLayer = Math.max(0, ...currentDesigns.map(d => parseInt(d.layer || '0')));
-    const newLayer = (highestLayer + 1).toString();
-
-    // Store the current view and layer with the text object
-    text.set('data', { view: view, layer: newLayer });
+    // Store the current view with the text object
+    text.set('data', { view: view });
 
     // Apply Clipping Path
     applyClipPathToObject(text, view);
@@ -924,16 +829,10 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
             const [removed] = currentDesigns.splice(startIndex, 1);
             currentDesigns.splice(endIndex, 0, removed);
 
-            // Update layer numbers based on new order
-            const updatedDesigns = currentDesigns.map((design, index) => ({
-              ...design,
-              layer: (index + 1).toString()
-            }));
-
             // Update state
             setDesigns(prev => ({
               ...prev,
-              [view]: updatedDesigns,
+              [view]: currentDesigns,
             }));
 
             // Re-render canvas with new order
@@ -958,10 +857,7 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
                   scaleY: design.scaleY,
                   angle: design.angle,
                 });
-                text.set('data', {
-                  view: design.view,
-                  layer: (design.layer || '0')
-                });
+                text.set('data', { view: design.view });
                 applyClipPathToObject(text, view);
                 canvas.add(text);
               } else if (design.type === 'image' && design.src) {
@@ -976,10 +872,7 @@ export default function ProductDesigner({ initialDesigns }: ProductDesignerProps
                     scaleY: design.scaleY,
                     angle: design.angle,
                   });
-                  fabricImage.set('data', {
-                    view: design.view,
-                    layer: (design.layer || '0')
-                  });
+                  fabricImage.set('data', { view: design.view });
                   applyClipPathToObject(fabricImage, view);
                   canvas.add(fabricImage);
                   canvas.renderAll();

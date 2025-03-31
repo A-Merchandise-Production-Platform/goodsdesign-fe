@@ -1,4 +1,8 @@
-import { ShirtColor } from '@/types/shirt';
+interface ShirtColor {
+  name: string;
+  path: string;
+  color: string;
+}
 
 export const SHIRT_COLORS: ShirtColor[] = [
   { name: 'White', path: '/models/shirt/white.png', color: '#ffffff' },

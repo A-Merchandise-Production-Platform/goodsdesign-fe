@@ -1,9 +1,0 @@
-mutation UpdateDesignPosition($input: UpdateDesignPositionDto!) {
-  updateDesignPosition(input: $input) {
-    positionType {
-      positionName
-      basePrice
-    }
-    designJSON
-  }
-}

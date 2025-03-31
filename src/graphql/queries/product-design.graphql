@@ -8,8 +8,6 @@ query ProductDesignById($productDesignId: ID!) {
       model
     }
     designPositions {
-      designId
-      productPositionTypeId
       positionType {
         positionName
         basePrice

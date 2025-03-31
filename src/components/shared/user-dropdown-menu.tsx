@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  LockKeyholeIcon,
-  LogOut,
-  Settings,
-  ShoppingBag,
-  User,
-} from 'lucide-react';
+import { LockKeyholeIcon, LogOut, Settings, User } from 'lucide-react';
 import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -68,12 +62,6 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
           <DropdownMenuItem>
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
-          </DropdownMenuItem>
-        </Link>
-        <Link href={'/my-orders'}>
-          <DropdownMenuItem>
-            <ShoppingBag className="mr-2 h-4 w-4" />
-            <span>My Order</span>
           </DropdownMenuItem>
         </Link>
         {isAuth && user.role.toUpperCase() === 'ADMIN' && (

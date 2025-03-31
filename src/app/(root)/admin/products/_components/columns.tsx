@@ -13,7 +13,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { type Product } from './product-table';
-import Link from 'next/link';
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -68,9 +67,6 @@ export const columns: ColumnDef<Product>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <Link href={`/admin/products/${product.id}`}>
-              <DropdownMenuItem>View Details</DropdownMenuItem>
-            </Link>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(product.id)}
             >
