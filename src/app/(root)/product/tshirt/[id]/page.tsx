@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
+  useCreateCartItemMutation,
   useProductDesignByIdQuery,
+  useUpdateCartItemMutation,
   useUpdateDesignPositionMutation,
 } from '@/graphql/generated/graphql';
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
@@ -23,6 +25,8 @@ export default function Page() {
     });
   const [uploadFile, { loading: uploadFileloading }] = useUploadFileMutation();
   const [updateDesignPosition] = useUpdateDesignPositionMutation();
+  const [createCartItem, { loading: cartLoading }] =
+    useCreateCartItemMutation();
 
   const handleUploadFile = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -75,6 +79,8 @@ export default function Page() {
         initialDesigns={proDesData?.productDesign?.designPositions}
         onUpload={handleUploadFile}
         onUpdatePosition={updateDesignPosition}
+        onCreateCartItem={createCartItem}
+        cartLoading={cartLoading}
         designId={id}
       />
     </div>
