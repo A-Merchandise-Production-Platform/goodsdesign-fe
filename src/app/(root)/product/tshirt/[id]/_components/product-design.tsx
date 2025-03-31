@@ -26,12 +26,14 @@ interface DesignPosition {
 
 interface ProductDesignerComponentProps {
   initialDesigns?: DesignPosition[] | null;
+  onUpload?: (event: React.ChangeEvent<HTMLInputElement>) => Promise<string | null | undefined>;
 }
 
 type ProductDesignerProps = SerializedDesign;
 
 export default function ProductDesigner({
   initialDesigns = [],
+  onUpload,
 }: ProductDesignerComponentProps) {
   const [view, setView] = useState('front');
   const [currentTexture, setCurrentTexture] = useState<string>(
@@ -40,7 +42,6 @@ export default function ProductDesigner({
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
   const [showColorDialog, setShowColorDialog] = useState(false);
   const [designs, setDesigns] = useState<ProductDesignerProps>(() => {
-    // Transform initialDesigns into the component's expected format
     if (!initialDesigns) return {};
 
     const transformedDesigns: ProductDesignerProps = {};
@@ -674,7 +675,7 @@ export default function ProductDesigner({
   }, [designs]);
 
   // Handle image upload
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (
       !e.target.files ||
       e.target.files.length === 0 ||
@@ -682,59 +683,71 @@ export default function ProductDesigner({
     )
       return;
 
-    const file = e.target.files[0];
-    const reader = new FileReader();
+    let imageUrl: string;
 
-    reader.onload = event => {
-      if (!event.target?.result) return;
+    if (onUpload) {
+      // Use the provided upload handler
+      const uploadedUrl = await onUpload(e);
+      if (!uploadedUrl) {
+        e.target.value = '';
+        return;
+      }
+      imageUrl = uploadedUrl;
+    } else {
+      // Fallback to local handling
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      imageUrl = await new Promise((resolve) => {
+        reader.onload = event => resolve(event.target?.result?.toString() || '');
+        reader.readAsDataURL(file);
+      });
+    }
 
-      const imageElement = new Image();
-      imageElement.crossOrigin = 'anonymous';
-      imageElement.src = event.target.result.toString();
+    const imageElement = new Image();
+    imageElement.crossOrigin = 'anonymous';
+    imageElement.src = imageUrl;
 
-      imageElement.onload = () => {
-        const fabricImage = new fabric.Image(imageElement);
-        const limits = getDesignZoneLimits(view);
-        const maxWidth = limits.maxX - limits.minX;
-        const maxHeight = limits.maxY - limits.minY;
+    imageElement.onload = () => {
+      const fabricImage = new fabric.Image(imageElement);
+      const limits = getDesignZoneLimits(view);
+      const maxWidth = limits.maxX - limits.minX;
+      const maxHeight = limits.maxY - limits.minY;
 
-        // Scale image to fit the design zone while maintaining aspect ratio
-        const scale = Math.min(
-          maxWidth / (fabricImage.width ?? 1),
-          maxHeight / (fabricImage.height ?? 1),
-        );
+      // Scale image to fit the design zone while maintaining aspect ratio
+      const scale = Math.min(
+        maxWidth / (fabricImage.width ?? 1),
+        maxHeight / (fabricImage.height ?? 1),
+      );
 
-        fabricImage.set({
-          scaleX: scale,
-          scaleY: scale,
-          left: limits.minX + (maxWidth - (fabricImage.width ?? 0) * scale) / 2,
-          top:
-            limits.minY + (maxHeight - (fabricImage.height ?? 0) * scale) / 2,
-        });
+      fabricImage.set({
+        scaleX: scale,
+        scaleY: scale,
+        left: limits.minX + (maxWidth - (fabricImage.width ?? 0) * scale) / 2,
+        top:
+          limits.minY + (maxHeight - (fabricImage.height ?? 0) * scale) / 2,
+      });
 
-        // Store the current view with the image
-        fabricImage.set('data', { view: view });
+      // Store the current view with the image
+      fabricImage.set('data', { view: view });
 
-        // Apply Clipping Path
-        applyClipPathToObject(fabricImage, view);
+      // Apply Clipping Path
+      applyClipPathToObject(fabricImage, view);
 
-        // If object is fully outside, remove it
-        if (isObjectFullyOutside(fabricImage, view)) {
-          return;
-        }
+      // If object is fully outside, remove it
+      if (isObjectFullyOutside(fabricImage, view)) {
+        return;
+      }
 
-        // Add image to canvas
-        fabricCanvasRef.current?.add(fabricImage);
-        fabricCanvasRef.current?.setActiveObject(fabricImage);
-        fabricCanvasRef.current?.renderAll();
+      // Add image to canvas
+      fabricCanvasRef.current?.add(fabricImage);
+      fabricCanvasRef.current?.setActiveObject(fabricImage);
+      fabricCanvasRef.current?.renderAll();
 
-        // Save the design and update the 3D model
-        saveCurrentDesign();
-        debounceTextureUpdate();
-      };
+      // Save the design and update the 3D model
+      saveCurrentDesign();
+      debounceTextureUpdate();
     };
 
-    reader.readAsDataURL(file);
     e.target.value = '';
   };
 
