@@ -664,13 +664,10 @@ export default function ProductDesigner({
     };
   }, [view, currentTexture]);
 
-  // Load saved design and update canvas when view changes
+  // Load saved design when view changes
   useEffect(() => {
     if (!fabricCanvasRef.current) return;
-
-    // Then load the saved design and update 3D model
     loadSavedDesign();
-    setTimeout(() => debounceTextureUpdate(), 100);
   }, [view]);
 
   // Update 3D model when designs change
@@ -773,7 +770,6 @@ export default function ProductDesigner({
       fabricCanvasRef.current?.renderAll();
       // Save the design and trigger texture update
       // Note: debounceTextureUpdate already includes saveCurrentDesign
-      debounceTextureUpdate();
       debounceTextureUpdate();
     };
 
