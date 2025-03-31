@@ -53,9 +53,7 @@ const formSchema = z.object({
 });
 
 export default function AddProductForm() {
-  const [createProduct, { loading }] = useCreateProductMutation({
-    refetchQueries: ['GetAllProducts'],
-  });
+  const [createProduct, { loading }] = useCreateProductMutation();
   const { data: categoriesData } = useGetAllCategoriesQuery();
   const [isOpen, setIsOpen] = useState(false);
 

@@ -1,6 +1,8 @@
 'use client';
 
 import BanksManagement from '@/app/(root)/admin/system/_components/banks-management';
+import ColorsManagement from '@/app/(root)/admin/system/_components/colors-management';
+import SizesManagement from '@/app/(root)/admin/system/_components/sizes-management';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Page() {
@@ -14,6 +16,12 @@ export default function Page() {
         </TabsList>
         <TabsContent value="banks">
           <BanksManagement />
+        </TabsContent>
+        <TabsContent value="colors">
+          <ColorsManagement />
+        </TabsContent>
+        <TabsContent value="sizes">
+          <SizesManagement />
         </TabsContent>
       </Tabs>
     </div>
