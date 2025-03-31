@@ -117,10 +117,11 @@ export default function RootLayout({
                 <main className="container mx-auto pt-16">
                   <Header />
                   {children}
-                  {/* <Footer /> */}
+                  <Footer />
                 </main>
               </ScrollArea>
             </AuthProvider>
+
             <Toaster richColors position="bottom-right" />
           </ThemeProvider>
         </ApolloClientProvider>

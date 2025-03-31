@@ -16,8 +16,8 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({ view, onViewChange }) => {
       <TabsList className="z-40 w-full justify-start rounded-none">
         <TabsTrigger value="front">Front</TabsTrigger>
         <TabsTrigger value="back">Back</TabsTrigger>
-        <TabsTrigger value="left-sleeve">Left sleeve</TabsTrigger>
-        <TabsTrigger value="right-sleeve">Right sleeve</TabsTrigger>
+        <TabsTrigger value="left sleeve">Left sleeve</TabsTrigger>
+        <TabsTrigger value="right sleeve">Right sleeve</TabsTrigger>
       </TabsList>
     </Tabs>
   );

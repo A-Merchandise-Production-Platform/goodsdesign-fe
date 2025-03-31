@@ -14,14 +14,81 @@ import { SHIRT_COLORS } from './shirt-colors';
 import type { SerializedDesign } from '@/types/shirt';
 import type { DesignObject } from '@/types/design-object';
 
-export default function ProductDesigner() {
+interface DesignPosition {
+  __typename?: 'DesignPositionEntity';
+  designJSON?: any[] | null;
+  positionType?: {
+    __typename?: 'ProductPositionTypeEntity';
+    id: string;
+    positionName: string;
+    basePrice: number;
+  } | null;
+}
+
+interface ProductDesignerComponentProps {
+  initialDesigns?: DesignPosition[] | null;
+  onUpload?: (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => Promise<string | null | undefined>;
+  onUpdatePosition?: (options: {
+    variables: {
+      input: {
+        designId: string;
+        productPositionTypeId: string;
+        designJSON: any;
+      };
+    };
+  }) => void;
+  designId?: string;
+}
+
+type ProductDesignerProps = SerializedDesign;
+
+export default function ProductDesigner({
+  initialDesigns = [],
+  onUpload,
+  onUpdatePosition,
+  designId,
+}: ProductDesignerComponentProps) {
   const [view, setView] = useState('front');
   const [currentTexture, setCurrentTexture] = useState<string>(
     SHIRT_COLORS[0].path,
   );
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
   const [showColorDialog, setShowColorDialog] = useState(false);
-  const [designs, setDesigns] = useState<SerializedDesign>({});
+  const [designs, setDesigns] = useState<ProductDesignerProps>(() => {
+    if (!initialDesigns) return {};
+
+    const transformedDesigns: ProductDesignerProps = {};
+
+    initialDesigns.forEach(position => {
+      const viewName = position.positionType?.positionName.toLowerCase() || '';
+      if (!position.designJSON) return;
+
+      const designs = position.designJSON.map(design => ({
+        type: design.type || '',
+        left: design.left || 0,
+        top: design.top || 0,
+        width: design.width || 0,
+        height: design.height || 0,
+        scaleX: design.scaleX || 1,
+        scaleY: design.scaleY || 1,
+        angle: design.angle || 0,
+        view: viewName,
+        ...(design.type === 'image' && { src: design.src }),
+        ...(design.type === 'textbox' && {
+          text: design.text || '',
+          fontSize: design.fontSize || 40,
+          fill: design.fill || '#000000',
+          fontFamily: design.fontFamily || 'Arial',
+        }),
+      })) as DesignObject[];
+
+      transformedDesigns[viewName] = designs;
+    });
+
+    return transformedDesigns;
+  });
 
   // Refs for canvas management
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -52,13 +119,13 @@ export default function ProductDesigner() {
         minY: 870 * scaleFactor,
         maxY: 1180 * scaleFactor,
       },
-      'left-sleeve': {
+      'left sleeve': {
         minX: 650 * scaleFactor,
         maxX: 760 * scaleFactor,
         minY: 620 * scaleFactor,
         maxY: 720 * scaleFactor,
       },
-      'right-sleeve': {
+      'right sleeve': {
         minX: 1030 * scaleFactor,
         maxX: 1140 * scaleFactor,
         minY: 620 * scaleFactor,
@@ -280,7 +347,7 @@ export default function ProductDesigner() {
     }
 
     // Get all views
-    const allViews = ['front', 'back', 'left-sleeve', 'right-sleeve'];
+    const allViews = ['front', 'back', 'left sleeve', 'right sleeve'];
 
     // Prepare all images first to avoid async issues
     const imagePromises: Promise<void>[] = [];
@@ -444,7 +511,7 @@ export default function ProductDesigner() {
 
     // Save to state with explicit typing
     setDesigns(prev => {
-      const newDesigns: SerializedDesign = {
+      const newDesigns: ProductDesignerProps = {
         ...prev,
         [view]: serializedObjects,
       };
@@ -516,8 +583,6 @@ export default function ProductDesigner() {
 
   // Initialize Fabric.js canvas
   useEffect(() => {
-    console.log(designs);
-
     if (!canvasRef.current) return;
 
     // Clean up previous canvas if it exists
@@ -601,31 +666,42 @@ export default function ProductDesigner() {
 
   // Load saved design when view changes
   useEffect(() => {
-    loadSavedDesign();
-    // Update the 3D model with all designs after loading the current view
-    setTimeout(() => debounceTextureUpdate(), 100);
-  }, [view]);
-
-  // Update canvas when view changes
-  useEffect(() => {
     if (!fabricCanvasRef.current) return;
-
-    // Update background texture
-    loadBackgroundTexture(currentTexture);
-
-    // Update design zone indicator
-    addDesignZoneIndicator(view);
+    loadSavedDesign();
   }, [view]);
 
   // Update 3D model when designs change
   useEffect(() => {
     if (Object.keys(designs).length > 0) {
       debounceTextureUpdate();
+
+      // Find the current position type for this view
+      const currentPosition = initialDesigns?.find(
+        position => position?.positionType?.positionName.toLowerCase() === view,
+      );
+
+      // Update position if we have all required data
+      if (
+        onUpdatePosition &&
+        designId &&
+        currentPosition?.positionType?.id &&
+        designs[view]
+      ) {
+        onUpdatePosition({
+          variables: {
+            input: {
+              designId: designId,
+              productPositionTypeId: currentPosition.positionType.id,
+              designJSON: designs[view],
+            },
+          },
+        });
+      }
     }
   }, [designs]);
 
   // Handle image upload
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (
       !e.target.files ||
       e.target.files.length === 0 ||
@@ -633,59 +709,70 @@ export default function ProductDesigner() {
     )
       return;
 
-    const file = e.target.files[0];
-    const reader = new FileReader();
+    let imageUrl: string;
 
-    reader.onload = event => {
-      if (!event.target?.result) return;
+    if (onUpload) {
+      // Use the provided upload handler
+      const uploadedUrl = await onUpload(e);
+      if (!uploadedUrl) {
+        e.target.value = '';
+        return;
+      }
+      imageUrl = uploadedUrl;
+    } else {
+      // Fallback to local handling
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      imageUrl = await new Promise(resolve => {
+        reader.onload = event =>
+          resolve(event.target?.result?.toString() || '');
+        reader.readAsDataURL(file);
+      });
+    }
 
-      const imageElement = new Image();
-      imageElement.crossOrigin = 'anonymous';
-      imageElement.src = event.target.result.toString();
+    const imageElement = new Image();
+    imageElement.crossOrigin = 'anonymous';
+    imageElement.src = imageUrl;
 
-      imageElement.onload = () => {
-        const fabricImage = new fabric.Image(imageElement);
-        const limits = getDesignZoneLimits(view);
-        const maxWidth = limits.maxX - limits.minX;
-        const maxHeight = limits.maxY - limits.minY;
+    imageElement.onload = () => {
+      const fabricImage = new fabric.Image(imageElement);
+      const limits = getDesignZoneLimits(view);
+      const maxWidth = limits.maxX - limits.minX;
+      const maxHeight = limits.maxY - limits.minY;
 
-        // Scale image to fit the design zone while maintaining aspect ratio
-        const scale = Math.min(
-          maxWidth / (fabricImage.width ?? 1),
-          maxHeight / (fabricImage.height ?? 1),
-        );
+      // Scale image to fit the design zone while maintaining aspect ratio
+      const scale = Math.min(
+        maxWidth / (fabricImage.width ?? 1),
+        maxHeight / (fabricImage.height ?? 1),
+      );
 
-        fabricImage.set({
-          scaleX: scale,
-          scaleY: scale,
-          left: limits.minX + (maxWidth - (fabricImage.width ?? 0) * scale) / 2,
-          top:
-            limits.minY + (maxHeight - (fabricImage.height ?? 0) * scale) / 2,
-        });
+      fabricImage.set({
+        scaleX: scale,
+        scaleY: scale,
+        left: limits.minX + (maxWidth - (fabricImage.width ?? 0) * scale) / 2,
+        top: limits.minY + (maxHeight - (fabricImage.height ?? 0) * scale) / 2,
+      });
 
-        // Store the current view with the image
-        fabricImage.set('data', { view: view });
+      // Store the current view with the image
+      fabricImage.set('data', { view: view });
 
-        // Apply Clipping Path
-        applyClipPathToObject(fabricImage, view);
+      // Apply Clipping Path
+      applyClipPathToObject(fabricImage, view);
 
-        // If object is fully outside, remove it
-        if (isObjectFullyOutside(fabricImage, view)) {
-          return;
-        }
+      // If object is fully outside, remove it
+      if (isObjectFullyOutside(fabricImage, view)) {
+        return;
+      }
 
-        // Add image to canvas
-        fabricCanvasRef.current?.add(fabricImage);
-        fabricCanvasRef.current?.setActiveObject(fabricImage);
-        fabricCanvasRef.current?.renderAll();
-
-        // Save the design and update the 3D model
-        saveCurrentDesign();
-        debounceTextureUpdate();
-      };
+      // Add image to canvas
+      fabricCanvasRef.current?.add(fabricImage);
+      fabricCanvasRef.current?.setActiveObject(fabricImage);
+      fabricCanvasRef.current?.renderAll();
+      // Save the design and trigger texture update
+      // Note: debounceTextureUpdate already includes saveCurrentDesign
+      debounceTextureUpdate();
     };
 
-    reader.readAsDataURL(file);
     e.target.value = '';
   };
 
@@ -740,20 +827,12 @@ export default function ProductDesigner() {
   };
 
   const handleColorChange = (texturePath: string) => {
-    // Save current design before changing color
-    saveCurrentDesign();
     setCurrentTexture(texturePath);
     setShowColorDialog(false);
-    // Load saved design after changing color
-    setTimeout(() => loadSavedDesign(), 0);
   };
 
   const handleViewChange = (newView: string) => {
-    // Save current design before switching view
-    saveCurrentDesign();
-    // Update texture
-    setCurrentTexture(currentTexture);
-    // Update view
+    // Just update the view, useEffect will handle loading the saved design
     setView(newView);
   };
 
