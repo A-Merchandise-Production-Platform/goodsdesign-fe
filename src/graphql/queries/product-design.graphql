@@ -9,6 +9,7 @@ query ProductDesignById($productDesignId: ID!) {
     }
     designPositions {
       positionType {
+        id
         positionName
         basePrice
       }
@@ -37,6 +38,7 @@ mutation UpdateProductDesign(
     }
     designPositions {
       positionType {
+        id
         positionName
         basePrice
       }

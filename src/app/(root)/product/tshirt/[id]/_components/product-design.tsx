@@ -19,6 +19,7 @@ interface DesignPosition {
   designJSON?: any[] | null;
   positionType?: {
     __typename?: 'ProductPositionTypeEntity';
+    id: string;
     positionName: string;
     basePrice: number;
   } | null;
@@ -29,6 +30,16 @@ interface ProductDesignerComponentProps {
   onUpload?: (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => Promise<string | null | undefined>;
+  onUpdatePosition?: (options: {
+    variables: {
+      input: {
+        designId: string;
+        productPositionTypeId: string;
+        designJSON: any;
+      };
+    };
+  }) => void;
+  designId?: string;
 }
 
 type ProductDesignerProps = SerializedDesign;
@@ -36,6 +47,8 @@ type ProductDesignerProps = SerializedDesign;
 export default function ProductDesigner({
   initialDesigns = [],
   onUpload,
+  onUpdatePosition,
+  designId,
 }: ProductDesignerComponentProps) {
   const [view, setView] = useState('front');
   const [currentTexture, setCurrentTexture] = useState<string>(
@@ -673,6 +686,24 @@ export default function ProductDesigner({
   useEffect(() => {
     if (Object.keys(designs).length > 0) {
       debounceTextureUpdate();
+
+      // Find the current position type for this view
+      const currentPosition = initialDesigns?.find(
+        position => position?.positionType?.positionName.toLowerCase() === view
+      );
+
+      // Update position if we have all required data
+      if (onUpdatePosition && designId && currentPosition?.positionType?.id && designs[view]) {
+        onUpdatePosition({
+          variables: {
+            input: {
+              designId: designId,
+              productPositionTypeId: currentPosition.positionType.id,
+              designJSON: designs[view]
+            },
+          },
+        });
+      }
     }
   }, [designs]);
 
