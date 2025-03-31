@@ -1,26 +1,12 @@
-import React from 'react';
+import { useState } from 'react';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { LayerItem } from './layer-item';
-import { DesignObject } from '@/types/design-object';
-import { Layers } from 'lucide-react';
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from '@hello-pangea/dnd';
+import { DesignObject } from '../_types/design-object';
+import { ImageIcon, Type } from 'lucide-react';
 
 interface LayersPanelProps {
   designs: DesignObject[];
@@ -28,54 +14,50 @@ interface LayersPanelProps {
 }
 
 export function LayersPanel({ designs, onReorder }: LayersPanelProps) {
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      const oldIndex = Number(active.id);
-      const newIndex = Number(over.id);
-      onReorder(oldIndex, newIndex);
-    }
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    onReorder(result.source.index, result.destination.index);
   };
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <button className="text-muted-foreground hover:bg-primary/5 dark:hover:bg-muted block w-full cursor-pointer rounded-md px-3 py-2 text-sm">
-          <div className="flex w-full items-center gap-2">
-            <Layers className="size-4" />
-            <div>Layers</div>
-          </div>
-        </button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="start">
-        <div className="space-y-1 p-2">
-          <div className="px-2 py-1 text-sm font-medium">Layers</div>
-          <div className="space-y-1">
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={designs.map((_, index) => index)}
-                strategy={verticalListSortingStrategy}
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <Droppable droppableId="layers">
+        {(provided) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            className="space-y-2"
+          >
+            {designs.map((design, index) => (
+              <Draggable
+                key={design.layer}
+                draggableId={design.layer || index.toString()}
+                index={index}
               >
-                {designs.map((design, index) => (
-                  <LayerItem key={index} id={index} designObject={design} />
-                ))}
-              </SortableContext>
-            </DndContext>
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    className="flex items-center gap-2 rounded-lg border border-border bg-card p-2"
+                  >
+                    {design.type === 'image' ? (
+                      <ImageIcon className="h-4 w-4" />
+                    ) : (
+                      <Type className="h-4 w-4" />
+                    )}
+                    <span className="text-sm">
+                      {design.type === 'image'
+                        ? 'Image'
+                        : design.text || 'Text'}
+                    </span>
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
           </div>
-        </div>
-      </PopoverContent>
-    </Popover>
+        )}
+      </Droppable>
+    </DragDropContext>
   );
-}

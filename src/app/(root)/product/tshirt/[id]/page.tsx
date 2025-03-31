@@ -16,7 +16,7 @@ export default function Page() {
 
   return (
     <div>
-      <ProductDesigner />
+      <ProductDesigner initialDesigns={prodesData?.productDesign?.designPositions} />
     </div>
   );
 }
