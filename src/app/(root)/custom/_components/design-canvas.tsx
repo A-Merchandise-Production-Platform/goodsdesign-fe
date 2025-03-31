@@ -32,13 +32,13 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
         </div>
 
         {/* Mask elements for different views */}
-        {(view === 'left sleeve' || view === 'rgiht sleeve') && (
+        {(view === 'left sleeve' || view === 'right sleeve') && (
           <div className="bg-muted absolute bottom-0 left-0 h-[11rem] w-[31rem]" />
         )}
-        {(view === 'left sleeve' || view === 'rgiht sleeve') && (
+        {(view === 'left sleeve' || view === 'right sleeve') && (
           <div className="bg-muted absolute top-0 left-0 h-[22rem] w-[4rem]" />
         )}
-        {(view === 'left sleeve' || view === 'rgiht sleeve') && (
+        {(view === 'left sleeve' || view === 'right sleeve') && (
           <div className="bg-muted absolute top-0 right-0 h-[22rem] w-[4rem]" />
         )}
 

@@ -125,7 +125,7 @@ export default function ProductDesigner({
         minY: 620 * scaleFactor,
         maxY: 720 * scaleFactor,
       },
-      'rgiht sleeve': {
+      'right sleeve': {
         minX: 1030 * scaleFactor,
         maxX: 1140 * scaleFactor,
         minY: 620 * scaleFactor,
@@ -347,7 +347,7 @@ export default function ProductDesigner({
     }
 
     // Get all views
-    const allViews = ['front', 'back', 'left sleeve', 'rgiht sleeve'];
+    const allViews = ['front', 'back', 'left sleeve', 'right sleeve'];
 
     // Prepare all images first to avoid async issues
     const imagePromises: Promise<void>[] = [];
@@ -664,22 +664,13 @@ export default function ProductDesigner({
     };
   }, [view, currentTexture]);
 
-  // Load saved design when view changes
-  useEffect(() => {
-    loadSavedDesign();
-    // Update the 3D model with all designs after loading the current view
-    setTimeout(() => debounceTextureUpdate(), 100);
-  }, [view]);
-
-  // Update canvas when view changes
+  // Load saved design and update canvas when view changes
   useEffect(() => {
     if (!fabricCanvasRef.current) return;
 
-    // Update background texture
-    loadBackgroundTexture(currentTexture);
-
-    // Update design zone indicator
-    addDesignZoneIndicator(view);
+    // Then load the saved design and update 3D model
+    loadSavedDesign();
+    setTimeout(() => debounceTextureUpdate(), 100);
   }, [view]);
 
   // Update 3D model when designs change
@@ -780,9 +771,9 @@ export default function ProductDesigner({
       fabricCanvasRef.current?.add(fabricImage);
       fabricCanvasRef.current?.setActiveObject(fabricImage);
       fabricCanvasRef.current?.renderAll();
-
-      // Save the design and update the 3D model
-      saveCurrentDesign();
+      // Save the design and trigger texture update
+      // Note: debounceTextureUpdate already includes saveCurrentDesign
+      debounceTextureUpdate();
       debounceTextureUpdate();
     };
 
@@ -840,20 +831,12 @@ export default function ProductDesigner({
   };
 
   const handleColorChange = (texturePath: string) => {
-    // Save current design before changing color
-    saveCurrentDesign();
     setCurrentTexture(texturePath);
     setShowColorDialog(false);
-    // Load saved design after changing color
-    setTimeout(() => loadSavedDesign(), 0);
   };
 
   const handleViewChange = (newView: string) => {
-    // Save current design before switching view
-    saveCurrentDesign();
-    // Update texture
-    setCurrentTexture(currentTexture);
-    // Update view
+    // Just update the view, useEffect will handle loading the saved design
     setView(newView);
   };
 

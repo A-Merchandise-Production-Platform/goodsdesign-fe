@@ -58,7 +58,7 @@ export default function ProductDesigner() {
         minY: 620 * scaleFactor,
         maxY: 720 * scaleFactor,
       },
-      'rgiht sleeve': {
+      'right sleeve': {
         minX: 1030 * scaleFactor,
         maxX: 1140 * scaleFactor,
         minY: 620 * scaleFactor,
@@ -280,7 +280,7 @@ export default function ProductDesigner() {
     }
 
     // Get all views
-    const allViews = ['front', 'back', 'left sleeve', 'rgiht sleeve'];
+    const allViews = ['front', 'back', 'left sleeve', 'right sleeve'];
 
     // Prepare all images first to avoid async issues
     const imagePromises: Promise<void>[] = [];
