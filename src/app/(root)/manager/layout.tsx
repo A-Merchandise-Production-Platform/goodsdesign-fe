@@ -1,0 +1,20 @@
+import ManagerGuardProvider from '@/providers/manager-guard-provider';
+import { Metadata } from 'next';
+import ManagerSidebarLayout from './_components/sidebar-layout';
+
+export const metadata: Metadata = {
+  title: 'Admin',
+  description: 'Admin panel',
+};
+
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <ManagerGuardProvider>
+      <ManagerSidebarLayout>{children}</ManagerSidebarLayout>
+    </ManagerGuardProvider>
+  );
+}
