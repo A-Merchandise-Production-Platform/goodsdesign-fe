@@ -689,17 +689,22 @@ export default function ProductDesigner({
 
       // Find the current position type for this view
       const currentPosition = initialDesigns?.find(
-        position => position?.positionType?.positionName.toLowerCase() === view
+        position => position?.positionType?.positionName.toLowerCase() === view,
       );
 
       // Update position if we have all required data
-      if (onUpdatePosition && designId && currentPosition?.positionType?.id && designs[view]) {
+      if (
+        onUpdatePosition &&
+        designId &&
+        currentPosition?.positionType?.id &&
+        designs[view]
+      ) {
         onUpdatePosition({
           variables: {
             input: {
               designId: designId,
               productPositionTypeId: currentPosition.positionType.id,
-              designJSON: designs[view]
+              designJSON: designs[view],
             },
           },
         });
