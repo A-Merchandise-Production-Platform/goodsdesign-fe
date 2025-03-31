@@ -92,6 +92,22 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
             </DropdownMenuItem>
           </Link>
         )}
+        {isAuth && user.role.toUpperCase() === 'STAFF' && (
+          <Link href={'/staff'}>
+            <DropdownMenuItem>
+              <LockKeyholeIcon className="mr-2 h-4 w-4" />
+              <span>Staff Dashboard</span>
+            </DropdownMenuItem>
+          </Link>
+        )}
+         {isAuth && user.role.toUpperCase() === 'MANAGER' && (
+          <Link href={'/manager'}>
+            <DropdownMenuItem>
+              <LockKeyholeIcon className="mr-2 h-4 w-4" />
+              <span>Manager Dashboard</span>
+            </DropdownMenuItem>
+          </Link>
+        )}
         <DropdownMenuItem>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>

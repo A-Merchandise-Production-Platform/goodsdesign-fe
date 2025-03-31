@@ -1,7 +1,7 @@
 'use client';
 
 import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
-import { HomeIcon, ShoppingBag } from 'lucide-react';
+import { HomeIcon, HouseIcon, PenSquareIcon, ShoppingBag } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function ManagerSidebarLayout({
@@ -12,14 +12,24 @@ export default function ManagerSidebarLayout({
   const pathname = usePathname();
   const navItems: NavItem[] = [
     {
-      href: '/factory',
+      href: '/manger',
       label: 'Dashboard',
       icon: <HomeIcon className="size-4" />,
     },
     {
-      href: '/factory/orders',
+      href: '/manger/orders',
       label: 'Orders',
       icon: <ShoppingBag className="size-4" />,
+    },
+    {
+      href: '/manger/fa',
+      label: 'Factory Management',
+      icon: <HouseIcon className="size-4" />,
+    },
+    {
+      href: '/manger/orders',
+      label: 'Tickets',
+      icon: <PenSquareIcon className="size-4" />,
     },
   ];
 
