@@ -87,8 +87,7 @@ mutation CreatePaymentGatewayUrl($gateway: String!, $paymentId: String!) {
   createPayment(gateway: $gateway, paymentId: $paymentId)
 }
 
-
-query GetCurrentFactoryOrders{
+query GetCurrentFactoryOrders {
   factoryOrdersByFactory {
     acceptanceDeadline
     factoryId

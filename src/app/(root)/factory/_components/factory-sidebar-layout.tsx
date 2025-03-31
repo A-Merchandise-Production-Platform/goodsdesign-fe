@@ -37,7 +37,7 @@ export default function FactoryOwnerSidebarLayout({
       href: '/factory/ticket',
       label: 'Write Ticket',
       icon: <Pen className="size-4" />,
-    }
+    },
   ];
 
   return <MySidebar navItems={navItems}>{children}</MySidebar>;

@@ -64,7 +64,10 @@ mutation UpdateFactoryInfo($updateFactoryInfoInput: UpdateFactoryInfoDto!) {
   }
 }
 
-mutation UpdateFactoryOrderStatus($updateFactoryOrderStatusId: ID!, $status: String!) {
+mutation UpdateFactoryOrderStatus(
+  $updateFactoryOrderStatusId: ID!
+  $status: String!
+) {
   updateFactoryOrderStatus(id: $updateFactoryOrderStatusId, status: $status) {
     id
   }

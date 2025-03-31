@@ -100,7 +100,7 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
             </DropdownMenuItem>
           </Link>
         )}
-         {isAuth && user.role.toUpperCase() === 'MANAGER' && (
+        {isAuth && user.role.toUpperCase() === 'MANAGER' && (
           <Link href={'/manager'}>
             <DropdownMenuItem>
               <LockKeyholeIcon className="mr-2 h-4 w-4" />
