@@ -1,18 +1,37 @@
 'use client';
-import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
+import type React from 'react';
+
 import * as THREE from 'three';
-import * as fabric from 'fabric';
+import * as fabric  from 'fabric';
+import { SHIRT_COLORS } from './shirt-colors';
 import DesignHeader from './design-header';
 import DesignSidebar from './design-sidebar';
 import DesignCanvas from './design-canvas';
 import DesignFooter from './design-footer';
 import ViewSelector from './view-selector';
-import { SHIRT_COLORS } from './shirt-colors';
 
 // Types
-import type { SerializedDesign } from '@/types/shirt';
-import type { DesignObject } from '@/types/design-object';
+interface DesignObject {
+  type: string;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  scaleX: number;
+  scaleY: number;
+  angle: number;
+  view: string;
+  src?: string;
+  text?: string;
+  fontSize?: number;
+  fill?: string;
+  fontFamily?: string;
+}
+
+interface SerializedDesign {
+  [key: string]: DesignObject[];
+}
 
 interface DesignPosition {
   __typename?: 'DesignPositionEntity';
@@ -42,8 +61,6 @@ interface ProductDesignerComponentProps {
   designId?: string;
 }
 
-type ProductDesignerProps = SerializedDesign;
-
 export default function ProductDesigner({
   initialDesigns = [],
   onUpload,
@@ -56,10 +73,16 @@ export default function ProductDesigner({
   );
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
   const [showColorDialog, setShowColorDialog] = useState(false);
-  const [designs, setDesigns] = useState<ProductDesignerProps>(() => {
+  const [designsInitialized, setDesignsInitialized] = useState(false);
+  const [designs, setDesigns] = useState<SerializedDesign>(() => {
     if (!initialDesigns) return {};
 
-    const transformedDesigns: ProductDesignerProps = {};
+    // Add timeout to initialize designs after 2 seconds
+    setTimeout(() => {
+      setDesignsInitialized(true);
+    }, 1000);
+
+    const transformedDesigns: SerializedDesign = {};
 
     initialDesigns.forEach(position => {
       const viewName = position.positionType?.positionName.toLowerCase() || '';
@@ -165,7 +188,7 @@ export default function ProductDesigner({
 
     textureUpdateTimeoutRef.current = setTimeout(() => {
       if (pendingUpdateRef.current) {
-        saveCurrentDesign();
+        // Only update texture model during movement
         updateTextureOnModel();
         pendingUpdateRef.current = false;
       }
@@ -481,7 +504,8 @@ export default function ProductDesigner({
       return obj.get('data')?.type !== 'designZone';
     });
 
-    const serializedObjects = objects.map(obj => {
+    // Map canvas objects directly to our design objects format
+    const currentDesigns = objects.map(obj => {
       const base: DesignObject = {
         type: obj.type || '',
         left: obj.left || 0,
@@ -509,12 +533,40 @@ export default function ProductDesigner({
       return base;
     });
 
-    // Save to state with explicit typing
+    // Update state directly with the new designs
     setDesigns(prev => {
-      const newDesigns: ProductDesignerProps = {
+      const newDesigns: SerializedDesign = {
         ...prev,
-        [view]: serializedObjects,
+        [view]: currentDesigns,
       };
+
+      // Find the current position type for this view
+      const currentPosition = initialDesigns?.find(
+        position => position?.positionType?.positionName.toLowerCase() === view,
+      );
+
+      // Check if designs changed before calling onUpdatePosition
+      const hasChanges =
+        JSON.stringify(prev[view]) !== JSON.stringify(currentDesigns);
+
+      // Update position if we have all required data and there are changes
+      if (
+        hasChanges &&
+        onUpdatePosition &&
+        designId &&
+        currentPosition?.positionType?.id
+      ) {
+        onUpdatePosition({
+          variables: {
+            input: {
+              designId: designId,
+              productPositionTypeId: currentPosition.positionType.id,
+              designJSON: currentDesigns,
+            },
+          },
+        });
+      }
+
       return newDesigns;
     });
   };
@@ -583,6 +635,7 @@ export default function ProductDesigner({
 
   // Initialize Fabric.js canvas
   useEffect(() => {
+    console.log(designs);
     if (!canvasRef.current) return;
 
     // Clean up previous canvas if it exists
@@ -600,7 +653,17 @@ export default function ProductDesigner({
     });
 
     // Set up event listeners with debouncing
-    fabricCanvasRef.current.on('object:modified', debounceTextureUpdate);
+    fabricCanvasRef.current.on('object:moving', debounceTextureUpdate); // Update 3D model during movement
+    fabricCanvasRef.current.on('object:scaling', debounceTextureUpdate); // Update 3D model during scaling
+    fabricCanvasRef.current.on('object:rotating', debounceTextureUpdate); // Update 3D model during rotation
+
+    // Save design only when modification is complete
+    fabricCanvasRef.current.on('mouse:up', () => {
+      if (fabricCanvasRef.current?.getActiveObjects().length) {
+        saveCurrentDesign();
+      }
+    });
+
     fabricCanvasRef.current.on('object:added', e => {
       const obj = e.target as fabric.Object;
       applyClipPathToObject(obj, view);
@@ -629,12 +692,14 @@ export default function ProductDesigner({
       }
     });
 
+    // Handle scaling boundary check
     fabricCanvasRef.current.on('object:scaling', e => {
       const obj = e.target as fabric.Object;
 
       // If object is fully outside after scaling, remove it
       if (isObjectFullyOutside(obj, view)) {
         fabricCanvasRef.current?.remove(obj);
+        saveCurrentDesign(); // Save when object is removed
       }
     });
 
@@ -664,39 +729,16 @@ export default function ProductDesigner({
     };
   }, [view, currentTexture]);
 
-  // Load saved design when view changes
+  // Load saved design when view changes or after initialization delay
   useEffect(() => {
-    if (!fabricCanvasRef.current) return;
+    if (!fabricCanvasRef.current || !designsInitialized) return;
     loadSavedDesign();
-  }, [view]);
+  }, [view, designsInitialized]);
 
   // Update 3D model when designs change
   useEffect(() => {
     if (Object.keys(designs).length > 0) {
       debounceTextureUpdate();
-
-      // Find the current position type for this view
-      const currentPosition = initialDesigns?.find(
-        position => position?.positionType?.positionName.toLowerCase() === view,
-      );
-
-      // Update position if we have all required data
-      if (
-        onUpdatePosition &&
-        designId &&
-        currentPosition?.positionType?.id &&
-        designs[view]
-      ) {
-        onUpdatePosition({
-          variables: {
-            input: {
-              designId: designId,
-              productPositionTypeId: currentPosition.positionType.id,
-              designJSON: designs[view],
-            },
-          },
-        });
-      }
     }
   }, [designs]);
 
@@ -768,9 +810,10 @@ export default function ProductDesigner({
       fabricCanvasRef.current?.add(fabricImage);
       fabricCanvasRef.current?.setActiveObject(fabricImage);
       fabricCanvasRef.current?.renderAll();
-      // Save the design and trigger texture update
-      // Note: debounceTextureUpdate already includes saveCurrentDesign
+      // Update texture for live preview
       debounceTextureUpdate();
+      // Save design and trigger API update
+      saveCurrentDesign();
     };
 
     e.target.value = '';
