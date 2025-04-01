@@ -1,10 +1,11 @@
 import { ApolloClient, InMemoryCache, Observable } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
-import { HttpLink } from '@apollo/client/link/http';
 import { onError } from '@apollo/client/link/error';
+import { HttpLink } from '@apollo/client/link/http';
+
+import { envConfig } from '@/constant';
 import { RefreshTokenDocument } from '@/graphql/generated/graphql';
 import { useAuthStore } from '@/stores/auth.store';
-import { envConfig } from '@/constant';
 
 const authLink = setContext((_, { headers }) => {
   const { accessToken } = useAuthStore.getState();
