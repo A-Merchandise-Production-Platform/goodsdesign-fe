@@ -96,10 +96,12 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
             </DropdownMenuItem>
           </Link>
         )}
-        <DropdownMenuItem>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
-        </DropdownMenuItem>
+        <Link href={'/my-order'}>
+          <DropdownMenuItem>
+            <LockKeyholeIcon className="mr-2 h-4 w-4" />
+            <span>My Order</span>
+          </DropdownMenuItem>
+        </Link>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => logoutMutation()}>
           <LogOut className="mr-2 h-4 w-4" />
