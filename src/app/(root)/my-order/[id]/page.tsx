@@ -260,25 +260,17 @@ export default function OrderDetailsPage() {
   };
 
   // Handle payment balance
-  const handlePayBalance = () => {
+  const handlePayBalance = (paymentId: string, gateway: string) => {
     if (!order) return;
 
-    const pendingPayment = order.payments?.find(p => p.status === 'PENDING');
+    setSelectedPaymentGateway(gateway);
 
-    if (pendingPayment) {
-      createPaymentGatewayUrl({
-        variables: {
-          gateway: selectedPaymentGateway, // Use selected gateway
-          paymentId: pendingPayment.id,
-        },
-      });
-    } else {
-      toast({
-        title: 'Payment Error',
-        description: 'No pending payment found for this order.',
-        variant: 'destructive',
-      });
-    }
+    createPaymentGatewayUrl({
+      variables: {
+        gateway: gateway,
+        paymentId: paymentId,
+      },
+    });
   };
 
   // Handle withdraw request
@@ -302,7 +294,7 @@ export default function OrderDetailsPage() {
   // Back to orders button
   const BackButton = () => (
     <div className="mb-6">
-      <Button variant="outline" onClick={() => router.push('/my-orders')}>
+      <Button variant="outline" onClick={() => router.push('/my-order')}>
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Orders
       </Button>
@@ -417,7 +409,7 @@ export default function OrderDetailsPage() {
                 </p>
               </>
             )}
-            <Button onClick={() => router.push('/my-orders')}>
+            <Button onClick={() => router.push('/my-order')}>
               View All Orders
             </Button>
           </CardContent>
@@ -449,49 +441,6 @@ export default function OrderDetailsPage() {
                 </CardDescription>
               </div>
               <div className="mt-4 flex flex-col md:mt-0 md:flex-row md:items-center md:gap-4">
-                {order.depositPaid < order.totalPrice && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        className="mb-2 md:mb-0"
-                        disabled={createPaymentGatewayUrlLoading}
-                      >
-                        {createPaymentGatewayUrlLoading ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Processing...
-                          </>
-                        ) : (
-                          <>
-                            <CreditCard className="mr-2 h-4 w-4" />
-                            Pay Balance (
-                            {formatPrice(order.totalPrice - order.depositPaid)})
-                          </>
-                        )}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedPaymentGateway('VNPAY');
-                          handlePayBalance();
-                        }}
-                      >
-                        <CreditCardIcon className="mr-2 h-4 w-4" />
-                        Pay with VNPAY
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedPaymentGateway('PAYOS');
-                          handlePayBalance();
-                        }}
-                      >
-                        <Wallet className="mr-2 h-4 w-4" />
-                        Pay with PAYOS
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
                 <div>{getStatusBadge(order.status)}</div>
               </div>
             </div>
@@ -536,7 +485,7 @@ export default function OrderDetailsPage() {
               This order doesn&apos;t contain any items. This might be due to a
               system error.
             </p>
-            <Button onClick={() => router.push('/my-orders')}>
+            <Button onClick={() => router.push('/my-order')}>
               View All Orders
             </Button>
           </CardContent>
@@ -567,49 +516,6 @@ export default function OrderDetailsPage() {
                 </CardDescription>
               </div>
               <div className="mt-4 flex flex-col md:mt-0 md:flex-row md:items-center md:gap-4">
-                {order.depositPaid < order.totalPrice && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        className="mb-2 md:mb-0"
-                        disabled={createPaymentGatewayUrlLoading}
-                      >
-                        {createPaymentGatewayUrlLoading ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Processing...
-                          </>
-                        ) : (
-                          <>
-                            <CreditCard className="mr-2 h-4 w-4" />
-                            Pay Balance (
-                            {formatPrice(order.totalPrice - order.depositPaid)})
-                          </>
-                        )}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedPaymentGateway('VNPAY');
-                          handlePayBalance();
-                        }}
-                      >
-                        <CreditCardIcon className="mr-2 h-4 w-4" />
-                        Pay with VNPAY
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedPaymentGateway('PAYOS');
-                          handlePayBalance();
-                        }}
-                      >
-                        <Wallet className="mr-2 h-4 w-4" />
-                        Pay with PAYOS
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
                 <div>{getStatusBadge(order.status)}</div>
               </div>
             </div>
@@ -767,37 +673,114 @@ export default function OrderDetailsPage() {
                           className="overflow-hidden rounded-md border"
                         >
                           {/* Payment row (clickable to expand) */}
-                          <div
-                            className="hover:bg-muted/50 flex cursor-pointer items-center justify-between p-4"
-                            onClick={() => togglePayment(payment.id)}
-                          >
-                            <div className="flex items-center space-x-4">
-                              <CreditCard className="text-muted-foreground h-5 w-5" />
-                              <div>
-                                <p className="font-medium">
-                                  Payment #{payment.id.substring(0, 8)}...
-                                </p>
-                                <p className="text-muted-foreground text-sm">
-                                  {formatDate(payment.createdAt)} •{' '}
-                                  {payment.type.toLowerCase()}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-4">
-                              <div className="text-right">
-                                <p className="font-medium">
-                                  {formatPrice(payment.amount)}
-                                </p>
+                          <div className="flex flex-col">
+                            <div
+                              className="hover:bg-muted/50 flex cursor-pointer items-center justify-between p-4"
+                              onClick={() => togglePayment(payment.id)}
+                            >
+                              <div className="flex items-center space-x-4">
+                                <CreditCard className="text-muted-foreground h-5 w-5" />
                                 <div>
-                                  {getPaymentStatusBadge(payment.status)}
+                                  <p className="font-medium">
+                                    Payment #{payment.id.substring(0, 8)}...
+                                  </p>
+                                  <p className="text-muted-foreground text-sm">
+                                    {formatDate(payment.createdAt)} •{' '}
+                                    {payment.type.toLowerCase()}
+                                  </p>
                                 </div>
                               </div>
-                              {expandedPayments[payment.id] ? (
-                                <ChevronDown className="text-muted-foreground h-5 w-5" />
-                              ) : (
-                                <ChevronRight className="text-muted-foreground h-5 w-5" />
-                              )}
+                              <div className="flex items-center space-x-4">
+                                <div className="text-right">
+                                  <p className="font-medium">
+                                    {formatPrice(payment.amount)}
+                                  </p>
+                                  <div>
+                                    {getPaymentStatusBadge(payment.status)}
+                                  </div>
+                                </div>
+                                {expandedPayments[payment.id] ? (
+                                  <ChevronDown className="text-muted-foreground h-5 w-5" />
+                                ) : (
+                                  <ChevronRight className="text-muted-foreground h-5 w-5" />
+                                )}
+                              </div>
                             </div>
+
+                            {/* Pay Balance button for pending payments */}
+                            {payment.status === 'PENDING' && (
+                              <div className="px-4 pb-2">
+                                {payment.type === 'DEPOSIT' ? (
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button
+                                        size="sm"
+                                        className="w-full"
+                                        disabled={
+                                          createPaymentGatewayUrlLoading
+                                        }
+                                      >
+                                        {createPaymentGatewayUrlLoading ? (
+                                          <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Processing...
+                                          </>
+                                        ) : (
+                                          <>
+                                            <CreditCard className="mr-2 h-4 w-4" />
+                                            Pay Balance
+                                          </>
+                                        )}
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                      <DropdownMenuItem
+                                        onClick={() =>
+                                          handlePayBalance(payment.id, 'VNPAY')
+                                        }
+                                      >
+                                        <CreditCardIcon className="mr-2 h-4 w-4" />
+                                        Pay with VNPAY
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem
+                                        onClick={() =>
+                                          handlePayBalance(payment.id, 'PAYOS')
+                                        }
+                                      >
+                                        <Wallet className="mr-2 h-4 w-4" />
+                                        Pay with PAYOS
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                ) : payment.type === 'WITHDRAWN' ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="w-full"
+                                    onClick={() =>
+                                      console.log(
+                                        'Withdraw payment:',
+                                        payment.id,
+                                      )
+                                    }
+                                  >
+                                    <DollarSign className="mr-2 h-4 w-4" />
+                                    Process Withdrawal
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    className="w-full"
+                                    onClick={() =>
+                                      handlePayBalance(payment.id, 'VNPAY')
+                                    }
+                                  >
+                                    <CreditCard className="mr-2 h-4 w-4" />
+                                    Pay Balance
+                                  </Button>
+                                )}
+                              </div>
+                            )}
                           </div>
 
                           {/* Transactions for this payment */}
