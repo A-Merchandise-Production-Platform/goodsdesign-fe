@@ -138,5 +138,55 @@ query GetFactoryOrder($factoryOrderId: ID!) {
         }
       }
     }
+    totalProductionCost
+    totalItems
+    rejectionReason
+    progressReports {
+      completedQty
+      estimatedCompletion
+      factoryOrderId
+      id
+      notes
+      photoUrls
+      reportDate
+    }
+    assignedAt
+    completedAt
+    acceptedAt
+    currentProgress
+    delayReason
+    estimatedCompletionDate
+    isDelayed
+    lastUpdated
+    orderDetails {
+      checkQualities {
+        checkedAt
+        checkedBy
+        factoryOrderDetailId
+        failedQuantity
+        id
+        note
+        orderDetailId
+        passedQuantity
+        reworkRequired
+        status
+        taskId
+        totalChecked
+      }
+      completedQty
+      createdAt
+      factoryOrderId
+      id
+      orderDetailId
+      price
+      productionCost
+      qualityCheckedAt
+      qualityCheckedBy
+      qualityStatus
+      quantity
+      rejectedQty
+      status
+      updatedAt
+    }
   }
 }
