@@ -1,10 +1,15 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,10 +17,16 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Button } from "@/components/ui/button"
-import { Calendar as CalendarComponent } from "@/components/ui/calendar"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+} from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/button';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -24,19 +35,30 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Textarea } from "@/components/ui/textarea"
-import { useGetFactoryOrderQuery } from "@/graphql/generated/graphql"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { useGetFactoryOrderQuery } from '@/graphql/generated/graphql';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 import {
   AlertCircle,
   AlertTriangle,
@@ -61,222 +83,256 @@ import {
   Truck,
   Upload,
   XCircle,
-} from "lucide-react"
-import Image from "next/image"
-import { useParams, useRouter } from "next/navigation"
-import { useRef, useState } from "react"
+} from 'lucide-react';
+import Image from 'next/image';
+import { useParams, useRouter } from 'next/navigation';
+import { useRef, useState } from 'react';
 
 export default function FactoryOrderDetails() {
-  const { id } = useParams<{ id: string }>()
-  const router = useRouter()
-  const [activeTab, setActiveTab] = useState("overview")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [progressDate, setProgressDate] = useState<Date | undefined>(new Date())
-  const [progressQty, setProgressQty] = useState("")
-  const [progressNotes, setProgressNotes] = useState("")
-  const [progressPhotos, setProgressPhotos] = useState<string[]>([])
-  const [delayReason, setDelayReason] = useState("")
-  const [estimatedCompletion, setEstimatedCompletion] = useState<Date | undefined>(new Date())
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState('overview');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [progressDate, setProgressDate] = useState<Date | undefined>(
+    new Date(),
+  );
+  const [progressQty, setProgressQty] = useState('');
+  const [progressNotes, setProgressNotes] = useState('');
+  const [progressPhotos, setProgressPhotos] = useState<string[]>([]);
+  const [delayReason, setDelayReason] = useState('');
+  const [estimatedCompletion, setEstimatedCompletion] = useState<
+    Date | undefined
+  >(new Date());
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data, loading, error } = useGetFactoryOrderQuery({
     variables: {
       factoryOrderId: id,
     },
-  })
+  });
 
-  const factoryOrder = data?.factoryOrder
+  const factoryOrder = data?.factoryOrder;
 
   // Helper functions
   const formatDate = (dateString: string | null | undefined) => {
-    if (!dateString) return "N/A"
-    const date = new Date(dateString)
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date)
-  }
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  };
 
   const getStatusBadge = (status: string | null | undefined) => {
-    if (!status) return <Badge variant="outline">Unknown</Badge>
+    if (!status) return <Badge variant="outline">Unknown</Badge>;
 
     switch (status) {
-      case "PENDING_ACCEPTANCE":
+      case 'PENDING_ACCEPTANCE':
         return (
-          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+          <Badge
+            variant="outline"
+            className="border-yellow-200 bg-yellow-50 text-yellow-700"
+          >
             <Clock className="mr-1 h-3 w-3" /> Pending Acceptance
           </Badge>
-        )
-      case "ACCEPTED":
+        );
+      case 'ACCEPTED':
         return (
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+          <Badge
+            variant="outline"
+            className="border-green-200 bg-green-50 text-green-700"
+          >
             <CheckCircle className="mr-1 h-3 w-3" /> Accepted
           </Badge>
-        )
-      case "IN_PRODUCTION":
+        );
+      case 'IN_PRODUCTION':
         return (
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+          <Badge
+            variant="outline"
+            className="border-blue-200 bg-blue-50 text-blue-700"
+          >
             <Loader2 className="mr-1 h-3 w-3 animate-spin" /> In Production
           </Badge>
-        )
-      case "COMPLETED":
+        );
+      case 'COMPLETED':
         return (
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+          <Badge
+            variant="outline"
+            className="border-green-200 bg-green-50 text-green-700"
+          >
             <CheckSquare className="mr-1 h-3 w-3" /> Completed
           </Badge>
-        )
-      case "REJECTED":
+        );
+      case 'REJECTED':
         return (
-          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+          <Badge
+            variant="outline"
+            className="border-red-200 bg-red-50 text-red-700"
+          >
             <XCircle className="mr-1 h-3 w-3" /> Rejected
           </Badge>
-        )
-      case "PARTIAL_APPROVED":
+        );
+      case 'PARTIAL_APPROVED':
         return (
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+          <Badge
+            variant="outline"
+            className="border-blue-200 bg-blue-50 text-blue-700"
+          >
             <AlertCircle className="mr-1 h-3 w-3" /> Partially Approved
           </Badge>
-        )
+        );
       default:
         return (
           <Badge variant="outline">
             <AlertCircle className="mr-1 h-3 w-3" /> {status}
           </Badge>
-        )
+        );
     }
-  }
+  };
 
   const getQualityStatusBadge = (status: string | null | undefined) => {
-    if (!status) return <Badge variant="outline">Unknown</Badge>
+    if (!status) return <Badge variant="outline">Unknown</Badge>;
 
     switch (status) {
-      case "PENDING":
+      case 'PENDING':
         return (
-          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+          <Badge
+            variant="outline"
+            className="border-yellow-200 bg-yellow-50 text-yellow-700"
+          >
             <Clock className="mr-1 h-3 w-3" /> Pending
           </Badge>
-        )
-      case "APPROVED":
+        );
+      case 'APPROVED':
         return (
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+          <Badge
+            variant="outline"
+            className="border-green-200 bg-green-50 text-green-700"
+          >
             <CheckCircle className="mr-1 h-3 w-3" /> Approved
           </Badge>
-        )
-      case "REJECTED":
+        );
+      case 'REJECTED':
         return (
-          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+          <Badge
+            variant="outline"
+            className="border-red-200 bg-red-50 text-red-700"
+          >
             <XCircle className="mr-1 h-3 w-3" /> Rejected
           </Badge>
-        )
-      case "PARTIAL_APPROVED":
+        );
+      case 'PARTIAL_APPROVED':
         return (
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+          <Badge
+            variant="outline"
+            className="border-blue-200 bg-blue-50 text-blue-700"
+          >
             <AlertCircle className="mr-1 h-3 w-3" /> Partially Approved
           </Badge>
-        )
+        );
       default:
         return (
           <Badge variant="outline">
             <AlertCircle className="mr-1 h-3 w-3" /> {status}
           </Badge>
-        )
+        );
     }
-  }
+  };
 
   const handleAcceptOrder = () => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     // Simulate API call
     setTimeout(() => {
-      setIsSubmitting(false)
-      alert("Order accepted successfully!")
+      setIsSubmitting(false);
+      alert('Order accepted successfully!');
       // Here you would typically call a mutation to update the order status
-    }, 1000)
-  }
+    }, 1000);
+  };
 
   const handleRejectOrder = () => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     // Simulate API call
     setTimeout(() => {
-      setIsSubmitting(false)
-      alert("Order rejected successfully!")
+      setIsSubmitting(false);
+      alert('Order rejected successfully!');
       // Here you would typically call a mutation to update the order status
-    }, 1000)
-  }
+    }, 1000);
+  };
 
   const handleStartProduction = () => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     // Simulate API call
     setTimeout(() => {
-      setIsSubmitting(false)
-      alert("Production started successfully!")
+      setIsSubmitting(false);
+      alert('Production started successfully!');
       // Here you would typically call a mutation to update the order status
-    }, 1000)
-  }
+    }, 1000);
+  };
 
   const handleMarkAsCompleted = () => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     // Simulate API call
     setTimeout(() => {
-      setIsSubmitting(false)
-      alert("Order marked as completed successfully!")
+      setIsSubmitting(false);
+      alert('Order marked as completed successfully!');
       // Here you would typically call a mutation to update the order status
-    }, 1000)
-  }
+    }, 1000);
+  };
 
   const handleAddProgressReport = () => {
-    if (!progressQty || !progressDate) return
+    if (!progressQty || !progressDate) return;
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     // Simulate API call
     setTimeout(() => {
-      setIsSubmitting(false)
-      setProgressQty("")
-      setProgressNotes("")
-      setProgressPhotos([])
-      setProgressDate(new Date())
+      setIsSubmitting(false);
+      setProgressQty('');
+      setProgressNotes('');
+      setProgressPhotos([]);
+      setProgressDate(new Date());
       // Here you would typically call a mutation to add a progress report
-      alert("Progress report added successfully!")
-    }, 1000)
-  }
+      alert('Progress report added successfully!');
+    }, 1000);
+  };
 
   const handleMarkAsDelayed = () => {
-    if (!delayReason || !estimatedCompletion) return
+    if (!delayReason || !estimatedCompletion) return;
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     // Simulate API call
     setTimeout(() => {
-      setIsSubmitting(false)
-      setDelayReason("")
-      setEstimatedCompletion(new Date())
+      setIsSubmitting(false);
+      setDelayReason('');
+      setEstimatedCompletion(new Date());
       // Here you would typically call a mutation to mark the order as delayed
-      alert("Order marked as delayed successfully!")
-    }, 1000)
-  }
+      alert('Order marked as delayed successfully!');
+    }, 1000);
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files) return
+    const files = e.target.files;
+    if (!files) return;
 
     // In a real app, you would upload these files to a server
     // For this example, we'll just simulate adding the file names
-    const newPhotos = Array.from(files).map((file) => URL.createObjectURL(file))
-    setProgressPhotos([...progressPhotos, ...newPhotos])
-  }
+    const newPhotos = Array.from(files).map(file => URL.createObjectURL(file));
+    setProgressPhotos([...progressPhotos, ...newPhotos]);
+  };
 
   const removePhoto = (index: number) => {
-    const newPhotos = [...progressPhotos]
-    newPhotos.splice(index, 1)
-    setProgressPhotos(newPhotos)
-  }
+    const newPhotos = [...progressPhotos];
+    newPhotos.splice(index, 1);
+    setProgressPhotos(newPhotos);
+  };
 
   // If loading, show skeleton UI
   if (loading) {
-    return <FactoryOrderDetailsSkeleton />
+    return <FactoryOrderDetailsSkeleton />;
   }
 
   // If error or no data, show error message
@@ -287,7 +343,9 @@ export default function FactoryOrderDetails() {
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>
-            {error ? `Failed to load factory order details: ${error.message}` : "Factory order not found"}
+            {error
+              ? `Failed to load factory order details: ${error.message}`
+              : 'Factory order not found'}
           </AlertDescription>
         </Alert>
         <div className="mt-4">
@@ -297,15 +355,28 @@ export default function FactoryOrderDetails() {
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
-  const totalCompletedQty = factoryOrder.orderDetails ? factoryOrder.orderDetails.reduce((sum, detail) => sum + (detail.completedQty || 0), 0) : 0
-  const totalQuantity = factoryOrder.orderDetails ? factoryOrder.orderDetails.reduce((sum, detail) => sum + (detail.quantity || 0), 0) : 0
-  const progressPercentage = totalQuantity > 0 ? Math.round((totalCompletedQty / totalQuantity) * 100) : 0
+  const totalCompletedQty = factoryOrder.orderDetails
+    ? factoryOrder.orderDetails.reduce(
+        (sum, detail) => sum + (detail.completedQty || 0),
+        0,
+      )
+    : 0;
+  const totalQuantity = factoryOrder.orderDetails
+    ? factoryOrder.orderDetails.reduce(
+        (sum, detail) => sum + (detail.quantity || 0),
+        0,
+      )
+    : 0;
+  const progressPercentage =
+    totalQuantity > 0
+      ? Math.round((totalCompletedQty / totalQuantity) * 100)
+      : 0;
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="container mx-auto space-y-6 py-6">
       {/* Breadcrumb navigation */}
       <Breadcrumb>
         <BreadcrumbList>
@@ -328,13 +399,19 @@ export default function FactoryOrderDetails() {
       </Breadcrumb>
 
       {/* Order header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="text-3xl font-bold">Factory Order: {factoryOrder.id}</h1>
-          <div className="flex items-center gap-2 mt-2">
-            <span className="text-muted-foreground">Factory ID: {factoryOrder.factoryId}</span>
+          <h1 className="text-3xl font-bold">
+            Factory Order: {factoryOrder.id}
+          </h1>
+          <div className="mt-2 flex items-center gap-2">
+            <span className="text-muted-foreground">
+              Factory ID: {factoryOrder.factoryId}
+            </span>
             {getStatusBadge(factoryOrder.status)}
-            {factoryOrder.isDelayed && <Badge variant="destructive">Delayed</Badge>}
+            {factoryOrder.isDelayed && (
+              <Badge variant="destructive">Delayed</Badge>
+            )}
           </div>
         </div>
         <div className="flex gap-2">
@@ -343,7 +420,7 @@ export default function FactoryOrderDetails() {
             Back to Orders
           </Button>
 
-          {factoryOrder.status === "PENDING_ACCEPTANCE" && (
+          {factoryOrder.status === 'PENDING_ACCEPTANCE' && (
             <>
               <Button onClick={handleAcceptOrder} disabled={isSubmitting}>
                 {isSubmitting ? (
@@ -358,14 +435,18 @@ export default function FactoryOrderDetails() {
                   </>
                 )}
               </Button>
-              <Button variant="outline" onClick={handleRejectOrder} disabled={isSubmitting}>
+              <Button
+                variant="outline"
+                onClick={handleRejectOrder}
+                disabled={isSubmitting}
+              >
                 <XCircle className="mr-2 h-4 w-4" />
                 Reject Order
               </Button>
             </>
           )}
 
-          {factoryOrder.status === "ACCEPTED" && (
+          {factoryOrder.status === 'ACCEPTED' && (
             <Button onClick={handleStartProduction} disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
@@ -381,7 +462,7 @@ export default function FactoryOrderDetails() {
             </Button>
           )}
 
-          {factoryOrder.status === "IN_PRODUCTION" && (
+          {factoryOrder.status === 'IN_PRODUCTION' && (
             <>
               <Dialog>
                 <DialogTrigger asChild>
@@ -394,7 +475,8 @@ export default function FactoryOrderDetails() {
                   <DialogHeader>
                     <DialogTitle>Mark Order as Delayed</DialogTitle>
                     <DialogDescription>
-                      Please provide a reason for the delay and a new estimated completion date.
+                      Please provide a reason for the delay and a new estimated
+                      completion date.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
@@ -404,7 +486,7 @@ export default function FactoryOrderDetails() {
                         id="delay-reason"
                         placeholder="Enter the reason for the delay..."
                         value={delayReason}
-                        onChange={(e) => setDelayReason(e.target.value)}
+                        onChange={e => setDelayReason(e.target.value)}
                       />
                     </div>
                     <div className="grid gap-2">
@@ -414,12 +496,14 @@ export default function FactoryOrderDetails() {
                           <Button
                             variant="outline"
                             className={cn(
-                              "justify-start text-left font-normal",
-                              !estimatedCompletion && "text-muted-foreground",
+                              'justify-start text-left font-normal',
+                              !estimatedCompletion && 'text-muted-foreground',
                             )}
                           >
                             <CalendarClock className="mr-2 h-4 w-4" />
-                            {estimatedCompletion ? format(estimatedCompletion, "PPP") : "Select a date"}
+                            {estimatedCompletion
+                              ? format(estimatedCompletion, 'PPP')
+                              : 'Select a date'}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
@@ -437,15 +521,17 @@ export default function FactoryOrderDetails() {
                     <Button
                       variant="outline"
                       onClick={() => {
-                        setDelayReason("")
-                        setEstimatedCompletion(new Date())
+                        setDelayReason('');
+                        setEstimatedCompletion(new Date());
                       }}
                     >
                       Cancel
                     </Button>
                     <Button
                       onClick={handleMarkAsDelayed}
-                      disabled={isSubmitting || !delayReason || !estimatedCompletion}
+                      disabled={
+                        isSubmitting || !delayReason || !estimatedCompletion
+                      }
                     >
                       {isSubmitting ? (
                         <>
@@ -485,12 +571,12 @@ export default function FactoryOrderDetails() {
       <Card>
         <CardContent className="pt-6">
           <div className="space-y-2">
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Production Progress</span>
               <span className="text-sm font-medium">{progressPercentage}%</span>
             </div>
             <Progress value={progressPercentage} className="h-2" />
-            <div className="flex justify-between text-xs text-muted-foreground">
+            <div className="text-muted-foreground flex justify-between text-xs">
               <span>Total Items: {totalQuantity}</span>
               <span>Completed: {totalCompletedQty}</span>
             </div>
@@ -499,7 +585,12 @@ export default function FactoryOrderDetails() {
       </Card>
 
       {/* Order details tabs */}
-      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs
+        defaultValue="overview"
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-4"
+      >
         <TabsList className="grid grid-cols-5 md:w-[600px]">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="details">Details</TabsTrigger>
@@ -510,7 +601,7 @@ export default function FactoryOrderDetails() {
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {/* Order Information */}
             <Card>
               <CardHeader>
@@ -521,28 +612,44 @@ export default function FactoryOrderDetails() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Status</h4>
-                  <div className="flex items-center gap-2">{getStatusBadge(factoryOrder.status)}</div>
+                  <h4 className="text-muted-foreground mb-1 text-sm font-medium">
+                    Status
+                  </h4>
+                  <div className="flex items-center gap-2">
+                    {getStatusBadge(factoryOrder.status)}
+                  </div>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Customer Order ID</h4>
-                  <p>{factoryOrder.customerOrder?.id || "N/A"}</p>
+                  <h4 className="text-muted-foreground mb-1 text-sm font-medium">
+                    Customer Order ID
+                  </h4>
+                  <p>{factoryOrder.customerOrder?.id || 'N/A'}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Total Items</h4>
+                  <h4 className="text-muted-foreground mb-1 text-sm font-medium">
+                    Total Items
+                  </h4>
                   <p>{factoryOrder.totalItems || totalQuantity}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Total Production Cost</h4>
+                  <h4 className="text-muted-foreground mb-1 text-sm font-medium">
+                    Total Production Cost
+                  </h4>
                   <p className="flex items-center">
-                    <DollarSign className="h-4 w-4 mr-1" />
-                    {new Intl.NumberFormat("en-US").format(factoryOrder.totalProductionCost || 0)}
+                    <DollarSign className="mr-1 h-4 w-4" />
+                    {new Intl.NumberFormat('en-US').format(
+                      factoryOrder.totalProductionCost || 0,
+                    )}
                   </p>
                 </div>
                 {factoryOrder.rejectionReason && (
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Rejection Reason</h4>
-                    <p className="text-red-600">{factoryOrder.rejectionReason}</p>
+                    <h4 className="text-muted-foreground mb-1 text-sm font-medium">
+                      Rejection Reason
+                    </h4>
+                    <p className="text-red-600">
+                      {factoryOrder.rejectionReason}
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -559,50 +666,60 @@ export default function FactoryOrderDetails() {
               <CardContent className="space-y-4">
                 <div className="space-y-4">
                   <div className="flex">
-                    <div className="flex flex-col items-center mr-4">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-600">
+                    <div className="mr-4 flex flex-col items-center">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
                         <Calendar className="h-4 w-4" />
                       </div>
-                      <div className="w-px h-full bg-muted-foreground/20 my-2"></div>
+                      <div className="bg-muted-foreground/20 my-2 h-full w-px"></div>
                     </div>
                     <div>
                       <h4 className="text-sm font-medium">Order Created</h4>
-                      <p className="text-sm text-muted-foreground">{formatDate(factoryOrder.createdAt)}</p>
-                      <p className="text-sm mt-1">
-                        Factory order was created and assigned to factory {factoryOrder.factoryId}.
+                      <p className="text-muted-foreground text-sm">
+                        {formatDate(factoryOrder.createdAt)}
+                      </p>
+                      <p className="mt-1 text-sm">
+                        Factory order was created and assigned to factory{' '}
+                        {factoryOrder.factoryId}.
                       </p>
                     </div>
                   </div>
 
                   {factoryOrder.acceptedAt && (
                     <div className="flex">
-                      <div className="flex flex-col items-center mr-4">
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-600">
+                      <div className="mr-4 flex flex-col items-center">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
                           <CheckCircle className="h-4 w-4" />
                         </div>
-                        <div className="w-px h-full bg-muted-foreground/20 my-2"></div>
+                        <div className="bg-muted-foreground/20 my-2 h-full w-px"></div>
                       </div>
                       <div>
                         <h4 className="text-sm font-medium">Order Accepted</h4>
-                        <p className="text-sm text-muted-foreground">{formatDate(factoryOrder.acceptedAt)}</p>
-                        <p className="text-sm mt-1">Factory accepted the order.</p>
+                        <p className="text-muted-foreground text-sm">
+                          {formatDate(factoryOrder.acceptedAt)}
+                        </p>
+                        <p className="mt-1 text-sm">
+                          Factory accepted the order.
+                        </p>
                       </div>
                     </div>
                   )}
 
                   {factoryOrder.isDelayed && (
                     <div className="flex">
-                      <div className="flex flex-col items-center mr-4">
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-600">
+                      <div className="mr-4 flex flex-col items-center">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-600">
                           <AlertTriangle className="h-4 w-4" />
                         </div>
-                        <div className="w-px h-full bg-muted-foreground/20 my-2"></div>
+                        <div className="bg-muted-foreground/20 my-2 h-full w-px"></div>
                       </div>
                       <div>
                         <h4 className="text-sm font-medium">Order Delayed</h4>
-                        <p className="text-sm text-muted-foreground">{formatDate(factoryOrder.lastUpdated)}</p>
-                        <p className="text-sm mt-1">
-                          Order was marked as delayed. Reason: {factoryOrder.delayReason || "No reason provided"}
+                        <p className="text-muted-foreground text-sm">
+                          {formatDate(factoryOrder.lastUpdated)}
+                        </p>
+                        <p className="mt-1 text-sm">
+                          Order was marked as delayed. Reason:{' '}
+                          {factoryOrder.delayReason || 'No reason provided'}
                         </p>
                       </div>
                     </div>
@@ -610,38 +727,44 @@ export default function FactoryOrderDetails() {
 
                   {factoryOrder.completedAt && (
                     <div className="flex">
-                      <div className="flex flex-col items-center mr-4">
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-600">
+                      <div className="mr-4 flex flex-col items-center">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
                           <CheckSquare className="h-4 w-4" />
                         </div>
                       </div>
                       <div>
                         <h4 className="text-sm font-medium">Order Completed</h4>
-                        <p className="text-sm text-muted-foreground">{formatDate(factoryOrder.completedAt)}</p>
-                        <p className="text-sm mt-1">Factory completed the order production.</p>
+                        <p className="text-muted-foreground text-sm">
+                          {formatDate(factoryOrder.completedAt)}
+                        </p>
+                        <p className="mt-1 text-sm">
+                          Factory completed the order production.
+                        </p>
                       </div>
                     </div>
                   )}
 
                   {!factoryOrder.completedAt && (
                     <div className="flex">
-                      <div className="flex flex-col items-center mr-4">
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted text-muted-foreground">
+                      <div className="mr-4 flex flex-col items-center">
+                        <div className="bg-muted text-muted-foreground flex h-8 w-8 items-center justify-center rounded-full">
                           <Clock className="h-4 w-4" />
                         </div>
                       </div>
                       <div>
-                        <h4 className="text-sm font-medium">Estimated Completion</h4>
+                        <h4 className="text-sm font-medium">
+                          Estimated Completion
+                        </h4>
                         <p
-                          className={`text-sm ${factoryOrder.isDelayed ? "text-red-500 font-medium" : "text-muted-foreground"}`}
+                          className={`text-sm ${factoryOrder.isDelayed ? 'font-medium text-red-500' : 'text-muted-foreground'}`}
                         >
                           {formatDate(factoryOrder.estimatedCompletionDate)}
-                          {factoryOrder.isDelayed && " (Delayed)"}
+                          {factoryOrder.isDelayed && ' (Delayed)'}
                         </p>
-                        <p className="text-sm mt-1">
+                        <p className="mt-1 text-sm">
                           {factoryOrder.isDelayed
-                            ? "New estimated completion date due to delay."
-                            : "Expected completion date for this order."}
+                            ? 'New estimated completion date due to delay.'
+                            : 'Expected completion date for this order.'}
                         </p>
                       </div>
                     </div>
@@ -652,31 +775,39 @@ export default function FactoryOrderDetails() {
           </div>
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {/* Order Details Summary */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-base">
                   <Package className="h-4 w-4" />
                   Order Details
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Total Items:</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      Total Items:
+                    </span>
                     <span>{factoryOrder.totalItems || totalQuantity}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Completed Items:</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      Completed Items:
+                    </span>
                     <span>{totalCompletedQty}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Progress:</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      Progress:
+                    </span>
                     <span>{progressPercentage}%</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Order Details:</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      Order Details:
+                    </span>
                     <span>{factoryOrder?.orderDetails?.length}</span>
                   </div>
                 </div>
@@ -686,28 +817,38 @@ export default function FactoryOrderDetails() {
             {/* Dates Summary */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-base">
                   <CalendarClock className="h-4 w-4" />
                   Important Dates
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Created:</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      Created:
+                    </span>
                     <span>{formatDate(factoryOrder.createdAt)}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Updated:</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      Updated:
+                    </span>
                     <span>{formatDate(factoryOrder.updatedAt)}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Acceptance Deadline:</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      Acceptance Deadline:
+                    </span>
                     <span>{formatDate(factoryOrder.acceptanceDeadline)}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Est. Completion:</span>
-                    <span className={factoryOrder.isDelayed ? "text-red-600" : ""}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      Est. Completion:
+                    </span>
+                    <span
+                      className={factoryOrder.isDelayed ? 'text-red-600' : ''}
+                    >
                       {formatDate(factoryOrder.estimatedCompletionDate)}
                     </span>
                   </div>
@@ -718,36 +859,57 @@ export default function FactoryOrderDetails() {
             {/* Progress Reports Summary */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-base">
                   <BarChart3 className="h-4 w-4" />
                   Progress Reports
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {factoryOrder.progressReports && factoryOrder.progressReports.length > 0 ? (
+                {factoryOrder.progressReports &&
+                factoryOrder.progressReports.length > 0 ? (
                   <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Total Reports:</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground text-sm">
+                        Total Reports:
+                      </span>
                       <span>{factoryOrder.progressReports.length}</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Latest Report:</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground text-sm">
+                        Latest Report:
+                      </span>
                       <span>
-                        {formatDate(factoryOrder.progressReports[factoryOrder.progressReports.length - 1]?.reportDate)}
+                        {formatDate(
+                          factoryOrder.progressReports[
+                            factoryOrder.progressReports.length - 1
+                          ]?.reportDate,
+                        )}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Latest Completed:</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground text-sm">
+                        Latest Completed:
+                      </span>
                       <span>
-                        {factoryOrder.progressReports[factoryOrder.progressReports.length - 1]?.completedQty || 0} items
+                        {factoryOrder.progressReports[
+                          factoryOrder.progressReports.length - 1
+                        ]?.completedQty || 0}{' '}
+                        items
                       </span>
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-2 text-muted-foreground">No progress reports available</div>
+                  <div className="text-muted-foreground py-2 text-center">
+                    No progress reports available
+                  </div>
                 )}
                 <div className="mt-4">
-                  <Button variant="outline" size="sm" className="w-full" onClick={() => setActiveTab("progress")}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => setActiveTab('progress')}
+                  >
                     <Eye className="mr-2 h-4 w-4" />
                     View All Reports
                   </Button>
@@ -757,14 +919,14 @@ export default function FactoryOrderDetails() {
           </div>
 
           {/* Quick Actions */}
-          {factoryOrder.status === "IN_PRODUCTION" && (
+          {factoryOrder.status === 'IN_PRODUCTION' && (
             <Card>
               <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
                 <CardDescription>Common actions for this order</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button variant="outline" className="w-full">
@@ -775,17 +937,21 @@ export default function FactoryOrderDetails() {
                     <DialogContent className="max-w-md">
                       <DialogHeader>
                         <DialogTitle>Add Progress Report</DialogTitle>
-                        <DialogDescription>Update the production progress for this order.</DialogDescription>
+                        <DialogDescription>
+                          Update the production progress for this order.
+                        </DialogDescription>
                       </DialogHeader>
                       <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
-                          <Label htmlFor="completed-qty">Completed Quantity</Label>
+                          <Label htmlFor="completed-qty">
+                            Completed Quantity
+                          </Label>
                           <Input
                             id="completed-qty"
                             type="number"
                             placeholder="Enter completed quantity"
                             value={progressQty}
-                            onChange={(e) => setProgressQty(e.target.value)}
+                            onChange={e => setProgressQty(e.target.value)}
                           />
                         </div>
                         <div className="grid gap-2">
@@ -795,12 +961,14 @@ export default function FactoryOrderDetails() {
                               <Button
                                 variant="outline"
                                 className={cn(
-                                  "justify-start text-left font-normal",
-                                  !progressDate && "text-muted-foreground",
+                                  'justify-start text-left font-normal',
+                                  !progressDate && 'text-muted-foreground',
                                 )}
                               >
                                 <CalendarClock className="mr-2 h-4 w-4" />
-                                {progressDate ? format(progressDate, "PPP") : "Select a date"}
+                                {progressDate
+                                  ? format(progressDate, 'PPP')
+                                  : 'Select a date'}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
@@ -819,16 +987,19 @@ export default function FactoryOrderDetails() {
                             id="progress-notes"
                             placeholder="Add any notes about this progress update..."
                             value={progressNotes}
-                            onChange={(e) => setProgressNotes(e.target.value)}
+                            onChange={e => setProgressNotes(e.target.value)}
                           />
                         </div>
                         <div className="grid gap-2">
                           <Label>Photos</Label>
-                          <div className="flex flex-wrap gap-2 mb-2">
+                          <div className="mb-2 flex flex-wrap gap-2">
                             {progressPhotos.map((photo, index) => (
-                              <div key={index} className="relative w-16 h-16 rounded-md overflow-hidden border">
+                              <div
+                                key={index}
+                                className="relative h-16 w-16 overflow-hidden rounded-md border"
+                              >
                                 <Image
-                                  src={photo || "/placeholder.svg"}
+                                  src={photo || '/placeholder.svg'}
                                   alt={`Progress photo ${index + 1}`}
                                   fill
                                   className="object-cover"
@@ -845,7 +1016,11 @@ export default function FactoryOrderDetails() {
                             ))}
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => fileInputRef.current?.click()}
+                            >
                               <Upload className="mr-2 h-4 w-4" />
                               Upload Photos
                             </Button>
@@ -857,7 +1032,7 @@ export default function FactoryOrderDetails() {
                               multiple
                               onChange={handleFileUpload}
                             />
-                            <span className="text-xs text-muted-foreground">
+                            <span className="text-muted-foreground text-xs">
                               Upload photos of the production progress
                             </span>
                           </div>
@@ -867,17 +1042,19 @@ export default function FactoryOrderDetails() {
                         <Button
                           variant="outline"
                           onClick={() => {
-                            setProgressQty("")
-                            setProgressNotes("")
-                            setProgressPhotos([])
-                            setProgressDate(new Date())
+                            setProgressQty('');
+                            setProgressNotes('');
+                            setProgressPhotos([]);
+                            setProgressDate(new Date());
                           }}
                         >
                           Cancel
                         </Button>
                         <Button
                           onClick={handleAddProgressReport}
-                          disabled={isSubmitting || !progressQty || !progressDate}
+                          disabled={
+                            isSubmitting || !progressQty || !progressDate
+                          }
                         >
                           {isSubmitting ? (
                             <>
@@ -895,12 +1072,20 @@ export default function FactoryOrderDetails() {
                     </DialogContent>
                   </Dialog>
 
-                  <Button variant="outline" className="w-full" onClick={() => setActiveTab("quality")}>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setActiveTab('quality')}
+                  >
                     <ShieldAlert className="mr-2 h-4 w-4" />
                     View Quality Checks
                   </Button>
 
-                  <Button variant="outline" className="w-full" onClick={() => setActiveTab("designs")}>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setActiveTab('designs')}
+                  >
                     <ImageIcon className="mr-2 h-4 w-4" />
                     View Designs
                   </Button>
@@ -915,7 +1100,9 @@ export default function FactoryOrderDetails() {
           <Card>
             <CardHeader>
               <CardTitle>Order Details</CardTitle>
-              <CardDescription>Detailed information about all items in this factory order</CardDescription>
+              <CardDescription>
+                Detailed information about all items in this factory order
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -933,16 +1120,28 @@ export default function FactoryOrderDetails() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {factoryOrder?.orderDetails?.map((detail) => (
+                    {factoryOrder?.orderDetails?.map(detail => (
                       <TableRow key={detail.id}>
-                        <TableCell className="font-medium">{detail.id}</TableCell>
+                        <TableCell className="font-medium">
+                          {detail.id}
+                        </TableCell>
                         <TableCell>{getStatusBadge(detail.status)}</TableCell>
                         <TableCell>{detail.quantity}</TableCell>
                         <TableCell>{detail.completedQty || 0}</TableCell>
                         <TableCell>{detail.rejectedQty || 0}</TableCell>
-                        <TableCell>{getQualityStatusBadge(detail.qualityStatus)}</TableCell>
-                        <TableCell>{new Intl.NumberFormat("en-US").format(detail.productionCost || 0)}</TableCell>
-                        <TableCell>{new Intl.NumberFormat("en-US").format(detail.price || 0)}</TableCell>
+                        <TableCell>
+                          {getQualityStatusBadge(detail.qualityStatus)}
+                        </TableCell>
+                        <TableCell>
+                          {new Intl.NumberFormat('en-US').format(
+                            detail.productionCost || 0,
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {new Intl.NumberFormat('en-US').format(
+                            detail.price || 0,
+                          )}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -954,49 +1153,83 @@ export default function FactoryOrderDetails() {
           <Card>
             <CardHeader>
               <CardTitle>Customer Order Information</CardTitle>
-              <CardDescription>Details about the customer order associated with this factory order</CardDescription>
+              <CardDescription>
+                Details about the customer order associated with this factory
+                order
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3">Order Information</h3>
+                  <h3 className="text-muted-foreground mb-3 text-sm font-medium">
+                    Order Information
+                  </h3>
                   <Table>
                     <TableBody>
                       <TableRow>
-                        <TableCell className="font-medium">Customer Order ID</TableCell>
+                        <TableCell className="font-medium">
+                          Customer Order ID
+                        </TableCell>
                         <TableCell>{factoryOrder.customerOrder?.id}</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell className="font-medium">Order Date</TableCell>
-                        <TableCell>{formatDate(factoryOrder.customerOrder?.orderDate)}</TableCell>
+                        <TableCell className="font-medium">
+                          Order Date
+                        </TableCell>
+                        <TableCell>
+                          {formatDate(factoryOrder.customerOrder?.orderDate)}
+                        </TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell className="font-medium">Number of Items</TableCell>
-                        <TableCell>{factoryOrder.customerOrder?.orderDetails?.length || 0}</TableCell>
+                        <TableCell className="font-medium">
+                          Number of Items
+                        </TableCell>
+                        <TableCell>
+                          {factoryOrder.customerOrder?.orderDetails?.length ||
+                            0}
+                        </TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3">Factory Information</h3>
+                  <h3 className="text-muted-foreground mb-3 text-sm font-medium">
+                    Factory Information
+                  </h3>
                   <Table>
                     <TableBody>
                       <TableRow>
-                        <TableCell className="font-medium">Factory ID</TableCell>
+                        <TableCell className="font-medium">
+                          Factory ID
+                        </TableCell>
                         <TableCell>{factoryOrder.factoryId}</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell className="font-medium">Assigned At</TableCell>
-                        <TableCell>{formatDate(factoryOrder.assignedAt)}</TableCell>
+                        <TableCell className="font-medium">
+                          Assigned At
+                        </TableCell>
+                        <TableCell>
+                          {formatDate(factoryOrder.assignedAt)}
+                        </TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell className="font-medium">Accepted At</TableCell>
-                        <TableCell>{formatDate(factoryOrder.acceptedAt) || "Not yet accepted"}</TableCell>
+                        <TableCell className="font-medium">
+                          Accepted At
+                        </TableCell>
+                        <TableCell>
+                          {formatDate(factoryOrder.acceptedAt) ||
+                            'Not yet accepted'}
+                        </TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell className="font-medium">Completed At</TableCell>
-                        <TableCell>{formatDate(factoryOrder.completedAt) || "Not yet completed"}</TableCell>
+                        <TableCell className="font-medium">
+                          Completed At
+                        </TableCell>
+                        <TableCell>
+                          {formatDate(factoryOrder.completedAt) ||
+                            'Not yet completed'}
+                        </TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
@@ -1011,86 +1244,120 @@ export default function FactoryOrderDetails() {
           <Card>
             <CardHeader>
               <CardTitle>Design Information</CardTitle>
-              <CardDescription>View all design details for this order</CardDescription>
+              <CardDescription>
+                View all design details for this order
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              {factoryOrder.customerOrder?.orderDetails?.map((detail, index) => (
-                <div key={index} className="mb-6">
-                  <h3 className="mb-2 flex items-center text-lg font-semibold">
-                    <Package className="mr-2 h-5 w-5" /> Design Item {index + 1}
-                  </h3>
-                  {detail.design?.designPositions ? (
-                    <div className="bg-muted rounded-md p-4">
-                      <h4 className="mb-2 font-medium">Design Positions</h4>
-                      <div className="grid gap-4 md:grid-cols-2">
-                        {detail.design.designPositions.map((position, posIndex) => (
-                          <Card key={posIndex}>
-                            <CardHeader className="pb-2">
-                              <CardTitle className="text-sm">
-                                Position: {position.positionType?.positionName || position.productPositionTypeId}
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                              <div className="text-sm">
-                                {position.designJSON && (
-                                  <>
-                                    <p>
-                                      <span className="font-medium">Type:</span> {position.designJSON.type}
-                                    </p>
-                                    {position.designJSON.type === "text" ? (
+              {factoryOrder.customerOrder?.orderDetails?.map(
+                (detail, index) => (
+                  <div key={index} className="mb-6">
+                    <h3 className="mb-2 flex items-center text-lg font-semibold">
+                      <Package className="mr-2 h-5 w-5" /> Design Item{' '}
+                      {index + 1}
+                    </h3>
+                    {detail.design?.designPositions ? (
+                      <div className="bg-muted rounded-md p-4">
+                        <h4 className="mb-2 font-medium">Design Positions</h4>
+                        <div className="grid gap-4 md:grid-cols-2">
+                          {detail.design.designPositions.map(
+                            (position, posIndex) => (
+                              <Card key={posIndex}>
+                                <CardHeader className="pb-2">
+                                  <CardTitle className="text-sm">
+                                    Position:{' '}
+                                    {position.positionType?.positionName ||
+                                      position.productPositionTypeId}
+                                  </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                  <div className="text-sm">
+                                    {position.designJSON && (
                                       <>
                                         <p>
-                                          <span className="font-medium">Content:</span> {position.designJSON.content}
+                                          <span className="font-medium">
+                                            Type:
+                                          </span>{' '}
+                                          {position.designJSON.type}
                                         </p>
+                                        {position.designJSON.type === 'text' ? (
+                                          <>
+                                            <p>
+                                              <span className="font-medium">
+                                                Content:
+                                              </span>{' '}
+                                              {position.designJSON.content}
+                                            </p>
+                                            <p>
+                                              <span className="font-medium">
+                                                Font:
+                                              </span>{' '}
+                                              {position.designJSON.fontFamily},{' '}
+                                              {position.designJSON.fontSize}px
+                                            </p>
+                                            <p>
+                                              <span className="font-medium">
+                                                Color:
+                                              </span>{' '}
+                                              {position.designJSON.color}
+                                            </p>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <p>
+                                              <span className="font-medium">
+                                                Image URL:
+                                              </span>{' '}
+                                              {position.designJSON.url}
+                                            </p>
+                                            <p>
+                                              <span className="font-medium">
+                                                Dimensions:
+                                              </span>{' '}
+                                              {position.designJSON.width}x
+                                              {position.designJSON.height}
+                                            </p>
+                                          </>
+                                        )}
+                                        {position.designJSON.position && (
+                                          <p>
+                                            <span className="font-medium">
+                                              Position:
+                                            </span>{' '}
+                                            X: {position.designJSON.position.x},
+                                            Y: {position.designJSON.position.y}
+                                          </p>
+                                        )}
                                         <p>
-                                          <span className="font-medium">Font:</span> {position.designJSON.fontFamily},{" "}
-                                          {position.designJSON.fontSize}px
-                                        </p>
-                                        <p>
-                                          <span className="font-medium">Color:</span> {position.designJSON.color}
-                                        </p>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <p>
-                                          <span className="font-medium">Image URL:</span> {position.designJSON.url}
-                                        </p>
-                                        <p>
-                                          <span className="font-medium">Dimensions:</span> {position.designJSON.width}x
-                                          {position.designJSON.height}
+                                          <span className="font-medium">
+                                            Rotation:
+                                          </span>{' '}
+                                          {position.designJSON.rotation || 0}°
                                         </p>
                                       </>
                                     )}
-                                    {position.designJSON.position && (
-                                      <p>
-                                        <span className="font-medium">Position:</span> X:{" "}
-                                        {position.designJSON.position.x}, Y: {position.designJSON.position.y}
-                                      </p>
-                                    )}
-                                    <p>
-                                      <span className="font-medium">Rotation:</span> {position.designJSON.rotation || 0}
-                                      °
-                                    </p>
-                                  </>
-                                )}
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ),
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <Alert>
-                      <Info className="h-4 w-4" />
-                      <AlertTitle>No design positions</AlertTitle>
-                      <AlertDescription>This design does not have any position information.</AlertDescription>
-                    </Alert>
-                  )}
-                  {index < (factoryOrder.customerOrder?.orderDetails?.length || 0) - 1 && (
-                    <Separator className="my-4" />
-                  )}
-                </div>
-              ))}
+                    ) : (
+                      <Alert>
+                        <Info className="h-4 w-4" />
+                        <AlertTitle>No design positions</AlertTitle>
+                        <AlertDescription>
+                          This design does not have any position information.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    {index <
+                      (factoryOrder.customerOrder?.orderDetails?.length || 0) -
+                        1 && <Separator className="my-4" />}
+                  </div>
+                ),
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -1101,9 +1368,11 @@ export default function FactoryOrderDetails() {
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div>
                 <CardTitle>Progress Reports</CardTitle>
-                <CardDescription>Track the production progress of this order</CardDescription>
+                <CardDescription>
+                  Track the production progress of this order
+                </CardDescription>
               </div>
-              {factoryOrder.status === "IN_PRODUCTION" && (
+              {factoryOrder.status === 'IN_PRODUCTION' && (
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button>
@@ -1114,17 +1383,21 @@ export default function FactoryOrderDetails() {
                   <DialogContent className="max-w-md">
                     <DialogHeader>
                       <DialogTitle>Add Progress Report</DialogTitle>
-                      <DialogDescription>Update the production progress for this order.</DialogDescription>
+                      <DialogDescription>
+                        Update the production progress for this order.
+                      </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid gap-2">
-                        <Label htmlFor="completed-qty">Completed Quantity</Label>
+                        <Label htmlFor="completed-qty">
+                          Completed Quantity
+                        </Label>
                         <Input
                           id="completed-qty"
                           type="number"
                           placeholder="Enter completed quantity"
                           value={progressQty}
-                          onChange={(e) => setProgressQty(e.target.value)}
+                          onChange={e => setProgressQty(e.target.value)}
                         />
                       </div>
                       <div className="grid gap-2">
@@ -1134,12 +1407,14 @@ export default function FactoryOrderDetails() {
                             <Button
                               variant="outline"
                               className={cn(
-                                "justify-start text-left font-normal",
-                                !progressDate && "text-muted-foreground",
+                                'justify-start text-left font-normal',
+                                !progressDate && 'text-muted-foreground',
                               )}
                             >
                               <CalendarClock className="mr-2 h-4 w-4" />
-                              {progressDate ? format(progressDate, "PPP") : "Select a date"}
+                              {progressDate
+                                ? format(progressDate, 'PPP')
+                                : 'Select a date'}
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0">
@@ -1158,16 +1433,19 @@ export default function FactoryOrderDetails() {
                           id="progress-notes"
                           placeholder="Add any notes about this progress update..."
                           value={progressNotes}
-                          onChange={(e) => setProgressNotes(e.target.value)}
+                          onChange={e => setProgressNotes(e.target.value)}
                         />
                       </div>
                       <div className="grid gap-2">
                         <Label>Photos</Label>
-                        <div className="flex flex-wrap gap-2 mb-2">
+                        <div className="mb-2 flex flex-wrap gap-2">
                           {progressPhotos.map((photo, index) => (
-                            <div key={index} className="relative w-16 h-16 rounded-md overflow-hidden border">
+                            <div
+                              key={index}
+                              className="relative h-16 w-16 overflow-hidden rounded-md border"
+                            >
                               <Image
-                                src={photo || "/placeholder.svg"}
+                                src={photo || '/placeholder.svg'}
                                 alt={`Progress photo ${index + 1}`}
                                 fill
                                 className="object-cover"
@@ -1184,7 +1462,11 @@ export default function FactoryOrderDetails() {
                           ))}
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => fileInputRef.current?.click()}
+                          >
                             <Upload className="mr-2 h-4 w-4" />
                             Upload Photos
                           </Button>
@@ -1196,7 +1478,7 @@ export default function FactoryOrderDetails() {
                             multiple
                             onChange={handleFileUpload}
                           />
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-muted-foreground text-xs">
                             Upload photos of the production progress
                           </span>
                         </div>
@@ -1206,10 +1488,10 @@ export default function FactoryOrderDetails() {
                       <Button
                         variant="outline"
                         onClick={() => {
-                          setProgressQty("")
-                          setProgressNotes("")
-                          setProgressPhotos([])
-                          setProgressDate(new Date())
+                          setProgressQty('');
+                          setProgressNotes('');
+                          setProgressPhotos([]);
+                          setProgressDate(new Date());
                         }}
                       >
                         Cancel
@@ -1236,47 +1518,66 @@ export default function FactoryOrderDetails() {
               )}
             </CardHeader>
             <CardContent>
-              {factoryOrder.progressReports && factoryOrder.progressReports.length > 0 ? (
+              {factoryOrder.progressReports &&
+              factoryOrder.progressReports.length > 0 ? (
                 <div className="space-y-6">
                   {factoryOrder.progressReports.map((report, index) => (
                     <Card key={index} className="overflow-hidden">
                       <CardHeader className="bg-muted/50 pb-2">
-                        <div className="flex justify-between items-center">
-                          <CardTitle className="text-base">Progress Report {index + 1}</CardTitle>
-                          <Badge variant="outline">{formatDate(report.reportDate)}</Badge>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-base">
+                            Progress Report {index + 1}
+                          </CardTitle>
+                          <Badge variant="outline">
+                            {formatDate(report.reportDate)}
+                          </Badge>
                         </div>
                       </CardHeader>
                       <CardContent className="pt-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                           <div>
                             <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm text-muted-foreground">Completed Quantity:</span>
-                                <span className="font-medium">{report.completedQty}</span>
+                              <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground text-sm">
+                                  Completed Quantity:
+                                </span>
+                                <span className="font-medium">
+                                  {report.completedQty}
+                                </span>
                               </div>
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm text-muted-foreground">Estimated Completion:</span>
-                                <span>{formatDate(report.estimatedCompletion)}</span>
+                              <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground text-sm">
+                                  Estimated Completion:
+                                </span>
+                                <span>
+                                  {formatDate(report.estimatedCompletion)}
+                                </span>
                               </div>
                               {report.notes && (
                                 <div className="pt-2">
-                                  <span className="text-sm text-muted-foreground">Notes:</span>
-                                  <p className="mt-1 p-2 bg-muted rounded-md text-sm">{report.notes}</p>
+                                  <span className="text-muted-foreground text-sm">
+                                    Notes:
+                                  </span>
+                                  <p className="bg-muted mt-1 rounded-md p-2 text-sm">
+                                    {report.notes}
+                                  </p>
                                 </div>
                               )}
                             </div>
                           </div>
                           {report.photoUrls && report.photoUrls.length > 0 && (
                             <div>
-                              <span className="text-sm text-muted-foreground block mb-2">Photos:</span>
+                              <span className="text-muted-foreground mb-2 block text-sm">
+                                Photos:
+                              </span>
                               <div className="grid grid-cols-3 gap-2">
                                 {report.photoUrls.map((photo, photoIndex) => (
                                   <div
                                     key={photoIndex}
-                                    className="relative aspect-square rounded-md overflow-hidden border"
+                                    className="relative aspect-square overflow-hidden rounded-md border"
                                   >
                                     <Image
-                                      src={photo || "/placeholder.svg"}
+                                      src={photo || '/placeholder.svg'}
                                       alt={`Progress photo ${photoIndex + 1}`}
                                       fill
                                       className="object-cover"
@@ -1292,14 +1593,17 @@ export default function FactoryOrderDetails() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
-                    <Info className="h-6 w-6 text-muted-foreground" />
+                <div className="py-8 text-center">
+                  <div className="bg-muted mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
+                    <Info className="text-muted-foreground h-6 w-6" />
                   </div>
-                  <h3 className="text-lg font-medium mb-2">No Progress Reports</h3>
-                  <p className="text-muted-foreground max-w-md mx-auto">
+                  <h3 className="mb-2 text-lg font-medium">
+                    No Progress Reports
+                  </h3>
+                  <p className="text-muted-foreground mx-auto max-w-md">
                     There are no progress reports for this order yet.
-                    {factoryOrder.status === "IN_PRODUCTION" && " Add a progress report to track production."}
+                    {factoryOrder.status === 'IN_PRODUCTION' &&
+                      ' Add a progress report to track production.'}
                   </p>
                 </div>
               )}
@@ -1312,7 +1616,9 @@ export default function FactoryOrderDetails() {
           <Card>
             <CardHeader>
               <CardTitle>Quality Checks</CardTitle>
-              <CardDescription>Quality check information for all items in this order</CardDescription>
+              <CardDescription>
+                Quality check information for all items in this order
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Accordion type="single" collapsible className="w-full">
@@ -1325,47 +1631,74 @@ export default function FactoryOrderDetails() {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                      {detail.checkQualities && detail.checkQualities.length > 0 ? (
+                      {detail.checkQualities &&
+                      detail.checkQualities.length > 0 ? (
                         <div className="space-y-4 pt-2">
                           {detail.checkQualities.map((check, checkIndex) => (
                             <Card key={checkIndex}>
                               <CardHeader className="pb-2">
-                                <div className="flex justify-between items-center">
-                                  <CardTitle className="text-sm">Quality Check {checkIndex + 1}</CardTitle>
-                                  <Badge variant="outline">{formatDate(check.checkedAt)}</Badge>
+                                <div className="flex items-center justify-between">
+                                  <CardTitle className="text-sm">
+                                    Quality Check {checkIndex + 1}
+                                  </CardTitle>
+                                  <Badge variant="outline">
+                                    {formatDate(check.checkedAt)}
+                                  </Badge>
                                 </div>
                               </CardHeader>
                               <CardContent className="pt-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                   <div>
                                     <div className="space-y-2">
-                                      <div className="flex justify-between items-center">
-                                        <span className="text-sm text-muted-foreground">Status:</span>
-                                        <span>{getQualityStatusBadge(check.status)}</span>
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-muted-foreground text-sm">
+                                          Status:
+                                        </span>
+                                        <span>
+                                          {getQualityStatusBadge(check.status)}
+                                        </span>
                                       </div>
-                                      <div className="flex justify-between items-center">
-                                        <span className="text-sm text-muted-foreground">Checked By:</span>
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-muted-foreground text-sm">
+                                          Checked By:
+                                        </span>
                                         <span>{check.checkedBy}</span>
                                       </div>
-                                      <div className="flex justify-between items-center">
-                                        <span className="text-sm text-muted-foreground">Total Checked:</span>
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-muted-foreground text-sm">
+                                          Total Checked:
+                                        </span>
                                         <span>{check.totalChecked}</span>
                                       </div>
-                                      <div className="flex justify-between items-center">
-                                        <span className="text-sm text-muted-foreground">Passed:</span>
-                                        <span className="text-green-600">{check.passedQuantity}</span>
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-muted-foreground text-sm">
+                                          Passed:
+                                        </span>
+                                        <span className="text-green-600">
+                                          {check.passedQuantity}
+                                        </span>
                                       </div>
-                                      <div className="flex justify-between items-center">
-                                        <span className="text-sm text-muted-foreground">Failed:</span>
-                                        <span className="text-red-600">{check.failedQuantity}</span>
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-muted-foreground text-sm">
+                                          Failed:
+                                        </span>
+                                        <span className="text-red-600">
+                                          {check.failedQuantity}
+                                        </span>
                                       </div>
-                                      <div className="flex justify-between items-center">
-                                        <span className="text-sm text-muted-foreground">Rework Required:</span>
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-muted-foreground text-sm">
+                                          Rework Required:
+                                        </span>
                                         <Badge
-                                          variant={check.reworkRequired ? "destructive" : "outline"}
+                                          variant={
+                                            check.reworkRequired
+                                              ? 'destructive'
+                                              : 'outline'
+                                          }
                                           className="font-normal"
                                         >
-                                          {check.reworkRequired ? "Yes" : "No"}
+                                          {check.reworkRequired ? 'Yes' : 'No'}
                                         </Badge>
                                       </div>
                                     </div>
@@ -1373,33 +1706,45 @@ export default function FactoryOrderDetails() {
                                   <div>
                                     {check.note && (
                                       <div>
-                                        <span className="text-sm text-muted-foreground">Notes:</span>
-                                        <p className="mt-1 p-2 bg-muted rounded-md text-sm">{check.note}</p>
+                                        <span className="text-muted-foreground text-sm">
+                                          Notes:
+                                        </span>
+                                        <p className="bg-muted mt-1 rounded-md p-2 text-sm">
+                                          {check.note}
+                                        </p>
                                       </div>
                                     )}
                                     <div className="mt-4">
-                                      <div className="h-8 w-full bg-gray-200 rounded-full overflow-hidden">
+                                      <div className="h-8 w-full overflow-hidden rounded-full bg-gray-200">
                                         {check.totalChecked > 0 && (
                                           <>
                                             <div
-                                              className="h-full bg-green-500 float-left"
-                                              style={{ width: `${(check.passedQuantity / check.totalChecked) * 100}%` }}
+                                              className="float-left h-full bg-green-500"
+                                              style={{
+                                                width: `${(check.passedQuantity / check.totalChecked) * 100}%`,
+                                              }}
                                             ></div>
                                             <div
-                                              className="h-full bg-red-500 float-left"
-                                              style={{ width: `${(check.failedQuantity / check.totalChecked) * 100}%` }}
+                                              className="float-left h-full bg-red-500"
+                                              style={{
+                                                width: `${(check.failedQuantity / check.totalChecked) * 100}%`,
+                                              }}
                                             ></div>
                                           </>
                                         )}
                                       </div>
-                                      <div className="flex justify-between mt-2 text-xs">
+                                      <div className="mt-2 flex justify-between text-xs">
                                         <div className="flex items-center">
-                                          <div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
-                                          <span>Passed: {check.passedQuantity}</span>
+                                          <div className="mr-1 h-3 w-3 rounded-full bg-green-500"></div>
+                                          <span>
+                                            Passed: {check.passedQuantity}
+                                          </span>
                                         </div>
                                         <div className="flex items-center">
-                                          <div className="w-3 h-3 bg-red-500 rounded-full mr-1"></div>
-                                          <span>Failed: {check.failedQuantity}</span>
+                                          <div className="mr-1 h-3 w-3 rounded-full bg-red-500"></div>
+                                          <span>
+                                            Failed: {check.failedQuantity}
+                                          </span>
                                         </div>
                                       </div>
                                     </div>
@@ -1410,8 +1755,9 @@ export default function FactoryOrderDetails() {
                           ))}
                         </div>
                       ) : (
-                        <div className="py-4 text-center text-muted-foreground">
-                          No quality checks have been performed for this item yet.
+                        <div className="text-muted-foreground py-4 text-center">
+                          No quality checks have been performed for this item
+                          yet.
                         </div>
                       )}
                     </AccordionContent>
@@ -1423,25 +1769,24 @@ export default function FactoryOrderDetails() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
 
 function FactoryOrderDetailsSkeleton() {
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="container mx-auto space-y-6 py-6">
       <div className="flex items-center space-x-2">
         <Skeleton className="h-6 w-24" />
         <Skeleton className="h-6 w-6" />
         <Skeleton className="h-6 w-32" />
       </div>
       <Skeleton className="h-12 w-full" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <Skeleton className="h-64 w-full" />
         <Skeleton className="h-64 w-full md:col-span-2" />
       </div>
       <Skeleton className="h-12 w-full" />
       <Skeleton className="h-96 w-full" />
     </div>
-  )
+  );
 }
-
