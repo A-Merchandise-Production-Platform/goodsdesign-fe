@@ -20,10 +20,13 @@ export function removeVietnameseTones(str: string): string {
     .replace(/Đ/g, 'D');
 }
 
-export const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
+export function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-  });
-};
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+}

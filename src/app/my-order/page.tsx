@@ -160,7 +160,7 @@ export default function MyOrdersPage() {
                         {getStatusBadge(order.status)}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Link href={`/my-orders/${order.id}`}>
+                        <Link href={`/my-order/${order.id}`}>
                           <Button variant="outline" size="sm">
                             <Eye className="mr-2 h-4 w-4" />
                             Details

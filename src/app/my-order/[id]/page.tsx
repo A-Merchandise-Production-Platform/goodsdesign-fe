@@ -10,7 +10,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -31,15 +30,32 @@ import {
   ChevronRight,
   CreditCard,
   Loader2,
-  Package,
   ShoppingBag,
   User,
   XCircle,
+  DollarSign,
+  CreditCardIcon,
+  Wallet,
 } from 'lucide-react';
 import { formatDate, formatPrice } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -56,6 +72,9 @@ export default function OrderDetailsPage() {
   const [expandedPayments, setExpandedPayments] = useState<
     Record<string, boolean>
   >({});
+  const [selectedPaymentGateway, setSelectedPaymentGateway] =
+    useState<string>('VNPAY');
+  const [isWithdrawDialogOpen, setIsWithdrawDialogOpen] = useState(false);
 
   const [createPaymentGatewayUrl, { loading: createPaymentGatewayUrlLoading }] =
     useCreatePaymentGatewayUrlMutation({
@@ -248,7 +267,7 @@ export default function OrderDetailsPage() {
     if (pendingPayment) {
       createPaymentGatewayUrl({
         variables: {
-          gateway: 'VNPAY', // Default gateway
+          gateway: selectedPaymentGateway, // Use selected gateway
           paymentId: pendingPayment.id,
         },
       });
@@ -259,6 +278,16 @@ export default function OrderDetailsPage() {
         variant: 'destructive',
       });
     }
+  };
+
+  // Handle withdraw request
+  const handleWithdraw = () => {
+    console.log('Withdraw request for order:', id);
+    setIsWithdrawDialogOpen(false);
+    toast({
+      title: 'Withdraw Request',
+      description: 'Your withdraw request has been logged.',
+    });
   };
 
   // Toggle expanded payment
@@ -420,24 +449,47 @@ export default function OrderDetailsPage() {
               </div>
               <div className="mt-4 flex flex-col md:mt-0 md:flex-row md:items-center md:gap-4">
                 {order.depositPaid < order.totalPrice && (
-                  <Button
-                    className="mb-2 md:mb-0"
-                    onClick={handlePayBalance}
-                    disabled={createPaymentGatewayUrlLoading}
-                  >
-                    {createPaymentGatewayUrlLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="mr-2 h-4 w-4" />
-                        Pay Balance (
-                        {formatPrice(order.totalPrice - order.depositPaid)})
-                      </>
-                    )}
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        className="mb-2 md:mb-0"
+                        disabled={createPaymentGatewayUrlLoading}
+                      >
+                        {createPaymentGatewayUrlLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <CreditCard className="mr-2 h-4 w-4" />
+                            Pay Balance (
+                            {formatPrice(order.totalPrice - order.depositPaid)})
+                          </>
+                        )}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelectedPaymentGateway('VNPAY');
+                          handlePayBalance();
+                        }}
+                      >
+                        <CreditCardIcon className="mr-2 h-4 w-4" />
+                        Pay with VNPAY
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelectedPaymentGateway('PAYOS');
+                          handlePayBalance();
+                        }}
+                      >
+                        <Wallet className="mr-2 h-4 w-4" />
+                        Pay with PAYOS
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 )}
                 <div>{getStatusBadge(order.status)}</div>
               </div>
@@ -515,24 +567,47 @@ export default function OrderDetailsPage() {
               </div>
               <div className="mt-4 flex flex-col md:mt-0 md:flex-row md:items-center md:gap-4">
                 {order.depositPaid < order.totalPrice && (
-                  <Button
-                    className="mb-2 md:mb-0"
-                    onClick={handlePayBalance}
-                    disabled={createPaymentGatewayUrlLoading}
-                  >
-                    {createPaymentGatewayUrlLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="mr-2 h-4 w-4" />
-                        Pay Balance (
-                        {formatPrice(order.totalPrice - order.depositPaid)})
-                      </>
-                    )}
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        className="mb-2 md:mb-0"
+                        disabled={createPaymentGatewayUrlLoading}
+                      >
+                        {createPaymentGatewayUrlLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <CreditCard className="mr-2 h-4 w-4" />
+                            Pay Balance (
+                            {formatPrice(order.totalPrice - order.depositPaid)})
+                          </>
+                        )}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelectedPaymentGateway('VNPAY');
+                          handlePayBalance();
+                        }}
+                      >
+                        <CreditCardIcon className="mr-2 h-4 w-4" />
+                        Pay with VNPAY
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelectedPaymentGateway('PAYOS');
+                          handlePayBalance();
+                        }}
+                      >
+                        <Wallet className="mr-2 h-4 w-4" />
+                        Pay with PAYOS
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 )}
                 <div>{getStatusBadge(order.status)}</div>
               </div>
@@ -564,6 +639,44 @@ export default function OrderDetailsPage() {
                   {formatPrice(order.shippingPrice)}
                 </p>
               </div>
+            </div>
+
+            {/* Hidden Withdraw Button - Only visible to admins or for testing */}
+            <div className="hidden">
+              <Dialog
+                open={isWithdrawDialogOpen}
+                onOpenChange={setIsWithdrawDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="mt-4"
+                    onClick={() => console.log('Withdraw button clicked')}
+                  >
+                    <DollarSign className="mr-2 h-4 w-4" />
+                    Withdraw Funds
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Withdraw Funds</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to withdraw funds from this order?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsWithdrawDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button variant="destructive" onClick={handleWithdraw}>
+                      Confirm Withdrawal
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </CardContent>
         </Card>
@@ -824,6 +937,24 @@ export default function OrderDetailsPage() {
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Hidden Withdraw Button - For admin access */}
+      <div className="hidden">
+        <Button
+          variant="outline"
+          className="mt-4"
+          onClick={() => {
+            console.log('Withdraw funds for order:', id);
+            toast({
+              title: 'Withdraw Request',
+              description: 'Your withdraw request has been logged.',
+            });
+          }}
+        >
+          <DollarSign className="mr-2 h-4 w-4" />
+          Withdraw Funds
+        </Button>
       </div>
     </div>
   );

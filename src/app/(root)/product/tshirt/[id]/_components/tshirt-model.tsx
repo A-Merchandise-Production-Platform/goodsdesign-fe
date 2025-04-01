@@ -16,8 +16,8 @@ interface ModelProps {
 const cameraPositions = {
   front: { position: [0, 0.05, 0.25], target: [0, 0, 0] },
   back: { position: [0, 0.05, -0.25], target: [0, 0, 0] },
-  'left-sleeve': { position: [-0.25, 0.05, 0], target: [0, 0, 0] },
-  'right-sleeve': { position: [0.25, 0.05, 0], target: [0, 0, 0] },
+  'left sleeve': { position: [-0.25, 0.05, 0], target: [0, 0, 0] },
+  'right sleeve': { position: [0.25, 0.05, 0], target: [0, 0, 0] },
 };
 
 function Model({ texture, view, color }: ModelProps) {
@@ -39,10 +39,10 @@ function Model({ texture, view, color }: ModelProps) {
       case 'back':
         targetRotation.current = Math.PI * 2; // 360 degrees
         break;
-      case 'left-sleeve':
+      case 'left sleeve':
         targetRotation.current = -Math.PI; // -180 degrees
         break;
-      case 'right-sleeve':
+      case 'right sleeve':
         targetRotation.current = Math.PI; // 180 degrees
         break;
       default: // 'front'

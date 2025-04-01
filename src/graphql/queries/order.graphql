@@ -86,3 +86,107 @@ query GetUserOrder($userOrderId: String!) {
 mutation CreatePaymentGatewayUrl($gateway: String!, $paymentId: String!) {
   createPayment(gateway: $gateway, paymentId: $paymentId)
 }
+
+query GetCurrentFactoryOrders {
+  factoryOrdersByFactory {
+    acceptanceDeadline
+    factoryId
+    id
+    status
+    createdAt
+    updatedAt
+    customerOrder {
+      id
+      orderDate
+      orderDetails {
+        design {
+          designPositions {
+            designId
+            designJSON
+            positionType {
+              positionName
+            }
+            productPositionTypeId
+          }
+        }
+      }
+    }
+  }
+}
+
+query GetFactoryOrder($factoryOrderId: ID!) {
+  factoryOrder(id: $factoryOrderId) {
+    acceptanceDeadline
+    factoryId
+    id
+    status
+    createdAt
+    updatedAt
+    customerOrder {
+      id
+      orderDate
+      orderDetails {
+        design {
+          designPositions {
+            designId
+            designJSON
+            positionType {
+              positionName
+            }
+            productPositionTypeId
+          }
+        }
+      }
+    }
+    totalProductionCost
+    totalItems
+    rejectionReason
+    progressReports {
+      completedQty
+      estimatedCompletion
+      factoryOrderId
+      id
+      notes
+      photoUrls
+      reportDate
+    }
+    assignedAt
+    completedAt
+    acceptedAt
+    currentProgress
+    delayReason
+    estimatedCompletionDate
+    isDelayed
+    lastUpdated
+    orderDetails {
+      checkQualities {
+        checkedAt
+        checkedBy
+        factoryOrderDetailId
+        failedQuantity
+        id
+        note
+        orderDetailId
+        passedQuantity
+        reworkRequired
+        status
+        taskId
+        totalChecked
+      }
+      completedQty
+      createdAt
+      factoryOrderId
+      id
+      orderDetailId
+      price
+      productionCost
+      qualityCheckedAt
+      qualityCheckedBy
+      qualityStatus
+      quantity
+      rejectedQty
+      status
+      updatedAt
+    }
+  }
+}

@@ -1,0 +1,183 @@
+query GetMyStaffTasks {
+  myStaffTasks {
+    status
+    note
+    task {
+      assignedBy
+      checkQualities {
+        checkedAt
+        checkedBy
+        failedQuantity
+        id
+        note
+        passedQuantity
+        reworkRequired
+        status
+        taskId
+        totalChecked
+        factoryOrderDetail {
+          completedQty
+          createdAt
+          designId
+          factoryOrder {
+            status
+            isDelayed
+            estimatedCompletionDate
+            completedAt
+            acceptanceDeadline
+            factoryId
+            createdAt
+            updatedAt
+          }
+          factoryOrderId
+          id
+          orderDetailId
+          price
+          productionCost
+          qualityCheckedAt
+          qualityCheckedBy
+          qualityStatus
+          quantity
+          rejectedQty
+          status
+          updatedAt
+        }
+        orderDetail {
+          design {
+            isTemplate
+            isPublic
+            isFinalized
+            designPositions {
+              designId
+              designJSON
+              positionType {
+                positionName
+                basePrice
+              }
+            }
+            systemConfigVariant {
+              model
+              size
+              price
+              product {
+                name
+                weight
+                imageUrl
+              }
+            }
+          }
+          id
+          orderId
+          price
+          qualityCheckStatus
+          quantity
+          reworkStatus
+          status
+        }
+      }
+      description
+      expiredTime
+      id
+      qualityCheckStatus
+      startDate
+      status
+      taskType
+      taskname
+    }
+    completedDate
+    assignedDate
+    id
+  }
+}
+
+query GetStaffTaskDetail($staffTaskId: ID!) {
+  staffTask(id: $staffTaskId) {
+    status
+    note
+    task {
+      assignedBy
+      checkQualities {
+        checkedAt
+        checkedBy
+        failedQuantity
+        id
+        note
+        passedQuantity
+        reworkRequired
+        status
+        taskId
+        totalChecked
+        factoryOrderDetail {
+          completedQty
+          createdAt
+          designId
+          factoryOrder {
+            status
+            isDelayed
+            estimatedCompletionDate
+            completedAt
+            acceptanceDeadline
+            factoryId
+            createdAt
+            updatedAt
+          }
+          factoryOrderId
+          id
+          orderDetailId
+          price
+          productionCost
+          qualityCheckedAt
+          qualityCheckedBy
+          qualityStatus
+          quantity
+          rejectedQty
+          status
+          updatedAt
+        }
+        orderDetail {
+          design {
+            isTemplate
+            isPublic
+            isFinalized
+            designPositions {
+              designId
+              designJSON
+              positionType {
+                positionName
+                basePrice
+              }
+            }
+            systemConfigVariant {
+              model
+              size
+              price
+              product {
+                name
+                weight
+                imageUrl
+              }
+            }
+          }
+          id
+          orderId
+          price
+          qualityCheckStatus
+          quantity
+          reworkStatus
+          status
+        }
+      }
+      description
+      expiredTime
+      id
+      qualityCheckStatus
+      startDate
+      status
+      taskType
+      taskname
+    }
+    completedDate
+    assignedDate
+    id
+  }
+}

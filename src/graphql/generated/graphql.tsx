@@ -94,6 +94,24 @@ export type CategoryEntity = {
   updatedBy?: Maybe<Scalars['String']['output']>;
 };
 
+export type CheckQuality = {
+  __typename?: 'CheckQuality';
+  checkedAt: Scalars['DateTime']['output'];
+  checkedBy?: Maybe<Scalars['String']['output']>;
+  factoryOrderDetail?: Maybe<FactoryOrderDetailEntity>;
+  factoryOrderDetailId?: Maybe<Scalars['ID']['output']>;
+  failedQuantity: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  note?: Maybe<Scalars['String']['output']>;
+  orderDetail?: Maybe<CustomerOrderDetailEntity>;
+  orderDetailId: Scalars['ID']['output'];
+  passedQuantity: Scalars['Int']['output'];
+  reworkRequired: Scalars['Boolean']['output'];
+  status: QualityCheckStatus;
+  taskId: Scalars['ID']['output'];
+  totalChecked: Scalars['Int']['output'];
+};
+
 /** Create Address Input */
 export type CreateAddressInput = {
   districtID: Scalars['Float']['input'];
@@ -129,6 +147,17 @@ export type CreateOrderDetailDto = {
 
 export type CreateOrderDto = {
   orderDetails: Array<CreateOrderDetailDto>;
+};
+
+export type CreatePaymentTransactionInput = {
+  amount: Scalars['Int']['input'];
+  customerId: Scalars['String']['input'];
+  paymentGatewayTransactionId: Scalars['String']['input'];
+  paymentId: Scalars['String']['input'];
+  paymentMethod: PaymentMethod;
+  status: TransactionStatus;
+  transactionLog: Scalars['String']['input'];
+  type: TransactionType;
 };
 
 export type CreateProductDesignDto = {
@@ -192,6 +221,7 @@ export type CreateUserDto = {
 
 export type CustomerOrderDetailEntity = {
   __typename?: 'CustomerOrderDetailEntity';
+  design?: Maybe<ProductDesignEntity>;
   designId: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   orderId: Scalars['String']['output'];
@@ -253,7 +283,7 @@ export type FactoryEntity = {
   operationalHours?: Maybe<Scalars['String']['output']>;
   owner: UserEntity;
   printingMethods: Array<Scalars['String']['output']>;
-  products: Array<ProductEntity>;
+  products: Array<FactoryProductEntity>;
   qualityCertifications?: Maybe<Scalars['String']['output']>;
   reviewedAt?: Maybe<Scalars['DateTime']['output']>;
   reviewedBy?: Maybe<Scalars['String']['output']>;
@@ -262,6 +292,89 @@ export type FactoryEntity = {
   taxIdentificationNumber?: Maybe<Scalars['String']['output']>;
   totalEmployees?: Maybe<Scalars['Int']['output']>;
   website?: Maybe<Scalars['String']['output']>;
+};
+
+export type FactoryOrder = {
+  __typename?: 'FactoryOrder';
+  acceptanceDeadline: Scalars['DateTime']['output'];
+  acceptedAt?: Maybe<Scalars['DateTime']['output']>;
+  assignedAt: Scalars['DateTime']['output'];
+  completedAt?: Maybe<Scalars['DateTime']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  currentProgress?: Maybe<Scalars['Int']['output']>;
+  customerOrder?: Maybe<CustomerOrderEntity>;
+  customerOrderId: Scalars['String']['output'];
+  delayReason?: Maybe<Scalars['String']['output']>;
+  estimatedCompletionDate?: Maybe<Scalars['DateTime']['output']>;
+  factoryId: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isDelayed: Scalars['Boolean']['output'];
+  lastUpdated?: Maybe<Scalars['DateTime']['output']>;
+  orderDetails?: Maybe<Array<FactoryOrderDetailEntity>>;
+  progressReports?: Maybe<Array<FactoryProgressReport>>;
+  qualityIssues?: Maybe<Array<QualityIssue>>;
+  rejectionReason?: Maybe<Scalars['String']['output']>;
+  shippedAt?: Maybe<Scalars['DateTime']['output']>;
+  status: FactoryOrderStatus;
+  tasks?: Maybe<Array<TaskEntity>>;
+  totalItems: Scalars['Int']['output'];
+  totalProductionCost: Scalars['Int']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type FactoryOrderDetailEntity = {
+  __typename?: 'FactoryOrderDetailEntity';
+  checkQualities?: Maybe<Array<CheckQuality>>;
+  completedQty: Scalars['Int']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  design: ProductDesign;
+  designId: Scalars['ID']['output'];
+  factoryOrder?: Maybe<FactoryOrder>;
+  factoryOrderId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  orderDetail: CustomerOrderDetailEntity;
+  orderDetailId: Scalars['ID']['output'];
+  price: Scalars['Int']['output'];
+  productionCost: Scalars['Int']['output'];
+  qualityCheckedAt?: Maybe<Scalars['DateTime']['output']>;
+  qualityCheckedBy?: Maybe<Scalars['String']['output']>;
+  qualityStatus?: Maybe<QualityCheckStatus>;
+  quantity: Scalars['Int']['output'];
+  rejectedQty: Scalars['Int']['output'];
+  status: OrderStatus;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export enum FactoryOrderStatus {
+  Accepted = 'ACCEPTED',
+  Cancelled = 'CANCELLED',
+  Completed = 'COMPLETED',
+  Expired = 'EXPIRED',
+  InProduction = 'IN_PRODUCTION',
+  PendingAcceptance = 'PENDING_ACCEPTANCE',
+  Rejected = 'REJECTED',
+  Shipped = 'SHIPPED',
+}
+
+export type FactoryProductEntity = {
+  __typename?: 'FactoryProductEntity';
+  estimatedProductionTime: Scalars['Int']['output'];
+  factoryId: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  productionCapacity: Scalars['Int']['output'];
+  systemConfigVariantId: Scalars['String']['output'];
+};
+
+export type FactoryProgressReport = {
+  __typename?: 'FactoryProgressReport';
+  completedQty: Scalars['Int']['output'];
+  estimatedCompletion: Scalars['DateTime']['output'];
+  factoryOrder?: Maybe<FactoryOrder>;
+  factoryOrderId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  notes: Scalars['String']['output'];
+  photoUrls: Array<Scalars['String']['output']>;
+  reportDate: Scalars['DateTime']['output'];
 };
 
 export enum FactoryStatus {
@@ -291,12 +404,15 @@ export type Mutation = {
   __typename?: 'Mutation';
   calculateShippingFee: ShippingFee;
   clearCart: Scalars['Boolean']['output'];
+  completeStaffTask: StaffTask;
   createAddress: AddressEntity;
   createCartItem: CartItemEntity;
   createCategory: CategoryEntity;
+  createCheckQuality: CheckQuality;
   createNotification: NotificationEntity;
   createOrder: CustomerOrderEntity;
   createPayment: Scalars['String']['output'];
+  createPaymentTransaction: PaymentTransaction;
   createProduct: ProductEntity;
   createProductDesign: ProductDesignEntity;
   createProductPositionType: ProductPositionTypeEntity;
@@ -312,10 +428,12 @@ export type Mutation = {
   login: AuthResponseDto;
   logout: Scalars['String']['output'];
   markAllNotificationsAsRead: Array<NotificationEntity>;
+  markFactoryOrderAsDelayed: FactoryOrder;
   markNotificationAsRead: NotificationEntity;
   refreshToken: AuthResponseDto;
   register: AuthResponseDto;
   removeNotification: NotificationEntity;
+  removePaymentTransaction: PaymentTransaction;
   removeProductDesign: ProductDesignEntity;
   removeProductPositionType: ProductPositionTypeEntity;
   removeSystemConfigBank: SystemConfigBankEntity;
@@ -329,12 +447,16 @@ export type Mutation = {
   updateAddress: AddressEntity;
   updateCartItem: CartItemEntity;
   updateCategory: CategoryEntity;
+  updateCheckQualityStatus: CheckQuality;
   updateDesignPosition: DesignPositionEntity;
   updateFactoryInfo: FactoryEntity;
+  updateFactoryOrderStatus: FactoryOrder;
   updateNotification: NotificationEntity;
+  updatePaymentTransaction: PaymentTransaction;
   updateProduct: ProductEntity;
   updateProductDesign: ProductDesignEntity;
   updateProductPositionType: ProductPositionTypeEntity;
+  updateStaffTaskStatus: StaffTask;
   updateSystemConfigBank: SystemConfigBankEntity;
   updateSystemConfigDiscount: SystemConfigDiscountEntity;
   updateSystemConfigVariant: SystemConfigVariantEntity;
@@ -344,6 +466,10 @@ export type Mutation = {
 
 export type MutationCalculateShippingFeeArgs = {
   input: CalculateShippingFeeDto;
+};
+
+export type MutationCompleteStaffTaskArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export type MutationCreateAddressArgs = {
@@ -358,6 +484,18 @@ export type MutationCreateCategoryArgs = {
   createCategoryInput: CreateCategoryDto;
 };
 
+export type MutationCreateCheckQualityArgs = {
+  factoryOrderDetailId?: InputMaybe<Scalars['ID']['input']>;
+  failedQuantity: Scalars['Float']['input'];
+  note?: InputMaybe<Scalars['String']['input']>;
+  orderDetailId: Scalars['ID']['input'];
+  passedQuantity: Scalars['Float']['input'];
+  reworkRequired: Scalars['Boolean']['input'];
+  status: QualityCheckStatus;
+  taskId: Scalars['ID']['input'];
+  totalChecked: Scalars['Float']['input'];
+};
+
 export type MutationCreateNotificationArgs = {
   input: CreateNotificationDto;
 };
@@ -369,6 +507,10 @@ export type MutationCreateOrderArgs = {
 export type MutationCreatePaymentArgs = {
   gateway: Scalars['String']['input'];
   paymentId: Scalars['String']['input'];
+};
+
+export type MutationCreatePaymentTransactionArgs = {
+  input: CreatePaymentTransactionInput;
 };
 
 export type MutationCreateProductArgs = {
@@ -423,6 +565,10 @@ export type MutationLoginArgs = {
   loginInput: LoginDto;
 };
 
+export type MutationMarkFactoryOrderAsDelayedArgs = {
+  id: Scalars['ID']['input'];
+};
+
 export type MutationMarkNotificationAsReadArgs = {
   id: Scalars['ID']['input'];
 };
@@ -436,6 +582,10 @@ export type MutationRegisterArgs = {
 };
 
 export type MutationRemoveNotificationArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type MutationRemovePaymentTransactionArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -494,6 +644,11 @@ export type MutationUpdateCategoryArgs = {
   updateCategoryInput: UpdateCategoryDto;
 };
 
+export type MutationUpdateCheckQualityStatusArgs = {
+  id: Scalars['ID']['input'];
+  status: QualityCheckStatus;
+};
+
 export type MutationUpdateDesignPositionArgs = {
   input: UpdateDesignPositionDto;
 };
@@ -502,8 +657,18 @@ export type MutationUpdateFactoryInfoArgs = {
   updateFactoryInfoInput: UpdateFactoryInfoDto;
 };
 
+export type MutationUpdateFactoryOrderStatusArgs = {
+  id: Scalars['ID']['input'];
+  status: Scalars['String']['input'];
+};
+
 export type MutationUpdateNotificationArgs = {
   input: UpdateNotificationDto;
+};
+
+export type MutationUpdatePaymentTransactionArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdatePaymentTransactionInput;
 };
 
 export type MutationUpdateProductArgs = {
@@ -518,6 +683,11 @@ export type MutationUpdateProductDesignArgs = {
 
 export type MutationUpdateProductPositionTypeArgs = {
   input: UpdateProductPositionTypeDto;
+};
+
+export type MutationUpdateStaffTaskStatusArgs = {
+  id: Scalars['ID']['input'];
+  status: Scalars['String']['input'];
 };
 
 export type MutationUpdateSystemConfigBankArgs = {
@@ -555,6 +725,17 @@ export type NotificationEntity = {
   userId: Scalars['String']['output'];
 };
 
+export enum OrderStatus {
+  Accepted = 'ACCEPTED',
+  AssignedToFactory = 'ASSIGNED_TO_FACTORY',
+  Canceled = 'CANCELED',
+  Completed = 'COMPLETED',
+  Delivered = 'DELIVERED',
+  InProduction = 'IN_PRODUCTION',
+  PaymentReceived = 'PAYMENT_RECEIVED',
+  Pending = 'PENDING',
+}
+
 export type PaymentEntity = {
   __typename?: 'PaymentEntity';
   amount: Scalars['Int']['output'];
@@ -567,6 +748,26 @@ export type PaymentEntity = {
   status: Scalars['String']['output'];
   transactions?: Maybe<Array<PaymentTransactionEntity>>;
   type: Scalars['String']['output'];
+};
+
+/** Method of payment */
+export enum PaymentMethod {
+  Payos = 'PAYOS',
+  Vnpay = 'VNPAY',
+}
+
+export type PaymentTransaction = {
+  __typename?: 'PaymentTransaction';
+  amount: Scalars['Float']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  customer?: Maybe<UserEntity>;
+  customerId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  paymentGatewayTransactionId: Scalars['String']['output'];
+  paymentMethod: PaymentMethod;
+  status: TransactionStatus;
+  transactionLog: Scalars['String']['output'];
+  type: TransactionType;
 };
 
 export type PaymentTransactionEntity = {
@@ -583,6 +784,19 @@ export type PaymentTransactionEntity = {
   type: Scalars['String']['output'];
 };
 
+export type ProductDesign = {
+  __typename?: 'ProductDesign';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  isFinalized: Scalars['Boolean']['output'];
+  isPublic: Scalars['Boolean']['output'];
+  isTemplate: Scalars['Boolean']['output'];
+  systemConfigVariant: SystemConfigVariantEntity;
+  systemConfigVariantId: Scalars['ID']['output'];
+  user: UserEntity;
+  userId: Scalars['ID']['output'];
+};
+
 export type ProductDesignEntity = {
   __typename?: 'ProductDesignEntity';
   createdAt: Scalars['DateTime']['output'];
@@ -591,7 +805,7 @@ export type ProductDesignEntity = {
   isFinalized: Scalars['Boolean']['output'];
   isPublic: Scalars['Boolean']['output'];
   isTemplate: Scalars['Boolean']['output'];
-  systemConfigVariant: SystemConfigVariantEntity;
+  systemConfigVariant?: Maybe<SystemConfigVariantEntity>;
   systemConfigVariantId: Scalars['String']['output'];
   user?: Maybe<UserEntity>;
   userId: Scalars['String']['output'];
@@ -637,6 +851,37 @@ export type Province = {
   provinceName: Scalars['String']['output'];
 };
 
+export enum QualityCheckStatus {
+  Approved = 'APPROVED',
+  PartialApproved = 'PARTIAL_APPROVED',
+  Pending = 'PENDING',
+  Rejected = 'REJECTED',
+}
+
+export type QualityIssue = {
+  __typename?: 'QualityIssue';
+  assignedTo?: Maybe<Scalars['String']['output']>;
+  description: Scalars['String']['output'];
+  factoryOrder?: Maybe<FactoryOrder>;
+  factoryOrderId: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  issueType: Scalars['String']['output'];
+  photoUrls: Array<Scalars['String']['output']>;
+  reportedAt: Scalars['DateTime']['output'];
+  reportedBy?: Maybe<Scalars['String']['output']>;
+  resolution?: Maybe<Scalars['String']['output']>;
+  resolvedAt?: Maybe<Scalars['DateTime']['output']>;
+  resolvedBy?: Maybe<Scalars['String']['output']>;
+  status: QualityIssueStatus;
+};
+
+export enum QualityIssueStatus {
+  Investigating = 'INVESTIGATING',
+  Rejected = 'REJECTED',
+  Reported = 'REPORTED',
+  Resolved = 'RESOLVED',
+}
+
 export type Query = {
   __typename?: 'Query';
   address: AddressEntity;
@@ -644,18 +889,30 @@ export type Query = {
   availableServices: Array<ShippingService>;
   categories: Array<CategoryEntity>;
   category: CategoryEntity;
+  checkQualities: Array<CheckQuality>;
+  checkQualitiesByTask: Array<CheckQuality>;
+  checkQuality: CheckQuality;
   designPosition: DesignPositionEntity;
   distinctVariantAttributes: VariantAttributes;
   district: District;
   districts: Array<District>;
+  factoryOrder: FactoryOrder;
+  factoryOrders: Array<FactoryOrder>;
+  factoryOrdersByCustomerOrder: Array<FactoryOrder>;
+  factoryOrdersByFactory: Array<FactoryOrder>;
   getAllDiscountByProductId: Array<SystemConfigDiscountEntity>;
   getApplicableDiscount: Scalars['Float']['output'];
   getCartItem: CartItemEntity;
   getCartItemCount: Scalars['Float']['output'];
   getMe: UserEntity;
   getMyFactory: FactoryEntity;
+  myStaffTasks: Array<StaffTask>;
   notification: NotificationEntity;
   notifications: Array<NotificationEntity>;
+  paymentTransaction?: Maybe<PaymentTransaction>;
+  paymentTransactions: Array<PaymentTransaction>;
+  paymentTransactionsByCustomer: Array<PaymentTransaction>;
+  paymentTransactionsByPayment: Array<PaymentTransaction>;
   product: ProductEntity;
   productDesign: ProductDesignEntity;
   productDesigns: Array<ProductDesignEntity>;
@@ -664,6 +921,9 @@ export type Query = {
   products: Array<ProductEntity>;
   province: Province;
   provinces: Array<Province>;
+  staffTask: StaffTask;
+  staffTasks: Array<StaffTask>;
+  staffTasksByTask: Array<StaffTask>;
   systemConfigBank: SystemConfigBankEntity;
   systemConfigBanks: Array<SystemConfigBankEntity>;
   systemConfigDiscount: SystemConfigDiscountEntity;
@@ -692,6 +952,14 @@ export type QueryCategoryArgs = {
   id: Scalars['String']['input'];
 };
 
+export type QueryCheckQualitiesByTaskArgs = {
+  taskId: Scalars['ID']['input'];
+};
+
+export type QueryCheckQualityArgs = {
+  id: Scalars['ID']['input'];
+};
+
 export type QueryDesignPositionArgs = {
   designId: Scalars['ID']['input'];
   productPositionTypeId: Scalars['ID']['input'];
@@ -709,6 +977,14 @@ export type QueryDistrictsArgs = {
   provinceId: Scalars['Int']['input'];
 };
 
+export type QueryFactoryOrderArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type QueryFactoryOrdersByCustomerOrderArgs = {
+  customerOrderId: Scalars['ID']['input'];
+};
+
 export type QueryGetAllDiscountByProductIdArgs = {
   productId: Scalars['String']['input'];
 };
@@ -724,6 +1000,18 @@ export type QueryGetCartItemArgs = {
 
 export type QueryNotificationArgs = {
   id: Scalars['ID']['input'];
+};
+
+export type QueryPaymentTransactionArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type QueryPaymentTransactionsByCustomerArgs = {
+  customerId: Scalars['ID']['input'];
+};
+
+export type QueryPaymentTransactionsByPaymentArgs = {
+  paymentId: Scalars['ID']['input'];
 };
 
 export type QueryProductArgs = {
@@ -744,6 +1032,14 @@ export type QueryProductPositionTypesArgs = {
 
 export type QueryProvinceArgs = {
   provinceId: Scalars['Int']['input'];
+};
+
+export type QueryStaffTaskArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type QueryStaffTasksByTaskArgs = {
+  taskId: Scalars['ID']['input'];
 };
 
 export type QuerySystemConfigBankArgs = {
@@ -813,6 +1109,19 @@ export type ShippingService = {
   shortName: Scalars['String']['output'];
 };
 
+export type StaffTask = {
+  __typename?: 'StaffTask';
+  assignedDate: Scalars['DateTime']['output'];
+  completedDate?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  note?: Maybe<Scalars['String']['output']>;
+  status: Scalars['String']['output'];
+  task: TaskEntity;
+  taskId: Scalars['ID']['output'];
+  user: UserEntity;
+  userId: Scalars['ID']['output'];
+};
+
 export type SystemConfigBankEntity = {
   __typename?: 'SystemConfigBankEntity';
   bin: Scalars['String']['output'];
@@ -850,6 +1159,35 @@ export type SystemConfigVariantEntity = {
   productId: Scalars['String']['output'];
   size?: Maybe<Scalars['String']['output']>;
 };
+
+export type TaskEntity = {
+  __typename?: 'TaskEntity';
+  assignedBy?: Maybe<Scalars['String']['output']>;
+  checkQualities: Array<CheckQuality>;
+  description: Scalars['String']['output'];
+  expiredTime: Scalars['DateTime']['output'];
+  factoryOrderId?: Maybe<Scalars['ID']['output']>;
+  id: Scalars['ID']['output'];
+  qualityCheckStatus: QualityCheckStatus;
+  staffTasks?: Maybe<Array<StaffTask>>;
+  startDate: Scalars['DateTime']['output'];
+  status: Scalars['String']['output'];
+  taskType?: Maybe<Scalars['String']['output']>;
+  taskname: Scalars['String']['output'];
+};
+
+/** Status of transaction */
+export enum TransactionStatus {
+  Completed = 'COMPLETED',
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+}
+
+/** Type of transaction */
+export enum TransactionType {
+  Payment = 'PAYMENT',
+  Refund = 'REFUND',
+}
 
 export type UpdateAddressInput = {
   districtID?: InputMaybe<Scalars['Float']['input']>;
@@ -907,6 +1245,17 @@ export type UpdateNotificationDto = {
   title?: InputMaybe<Scalars['String']['input']>;
   url?: InputMaybe<Scalars['String']['input']>;
   userId?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdatePaymentTransactionInput = {
+  amount?: InputMaybe<Scalars['Int']['input']>;
+  customerId?: InputMaybe<Scalars['String']['input']>;
+  paymentGatewayTransactionId?: InputMaybe<Scalars['String']['input']>;
+  paymentId?: InputMaybe<Scalars['String']['input']>;
+  paymentMethod?: InputMaybe<PaymentMethod>;
+  status?: InputMaybe<TransactionStatus>;
+  transactionLog?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<TransactionType>;
 };
 
 export type UpdateProductDesignDto = {
@@ -1212,7 +1561,7 @@ export type GetUserCartItemsQuery = {
       isTemplate: boolean;
       isPublic: boolean;
       isFinalized: boolean;
-      systemConfigVariant: {
+      systemConfigVariant?: {
         __typename?: 'SystemConfigVariantEntity';
         color?: string | null;
         id: string;
@@ -1234,7 +1583,7 @@ export type GetUserCartItemsQuery = {
             discountPercent: number;
           }> | null;
         };
-      };
+      } | null;
       designPositions?: Array<{
         __typename?: 'DesignPositionEntity';
         positionType?: {
@@ -1254,6 +1603,20 @@ export type GetCartItemCountQuery = {
   getCartItemCount: number;
 };
 
+export type CreateCartItemMutationVariables = Exact<{
+  createCartItemInput: CreateCartItemDto;
+}>;
+
+export type CreateCartItemMutation = {
+  __typename?: 'Mutation';
+  createCartItem: {
+    __typename?: 'CartItemEntity';
+    userId: string;
+    id: string;
+    quantity: number;
+  };
+};
+
 export type UpdateCartItemMutationVariables = Exact<{
   updateCartItemId: Scalars['String']['input'];
   updateCartItemInput: UpdateCartItemDto;
@@ -1264,8 +1627,8 @@ export type UpdateCartItemMutation = {
   updateCartItem: {
     __typename?: 'CartItemEntity';
     userId: string;
-    quantity: number;
     id: string;
+    quantity: number;
   };
 };
 
@@ -1333,60 +1696,20 @@ export type DeleteCategoryMutation = {
   };
 };
 
-export type GetAllDiscountByProductIdQueryVariables = Exact<{
-  productId: Scalars['String']['input'];
+export type UpdateDesignPositionMutationVariables = Exact<{
+  input: UpdateDesignPositionDto;
 }>;
 
-export type GetAllDiscountByProductIdQuery = {
-  __typename?: 'Query';
-  getAllDiscountByProductId: Array<{
-    __typename?: 'SystemConfigDiscountEntity';
-    createdAt: any;
-    discountPercent: number;
-    id: string;
-    isActive: boolean;
-    isDeleted: boolean;
-    minQuantity: number;
-    name: string;
-    updatedAt: any;
-  }>;
-};
-
-export type CreateSystemConfigDiscountMutationVariables = Exact<{
-  createDiscountInput: CreateSystemConfigDiscountDto;
-}>;
-
-export type CreateSystemConfigDiscountMutation = {
+export type UpdateDesignPositionMutation = {
   __typename?: 'Mutation';
-  createSystemConfigDiscount: {
-    __typename?: 'SystemConfigDiscountEntity';
-    id: string;
-    discountPercent: number;
-    createdAt: any;
-    isActive: boolean;
-    isDeleted: boolean;
-    minQuantity: number;
-    name: string;
-    updatedAt: any;
-  };
-};
-
-export type RemoveSystemConfigDiscountMutationVariables = Exact<{
-  removeSystemConfigDiscountId: Scalars['String']['input'];
-}>;
-
-export type RemoveSystemConfigDiscountMutation = {
-  __typename?: 'Mutation';
-  removeSystemConfigDiscount: {
-    __typename?: 'SystemConfigDiscountEntity';
-    createdAt: any;
-    discountPercent: number;
-    id: string;
-    isActive: boolean;
-    isDeleted: boolean;
-    minQuantity: number;
-    name: string;
-    updatedAt: any;
+  updateDesignPosition: {
+    __typename?: 'DesignPositionEntity';
+    designJSON?: any | null;
+    positionType?: {
+      __typename?: 'ProductPositionTypeEntity';
+      positionName: string;
+      basePrice: number;
+    } | null;
   };
 };
 
@@ -1422,12 +1745,7 @@ export type GetMyFactoryQuery = {
       name?: string | null;
       imageUrl?: string | null;
     };
-    products: Array<{
-      __typename?: 'ProductEntity';
-      id: string;
-      imageUrl?: string | null;
-      name: string;
-    }>;
+    products: Array<{ __typename?: 'FactoryProductEntity'; id: string }>;
   };
 };
 
@@ -1465,13 +1783,18 @@ export type UpdateFactoryInfoMutation = {
       name?: string | null;
       imageUrl?: string | null;
     };
-    products: Array<{
-      __typename?: 'ProductEntity';
-      id: string;
-      imageUrl?: string | null;
-      name: string;
-    }>;
+    products: Array<{ __typename?: 'FactoryProductEntity'; id: string }>;
   };
+};
+
+export type UpdateFactoryOrderStatusMutationVariables = Exact<{
+  updateFactoryOrderStatusId: Scalars['ID']['input'];
+  status: Scalars['String']['input'];
+}>;
+
+export type UpdateFactoryOrderStatusMutation = {
+  __typename?: 'Mutation';
+  updateFactoryOrderStatus: { __typename?: 'FactoryOrder'; id: string };
 };
 
 export type CreateOrderMutationVariables = Exact<{
@@ -1588,6 +1911,135 @@ export type CreatePaymentGatewayUrlMutation = {
   createPayment: string;
 };
 
+export type GetCurrentFactoryOrdersQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetCurrentFactoryOrdersQuery = {
+  __typename?: 'Query';
+  factoryOrdersByFactory: Array<{
+    __typename?: 'FactoryOrder';
+    acceptanceDeadline: any;
+    factoryId: string;
+    id: string;
+    status: FactoryOrderStatus;
+    createdAt: any;
+    updatedAt?: any | null;
+    customerOrder?: {
+      __typename?: 'CustomerOrderEntity';
+      id: string;
+      orderDate: any;
+      orderDetails?: Array<{
+        __typename?: 'CustomerOrderDetailEntity';
+        design?: {
+          __typename?: 'ProductDesignEntity';
+          designPositions?: Array<{
+            __typename?: 'DesignPositionEntity';
+            designId: string;
+            designJSON?: any | null;
+            productPositionTypeId: string;
+            positionType?: {
+              __typename?: 'ProductPositionTypeEntity';
+              positionName: string;
+            } | null;
+          }> | null;
+        } | null;
+      }> | null;
+    } | null;
+  }>;
+};
+
+export type GetFactoryOrderQueryVariables = Exact<{
+  factoryOrderId: Scalars['ID']['input'];
+}>;
+
+export type GetFactoryOrderQuery = {
+  __typename?: 'Query';
+  factoryOrder: {
+    __typename?: 'FactoryOrder';
+    acceptanceDeadline: any;
+    factoryId: string;
+    id: string;
+    status: FactoryOrderStatus;
+    createdAt: any;
+    updatedAt?: any | null;
+    totalProductionCost: number;
+    totalItems: number;
+    rejectionReason?: string | null;
+    assignedAt: any;
+    completedAt?: any | null;
+    acceptedAt?: any | null;
+    currentProgress?: number | null;
+    delayReason?: string | null;
+    estimatedCompletionDate?: any | null;
+    isDelayed: boolean;
+    lastUpdated?: any | null;
+    customerOrder?: {
+      __typename?: 'CustomerOrderEntity';
+      id: string;
+      orderDate: any;
+      orderDetails?: Array<{
+        __typename?: 'CustomerOrderDetailEntity';
+        design?: {
+          __typename?: 'ProductDesignEntity';
+          designPositions?: Array<{
+            __typename?: 'DesignPositionEntity';
+            designId: string;
+            designJSON?: any | null;
+            productPositionTypeId: string;
+            positionType?: {
+              __typename?: 'ProductPositionTypeEntity';
+              positionName: string;
+            } | null;
+          }> | null;
+        } | null;
+      }> | null;
+    } | null;
+    progressReports?: Array<{
+      __typename?: 'FactoryProgressReport';
+      completedQty: number;
+      estimatedCompletion: any;
+      factoryOrderId: string;
+      id: string;
+      notes: string;
+      photoUrls: Array<string>;
+      reportDate: any;
+    }> | null;
+    orderDetails?: Array<{
+      __typename?: 'FactoryOrderDetailEntity';
+      completedQty: number;
+      createdAt: any;
+      factoryOrderId: string;
+      id: string;
+      orderDetailId: string;
+      price: number;
+      productionCost: number;
+      qualityCheckedAt?: any | null;
+      qualityCheckedBy?: string | null;
+      qualityStatus?: QualityCheckStatus | null;
+      quantity: number;
+      rejectedQty: number;
+      status: OrderStatus;
+      updatedAt?: any | null;
+      checkQualities?: Array<{
+        __typename?: 'CheckQuality';
+        checkedAt: any;
+        checkedBy?: string | null;
+        factoryOrderDetailId?: string | null;
+        failedQuantity: number;
+        id: string;
+        note?: string | null;
+        orderDetailId: string;
+        passedQuantity: number;
+        reworkRequired: boolean;
+        status: QualityCheckStatus;
+        taskId: string;
+        totalChecked: number;
+      }> | null;
+    }> | null;
+  };
+};
+
 export type ProductDesignByIdQueryVariables = Exact<{
   productDesignId: Scalars['ID']['input'];
 }>;
@@ -1596,21 +2048,20 @@ export type ProductDesignByIdQuery = {
   __typename?: 'Query';
   productDesign: {
     __typename?: 'ProductDesignEntity';
-    systemConfigVariant: {
+    systemConfigVariant?: {
       __typename?: 'SystemConfigVariantEntity';
       id: string;
       price?: number | null;
       color?: string | null;
       size?: string | null;
       model?: string | null;
-    };
+    } | null;
     designPositions?: Array<{
       __typename?: 'DesignPositionEntity';
-      designId: string;
-      productPositionTypeId: string;
       designJSON?: any | null;
       positionType?: {
         __typename?: 'ProductPositionTypeEntity';
+        id: string;
         positionName: string;
         basePrice: number;
       } | null;
@@ -1636,24 +2087,39 @@ export type UpdateProductDesignMutation = {
   __typename?: 'Mutation';
   updateProductDesign: {
     __typename?: 'ProductDesignEntity';
-    systemConfigVariant: {
+    systemConfigVariant?: {
       __typename?: 'SystemConfigVariantEntity';
       id: string;
       price?: number | null;
       color?: string | null;
       size?: string | null;
       model?: string | null;
-    };
+    } | null;
     designPositions?: Array<{
       __typename?: 'DesignPositionEntity';
       designJSON?: any | null;
       positionType?: {
         __typename?: 'ProductPositionTypeEntity';
+        id: string;
         positionName: string;
         basePrice: number;
       } | null;
     }> | null;
   };
+};
+
+export type GetAllDiscountByProductIdQueryVariables = Exact<{
+  productId: Scalars['String']['input'];
+}>;
+
+export type GetAllDiscountByProductIdQuery = {
+  __typename?: 'Query';
+  getAllDiscountByProductId: Array<{
+    __typename?: 'SystemConfigDiscountEntity';
+    id: string;
+    discountPercent: number;
+    minQuantity: number;
+  }>;
 };
 
 export type GetAllProductsQueryVariables = Exact<{ [key: string]: never }>;
@@ -1675,32 +2141,6 @@ export type GetAllProductsQuery = {
       price?: number | null;
     }> | null;
   }>;
-};
-
-export type GetProductByIdQueryVariables = Exact<{
-  productId: Scalars['String']['input'];
-}>;
-
-export type GetProductByIdQuery = {
-  __typename?: 'Query';
-  product: {
-    __typename?: 'ProductEntity';
-    createdAt: any;
-    createdBy?: string | null;
-    description?: string | null;
-    id: string;
-    imageUrl?: string | null;
-    isActive: boolean;
-    isDeleted: boolean;
-    model3DUrl?: string | null;
-    name: string;
-    updatedAt?: any | null;
-    category?: {
-      __typename?: 'CategoryEntity';
-      imageUrl?: string | null;
-      name: string;
-    } | null;
-  };
 };
 
 export type CreateProductMutationVariables = Exact<{
@@ -1931,6 +2371,220 @@ export type RemoveSystemConfigBankMutation = {
   };
 };
 
+export type GetMyStaffTasksQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetMyStaffTasksQuery = {
+  __typename?: 'Query';
+  myStaffTasks: Array<{
+    __typename?: 'StaffTask';
+    status: string;
+    note?: string | null;
+    completedDate?: any | null;
+    assignedDate: any;
+    id: string;
+    task: {
+      __typename?: 'TaskEntity';
+      assignedBy?: string | null;
+      description: string;
+      expiredTime: any;
+      id: string;
+      qualityCheckStatus: QualityCheckStatus;
+      startDate: any;
+      status: string;
+      taskType?: string | null;
+      taskname: string;
+      checkQualities: Array<{
+        __typename?: 'CheckQuality';
+        checkedAt: any;
+        checkedBy?: string | null;
+        failedQuantity: number;
+        id: string;
+        note?: string | null;
+        passedQuantity: number;
+        reworkRequired: boolean;
+        status: QualityCheckStatus;
+        taskId: string;
+        totalChecked: number;
+        factoryOrderDetail?: {
+          __typename?: 'FactoryOrderDetailEntity';
+          completedQty: number;
+          createdAt: any;
+          designId: string;
+          factoryOrderId: string;
+          id: string;
+          orderDetailId: string;
+          price: number;
+          productionCost: number;
+          qualityCheckedAt?: any | null;
+          qualityCheckedBy?: string | null;
+          qualityStatus?: QualityCheckStatus | null;
+          quantity: number;
+          rejectedQty: number;
+          status: OrderStatus;
+          updatedAt?: any | null;
+          factoryOrder?: {
+            __typename?: 'FactoryOrder';
+            status: FactoryOrderStatus;
+            isDelayed: boolean;
+            estimatedCompletionDate?: any | null;
+            completedAt?: any | null;
+            acceptanceDeadline: any;
+            factoryId: string;
+            createdAt: any;
+            updatedAt?: any | null;
+          } | null;
+        } | null;
+        orderDetail?: {
+          __typename?: 'CustomerOrderDetailEntity';
+          id: string;
+          orderId: string;
+          price: number;
+          qualityCheckStatus: string;
+          quantity: number;
+          reworkStatus: string;
+          status: string;
+          design?: {
+            __typename?: 'ProductDesignEntity';
+            isTemplate: boolean;
+            isPublic: boolean;
+            isFinalized: boolean;
+            designPositions?: Array<{
+              __typename?: 'DesignPositionEntity';
+              designId: string;
+              designJSON?: any | null;
+              positionType?: {
+                __typename?: 'ProductPositionTypeEntity';
+                positionName: string;
+                basePrice: number;
+              } | null;
+            }> | null;
+            systemConfigVariant?: {
+              __typename?: 'SystemConfigVariantEntity';
+              model?: string | null;
+              size?: string | null;
+              price?: number | null;
+              product: {
+                __typename?: 'ProductEntity';
+                name: string;
+                weight?: number | null;
+                imageUrl?: string | null;
+              };
+            } | null;
+          } | null;
+        } | null;
+      }>;
+    };
+  }>;
+};
+
+export type GetStaffTaskDetailQueryVariables = Exact<{
+  staffTaskId: Scalars['ID']['input'];
+}>;
+
+export type GetStaffTaskDetailQuery = {
+  __typename?: 'Query';
+  staffTask: {
+    __typename?: 'StaffTask';
+    status: string;
+    note?: string | null;
+    completedDate?: any | null;
+    assignedDate: any;
+    id: string;
+    task: {
+      __typename?: 'TaskEntity';
+      assignedBy?: string | null;
+      description: string;
+      expiredTime: any;
+      id: string;
+      qualityCheckStatus: QualityCheckStatus;
+      startDate: any;
+      status: string;
+      taskType?: string | null;
+      taskname: string;
+      checkQualities: Array<{
+        __typename?: 'CheckQuality';
+        checkedAt: any;
+        checkedBy?: string | null;
+        failedQuantity: number;
+        id: string;
+        note?: string | null;
+        passedQuantity: number;
+        reworkRequired: boolean;
+        status: QualityCheckStatus;
+        taskId: string;
+        totalChecked: number;
+        factoryOrderDetail?: {
+          __typename?: 'FactoryOrderDetailEntity';
+          completedQty: number;
+          createdAt: any;
+          designId: string;
+          factoryOrderId: string;
+          id: string;
+          orderDetailId: string;
+          price: number;
+          productionCost: number;
+          qualityCheckedAt?: any | null;
+          qualityCheckedBy?: string | null;
+          qualityStatus?: QualityCheckStatus | null;
+          quantity: number;
+          rejectedQty: number;
+          status: OrderStatus;
+          updatedAt?: any | null;
+          factoryOrder?: {
+            __typename?: 'FactoryOrder';
+            status: FactoryOrderStatus;
+            isDelayed: boolean;
+            estimatedCompletionDate?: any | null;
+            completedAt?: any | null;
+            acceptanceDeadline: any;
+            factoryId: string;
+            createdAt: any;
+            updatedAt?: any | null;
+          } | null;
+        } | null;
+        orderDetail?: {
+          __typename?: 'CustomerOrderDetailEntity';
+          id: string;
+          orderId: string;
+          price: number;
+          qualityCheckStatus: string;
+          quantity: number;
+          reworkStatus: string;
+          status: string;
+          design?: {
+            __typename?: 'ProductDesignEntity';
+            isTemplate: boolean;
+            isPublic: boolean;
+            isFinalized: boolean;
+            designPositions?: Array<{
+              __typename?: 'DesignPositionEntity';
+              designId: string;
+              designJSON?: any | null;
+              positionType?: {
+                __typename?: 'ProductPositionTypeEntity';
+                positionName: string;
+                basePrice: number;
+              } | null;
+            }> | null;
+            systemConfigVariant?: {
+              __typename?: 'SystemConfigVariantEntity';
+              model?: string | null;
+              size?: string | null;
+              price?: number | null;
+              product: {
+                __typename?: 'ProductEntity';
+                name: string;
+                weight?: number | null;
+                imageUrl?: string | null;
+              };
+            } | null;
+          } | null;
+        } | null;
+      }>;
+    };
+  };
+};
+
 export type GetUsersQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetUsersQuery = {
@@ -2038,24 +2692,6 @@ export type DeleteUserMutation = {
     role: Roles;
     updatedAt?: any | null;
   };
-};
-
-export type SystemConfigVariantsByProductQueryVariables = Exact<{
-  productId: Scalars['String']['input'];
-}>;
-
-export type SystemConfigVariantsByProductQuery = {
-  __typename?: 'Query';
-  systemConfigVariantsByProduct: Array<{
-    __typename?: 'SystemConfigVariantEntity';
-    color?: string | null;
-    id: string;
-    isActive: boolean;
-    isDeleted: boolean;
-    model?: string | null;
-    price?: number | null;
-    size?: string | null;
-  }>;
 };
 
 export const AddressesDocument = gql`
@@ -2841,6 +3477,58 @@ export type GetCartItemCountQueryResult = Apollo.QueryResult<
   GetCartItemCountQuery,
   GetCartItemCountQueryVariables
 >;
+export const CreateCartItemDocument = gql`
+  mutation CreateCartItem($createCartItemInput: CreateCartItemDto!) {
+    createCartItem(createCartItemInput: $createCartItemInput) {
+      userId
+      id
+      quantity
+    }
+  }
+`;
+export type CreateCartItemMutationFn = Apollo.MutationFunction<
+  CreateCartItemMutation,
+  CreateCartItemMutationVariables
+>;
+
+/**
+ * __useCreateCartItemMutation__
+ *
+ * To run a mutation, you first call `useCreateCartItemMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateCartItemMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createCartItemMutation, { data, loading, error }] = useCreateCartItemMutation({
+ *   variables: {
+ *      createCartItemInput: // value for 'createCartItemInput'
+ *   },
+ * });
+ */
+export function useCreateCartItemMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateCartItemMutation,
+    CreateCartItemMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateCartItemMutation,
+    CreateCartItemMutationVariables
+  >(CreateCartItemDocument, options);
+}
+export type CreateCartItemMutationHookResult = ReturnType<
+  typeof useCreateCartItemMutation
+>;
+export type CreateCartItemMutationResult =
+  Apollo.MutationResult<CreateCartItemMutation>;
+export type CreateCartItemMutationOptions = Apollo.BaseMutationOptions<
+  CreateCartItemMutation,
+  CreateCartItemMutationVariables
+>;
 export const UpdateCartItemDocument = gql`
   mutation UpdateCartItem(
     $updateCartItemId: String!
@@ -2851,8 +3539,8 @@ export const UpdateCartItemDocument = gql`
       updateCartItemInput: $updateCartItemInput
     ) {
       userId
-      quantity
       id
+      quantity
     }
   }
 `;
@@ -3148,213 +3836,60 @@ export type DeleteCategoryMutationOptions = Apollo.BaseMutationOptions<
   DeleteCategoryMutation,
   DeleteCategoryMutationVariables
 >;
-export const GetAllDiscountByProductIdDocument = gql`
-  query GetAllDiscountByProductId($productId: String!) {
-    getAllDiscountByProductId(productId: $productId) {
-      createdAt
-      discountPercent
-      id
-      isActive
-      isDeleted
-      minQuantity
-      name
-      updatedAt
+export const UpdateDesignPositionDocument = gql`
+  mutation UpdateDesignPosition($input: UpdateDesignPositionDto!) {
+    updateDesignPosition(input: $input) {
+      positionType {
+        positionName
+        basePrice
+      }
+      designJSON
     }
   }
 `;
-
-/**
- * __useGetAllDiscountByProductIdQuery__
- *
- * To run a query within a React component, call `useGetAllDiscountByProductIdQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetAllDiscountByProductIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetAllDiscountByProductIdQuery({
- *   variables: {
- *      productId: // value for 'productId'
- *   },
- * });
- */
-export function useGetAllDiscountByProductIdQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GetAllDiscountByProductIdQuery,
-    GetAllDiscountByProductIdQueryVariables
-  > &
-    (
-      | { variables: GetAllDiscountByProductIdQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    ),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GetAllDiscountByProductIdQuery,
-    GetAllDiscountByProductIdQueryVariables
-  >(GetAllDiscountByProductIdDocument, options);
-}
-export function useGetAllDiscountByProductIdLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetAllDiscountByProductIdQuery,
-    GetAllDiscountByProductIdQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GetAllDiscountByProductIdQuery,
-    GetAllDiscountByProductIdQueryVariables
-  >(GetAllDiscountByProductIdDocument, options);
-}
-export function useGetAllDiscountByProductIdSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GetAllDiscountByProductIdQuery,
-        GetAllDiscountByProductIdQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GetAllDiscountByProductIdQuery,
-    GetAllDiscountByProductIdQueryVariables
-  >(GetAllDiscountByProductIdDocument, options);
-}
-export type GetAllDiscountByProductIdQueryHookResult = ReturnType<
-  typeof useGetAllDiscountByProductIdQuery
->;
-export type GetAllDiscountByProductIdLazyQueryHookResult = ReturnType<
-  typeof useGetAllDiscountByProductIdLazyQuery
->;
-export type GetAllDiscountByProductIdSuspenseQueryHookResult = ReturnType<
-  typeof useGetAllDiscountByProductIdSuspenseQuery
->;
-export type GetAllDiscountByProductIdQueryResult = Apollo.QueryResult<
-  GetAllDiscountByProductIdQuery,
-  GetAllDiscountByProductIdQueryVariables
->;
-export const CreateSystemConfigDiscountDocument = gql`
-  mutation CreateSystemConfigDiscount(
-    $createDiscountInput: CreateSystemConfigDiscountDto!
-  ) {
-    createSystemConfigDiscount(createDiscountInput: $createDiscountInput) {
-      id
-      discountPercent
-      createdAt
-      isActive
-      isDeleted
-      minQuantity
-      name
-      updatedAt
-    }
-  }
-`;
-export type CreateSystemConfigDiscountMutationFn = Apollo.MutationFunction<
-  CreateSystemConfigDiscountMutation,
-  CreateSystemConfigDiscountMutationVariables
+export type UpdateDesignPositionMutationFn = Apollo.MutationFunction<
+  UpdateDesignPositionMutation,
+  UpdateDesignPositionMutationVariables
 >;
 
 /**
- * __useCreateSystemConfigDiscountMutation__
+ * __useUpdateDesignPositionMutation__
  *
- * To run a mutation, you first call `useCreateSystemConfigDiscountMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateSystemConfigDiscountMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useUpdateDesignPositionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateDesignPositionMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createSystemConfigDiscountMutation, { data, loading, error }] = useCreateSystemConfigDiscountMutation({
+ * const [updateDesignPositionMutation, { data, loading, error }] = useUpdateDesignPositionMutation({
  *   variables: {
- *      createDiscountInput: // value for 'createDiscountInput'
+ *      input: // value for 'input'
  *   },
  * });
  */
-export function useCreateSystemConfigDiscountMutation(
+export function useUpdateDesignPositionMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    CreateSystemConfigDiscountMutation,
-    CreateSystemConfigDiscountMutationVariables
+    UpdateDesignPositionMutation,
+    UpdateDesignPositionMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    CreateSystemConfigDiscountMutation,
-    CreateSystemConfigDiscountMutationVariables
-  >(CreateSystemConfigDiscountDocument, options);
+    UpdateDesignPositionMutation,
+    UpdateDesignPositionMutationVariables
+  >(UpdateDesignPositionDocument, options);
 }
-export type CreateSystemConfigDiscountMutationHookResult = ReturnType<
-  typeof useCreateSystemConfigDiscountMutation
+export type UpdateDesignPositionMutationHookResult = ReturnType<
+  typeof useUpdateDesignPositionMutation
 >;
-export type CreateSystemConfigDiscountMutationResult =
-  Apollo.MutationResult<CreateSystemConfigDiscountMutation>;
-export type CreateSystemConfigDiscountMutationOptions =
-  Apollo.BaseMutationOptions<
-    CreateSystemConfigDiscountMutation,
-    CreateSystemConfigDiscountMutationVariables
-  >;
-export const RemoveSystemConfigDiscountDocument = gql`
-  mutation RemoveSystemConfigDiscount($removeSystemConfigDiscountId: String!) {
-    removeSystemConfigDiscount(id: $removeSystemConfigDiscountId) {
-      createdAt
-      discountPercent
-      id
-      isActive
-      isDeleted
-      minQuantity
-      name
-      updatedAt
-    }
-  }
-`;
-export type RemoveSystemConfigDiscountMutationFn = Apollo.MutationFunction<
-  RemoveSystemConfigDiscountMutation,
-  RemoveSystemConfigDiscountMutationVariables
+export type UpdateDesignPositionMutationResult =
+  Apollo.MutationResult<UpdateDesignPositionMutation>;
+export type UpdateDesignPositionMutationOptions = Apollo.BaseMutationOptions<
+  UpdateDesignPositionMutation,
+  UpdateDesignPositionMutationVariables
 >;
-
-/**
- * __useRemoveSystemConfigDiscountMutation__
- *
- * To run a mutation, you first call `useRemoveSystemConfigDiscountMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRemoveSystemConfigDiscountMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [removeSystemConfigDiscountMutation, { data, loading, error }] = useRemoveSystemConfigDiscountMutation({
- *   variables: {
- *      removeSystemConfigDiscountId: // value for 'removeSystemConfigDiscountId'
- *   },
- * });
- */
-export function useRemoveSystemConfigDiscountMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RemoveSystemConfigDiscountMutation,
-    RemoveSystemConfigDiscountMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    RemoveSystemConfigDiscountMutation,
-    RemoveSystemConfigDiscountMutationVariables
-  >(RemoveSystemConfigDiscountDocument, options);
-}
-export type RemoveSystemConfigDiscountMutationHookResult = ReturnType<
-  typeof useRemoveSystemConfigDiscountMutation
->;
-export type RemoveSystemConfigDiscountMutationResult =
-  Apollo.MutationResult<RemoveSystemConfigDiscountMutation>;
-export type RemoveSystemConfigDiscountMutationOptions =
-  Apollo.BaseMutationOptions<
-    RemoveSystemConfigDiscountMutation,
-    RemoveSystemConfigDiscountMutationVariables
-  >;
 export const GetMyFactoryDocument = gql`
   query GetMyFactory {
     getMyFactory {
@@ -3380,8 +3915,6 @@ export const GetMyFactoryDocument = gql`
       printingMethods
       products {
         id
-        imageUrl
-        name
       }
       qualityCertifications
       specializations
@@ -3486,8 +4019,6 @@ export const UpdateFactoryInfoDocument = gql`
       printingMethods
       products {
         id
-        imageUrl
-        name
       }
       qualityCertifications
       specializations
@@ -3540,6 +4071,61 @@ export type UpdateFactoryInfoMutationOptions = Apollo.BaseMutationOptions<
   UpdateFactoryInfoMutation,
   UpdateFactoryInfoMutationVariables
 >;
+export const UpdateFactoryOrderStatusDocument = gql`
+  mutation UpdateFactoryOrderStatus(
+    $updateFactoryOrderStatusId: ID!
+    $status: String!
+  ) {
+    updateFactoryOrderStatus(id: $updateFactoryOrderStatusId, status: $status) {
+      id
+    }
+  }
+`;
+export type UpdateFactoryOrderStatusMutationFn = Apollo.MutationFunction<
+  UpdateFactoryOrderStatusMutation,
+  UpdateFactoryOrderStatusMutationVariables
+>;
+
+/**
+ * __useUpdateFactoryOrderStatusMutation__
+ *
+ * To run a mutation, you first call `useUpdateFactoryOrderStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateFactoryOrderStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateFactoryOrderStatusMutation, { data, loading, error }] = useUpdateFactoryOrderStatusMutation({
+ *   variables: {
+ *      updateFactoryOrderStatusId: // value for 'updateFactoryOrderStatusId'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useUpdateFactoryOrderStatusMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateFactoryOrderStatusMutation,
+    UpdateFactoryOrderStatusMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateFactoryOrderStatusMutation,
+    UpdateFactoryOrderStatusMutationVariables
+  >(UpdateFactoryOrderStatusDocument, options);
+}
+export type UpdateFactoryOrderStatusMutationHookResult = ReturnType<
+  typeof useUpdateFactoryOrderStatusMutation
+>;
+export type UpdateFactoryOrderStatusMutationResult =
+  Apollo.MutationResult<UpdateFactoryOrderStatusMutation>;
+export type UpdateFactoryOrderStatusMutationOptions =
+  Apollo.BaseMutationOptions<
+    UpdateFactoryOrderStatusMutation,
+    UpdateFactoryOrderStatusMutationVariables
+  >;
 export const CreateOrderDocument = gql`
   mutation CreateOrder($createOrderInput: CreateOrderDto!) {
     createOrder(createOrderInput: $createOrderInput) {
@@ -3864,6 +4450,257 @@ export type CreatePaymentGatewayUrlMutationOptions = Apollo.BaseMutationOptions<
   CreatePaymentGatewayUrlMutation,
   CreatePaymentGatewayUrlMutationVariables
 >;
+export const GetCurrentFactoryOrdersDocument = gql`
+  query GetCurrentFactoryOrders {
+    factoryOrdersByFactory {
+      acceptanceDeadline
+      factoryId
+      id
+      status
+      createdAt
+      updatedAt
+      customerOrder {
+        id
+        orderDate
+        orderDetails {
+          design {
+            designPositions {
+              designId
+              designJSON
+              positionType {
+                positionName
+              }
+              productPositionTypeId
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetCurrentFactoryOrdersQuery__
+ *
+ * To run a query within a React component, call `useGetCurrentFactoryOrdersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCurrentFactoryOrdersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCurrentFactoryOrdersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCurrentFactoryOrdersQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetCurrentFactoryOrdersQuery,
+    GetCurrentFactoryOrdersQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetCurrentFactoryOrdersQuery,
+    GetCurrentFactoryOrdersQueryVariables
+  >(GetCurrentFactoryOrdersDocument, options);
+}
+export function useGetCurrentFactoryOrdersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetCurrentFactoryOrdersQuery,
+    GetCurrentFactoryOrdersQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetCurrentFactoryOrdersQuery,
+    GetCurrentFactoryOrdersQueryVariables
+  >(GetCurrentFactoryOrdersDocument, options);
+}
+export function useGetCurrentFactoryOrdersSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetCurrentFactoryOrdersQuery,
+        GetCurrentFactoryOrdersQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetCurrentFactoryOrdersQuery,
+    GetCurrentFactoryOrdersQueryVariables
+  >(GetCurrentFactoryOrdersDocument, options);
+}
+export type GetCurrentFactoryOrdersQueryHookResult = ReturnType<
+  typeof useGetCurrentFactoryOrdersQuery
+>;
+export type GetCurrentFactoryOrdersLazyQueryHookResult = ReturnType<
+  typeof useGetCurrentFactoryOrdersLazyQuery
+>;
+export type GetCurrentFactoryOrdersSuspenseQueryHookResult = ReturnType<
+  typeof useGetCurrentFactoryOrdersSuspenseQuery
+>;
+export type GetCurrentFactoryOrdersQueryResult = Apollo.QueryResult<
+  GetCurrentFactoryOrdersQuery,
+  GetCurrentFactoryOrdersQueryVariables
+>;
+export const GetFactoryOrderDocument = gql`
+  query GetFactoryOrder($factoryOrderId: ID!) {
+    factoryOrder(id: $factoryOrderId) {
+      acceptanceDeadline
+      factoryId
+      id
+      status
+      createdAt
+      updatedAt
+      customerOrder {
+        id
+        orderDate
+        orderDetails {
+          design {
+            designPositions {
+              designId
+              designJSON
+              positionType {
+                positionName
+              }
+              productPositionTypeId
+            }
+          }
+        }
+      }
+      totalProductionCost
+      totalItems
+      rejectionReason
+      progressReports {
+        completedQty
+        estimatedCompletion
+        factoryOrderId
+        id
+        notes
+        photoUrls
+        reportDate
+      }
+      assignedAt
+      completedAt
+      acceptedAt
+      currentProgress
+      delayReason
+      estimatedCompletionDate
+      isDelayed
+      lastUpdated
+      orderDetails {
+        checkQualities {
+          checkedAt
+          checkedBy
+          factoryOrderDetailId
+          failedQuantity
+          id
+          note
+          orderDetailId
+          passedQuantity
+          reworkRequired
+          status
+          taskId
+          totalChecked
+        }
+        completedQty
+        createdAt
+        factoryOrderId
+        id
+        orderDetailId
+        price
+        productionCost
+        qualityCheckedAt
+        qualityCheckedBy
+        qualityStatus
+        quantity
+        rejectedQty
+        status
+        updatedAt
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetFactoryOrderQuery__
+ *
+ * To run a query within a React component, call `useGetFactoryOrderQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFactoryOrderQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFactoryOrderQuery({
+ *   variables: {
+ *      factoryOrderId: // value for 'factoryOrderId'
+ *   },
+ * });
+ */
+export function useGetFactoryOrderQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetFactoryOrderQuery,
+    GetFactoryOrderQueryVariables
+  > &
+    (
+      | { variables: GetFactoryOrderQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetFactoryOrderQuery, GetFactoryOrderQueryVariables>(
+    GetFactoryOrderDocument,
+    options,
+  );
+}
+export function useGetFactoryOrderLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetFactoryOrderQuery,
+    GetFactoryOrderQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetFactoryOrderQuery,
+    GetFactoryOrderQueryVariables
+  >(GetFactoryOrderDocument, options);
+}
+export function useGetFactoryOrderSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetFactoryOrderQuery,
+        GetFactoryOrderQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetFactoryOrderQuery,
+    GetFactoryOrderQueryVariables
+  >(GetFactoryOrderDocument, options);
+}
+export type GetFactoryOrderQueryHookResult = ReturnType<
+  typeof useGetFactoryOrderQuery
+>;
+export type GetFactoryOrderLazyQueryHookResult = ReturnType<
+  typeof useGetFactoryOrderLazyQuery
+>;
+export type GetFactoryOrderSuspenseQueryHookResult = ReturnType<
+  typeof useGetFactoryOrderSuspenseQuery
+>;
+export type GetFactoryOrderQueryResult = Apollo.QueryResult<
+  GetFactoryOrderQuery,
+  GetFactoryOrderQueryVariables
+>;
 export const ProductDesignByIdDocument = gql`
   query ProductDesignById($productDesignId: ID!) {
     productDesign(id: $productDesignId) {
@@ -3875,9 +4712,8 @@ export const ProductDesignByIdDocument = gql`
         model
       }
       designPositions {
-        designId
-        productPositionTypeId
         positionType {
+          id
           positionName
           basePrice
         }
@@ -4026,6 +4862,7 @@ export const UpdateProductDesignDocument = gql`
       }
       designPositions {
         positionType {
+          id
           positionName
           basePrice
         }
@@ -4077,6 +4914,90 @@ export type UpdateProductDesignMutationResult =
 export type UpdateProductDesignMutationOptions = Apollo.BaseMutationOptions<
   UpdateProductDesignMutation,
   UpdateProductDesignMutationVariables
+>;
+export const GetAllDiscountByProductIdDocument = gql`
+  query GetAllDiscountByProductId($productId: String!) {
+    getAllDiscountByProductId(productId: $productId) {
+      id
+      discountPercent
+      minQuantity
+    }
+  }
+`;
+
+/**
+ * __useGetAllDiscountByProductIdQuery__
+ *
+ * To run a query within a React component, call `useGetAllDiscountByProductIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllDiscountByProductIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllDiscountByProductIdQuery({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *   },
+ * });
+ */
+export function useGetAllDiscountByProductIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetAllDiscountByProductIdQuery,
+    GetAllDiscountByProductIdQueryVariables
+  > &
+    (
+      | { variables: GetAllDiscountByProductIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetAllDiscountByProductIdQuery,
+    GetAllDiscountByProductIdQueryVariables
+  >(GetAllDiscountByProductIdDocument, options);
+}
+export function useGetAllDiscountByProductIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAllDiscountByProductIdQuery,
+    GetAllDiscountByProductIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAllDiscountByProductIdQuery,
+    GetAllDiscountByProductIdQueryVariables
+  >(GetAllDiscountByProductIdDocument, options);
+}
+export function useGetAllDiscountByProductIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAllDiscountByProductIdQuery,
+        GetAllDiscountByProductIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAllDiscountByProductIdQuery,
+    GetAllDiscountByProductIdQueryVariables
+  >(GetAllDiscountByProductIdDocument, options);
+}
+export type GetAllDiscountByProductIdQueryHookResult = ReturnType<
+  typeof useGetAllDiscountByProductIdQuery
+>;
+export type GetAllDiscountByProductIdLazyQueryHookResult = ReturnType<
+  typeof useGetAllDiscountByProductIdLazyQuery
+>;
+export type GetAllDiscountByProductIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetAllDiscountByProductIdSuspenseQuery
+>;
+export type GetAllDiscountByProductIdQueryResult = Apollo.QueryResult<
+  GetAllDiscountByProductIdQuery,
+  GetAllDiscountByProductIdQueryVariables
 >;
 export const GetAllProductsDocument = gql`
   query GetAllProducts {
@@ -4166,101 +5087,6 @@ export type GetAllProductsSuspenseQueryHookResult = ReturnType<
 export type GetAllProductsQueryResult = Apollo.QueryResult<
   GetAllProductsQuery,
   GetAllProductsQueryVariables
->;
-export const GetProductByIdDocument = gql`
-  query GetProductById($productId: String!) {
-    product(id: $productId) {
-      category {
-        imageUrl
-        name
-      }
-      createdAt
-      createdBy
-      description
-      id
-      imageUrl
-      isActive
-      isDeleted
-      model3DUrl
-      name
-      updatedAt
-    }
-  }
-`;
-
-/**
- * __useGetProductByIdQuery__
- *
- * To run a query within a React component, call `useGetProductByIdQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetProductByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetProductByIdQuery({
- *   variables: {
- *      productId: // value for 'productId'
- *   },
- * });
- */
-export function useGetProductByIdQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GetProductByIdQuery,
-    GetProductByIdQueryVariables
-  > &
-    (
-      | { variables: GetProductByIdQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    ),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetProductByIdQuery, GetProductByIdQueryVariables>(
-    GetProductByIdDocument,
-    options,
-  );
-}
-export function useGetProductByIdLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetProductByIdQuery,
-    GetProductByIdQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetProductByIdQuery, GetProductByIdQueryVariables>(
-    GetProductByIdDocument,
-    options,
-  );
-}
-export function useGetProductByIdSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GetProductByIdQuery,
-        GetProductByIdQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GetProductByIdQuery,
-    GetProductByIdQueryVariables
-  >(GetProductByIdDocument, options);
-}
-export type GetProductByIdQueryHookResult = ReturnType<
-  typeof useGetProductByIdQuery
->;
-export type GetProductByIdLazyQueryHookResult = ReturnType<
-  typeof useGetProductByIdLazyQuery
->;
-export type GetProductByIdSuspenseQueryHookResult = ReturnType<
-  typeof useGetProductByIdSuspenseQuery
->;
-export type GetProductByIdQueryResult = Apollo.QueryResult<
-  GetProductByIdQuery,
-  GetProductByIdQueryVariables
 >;
 export const CreateProductDocument = gql`
   mutation CreateProduct($input: CreateProductDto!) {
@@ -5337,6 +6163,337 @@ export type RemoveSystemConfigBankMutationOptions = Apollo.BaseMutationOptions<
   RemoveSystemConfigBankMutation,
   RemoveSystemConfigBankMutationVariables
 >;
+export const GetMyStaffTasksDocument = gql`
+  query GetMyStaffTasks {
+    myStaffTasks {
+      status
+      note
+      task {
+        assignedBy
+        checkQualities {
+          checkedAt
+          checkedBy
+          failedQuantity
+          id
+          note
+          passedQuantity
+          reworkRequired
+          status
+          taskId
+          totalChecked
+          factoryOrderDetail {
+            completedQty
+            createdAt
+            designId
+            factoryOrder {
+              status
+              isDelayed
+              estimatedCompletionDate
+              completedAt
+              acceptanceDeadline
+              factoryId
+              createdAt
+              updatedAt
+            }
+            factoryOrderId
+            id
+            orderDetailId
+            price
+            productionCost
+            qualityCheckedAt
+            qualityCheckedBy
+            qualityStatus
+            quantity
+            rejectedQty
+            status
+            updatedAt
+          }
+          orderDetail {
+            design {
+              isTemplate
+              isPublic
+              isFinalized
+              designPositions {
+                designId
+                designJSON
+                positionType {
+                  positionName
+                  basePrice
+                }
+              }
+              systemConfigVariant {
+                model
+                size
+                price
+                product {
+                  name
+                  weight
+                  imageUrl
+                }
+              }
+            }
+            id
+            orderId
+            price
+            qualityCheckStatus
+            quantity
+            reworkStatus
+            status
+          }
+        }
+        description
+        expiredTime
+        id
+        qualityCheckStatus
+        startDate
+        status
+        taskType
+        taskname
+      }
+      completedDate
+      assignedDate
+      id
+    }
+  }
+`;
+
+/**
+ * __useGetMyStaffTasksQuery__
+ *
+ * To run a query within a React component, call `useGetMyStaffTasksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMyStaffTasksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMyStaffTasksQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetMyStaffTasksQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetMyStaffTasksQuery,
+    GetMyStaffTasksQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetMyStaffTasksQuery, GetMyStaffTasksQueryVariables>(
+    GetMyStaffTasksDocument,
+    options,
+  );
+}
+export function useGetMyStaffTasksLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetMyStaffTasksQuery,
+    GetMyStaffTasksQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetMyStaffTasksQuery,
+    GetMyStaffTasksQueryVariables
+  >(GetMyStaffTasksDocument, options);
+}
+export function useGetMyStaffTasksSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetMyStaffTasksQuery,
+        GetMyStaffTasksQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetMyStaffTasksQuery,
+    GetMyStaffTasksQueryVariables
+  >(GetMyStaffTasksDocument, options);
+}
+export type GetMyStaffTasksQueryHookResult = ReturnType<
+  typeof useGetMyStaffTasksQuery
+>;
+export type GetMyStaffTasksLazyQueryHookResult = ReturnType<
+  typeof useGetMyStaffTasksLazyQuery
+>;
+export type GetMyStaffTasksSuspenseQueryHookResult = ReturnType<
+  typeof useGetMyStaffTasksSuspenseQuery
+>;
+export type GetMyStaffTasksQueryResult = Apollo.QueryResult<
+  GetMyStaffTasksQuery,
+  GetMyStaffTasksQueryVariables
+>;
+export const GetStaffTaskDetailDocument = gql`
+  query GetStaffTaskDetail($staffTaskId: ID!) {
+    staffTask(id: $staffTaskId) {
+      status
+      note
+      task {
+        assignedBy
+        checkQualities {
+          checkedAt
+          checkedBy
+          failedQuantity
+          id
+          note
+          passedQuantity
+          reworkRequired
+          status
+          taskId
+          totalChecked
+          factoryOrderDetail {
+            completedQty
+            createdAt
+            designId
+            factoryOrder {
+              status
+              isDelayed
+              estimatedCompletionDate
+              completedAt
+              acceptanceDeadline
+              factoryId
+              createdAt
+              updatedAt
+            }
+            factoryOrderId
+            id
+            orderDetailId
+            price
+            productionCost
+            qualityCheckedAt
+            qualityCheckedBy
+            qualityStatus
+            quantity
+            rejectedQty
+            status
+            updatedAt
+          }
+          orderDetail {
+            design {
+              isTemplate
+              isPublic
+              isFinalized
+              designPositions {
+                designId
+                designJSON
+                positionType {
+                  positionName
+                  basePrice
+                }
+              }
+              systemConfigVariant {
+                model
+                size
+                price
+                product {
+                  name
+                  weight
+                  imageUrl
+                }
+              }
+            }
+            id
+            orderId
+            price
+            qualityCheckStatus
+            quantity
+            reworkStatus
+            status
+          }
+        }
+        description
+        expiredTime
+        id
+        qualityCheckStatus
+        startDate
+        status
+        taskType
+        taskname
+      }
+      completedDate
+      assignedDate
+      id
+    }
+  }
+`;
+
+/**
+ * __useGetStaffTaskDetailQuery__
+ *
+ * To run a query within a React component, call `useGetStaffTaskDetailQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStaffTaskDetailQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStaffTaskDetailQuery({
+ *   variables: {
+ *      staffTaskId: // value for 'staffTaskId'
+ *   },
+ * });
+ */
+export function useGetStaffTaskDetailQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetStaffTaskDetailQuery,
+    GetStaffTaskDetailQueryVariables
+  > &
+    (
+      | { variables: GetStaffTaskDetailQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetStaffTaskDetailQuery,
+    GetStaffTaskDetailQueryVariables
+  >(GetStaffTaskDetailDocument, options);
+}
+export function useGetStaffTaskDetailLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetStaffTaskDetailQuery,
+    GetStaffTaskDetailQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetStaffTaskDetailQuery,
+    GetStaffTaskDetailQueryVariables
+  >(GetStaffTaskDetailDocument, options);
+}
+export function useGetStaffTaskDetailSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetStaffTaskDetailQuery,
+        GetStaffTaskDetailQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetStaffTaskDetailQuery,
+    GetStaffTaskDetailQueryVariables
+  >(GetStaffTaskDetailDocument, options);
+}
+export type GetStaffTaskDetailQueryHookResult = ReturnType<
+  typeof useGetStaffTaskDetailQuery
+>;
+export type GetStaffTaskDetailLazyQueryHookResult = ReturnType<
+  typeof useGetStaffTaskDetailLazyQuery
+>;
+export type GetStaffTaskDetailSuspenseQueryHookResult = ReturnType<
+  typeof useGetStaffTaskDetailSuspenseQuery
+>;
+export type GetStaffTaskDetailQueryResult = Apollo.QueryResult<
+  GetStaffTaskDetailQuery,
+  GetStaffTaskDetailQueryVariables
+>;
 export const GetUsersDocument = gql`
   query GetUsers {
     users {
@@ -5678,95 +6835,4 @@ export type DeleteUserMutationResult =
 export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<
   DeleteUserMutation,
   DeleteUserMutationVariables
->;
-export const SystemConfigVariantsByProductDocument = gql`
-  query SystemConfigVariantsByProduct($productId: String!) {
-    systemConfigVariantsByProduct(productId: $productId) {
-      color
-      id
-      isActive
-      isDeleted
-      model
-      price
-      size
-    }
-  }
-`;
-
-/**
- * __useSystemConfigVariantsByProductQuery__
- *
- * To run a query within a React component, call `useSystemConfigVariantsByProductQuery` and pass it any options that fit your needs.
- * When your component renders, `useSystemConfigVariantsByProductQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSystemConfigVariantsByProductQuery({
- *   variables: {
- *      productId: // value for 'productId'
- *   },
- * });
- */
-export function useSystemConfigVariantsByProductQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    SystemConfigVariantsByProductQuery,
-    SystemConfigVariantsByProductQueryVariables
-  > &
-    (
-      | {
-          variables: SystemConfigVariantsByProductQueryVariables;
-          skip?: boolean;
-        }
-      | { skip: boolean }
-    ),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    SystemConfigVariantsByProductQuery,
-    SystemConfigVariantsByProductQueryVariables
-  >(SystemConfigVariantsByProductDocument, options);
-}
-export function useSystemConfigVariantsByProductLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    SystemConfigVariantsByProductQuery,
-    SystemConfigVariantsByProductQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    SystemConfigVariantsByProductQuery,
-    SystemConfigVariantsByProductQueryVariables
-  >(SystemConfigVariantsByProductDocument, options);
-}
-export function useSystemConfigVariantsByProductSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        SystemConfigVariantsByProductQuery,
-        SystemConfigVariantsByProductQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    SystemConfigVariantsByProductQuery,
-    SystemConfigVariantsByProductQueryVariables
-  >(SystemConfigVariantsByProductDocument, options);
-}
-export type SystemConfigVariantsByProductQueryHookResult = ReturnType<
-  typeof useSystemConfigVariantsByProductQuery
->;
-export type SystemConfigVariantsByProductLazyQueryHookResult = ReturnType<
-  typeof useSystemConfigVariantsByProductLazyQuery
->;
-export type SystemConfigVariantsByProductSuspenseQueryHookResult = ReturnType<
-  typeof useSystemConfigVariantsByProductSuspenseQuery
->;
-export type SystemConfigVariantsByProductQueryResult = Apollo.QueryResult<
-  SystemConfigVariantsByProductQuery,
-  SystemConfigVariantsByProductQueryVariables
 >;
