@@ -20,8 +20,6 @@ COPY . .
 # Set environment variables
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
-ENV NEXT_PUBLIC_API_URL=http://localhost:5000/graphql
-ENV NEXT_PUBLIC_IO_URL=http://localhost:5000
 
 # Build the application
 RUN npm run build
@@ -32,8 +30,6 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NEXT_PUBLIC_API_URL=http://localhost:5000/graphql
-ENV NEXT_PUBLIC_IO_URL=http://localhost:5000
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
