@@ -3,6 +3,7 @@ import { setContext } from '@apollo/client/link/context';
 import { HttpLink } from '@apollo/client/link/http';
 
 import { useAuthStore } from '@/stores/auth.store';
+import { envConfig } from '@/constant';
 
 const authLink = setContext((_, { headers }) => {
   const { accessToken } = useAuthStore.getState();
@@ -15,7 +16,7 @@ const authLink = setContext((_, { headers }) => {
 });
 
 const httpLink = new HttpLink({
-  uri: process.env.NEXT_PUBLIC_API_URL,
+  uri: envConfig().apiUrl + "/graphql",
 });
 
 const client = new ApolloClient({

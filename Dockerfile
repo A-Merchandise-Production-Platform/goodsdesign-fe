@@ -20,7 +20,7 @@ COPY . .
 # Set environment variables
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
-ENV NEXT_PUBLIC_API_URL=http://api.goodsdesign.uydev.id.vn/graphql
+ENV NEXT_PUBLIC_API_URL=http://api.goodsdesign.uydev.id.vn
 ENV NEXT_PUBLIC_IO_URL=http://api.goodsdesign.uydev.id.vn
 # Build the application
 RUN npm run build
@@ -31,7 +31,7 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NEXT_PUBLIC_API_URL=http://api.goodsdesign.uydev.id.vn/graphql
+ENV NEXT_PUBLIC_API_URL=http://api.goodsdesign.uydev.id.vn
 ENV NEXT_PUBLIC_IO_URL=api.goodsdesign.uydev.id.vn
 
 RUN addgroup --system --gid 1001 nodejs
