@@ -1,35 +1,58 @@
-# Stage 1: Install dependencies and build the Next.js app
-FROM node:18-alpine AS build
-
-# Set the working directory inside the container
+# Stage 1: Dependencies
+FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Copy package.json and yarn.lock files
-COPY package.json yarn.lock ./
+# Install dependencies using npm
+COPY package.json package-lock.json* ./
+RUN npm ci --f
 
-# Install dependencies using Yarn
-RUN yarn install --frozen-lockfile
+# Stage 2: Builder
+FROM node:20-alpine AS builder
+WORKDIR /app
 
-# Copy all project files into the container
+# Install build dependencies
+RUN apk add --no-cache python3 make g++
+RUN apk add --no-cache libc6-compat
+
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build the Next.js app
-RUN yarn build
+# Set environment variables
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+ENV NEXT_PUBLIC_API_URL=http://localhost:5000/graphql
+ENV NEXT_PUBLIC_IO_URL=http://localhost:5000
 
-# Stage 2: Run the Next.js app
-FROM node:18-alpine AS production
+# Build the application
+RUN npm run build
 
-# Set the working directory inside the container
+# Stage 3: Runner
+FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Copy the built app from the previous stage
-COPY --from=build /app ./ 
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PUBLIC_API_URL=http://localhost:5000/graphql
+ENV NEXT_PUBLIC_IO_URL=http://localhost:5000
 
-# Expose the port on which the app will run
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+# Automatically leverage output traces to reduce image size
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
 EXPOSE 3000
 
-# Set environment variable to production
-ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
-# Start the Next.js app
-CMD ["yarn", "start"]
+CMD ["node", "server.js"]
