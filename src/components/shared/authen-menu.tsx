@@ -26,16 +26,16 @@ export default function AuthenMenu() {
             <Button variant="outline" className="relative" size="icon">
               <ShoppingCartIcon />
               {cartItemCount?.getCartItemCount &&
-                cartItemCount.getCartItemCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-2 -right-2 h-5 min-w-5 rounded-full px-1.5 text-xs"
-                  >
-                    {cartItemCount.getCartItemCount > 99
-                      ? '99+'
-                      : cartItemCount.getCartItemCount}
-                  </Badge>
-                )}
+              cartItemCount.getCartItemCount > 0 ? (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-2 -right-2 h-5 min-w-5 rounded-full px-1.5 text-xs"
+                >
+                  {cartItemCount.getCartItemCount > 99
+                    ? '99+'
+                    : cartItemCount.getCartItemCount}
+                </Badge>
+              ) : null}
             </Button>
           </Link>
           <NotificationButton />

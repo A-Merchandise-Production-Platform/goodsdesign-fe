@@ -1,1 +1,1 @@
-export const NOTIFICATION_SYNCED_EVENT = 'notification-synced';
+export const NOTIFICATION_EVENT = 'notification';
