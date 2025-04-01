@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 
 import { ShoppingCartIcon } from 'lucide-react';
 import { useGetCartItemCountQuery } from '@/graphql/generated/graphql';
+import NotificationButton from '@/components/shared/notification-button';
 
 export default function AuthenMenu() {
   const { isAuth, user } = useAuthStore();
@@ -25,7 +26,7 @@ export default function AuthenMenu() {
       {isAuth && user ? (
         <>
           <Link href="/cart">
-            <Button variant="outline" className="relative">
+            <Button variant="outline" className="relative" size="icon">
               <ShoppingCartIcon />
               {cartItemCount?.getCartItemCount &&
               cartItemCount.getCartItemCount > 0 ? (
@@ -40,6 +41,7 @@ export default function AuthenMenu() {
               ) : undefined}
             </Button>
           </Link>
+          <NotificationButton />
           <div className="flex items-center gap-4">
             {/* <NotificationPanel /> */}
             <UserDropdownMenu user={user} />

@@ -16,6 +16,7 @@ import Header from '@/components/shared/header';
 import Footer from '@/components/shared/footer';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ApolloClientProvider from '@/providers/apollo-client-provider';
+import SocketIOClientProvider from '@/providers/socket-io-client-provider';
 
 // Primary font - Outfit
 const outfit = Outfit({
@@ -106,23 +107,25 @@ export default function RootLayout({
         className={`${outfit.variable} ${onest.variable} ${satoshi.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable} ${plusJakartaSans.variable} antialiased`}
       >
         <ApolloClientProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <AuthProvider>
-              <ScrollArea className="h-screen">
-                <main className="container mx-auto pt-16">
-                  <Header />
-                  {children}
-                  {/* <Footer /> */}
-                </main>
-              </ScrollArea>
-            </AuthProvider>
-            <Toaster richColors position="bottom-right" />
-          </ThemeProvider>
+          <SocketIOClientProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <AuthProvider>
+                <ScrollArea className="h-screen">
+                  <main className="container mx-auto pt-16">
+                    <Header />
+                    {children}
+                    <Footer />
+                  </main>
+                </ScrollArea>
+              </AuthProvider>
+              <Toaster richColors position="bottom-right" />
+            </ThemeProvider>
+          </SocketIOClientProvider>
         </ApolloClientProvider>
       </body>
     </html>
