@@ -1,8 +1,9 @@
 import { format } from 'date-fns';
 import { CalendarIcon, HelpCircle } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
-import { FactoryFormValues } from '../factory-form-schema';
 
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Card,
   CardContent,
@@ -10,9 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import {
   FormControl,
   FormDescription,
@@ -21,18 +19,21 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
+
+import { FactoryFormValues } from '../factory-form-schema';
 
 interface BasicInformationProps {
   form: UseFormReturn<FactoryFormValues>;
@@ -111,7 +112,7 @@ export function BasicInformation({ form }: BasicInformationProps) {
                 <FormMessage />
               ) : (
                 <FormDescription>
-                  Provide a comprehensive overview of your factory's
+                  Provide a comprehensive overview of your factory&apos;s
                   capabilities and unique selling points
                 </FormDescription>
               )}
@@ -133,9 +134,9 @@ export function BasicInformation({ form }: BasicInformationProps) {
                     </TooltipTrigger>
                     <TooltipContent className="max-w-80">
                       <p>
-                        Enter your factory's official website URL. Make sure to
-                        include the full address, including 'https://' or
-                        'http://'.
+                        Enter your factory&apos;s official website URL. Make
+                        sure to include the full address, including
+                        &apos;https://&apos; or &apos;http://&apos;.
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -147,7 +148,7 @@ export function BasicInformation({ form }: BasicInformationProps) {
                   <FormMessage />
                 ) : (
                   <FormDescription>
-                    Your factory's official website URL
+                    Your factory&apos;s official website URL
                   </FormDescription>
                 )}
               </FormItem>

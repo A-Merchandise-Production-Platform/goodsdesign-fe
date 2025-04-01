@@ -2,14 +2,14 @@
 
 import {
   type ColumnFiltersState,
-  type SortingState,
-  type VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  type SortingState,
   useReactTable,
+  type VisibilityState,
 } from '@tanstack/react-table';
 import { ChevronDown, RefreshCwIcon } from 'lucide-react';
 import * as React from 'react';
@@ -32,8 +32,8 @@ import {
 } from '@/components/ui/table';
 import { type GetAllCategoriesQuery } from '@/graphql/generated/graphql';
 export type Category = GetAllCategoriesQuery['categories'][number];
-import { columns } from './columns';
 import AddCategoryForm from './add-category-form';
+import { columns } from './columns';
 
 interface CategoryTableProps {
   refetch: () => void;

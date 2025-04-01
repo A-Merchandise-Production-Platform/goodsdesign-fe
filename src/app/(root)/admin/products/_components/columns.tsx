@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
 import { type Product } from './product-table';
 
 export const columns: ColumnDef<Product>[] = [

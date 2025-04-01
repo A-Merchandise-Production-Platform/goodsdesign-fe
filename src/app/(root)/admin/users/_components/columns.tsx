@@ -1,20 +1,8 @@
-import {
-  GetUsersQuery,
-  useDeleteUserMutation,
-} from '@/graphql/generated/graphql';
 import { ColumnDef } from '@tanstack/react-table';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,10 +14,88 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  GetUsersQuery,
+  useDeleteUserMutation,
+} from '@/graphql/generated/graphql';
 
 export type User = GetUsersQuery['users'][number];
+
+function UserActions({ user }: { user: User }) {
+  const [deleteUser] = useDeleteUserMutation({
+    variables: {
+      deleteUserId: user.id,
+    },
+    refetchQueries: ['GetUsers'],
+    onCompleted: () => {
+      toast.success('User deleted successfully');
+    },
+    onError: error => {
+      toast.error(error.message || 'Failed to delete user');
+    },
+  });
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuItem
+          onClick={() => navigator.clipboard.writeText(user.id)}
+        >
+          Copy user ID
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>Edit user</DropdownMenuItem>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <DropdownMenuItem
+              className="text-destructive"
+              onSelect={e => e.preventDefault()}
+            >
+              Delete user
+            </DropdownMenuItem>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete{' '}
+                {user.name || 'this user'} and remove their data from our
+                servers.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={() => deleteUser()}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 export const columns: ColumnDef<User>[] = [
   //   {
@@ -177,70 +243,7 @@ export const columns: ColumnDef<User>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
-      const user = row.original;
-      const [deleteUser] = useDeleteUserMutation({
-        variables: {
-          deleteUserId: user.id,
-        },
-        refetchQueries: ['GetUsers'],
-        onCompleted: () => {
-          toast.success('User deleted successfully');
-        },
-        onError: error => {
-          toast.error(error.message || 'Failed to delete user');
-        },
-      });
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user.id)}
-            >
-              Copy user ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
-            <DropdownMenuItem>Edit user</DropdownMenuItem>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <DropdownMenuItem
-                  className="text-destructive"
-                  onSelect={e => e.preventDefault()}
-                >
-                  Delete user
-                </DropdownMenuItem>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete{' '}
-                    {user.name || 'this user'}'s account and remove their data
-                    from our servers.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    onClick={() => deleteUser()}
-                  >
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      return <UserActions user={row.original} />;
     },
   },
 ];

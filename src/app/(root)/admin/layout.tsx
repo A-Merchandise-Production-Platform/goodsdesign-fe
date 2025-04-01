@@ -1,7 +1,8 @@
+import { CogIcon, HomeIcon, ShoppingCartIcon, UsersIcon } from 'lucide-react';
+import { Metadata } from 'next';
+
 import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 import AdminGuardProvider from '@/providers/admin-guard-provider';
-import { HomeIcon, ShoppingCartIcon, UsersIcon, CogIcon } from 'lucide-react';
-import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Admin',
@@ -39,7 +40,7 @@ export default function AdminLayout({
 }) {
   return (
     <AdminGuardProvider>
-      <MySidebar navItems={navItems} children={children} />
+      <MySidebar navItems={navItems}>{children}</MySidebar>
     </AdminGuardProvider>
   );
 }

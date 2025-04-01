@@ -5,8 +5,10 @@ import { format } from 'date-fns';
 import { CalendarIcon, Loader2, Save } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { isValidPhoneNumber } from 'react-phone-number-input';
 import * as z from 'zod';
 
+import AddressesUpdateForm from '@/app/(root)/profile/_component/addresses-update-form';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -28,6 +30,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { PhoneInput } from '@/components/ui/phone-input';
 import {
   Popover,
@@ -35,12 +38,9 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth.store';
-import { isValidPhoneNumber } from 'react-phone-number-input';
-import { Separator } from '@/components/ui/separator';
-import { Label } from '@/components/ui/label';
-import AddressesUpdateForm from '@/app/(root)/profile/_component/addresses-update-form';
 
 // Define the form schema with validation
 const profileFormSchema = z.object({

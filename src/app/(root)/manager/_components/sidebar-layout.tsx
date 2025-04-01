@@ -1,6 +1,5 @@
 'use client';
 
-import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 import {
   HomeIcon,
   HouseIcon,
@@ -9,6 +8,8 @@ import {
   User2Icon,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+
+import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 
 export default function ManagerSidebarLayout({
   children,

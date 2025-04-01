@@ -1,8 +1,9 @@
 'use client';
 
-import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 import { HomeIcon, PaperclipIcon } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+
+import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 
 export default function StaffSidebarLayout({
   children,

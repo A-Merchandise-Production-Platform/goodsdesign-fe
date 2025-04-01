@@ -1,11 +1,12 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
 import {
   Loader2,
   MinusCircle,
   PlusCircle,
   ShirtIcon as TShirt,
 } from 'lucide-react';
+import React from 'react';
+
+import { Button } from '@/components/ui/button';
 
 interface DesignFooterProps {
   quantity: number;

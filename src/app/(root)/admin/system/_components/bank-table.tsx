@@ -2,14 +2,14 @@
 
 import {
   type ColumnFiltersState,
-  type SortingState,
-  type VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  type SortingState,
   useReactTable,
+  type VisibilityState,
 } from '@tanstack/react-table';
 import { ChevronDown, RefreshCwIcon } from 'lucide-react';
 import * as React from 'react';
@@ -31,6 +31,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { type GetAllSystemConfigBanksQuery } from '@/graphql/generated/graphql';
+
 import AddBankForm from './add-bank-form';
 import { bankColumns } from './bank-columns';
 

@@ -1,5 +1,9 @@
 'use client';
 
+import { PlusCircleIcon, Trash2Icon } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
 import {
   AddressSelector,
   AddressValue,
@@ -29,9 +33,6 @@ import {
   useDeleteAddressMutation,
   useGetAddressDetailsQuery,
 } from '@/graphql/generated/graphql';
-import { PlusCircleIcon, Trash2Icon } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
 
 export default function AddressesUpdateForm() {
   const { data, loading } = useAddressesQuery();

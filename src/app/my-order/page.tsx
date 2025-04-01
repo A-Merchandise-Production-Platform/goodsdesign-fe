@@ -1,5 +1,9 @@
 'use client';
 
+import { ArrowUpDown, Calendar, Clock, Eye, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,9 +23,6 @@ import {
 } from '@/components/ui/table';
 import { useGetMyOrdersQuery } from '@/graphql/generated/graphql';
 import { formatDate, formatPrice } from '@/lib/utils';
-import { ArrowUpDown, Calendar, Clock, Eye, Loader2 } from 'lucide-react';
-import Link from 'next/link';
-import { useState } from 'react';
 
 export default function MyOrdersPage() {
   const { data, loading } = useGetMyOrdersQuery();
@@ -90,7 +91,7 @@ export default function MyOrdersPage() {
           ) : sortedOrders.length === 0 ? (
             <div className="py-10 text-center">
               <p className="text-muted-foreground">
-                You don't have any orders yet.
+                You don&apos;t have any orders yet.
               </p>
             </div>
           ) : (

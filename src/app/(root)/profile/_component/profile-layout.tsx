@@ -1,8 +1,9 @@
 'use client';
 
+import React, { useMemo } from 'react';
+
 import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 import { useAuthStore } from '@/stores/auth.store';
-import React, { useMemo } from 'react';
 
 export default function ProfileLayout({
   children,
@@ -29,7 +30,7 @@ export default function ProfileLayout({
 
   return (
     <div className="container mx-auto py-6">
-      <MySidebar navItems={navItems} children={children} />
+      <MySidebar navItems={navItems}>{children}</MySidebar>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import { HelpCircle } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
-import { FactoryFormValues } from '../factory-form-schema';
 
 import {
   Card,
@@ -9,8 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { TagsInput } from '@/components/ui/tag-ipnut';
 import {
   FormControl,
   FormDescription,
@@ -19,11 +16,15 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { TagsInput } from '@/components/ui/tag-ipnut';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+
+import { FactoryFormValues } from '../factory-form-schema';
 
 interface QualitySpecializationProps {
   form: UseFormReturn<FactoryFormValues>;
@@ -35,7 +36,7 @@ export function QualitySpecialization({ form }: QualitySpecializationProps) {
       <CardHeader>
         <CardTitle>Quality and Specialization</CardTitle>
         <CardDescription>
-          Your factory's expertise and quality standards
+          Your factory&apos;s expertise and quality standards
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-8 pt-4">

@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { CreditCard, Building, ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Building, CreditCard } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -12,7 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
 interface PaymentDetail {

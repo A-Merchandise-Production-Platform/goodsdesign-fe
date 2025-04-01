@@ -1,6 +1,7 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
 import { ShirtIcon as TShirt } from 'lucide-react';
+import React from 'react';
+
+import { Button } from '@/components/ui/button';
 
 const DesignFooter: React.FC = () => {
   return (

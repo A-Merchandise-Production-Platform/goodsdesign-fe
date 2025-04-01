@@ -1,9 +1,10 @@
 'use client';
 
-import { useAuthStore } from '@/stores/auth.store';
-import { useSocketStore } from '@/stores/socket-io-store';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+
+import { useAuthStore } from '@/stores/auth.store';
+import { useSocketStore } from '@/stores/socket-io-store';
 
 export default function SocketIOClientProvider({
   children,

@@ -1,12 +1,13 @@
-import Link from 'next/link';
 import { ArrowLeft, Paintbrush } from 'lucide-react';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
+
+import { ColorSelector } from '../_components/color-selector';
+import { ModelSelector } from '../_components/model-selector';
+import { PrintingTechniqueSelector } from '../_components/printing-technique-selector';
 import { ProductImageGallery } from '../_components/product-image-gallery';
 import { VolumeDiscount } from '../_components/volume-discount';
-import { ColorSelector } from '../_components/color-selector';
-import { PrintingTechniqueSelector } from '../_components/printing-technique-selector';
-import { ModelSelector } from '../_components/model-selector';
 
 export default function PhoneCasePage() {
   const product = {
@@ -72,7 +73,7 @@ export default function PhoneCasePage() {
             />
           </div>
 
-          <VolumeDiscount />
+          {/* <VolumeDiscount /> */}
 
           <Button size="lg" className="w-full">
             <Paintbrush className="mr-2 h-5 w-5" />

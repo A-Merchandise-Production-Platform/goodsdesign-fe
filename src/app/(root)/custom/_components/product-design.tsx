@@ -1,18 +1,19 @@
 'use client';
+import * as fabric from 'fabric';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import * as fabric from 'fabric';
-import DesignHeader from './design-header';
-import DesignSidebar from './design-sidebar';
-import DesignCanvas from './design-canvas';
-import DesignFooter from './design-footer';
-import ViewSelector from './view-selector';
-import { SHIRT_COLORS } from './shirt-colors';
 
+import type { DesignObject } from '@/types/design-object';
 // Types
 import type { SerializedDesign } from '@/types/shirt';
-import type { DesignObject } from '@/types/design-object';
+
+import DesignCanvas from './design-canvas';
+import DesignFooter from './design-footer';
+import DesignHeader from './design-header';
+import DesignSidebar from './design-sidebar';
+import { SHIRT_COLORS } from './shirt-colors';
+import ViewSelector from './view-selector';
 
 export default function ProductDesigner() {
   const [view, setView] = useState('front');

@@ -1,25 +1,27 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useGetMyFactoryQuery } from '@/graphql/generated/graphql';
+
 import {
-  BasicInformation,
-  LegalInformation,
-  QualitySpecialization,
-  OperationalDetails,
-  ContactInformation,
-} from './sections';
-import {
-  factoryFormSchema,
   defaultValues,
+  factoryFormSchema,
   type FactoryFormValues,
 } from './factory-form-schema';
-import { useState, useEffect } from 'react';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
-import { useGetMyFactoryQuery } from '@/graphql/generated/graphql';
+import {
+  BasicInformation,
+  ContactInformation,
+  LegalInformation,
+  OperationalDetails,
+  QualitySpecialization,
+} from './sections';
 
 export default function UpdateFactoryForm() {
   const [activeTab, setActiveTab] = useState('basics');

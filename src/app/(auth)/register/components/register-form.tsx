@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -16,10 +17,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useAuthStore } from '@/stores/auth.store';
-import { useRegisterMutation } from '@/graphql/generated/graphql';
-import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
+import { useRegisterMutation } from '@/graphql/generated/graphql';
+import { useAuthStore } from '@/stores/auth.store';
 
 const formSchema = z
   .object({

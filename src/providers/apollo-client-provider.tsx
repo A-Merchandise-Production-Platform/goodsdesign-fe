@@ -1,8 +1,9 @@
 'use client';
 
-import client from '@/graphql/apollo-client';
 import { ApolloProvider } from '@apollo/client';
 import React from 'react';
+
+import client from '@/graphql/apollo-client';
 
 export default function ApolloClientProvider({
   children,

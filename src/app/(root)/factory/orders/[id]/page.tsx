@@ -1,6 +1,35 @@
 'use client';
 
+import { format } from 'date-fns';
+import {
+  AlertCircle,
+  AlertTriangle,
+  ArrowLeft,
+  BarChart3,
+  Calendar,
+  CalendarClock,
+  CheckCircle,
+  CheckSquare,
+  ClipboardList,
+  Clock,
+  DollarSign,
+  Eye,
+  ImageIcon,
+  Info,
+  Loader2,
+  Package,
+  Plus,
+  Send,
+  ShieldAlert,
+  Trash2,
+  Truck,
+  Upload,
+  XCircle,
+} from 'lucide-react';
+import Image from 'next/image';
+import { useParams, useRouter } from 'next/navigation';
 import type React from 'react';
+import { useRef, useState } from 'react';
 
 import {
   Accordion,
@@ -58,35 +87,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useGetFactoryOrderQuery } from '@/graphql/generated/graphql';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
-import {
-  AlertCircle,
-  AlertTriangle,
-  ArrowLeft,
-  BarChart3,
-  Calendar,
-  CalendarClock,
-  CheckCircle,
-  CheckSquare,
-  ClipboardList,
-  Clock,
-  DollarSign,
-  Eye,
-  ImageIcon,
-  Info,
-  Loader2,
-  Package,
-  Plus,
-  Send,
-  ShieldAlert,
-  Trash2,
-  Truck,
-  Upload,
-  XCircle,
-} from 'lucide-react';
-import Image from 'next/image';
-import { useParams, useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
 
 export default function FactoryOrderDetails() {
   const { id } = useParams<{ id: string }>();

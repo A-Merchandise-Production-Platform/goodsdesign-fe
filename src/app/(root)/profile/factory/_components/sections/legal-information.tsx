@@ -1,6 +1,5 @@
 import { HelpCircle } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
-import { FactoryFormValues } from '../factory-form-schema';
 
 import {
   Card,
@@ -9,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import {
   FormControl,
   FormDescription,
@@ -18,11 +16,14 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+
+import { FactoryFormValues } from '../factory-form-schema';
 
 interface LegalInformationProps {
   form: UseFormReturn<FactoryFormValues>;
@@ -90,7 +91,7 @@ export function LegalInformation({ form }: LegalInformationProps) {
                     </TooltipTrigger>
                     <TooltipContent className="max-w-80">
                       <p>
-                        Enter your company's tax identification number or
+                        Enter your company&apos;s tax identification number or
                         business registration number. This is used for tax and
                         legal purposes and should match official government
                         records.
@@ -126,10 +127,10 @@ export function LegalInformation({ form }: LegalInformationProps) {
                   </TooltipTrigger>
                   <TooltipContent className="max-w-80">
                     <p>
-                      Enter the unique identifier for your factory's address in
-                      our system. If you've previously registered an address,
-                      use that ID. If not, you'll need to create a new address
-                      record first.
+                      Enter the unique identifier for your factory&apos;s
+                      address in our system. If you&apos;ve previously
+                      registered an address, use that ID. If not, you&apos;ll
+                      need to create a new address record first.
                     </p>
                   </TooltipContent>
                 </Tooltip>

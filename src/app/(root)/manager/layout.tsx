@@ -1,5 +1,7 @@
-import ManagerGuardProvider from '@/providers/manager-guard-provider';
 import { Metadata } from 'next';
+
+import ManagerGuardProvider from '@/providers/manager-guard-provider';
+
 import ManagerSidebarLayout from './_components/sidebar-layout';
 
 export const metadata: Metadata = {

@@ -1,5 +1,7 @@
-import FactoryOwnerGuardProvider from '@/providers/factory-owner-guard-provider';
 import { Metadata } from 'next';
+
+import FactoryOwnerGuardProvider from '@/providers/factory-owner-guard-provider';
+
 import FactoryOwnerSidebarLayout from './_components/factory-sidebar-layout';
 
 export const metadata: Metadata = {

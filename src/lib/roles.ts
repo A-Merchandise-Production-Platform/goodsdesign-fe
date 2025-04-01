@@ -1,4 +1,4 @@
-import { Roles } from '@/graphql/generated';
+import { Roles } from '@/graphql/generated/graphql';
 
 export const getRoleColor = (role: Roles) => {
   switch (role) {

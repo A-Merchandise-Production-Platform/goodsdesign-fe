@@ -2,21 +2,21 @@ import './globals.css';
 
 import type { Metadata } from 'next';
 import {
-  Outfit,
   JetBrains_Mono,
-  Space_Grotesk,
+  Outfit,
   Plus_Jakarta_Sans,
+  Space_Grotesk,
 } from 'next/font/google';
 import localFont from 'next/font/local';
 
-import { Toaster } from '@/components/ui/sonner';
-import AuthProvider from '@/providers/auth-provider';
-import { ThemeProvider } from '@/providers/theme-provider';
-import Header from '@/components/shared/header';
 import Footer from '@/components/shared/footer';
+import Header from '@/components/shared/header';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Toaster } from '@/components/ui/sonner';
 import ApolloClientProvider from '@/providers/apollo-client-provider';
+import AuthProvider from '@/providers/auth-provider';
 import SocketIOClientProvider from '@/providers/socket-io-client-provider';
+import { ThemeProvider } from '@/providers/theme-provider';
 
 // Primary font - Outfit
 const outfit = Outfit({

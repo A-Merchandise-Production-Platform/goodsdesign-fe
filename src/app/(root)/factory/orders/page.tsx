@@ -1,8 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import {
+  AlertCircle,
+  ArrowRight,
+  CheckCircle,
+  Clock,
+  Loader2,
+  XCircle,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useGetCurrentFactoryOrdersQuery } from '@/graphql/generated/graphql';
+import { useState } from 'react';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,15 +29,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useGetCurrentFactoryOrdersQuery } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
-import {
-  Clock,
-  ArrowRight,
-  CheckCircle,
-  AlertCircle,
-  Loader2,
-  XCircle,
-} from 'lucide-react';
 
 export default function FactoryOrdersPage() {
   const { data, loading } = useGetCurrentFactoryOrdersQuery();

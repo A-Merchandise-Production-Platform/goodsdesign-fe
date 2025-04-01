@@ -1,5 +1,7 @@
-import StaffGuardProvider from '@/providers/staff-guard-provider';
 import { Metadata } from 'next';
+
+import StaffGuardProvider from '@/providers/staff-guard-provider';
+
 import StaffSidebarLayout from './_components/sidebar-layout';
 
 export const metadata: Metadata = {

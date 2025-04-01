@@ -2,6 +2,8 @@
 
 import { LockKeyholeIcon, LogOut, Settings, User } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -15,8 +17,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useLogoutMutation, UserEntity } from '@/graphql/generated/graphql';
 import { useAuthStore } from '@/stores/auth.store';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 
 interface UserDropdownMenuProps {
   user: UserEntity;

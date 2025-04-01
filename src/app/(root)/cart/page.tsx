@@ -1,5 +1,9 @@
 'use client';
 
+import { MinusCircle, PlusCircle, ShoppingCart, Trash2 } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -14,9 +18,6 @@ import {
 } from '@/graphql/generated/graphql';
 import { useToast } from '@/hooks/use-toast';
 import { formatPrice } from '@/lib/utils';
-import { MinusCircle, PlusCircle, ShoppingCart, Trash2 } from 'lucide-react';
-import Image from 'next/image';
-import { useState } from 'react';
 
 // Interface for price calculation return values
 interface ItemPriceCalculation {
@@ -218,7 +219,7 @@ export default function CartPage() {
           <ShoppingCart className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
           <h2 className="mb-2 text-xl font-semibold">Your cart is empty</h2>
           <p className="text-muted-foreground mb-6">
-            Looks like you haven't added any items to your cart yet.
+            Looks like you haven&apos;t added any items to your cart yet.
           </p>
           <Button>Continue Shopping</Button>
         </Card>

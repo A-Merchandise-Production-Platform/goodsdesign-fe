@@ -1,6 +1,5 @@
 import { HelpCircle } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
-import { FactoryFormValues } from '../factory-form-schema';
 
 import {
   Card,
@@ -9,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import {
   FormControl,
   FormDescription,
@@ -18,11 +16,14 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+
+import { FactoryFormValues } from '../factory-form-schema';
 
 interface OperationalDetailsProps {
   form: UseFormReturn<FactoryFormValues>;
@@ -121,7 +122,8 @@ export function OperationalDetails({ form }: OperationalDetailsProps) {
                   <FormMessage />
                 ) : (
                   <FormDescription>
-                    Your factory's maximum production capacity in units per day
+                    Your factory&apos;s maximum production capacity in units per
+                    day
                   </FormDescription>
                 )}
               </FormItem>
@@ -227,7 +229,7 @@ export function OperationalDetails({ form }: OperationalDetailsProps) {
                       <p>
                         Specify the minimum number of units required for
                         accepting an order. This helps filter out inquiries that
-                        don't meet your production scale requirements.
+                        don&apos;t meet your production scale requirements.
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -248,7 +250,7 @@ export function OperationalDetails({ form }: OperationalDetailsProps) {
                   <FormMessage />
                 ) : (
                   <FormDescription>
-                    The smallest order quantity you're willing to accept
+                    The smallest order quantity you&apos;re willing to accept
                   </FormDescription>
                 )}
               </FormItem>

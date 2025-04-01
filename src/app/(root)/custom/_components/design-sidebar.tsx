@@ -1,13 +1,15 @@
+import { ShirtIcon as TShirt, Type, Upload } from 'lucide-react';
 import React from 'react';
-import { DesignObject } from '@/types/design-object';
-import { LayersPanel } from './layers-panel';
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ShirtIcon as TShirt, Type, Upload } from 'lucide-react';
+import { DesignObject } from '@/types/design-object';
+
+import { LayersPanel } from './layers-panel';
 import { SHIRT_COLORS } from './shirt-colors';
 
 interface DesignSidebarProps {

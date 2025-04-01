@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Image as ImageIcon, Type } from 'lucide-react';
+import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
+
 import { DesignObject } from '@/types/design-object';
 
 interface LayerItemProps {
@@ -63,7 +65,7 @@ export function LayerItem({ id, designObject }: LayerItemProps) {
           <div className="flex min-w-0 flex-1 items-center">
             {imagePreview ? (
               <div className="relative size-10 flex-shrink-0 overflow-hidden rounded-md">
-                <img
+                <Image
                   src={imagePreview}
                   alt="Layer preview"
                   className="bg-secondary/10 h-full w-full object-contain"

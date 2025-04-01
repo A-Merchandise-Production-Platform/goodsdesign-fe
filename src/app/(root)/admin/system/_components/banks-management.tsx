@@ -1,8 +1,10 @@
 'use client';
 
-import { useGetAllSystemConfigBanksQuery } from '@/graphql/generated/graphql';
-import { BankTable } from './bank-table';
 import { BuildingIcon } from 'lucide-react';
+
+import { useGetAllSystemConfigBanksQuery } from '@/graphql/generated/graphql';
+
+import { BankTable } from './bank-table';
 
 export default function BanksManagement() {
   const { data, loading, refetch } = useGetAllSystemConfigBanksQuery();

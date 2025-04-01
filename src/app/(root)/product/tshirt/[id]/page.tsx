@@ -1,6 +1,10 @@
 'use client';
 
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   useCreateCartItemMutation,
   useProductDesignByIdQuery,
@@ -8,10 +12,8 @@ import {
   useUpdateDesignPositionMutation,
 } from '@/graphql/generated/graphql';
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
+
 import ProductDesigner from './_components/product-design';
-import { useParams } from 'next/navigation';
-import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from 'sonner';
 
 export default function Page() {
   const params = useParams();

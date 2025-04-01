@@ -1,16 +1,15 @@
 'use client';
 
+import { ShoppingCartIcon } from 'lucide-react';
 import Link from 'next/link';
 
+import NotificationButton from '@/components/shared/notification-button';
 import { UserDropdownMenu } from '@/components/shared/user-dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { useAuthStore } from '@/stores/auth.store';
-import { Badge } from '@/components/ui/badge';
-
-import { ShoppingCartIcon } from 'lucide-react';
 import { useGetCartItemCountQuery } from '@/graphql/generated/graphql';
-import NotificationButton from '@/components/shared/notification-button';
+import { useAuthStore } from '@/stores/auth.store';
 
 export default function AuthenMenu() {
   const { isAuth, user } = useAuthStore();

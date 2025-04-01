@@ -1,11 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import { LoadingScreen } from '@/components/ui/loading-screen';
+import {
+  useGetMeLazyQuery,
+  useGetMeQuery,
+  UserEntity,
+} from '@/graphql/generated/graphql';
 import { useAuthStore } from '@/stores/auth.store';
-import { useGetMeLazyQuery, useGetMeQuery } from '@/graphql/generated/graphql';
-import { toast } from 'sonner';
 
 export default function AuthProvider({
   children,
@@ -16,7 +20,7 @@ export default function AuthProvider({
   const { setUser, accessToken, isAuth } = useAuthStore();
   const [getMeQuery] = useGetMeLazyQuery({
     onCompleted: data => {
-      setUser({ ...data.getMe, isDeleted: false });
+      setUser(data.getMe as UserEntity);
     },
     onError: error => {
       console.log(error);

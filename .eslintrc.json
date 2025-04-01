@@ -2,30 +2,18 @@
   "extends": [
     "next/core-web-vitals",
     "plugin:import/recommended",
-    "plugin:playwright/recommended",
-    "plugin:prettier/recommended"
+    "plugin:playwright/recommended"
   ],
-  "plugins": ["simple-import-sort"],
+  "plugins": ["simple-import-sort", "prettier"],
   "rules": {
     "import/named": 0,
-    "simple-import-sort/exports": "error",
-    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "warn",
+    "simple-import-sort/imports": "warn",
     "unicorn/no-array-callback-reference": "off",
     "unicorn/no-array-for-each": "off",
     "unicorn/no-array-reduce": "off",
-    "unicorn/prevent-abbreviations": [
-      "error",
-      {
-        "allowList": {
-          "e2e": true
-        },
-        "replacements": {
-          "props": false,
-          "ref": false,
-          "params": false
-        }
-      }
-    ]
+    "unicorn/prevent-npm run gen": "off",
+    "unicorn/prefer-module": "off"
   },
   "overrides": [
     {

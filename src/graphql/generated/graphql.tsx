@@ -133,14 +133,6 @@ export type CreateCategoryDto = {
   name: Scalars['String']['input'];
 };
 
-export type CreateNotificationDto = {
-  content?: InputMaybe<Scalars['String']['input']>;
-  isRead?: Scalars['Boolean']['input'];
-  title?: InputMaybe<Scalars['String']['input']>;
-  url?: InputMaybe<Scalars['String']['input']>;
-  userId: Scalars['String']['input'];
-};
-
 export type CreateOrderDetailDto = {
   cartItemId: Scalars['String']['input'];
 };
@@ -410,6 +402,7 @@ export type Mutation = {
   createCategory: CategoryEntity;
   createCheckQuality: CheckQuality;
   createNotification: NotificationEntity;
+  createNotificationForManyUsers: Array<NotificationEntity>;
   createOrder: CustomerOrderEntity;
   createPayment: Scalars['String']['output'];
   createPaymentTransaction: PaymentTransaction;
@@ -427,12 +420,10 @@ export type Mutation = {
   deleteUser: UserEntity;
   login: AuthResponseDto;
   logout: Scalars['String']['output'];
-  markAllNotificationsAsRead: Array<NotificationEntity>;
   markFactoryOrderAsDelayed: FactoryOrder;
   markNotificationAsRead: NotificationEntity;
   refreshToken: AuthResponseDto;
   register: AuthResponseDto;
-  removeNotification: NotificationEntity;
   removePaymentTransaction: PaymentTransaction;
   removeProductDesign: ProductDesignEntity;
   removeProductPositionType: ProductPositionTypeEntity;
@@ -451,7 +442,6 @@ export type Mutation = {
   updateDesignPosition: DesignPositionEntity;
   updateFactoryInfo: FactoryEntity;
   updateFactoryOrderStatus: FactoryOrder;
-  updateNotification: NotificationEntity;
   updatePaymentTransaction: PaymentTransaction;
   updateProduct: ProductEntity;
   updateProductDesign: ProductDesignEntity;
@@ -497,7 +487,17 @@ export type MutationCreateCheckQualityArgs = {
 };
 
 export type MutationCreateNotificationArgs = {
-  input: CreateNotificationDto;
+  content: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+  url?: InputMaybe<Scalars['String']['input']>;
+  userId: Scalars['String']['input'];
+};
+
+export type MutationCreateNotificationForManyUsersArgs = {
+  content: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+  url?: InputMaybe<Scalars['String']['input']>;
+  userIds: Array<Scalars['String']['input']>;
 };
 
 export type MutationCreateOrderArgs = {
@@ -570,7 +570,7 @@ export type MutationMarkFactoryOrderAsDelayedArgs = {
 };
 
 export type MutationMarkNotificationAsReadArgs = {
-  id: Scalars['ID']['input'];
+  id: Scalars['String']['input'];
 };
 
 export type MutationRefreshTokenArgs = {
@@ -579,10 +579,6 @@ export type MutationRefreshTokenArgs = {
 
 export type MutationRegisterArgs = {
   registerInput: RegisterDto;
-};
-
-export type MutationRemoveNotificationArgs = {
-  id: Scalars['ID']['input'];
 };
 
 export type MutationRemovePaymentTransactionArgs = {
@@ -662,10 +658,6 @@ export type MutationUpdateFactoryOrderStatusArgs = {
   status: Scalars['String']['input'];
 };
 
-export type MutationUpdateNotificationArgs = {
-  input: UpdateNotificationDto;
-};
-
 export type MutationUpdatePaymentTransactionArgs = {
   id: Scalars['ID']['input'];
   input: UpdatePaymentTransactionInput;
@@ -722,7 +714,6 @@ export type NotificationEntity = {
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   url?: Maybe<Scalars['String']['output']>;
   user?: Maybe<UserEntity>;
-  userId: Scalars['String']['output'];
 };
 
 export enum OrderStatus {
@@ -906,9 +897,11 @@ export type Query = {
   getCartItemCount: Scalars['Float']['output'];
   getMe: UserEntity;
   getMyFactory: FactoryEntity;
+  myNotifications: Array<NotificationEntity>;
   myStaffTasks: Array<StaffTask>;
   notification: NotificationEntity;
   notifications: Array<NotificationEntity>;
+  notificationsByUserId: Array<NotificationEntity>;
   paymentTransaction?: Maybe<PaymentTransaction>;
   paymentTransactions: Array<PaymentTransaction>;
   paymentTransactionsByCustomer: Array<PaymentTransaction>;
@@ -999,7 +992,11 @@ export type QueryGetCartItemArgs = {
 };
 
 export type QueryNotificationArgs = {
-  id: Scalars['ID']['input'];
+  id: Scalars['String']['input'];
+};
+
+export type QueryNotificationsByUserIdArgs = {
+  isRead?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type QueryPaymentTransactionArgs = {
@@ -1236,15 +1233,6 @@ export type UpdateFactoryInfoDto = {
   taxIdentificationNumber?: InputMaybe<Scalars['String']['input']>;
   totalEmployees?: InputMaybe<Scalars['Int']['input']>;
   website?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type UpdateNotificationDto = {
-  content?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['ID']['input'];
-  isRead?: InputMaybe<Scalars['Boolean']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-  url?: InputMaybe<Scalars['String']['input']>;
-  userId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdatePaymentTransactionInput = {
@@ -1535,6 +1523,7 @@ export type GetMeQuery = {
     id: string;
     imageUrl?: string | null;
     isActive: boolean;
+    isDeleted: boolean;
     name?: string | null;
     phoneNumber?: string | null;
     role: Roles;
@@ -3224,6 +3213,7 @@ export const GetMeDocument = gql`
       id
       imageUrl
       isActive
+      isDeleted
       name
       phoneNumber
       role

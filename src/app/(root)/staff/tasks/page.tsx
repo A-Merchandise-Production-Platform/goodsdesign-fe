@@ -1,36 +1,20 @@
 'use client';
 
-import { useGetMyStaffTasksQuery } from '@/graphql/generated/graphql';
-import { useState, useMemo } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
+  AlertTriangle,
+  ArrowUpDown,
   CalendarClock,
   Clock,
   ExternalLink,
-  AlertTriangle,
-  Search,
   Filter,
-  ArrowUpDown,
+  Search,
 } from 'lucide-react';
 import Link from 'next/link';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from '@/components/ui/select';
+import { useMemo, useState } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,6 +24,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { useGetMyStaffTasksQuery } from '@/graphql/generated/graphql';
 
 export default function MyStaffTasksPage() {
   const { data, loading } = useGetMyStaffTasksQuery();
@@ -527,8 +528,8 @@ export default function MyStaffTasksPage() {
                                 </span>
                                 <span>
                                   {formatDate(
-                                    factoryOrderDetail.factoryOrder
-                                      .estimatedCompletionDate,
+                                    factoryOrderDetail?.factoryOrder
+                                      ?.estimatedCompletionDate,
                                   )}
                                 </span>
                               </div>
@@ -537,7 +538,7 @@ export default function MyStaffTasksPage() {
                                   Delayed:
                                 </span>
                                 <span>
-                                  {factoryOrderDetail.factoryOrder.isDelayed
+                                  {factoryOrderDetail?.factoryOrder?.isDelayed
                                     ? 'Yes'
                                     : 'No'}
                                 </span>

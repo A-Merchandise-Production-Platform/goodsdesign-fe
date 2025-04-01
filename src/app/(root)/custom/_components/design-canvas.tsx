@@ -1,5 +1,6 @@
 import React from 'react';
 import * as THREE from 'three';
+
 import TshirtModel from './tshirt-model';
 
 interface DesignCanvasProps {

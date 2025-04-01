@@ -2,14 +2,14 @@
 
 import {
   type ColumnFiltersState,
-  type SortingState,
-  type VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  type SortingState,
   useReactTable,
+  type VisibilityState,
 } from '@tanstack/react-table';
 import { ChevronDown, RefreshCwIcon } from 'lucide-react';
 import * as React from 'react';
@@ -34,6 +34,7 @@ import {
   type GetUsersQuery,
   useGetUsersQuery,
 } from '@/graphql/generated/graphql';
+
 import AddUserForm from './add-user-form';
 import { columns } from './columns';
 

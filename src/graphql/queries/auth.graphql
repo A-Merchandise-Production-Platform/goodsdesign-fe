@@ -83,6 +83,7 @@ query GetMe {
     id
     imageUrl
     isActive
+    isDeleted
     name
     phoneNumber
     role

@@ -1,8 +1,10 @@
-import { useAuthStore } from '@/stores/auth.store';
 import { useEffect, useRef, useState } from 'react';
 import { Manager, Socket } from 'socket.io-client';
-import { UseIo } from './types';
+
 import { envConfig } from '@/constant';
+import { useAuthStore } from '@/stores/auth.store';
+
+import { UseIo } from './types';
 
 export const useSocketIo = (): UseIo => {
   const socket = useRef<Socket | null>(null);

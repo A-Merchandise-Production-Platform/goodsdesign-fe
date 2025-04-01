@@ -1,7 +1,8 @@
 'use client';
 
-import ProductTable from '@/app/(root)/admin/products/_components/product-table';
 import { PackageIcon } from 'lucide-react';
+
+import ProductTable from '@/app/(root)/admin/products/_components/product-table';
 import { useGetAllProductsQuery } from '@/graphql/generated/graphql';
 
 export default function ProductsPage() {

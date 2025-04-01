@@ -1,26 +1,28 @@
-import React from 'react';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  DndContext,
   closestCenter,
+  DndContext,
+  DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from '@dnd-kit/core';
 import {
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { LayerItem } from './layer-item';
-import { DesignObject } from '@/types/design-object';
 import { Layers } from 'lucide-react';
+import React from 'react';
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { DesignObject } from '@/types/design-object';
+
+import { LayerItem } from './layer-item';
 
 interface LayersPanelProps {
   designs: DesignObject[];

@@ -1,9 +1,21 @@
 'use client';
-import { useParams, useRouter } from 'next/navigation';
 import {
-  useCreatePaymentGatewayUrlMutation,
-  useGetUserOrderQuery,
-} from '@/graphql/generated/graphql';
+  ArrowLeft,
+  Calendar,
+  ChevronDown,
+  ChevronRight,
+  CreditCard,
+  CreditCardIcon,
+  DollarSign,
+  Loader2,
+  ShoppingBag,
+  User,
+  Wallet,
+  XCircle,
+} from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,7 +25,23 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -24,38 +52,11 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  ArrowLeft,
-  Calendar,
-  ChevronDown,
-  ChevronRight,
-  CreditCard,
-  Loader2,
-  ShoppingBag,
-  User,
-  XCircle,
-  DollarSign,
-  CreditCardIcon,
-  Wallet,
-} from 'lucide-react';
-import { formatDate, formatPrice } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useState } from 'react';
+  useCreatePaymentGatewayUrlMutation,
+  useGetUserOrderQuery,
+} from '@/graphql/generated/graphql';
 import { useToast } from '@/hooks/use-toast';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { formatDate, formatPrice } from '@/lib/utils';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -411,8 +412,8 @@ export default function OrderDetailsPage() {
                 <ShoppingBag className="text-muted-foreground mb-4 h-12 w-12" />
                 <h2 className="mb-2 text-xl font-semibold">Order Not Found</h2>
                 <p className="text-muted-foreground mx-auto mb-6 max-w-md">
-                  The order you're looking for doesn't exist or you don't have
-                  permission to view it.
+                  The order you&apos;re looking for doesn&apos;t exist or you
+                  don&apos;t have permission to view it.
                 </p>
               </>
             )}
@@ -532,7 +533,7 @@ export default function OrderDetailsPage() {
               No Items in This Order
             </h2>
             <p className="text-muted-foreground mb-6">
-              This order doesn't contain any items. This might be due to a
+              This order doesn&apos;t contain any items. This might be due to a
               system error.
             </p>
             <Button onClick={() => router.push('/my-orders')}>

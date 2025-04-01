@@ -1,7 +1,8 @@
 'use client';
 
-import UserTable from '@/app/(root)/admin/users/_components/user-table';
 import { UsersIcon } from 'lucide-react';
+
+import UserTable from '@/app/(root)/admin/users/_components/user-table';
 import { Roles, useGetUsersQuery } from '@/graphql/generated/graphql';
 
 export default function Page() {

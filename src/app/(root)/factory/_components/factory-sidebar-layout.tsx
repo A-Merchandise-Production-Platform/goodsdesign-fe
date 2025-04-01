@@ -8,8 +8,9 @@ import {
   ShoppingCartIcon,
   UsersIcon,
 } from 'lucide-react';
-import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 import { usePathname } from 'next/navigation';
+
+import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 
 export default function FactoryOwnerSidebarLayout({
   children,

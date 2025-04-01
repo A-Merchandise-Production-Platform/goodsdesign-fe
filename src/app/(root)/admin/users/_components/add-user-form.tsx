@@ -1,5 +1,13 @@
-import { Button } from '@/components/ui/button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { format } from 'date-fns';
 import { CalendarIcon, PlusCircleIcon } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Dialog,
   DialogContent,
@@ -8,9 +16,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import {
   Form,
   FormControl,
@@ -21,8 +26,12 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
 import { PhoneInput } from '@/components/ui/phone-input';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -30,16 +39,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { Calendar } from '@/components/ui/calendar';
 import { Roles, useCreateUserMutation } from '@/graphql/generated/graphql';
-import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -142,7 +143,9 @@ export default function AddUserForm() {
                   {form.formState.errors.email ? (
                     <FormMessage />
                   ) : (
-                    <FormDescription>This is user's email.</FormDescription>
+                    <FormDescription>
+                      This is user&apos;s email.
+                    </FormDescription>
                   )}
                 </FormItem>
               )}
@@ -159,7 +162,7 @@ export default function AddUserForm() {
                   {form.formState.errors.name ? (
                     <FormMessage />
                   ) : (
-                    <FormDescription>This is user's name.</FormDescription>
+                    <FormDescription>This is user&apos;s name.</FormDescription>
                   )}
                 </FormItem>
               )}
@@ -180,7 +183,9 @@ export default function AddUserForm() {
                   {form.formState.errors.password ? (
                     <FormMessage />
                   ) : (
-                    <FormDescription>This is user's password.</FormDescription>
+                    <FormDescription>
+                      This is user&apos;s password.
+                    </FormDescription>
                   )}
                 </FormItem>
               )}
@@ -203,7 +208,7 @@ export default function AddUserForm() {
                     <FormMessage />
                   ) : (
                     <FormDescription>
-                      This is user's phone number.
+                      This is user&apos;s phone number.
                     </FormDescription>
                   )}
                 </FormItem>
@@ -237,7 +242,9 @@ export default function AddUserForm() {
                     {form.formState.errors.role ? (
                       <FormMessage />
                     ) : (
-                      <FormDescription>This is user's role.</FormDescription>
+                      <FormDescription>
+                        This is user&apos;s role.
+                      </FormDescription>
                     )}
                   </FormItem>
                 )}
@@ -285,7 +292,7 @@ export default function AddUserForm() {
                       <FormMessage />
                     ) : (
                       <FormDescription>
-                        This is user's date of birth.
+                        This is user&apos;s date of birth.
                       </FormDescription>
                     )}
                   </FormItem>

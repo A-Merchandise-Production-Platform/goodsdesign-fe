@@ -1,16 +1,16 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import type React from 'react';
-
-import * as THREE from 'three';
 import * as fabric from 'fabric';
-import { SHIRT_COLORS } from './shirt-colors';
-import DesignHeader from './design-header';
-import DesignSidebar from './design-sidebar';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import * as THREE from 'three';
+
 import DesignCanvas from './design-canvas';
 import DesignFooter from './design-footer';
+import DesignHeader from './design-header';
+import DesignSidebar from './design-sidebar';
+import { SHIRT_COLORS } from './shirt-colors';
 import ViewSelector from './view-selector';
-import { toast } from 'sonner';
 
 // Types
 interface DesignObject {

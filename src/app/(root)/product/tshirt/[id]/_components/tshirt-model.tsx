@@ -1,8 +1,8 @@
 'use client';
 
-import { Suspense, useEffect, useRef } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, OrbitControls, useGLTF } from '@react-three/drei';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Suspense, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
 // Props interface for the Model component

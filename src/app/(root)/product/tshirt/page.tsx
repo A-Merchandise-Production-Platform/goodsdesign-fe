@@ -1,23 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { ArrowLeft, Loader2, Paintbrush } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Loader2, Paintbrush } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
-import { ProductImageGallery } from '../_components/product-image-gallery';
-import { VolumeDiscount } from '../_components/volume-discount';
-import { ColorSelector } from '../_components/color-selector';
-import { PrintingTechniqueSelector } from '../_components/printing-technique-selector';
-import { ModelSelector } from '../_components/model-selector';
 import {
   useCreateProductDesignMutation,
   useGetAllDiscountByProductIdQuery,
   useGetProductInformationByIdQuery,
 } from '@/graphql/generated/graphql';
-import { toast } from 'sonner';
 import { formatPrice } from '@/lib/utils';
+
+import { ColorSelector } from '../_components/color-selector';
+import { ModelSelector } from '../_components/model-selector';
+import { PrintingTechniqueSelector } from '../_components/printing-technique-selector';
+import { ProductImageGallery } from '../_components/product-image-gallery';
+import { VolumeDiscount } from '../_components/volume-discount';
 
 interface TShirtProduct {
   name: string;

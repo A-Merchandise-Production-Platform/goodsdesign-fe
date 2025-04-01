@@ -2,7 +2,9 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PlusCircleIcon } from 'lucide-react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -25,7 +27,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -33,12 +34,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import {
   useCreateProductMutation,
   useGetAllCategoriesQuery,
 } from '@/graphql/generated/graphql';
-import { useState } from 'react';
-import { toast } from 'sonner';
 
 const formSchema = z.object({
   name: z.string().min(2, {

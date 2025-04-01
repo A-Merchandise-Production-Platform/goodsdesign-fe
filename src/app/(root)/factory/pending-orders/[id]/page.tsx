@@ -1,5 +1,17 @@
 'use client';
 
+import {
+  AlertCircle,
+  ArrowLeft,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Loader2,
+  Package,
+} from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,17 +30,6 @@ import {
   useUpdateFactoryOrderStatusMutation,
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
-import {
-  AlertCircle,
-  ArrowLeft,
-  Calendar,
-  CheckCircle,
-  Clock,
-  Loader2,
-  Package,
-} from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 export default function OrderDetailsPage() {
   const { id } = useParams<{

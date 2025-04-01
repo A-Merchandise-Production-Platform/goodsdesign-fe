@@ -1,10 +1,8 @@
 'use client';
 
-import * as React from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
-import { useDebounce } from '@/hooks/use-debounce';
+import * as React from 'react';
 
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -19,12 +17,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { Textarea } from '@/components/ui/textarea';
 import {
   useGetAllDistrictsByProvinceIdLazyQuery,
   useGetAllProvincesQuery,
   useGetAllWardsByDistrictIdLazyQuery,
 } from '@/graphql/generated/graphql';
-import { Textarea } from '@/components/ui/textarea';
+import { useDebounce } from '@/hooks/use-debounce';
+import { cn } from '@/lib/utils';
 
 const normalizeVietnamese = (text: string): string => {
   return text

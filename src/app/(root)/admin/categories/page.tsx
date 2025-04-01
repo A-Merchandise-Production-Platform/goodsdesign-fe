@@ -1,7 +1,8 @@
 'use client';
 
-import CategoryTable from '@/app/(root)/admin/categories/_components/category-table';
 import { FolderIcon } from 'lucide-react';
+
+import CategoryTable from '@/app/(root)/admin/categories/_components/category-table';
 import { useGetAllCategoriesQuery } from '@/graphql/generated/graphql';
 
 export default function CategoriesPage() {

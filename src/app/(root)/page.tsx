@@ -1,9 +1,10 @@
 'use client';
 
-import { PromotionalBanner } from './_components/promotional-banner';
-import { ProductSection } from './_components/product-section';
-import { DesignSection } from './_components/design-section';
 import { useGetAllProductsQuery } from '@/graphql/generated/graphql';
+
+import { DesignSection } from './_components/design-section';
+import { ProductSection } from './_components/product-section';
+import { PromotionalBanner } from './_components/promotional-banner';
 
 export default function Home() {
   const { data: proData, loading: proLoading } = useGetAllProductsQuery();
