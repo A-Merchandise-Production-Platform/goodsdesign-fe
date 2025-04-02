@@ -171,35 +171,35 @@ export default function FactoryOrderDetails() {
   });
 
   // First, complete the updateFactoryOrderDetailStatus mutation
-const [updateFactoryOrderDetailStatus, { loading: updateStatusLoading }] = 
-useUpdateFactoryOrderDetailStatusMutation({
-  refetchQueries: ['GetFactoryOrder'],
-  onError: e => {
-    toast.error(e.message);
-  },
-  onCompleted: () => {
-    toast.success('Order detail status updated successfully');
-  }
-});
+  const [updateFactoryOrderDetailStatus, { loading: updateStatusLoading }] =
+    useUpdateFactoryOrderDetailStatusMutation({
+      refetchQueries: ['GetFactoryOrder'],
+      onError: e => {
+        toast.error(e.message);
+      },
+      onCompleted: () => {
+        toast.success('Order detail status updated successfully');
+      },
+    });
 
   // Add this function to handle status updates for a specific order detail
-  const handleUpdateDetailStatus = async (detailId: string, note = "") => {
-  setIsSubmitting(true);
-  try {
-    await updateFactoryOrderDetailStatus({
-      variables: {
-        input: {
-          orderDetailId: detailId,
-          status: OrderDetailStatus.Completed,
-          note: note
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Failed to update order detail status:', error);
-  } finally {
-    setIsSubmitting(false);
-  }
+  const handleUpdateDetailStatus = async (detailId: string, note = '') => {
+    setIsSubmitting(true);
+    try {
+      await updateFactoryOrderDetailStatus({
+        variables: {
+          input: {
+            orderDetailId: detailId,
+            status: OrderDetailStatus.Completed,
+            note: note,
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Failed to update order detail status:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const factoryOrder = data?.factoryOrder;
@@ -1210,117 +1210,132 @@ useUpdateFactoryOrderDetailStatusMutation({
 
         {/* Details Tab */}
         <TabsContent value="details" className="space-y-4">
-  <Card>
-    <CardHeader>
-      <CardTitle>Order Details</CardTitle>
-      <CardDescription>
-        Detailed information about all items in this factory order
-      </CardDescription>
-    </CardHeader>
-    <CardContent>
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Detail ID</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead>Completed</TableHead>
-              <TableHead>Rejected</TableHead>
-              <TableHead>Quality Status</TableHead>
-              <TableHead>Production Cost</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {factoryOrder?.orderDetails?.map(detail => (
-              <TableRow key={detail.id}>
-                <TableCell className="font-medium">
-                  {detail.id}
-                </TableCell>
-                <TableCell>{getStatusBadge(detail.status)}</TableCell>
-                <TableCell>{detail.quantity}</TableCell>
-                <TableCell>{detail.completedQty || 0}</TableCell>
-                <TableCell>{detail.rejectedQty || 0}</TableCell>
-                <TableCell>
-                  {getQualityStatusBadge(detail.qualityStatus)}
-                </TableCell>
-                <TableCell>
-                  {new Intl.NumberFormat('en-US').format(
-                    detail.productionCost || 0,
-                  )}
-                </TableCell>
-                <TableCell>
-                  {new Intl.NumberFormat('en-US').format(
-                    detail.price || 0,
-                  )}
-                </TableCell>
-                <TableCell>
-                  {(detail.status !== 'COMPLETED' && factoryOrder.status != FactoryOrderStatus.Rejected) && (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button size="sm" variant="outline">
-                          <CheckSquare className="mr-2 h-4 w-4" />
-                          Mark Complete
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Update Order Detail Status</DialogTitle>
-                          <DialogDescription>
-                            Are you sure you want to mark this item as completed?
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                          <div className="grid gap-2">
-                            <Label htmlFor="status-note">Note (Optional)</Label>
-                            <Textarea 
-                              id="status-note" 
-                              placeholder="Add any notes about this status update..."
-                              value={progressNotes}
-                              onChange={e => setProgressNotes(e.target.value)}
-                            />
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <Button variant="outline" onClick={() => setProgressNotes('')}>
-                            Cancel
-                          </Button>
-                          <Button 
-                            onClick={() => {
-                              handleUpdateDetailStatus(detail.id, progressNotes);
-                              setProgressNotes('');
-                            }}
-                            disabled={isSubmitting}
-                          >
-                            {isSubmitting ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Processing...
-                              </>
-                            ) : (
-                              <>
-                                <CheckSquare className="mr-2 h-4 w-4" />
-                                Confirm
-                              </>
+          <Card>
+            <CardHeader>
+              <CardTitle>Order Details</CardTitle>
+              <CardDescription>
+                Detailed information about all items in this factory order
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Detail ID</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Quantity</TableHead>
+                      <TableHead>Completed</TableHead>
+                      <TableHead>Rejected</TableHead>
+                      <TableHead>Quality Status</TableHead>
+                      <TableHead>Production Cost</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {factoryOrder?.orderDetails?.map(detail => (
+                      <TableRow key={detail.id}>
+                        <TableCell className="font-medium">
+                          {detail.id}
+                        </TableCell>
+                        <TableCell>{getStatusBadge(detail.status)}</TableCell>
+                        <TableCell>{detail.quantity}</TableCell>
+                        <TableCell>{detail.completedQty || 0}</TableCell>
+                        <TableCell>{detail.rejectedQty || 0}</TableCell>
+                        <TableCell>
+                          {getQualityStatusBadge(detail.qualityStatus)}
+                        </TableCell>
+                        <TableCell>
+                          {new Intl.NumberFormat('en-US').format(
+                            detail.productionCost || 0,
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {new Intl.NumberFormat('en-US').format(
+                            detail.price || 0,
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {detail.status !== 'COMPLETED' &&
+                            factoryOrder.status !=
+                              FactoryOrderStatus.Rejected && (
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button size="sm" variant="outline">
+                                    <CheckSquare className="mr-2 h-4 w-4" />
+                                    Mark Complete
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md">
+                                  <DialogHeader>
+                                    <DialogTitle>
+                                      Update Order Detail Status
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                      Are you sure you want to mark this item as
+                                      completed?
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <div className="grid gap-4 py-4">
+                                    <div className="grid gap-2">
+                                      <Label htmlFor="status-note">
+                                        Note (Optional)
+                                      </Label>
+                                      <Textarea
+                                        id="status-note"
+                                        placeholder="Add any notes about this status update..."
+                                        value={progressNotes}
+                                        onChange={e =>
+                                          setProgressNotes(e.target.value)
+                                        }
+                                      />
+                                    </div>
+                                  </div>
+                                  <DialogFooter>
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => setProgressNotes('')}
+                                    >
+                                      Cancel
+                                    </Button>
+                                    <Button
+                                      onClick={() => {
+                                        handleUpdateDetailStatus(
+                                          detail.id,
+                                          progressNotes,
+                                        );
+                                        setProgressNotes('');
+                                      }}
+                                      disabled={isSubmitting}
+                                    >
+                                      {isSubmitting ? (
+                                        <>
+                                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                          Processing...
+                                        </>
+                                      ) : (
+                                        <>
+                                          <CheckSquare className="mr-2 h-4 w-4" />
+                                          Confirm
+                                        </>
+                                      )}
+                                    </Button>
+                                  </DialogFooter>
+                                </DialogContent>
+                              </Dialog>
                             )}
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </CardContent>
-  </Card>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
 
-  {/* Rest of the Details Tab content remains the same */}
-  <Card>
+          {/* Rest of the Details Tab content remains the same */}
+          <Card>
             <CardHeader>
               <CardTitle>Customer Order Information</CardTitle>
               <CardDescription>
@@ -1407,8 +1422,7 @@ useUpdateFactoryOrderDetailStatusMutation({
               </div>
             </CardContent>
           </Card>
-</TabsContent>
-
+        </TabsContent>
 
         {/* Designs Tab */}
         <TabsContent value="designs" className="space-y-4">
