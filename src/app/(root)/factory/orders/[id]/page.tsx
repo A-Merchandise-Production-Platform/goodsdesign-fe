@@ -85,8 +85,9 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { useGetFactoryOrderQuery } from '@/graphql/generated/graphql';
+import { useCreateFactoryProgressReportMutation, useGetFactoryOrderQuery, useMarkFactoryOrderAsDelayedMutation, useMarkOnDoneProductionMutation } from '@/graphql/generated/graphql';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export default function FactoryOrderDetails() {
   const { id } = useParams<{ id: string }>();
@@ -104,6 +105,49 @@ export default function FactoryOrderDetails() {
     Date | undefined
   >(new Date());
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // First, complete the createFactoryProgressReport mutation
+const [createFactoryProgressReport, { loading: createFactoryProgressReportLoading }] = useCreateFactoryProgressReportMutation({
+  variables: {
+    input: {
+      completedQty: parseInt(progressQty),
+      estimatedCompletion: progressDate?.toISOString(),
+      factoryOrderId: id,
+      photoUrls: progressPhotos,
+      notes: progressNotes,
+    }
+  },
+  refetchQueries: ["GetFactoryOrder"],
+  onError: (e) => {
+    toast.error(e.message)
+  }
+})
+
+// Next, complete the markFactoryOrderAsDelayed mutation
+const [markFactoryOrderAsDelayed, { loading: markFactoryOrderAsDelayedLoading }] = useMarkFactoryOrderAsDelayedMutation({
+  variables: {
+    input: {
+      delayReason: delayReason,
+      estimatedCompletionDate: estimatedCompletion?.toISOString()
+    },
+    markFactoryOrderAsDelayedId: id
+  },
+  refetchQueries: ["GetFactoryOrder"],
+  onError: (e) => {
+    toast.error(e.message)
+  }
+})
+
+// Finally, complete the markOnDoneProduction mutation
+const [markOnDoneProduction, { loading: markOnDoneProductionLoading }] = useMarkOnDoneProductionMutation({
+  variables: {
+    markOnDoneProductionId: id
+  },
+  refetchQueries: ["GetFactoryOrder"],
+  onError: (e) => {
+    toast.error(e.message)
+  }
+})
 
   const { data, loading, error } = useGetFactoryOrderQuery({
     variables: {
@@ -247,7 +291,6 @@ export default function FactoryOrderDetails() {
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      alert('Order accepted successfully!');
       // Here you would typically call a mutation to update the order status
     }, 1000);
   };
@@ -257,7 +300,6 @@ export default function FactoryOrderDetails() {
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      alert('Order rejected successfully!');
       // Here you would typically call a mutation to update the order status
     }, 1000);
   };
@@ -267,51 +309,76 @@ export default function FactoryOrderDetails() {
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      alert('Production started successfully!');
       // Here you would typically call a mutation to update the order status
     }, 1000);
   };
 
-  const handleMarkAsCompleted = () => {
-    setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      alert('Order marked as completed successfully!');
-      // Here you would typically call a mutation to update the order status
-    }, 1000);
-  };
-
-  const handleAddProgressReport = () => {
+  const handleAddProgressReport = async () => {
     if (!progressQty || !progressDate) return;
-
+  
     setIsSubmitting(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await createFactoryProgressReport({
+        variables: {
+          input: {
+            completedQty: parseInt(progressQty),
+            estimatedCompletion: progressDate.toISOString(),
+            factoryOrderId: id,
+            photoUrls: progressPhotos,
+            notes: progressNotes,
+          }
+        }
+      });
+      
       setProgressQty('');
       setProgressNotes('');
       setProgressPhotos([]);
       setProgressDate(new Date());
-      // Here you would typically call a mutation to add a progress report
-      alert('Progress report added successfully!');
-    }, 1000);
-  };
-
-  const handleMarkAsDelayed = () => {
-    if (!delayReason || !estimatedCompletion) return;
-
-    setIsSubmitting(true);
-
-    // Simulate API call
-    setTimeout(() => {
+    } catch (error: any) {
+      console.error('Failed to add progress report:', error);
+    } finally {
       setIsSubmitting(false);
+    }
+  };
+  
+  const handleMarkAsDelayed = async () => {
+    if (!delayReason || !estimatedCompletion) return;
+  
+    setIsSubmitting(true);
+    try {
+      await markFactoryOrderAsDelayed({
+        variables: {
+          input: {
+            delayReason: delayReason,
+            estimatedCompletionDate: estimatedCompletion.toISOString()
+          },
+          markFactoryOrderAsDelayedId: id
+        }
+      });
+      
       setDelayReason('');
       setEstimatedCompletion(new Date());
-      // Here you would typically call a mutation to mark the order as delayed
-      alert('Order marked as delayed successfully!');
-    }, 1000);
+    } catch (error: any) {
+      console.error('Failed to mark order as delayed:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  const handleMarkAsCompleted = async () => {
+    setIsSubmitting(true);
+    try {
+      await markOnDoneProduction({
+        variables: {
+          markOnDoneProductionId: id
+        }
+      });
+      
+    } catch (error: any) {
+      console.error('Failed to mark order as completed:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -955,7 +1022,7 @@ export default function FactoryOrderDetails() {
                           />
                         </div>
                         <div className="grid gap-2">
-                          <Label>Report Date</Label>
+                          <Label>Estimated Completion</Label>
                           <Popover>
                             <PopoverTrigger asChild>
                               <Button
@@ -1401,7 +1468,7 @@ export default function FactoryOrderDetails() {
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label>Report Date</Label>
+                      <Label>Estimated Completion</Label>
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button

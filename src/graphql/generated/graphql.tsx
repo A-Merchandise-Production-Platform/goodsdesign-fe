@@ -120,6 +120,14 @@ export type CreateCategoryDto = {
   name: Scalars['String']['input'];
 };
 
+export type CreateFactoryProgressReportDto = {
+  completedQty: Scalars['Float']['input'];
+  estimatedCompletion: Scalars['DateTime']['input'];
+  factoryOrderId: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  photoUrls: Array<Scalars['String']['input']>;
+};
+
 export type CreateOrderDetailDto = {
   cartItemId: Scalars['String']['input'];
 };
@@ -328,6 +336,7 @@ export enum FactoryOrderStatus {
   Accepted = 'ACCEPTED',
   Cancelled = 'CANCELLED',
   Completed = 'COMPLETED',
+  DoneProduction = 'DONE_PRODUCTION',
   Expired = 'EXPIRED',
   InProduction = 'IN_PRODUCTION',
   PendingAcceptance = 'PENDING_ACCEPTANCE',
@@ -351,7 +360,7 @@ export type FactoryProgressReport = {
   factoryOrder?: Maybe<FactoryOrder>;
   factoryOrderId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
-  notes: Scalars['String']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
   photoUrls: Array<Scalars['String']['output']>;
   reportDate: Scalars['DateTime']['output'];
 };
@@ -379,6 +388,11 @@ export type LoginDto = {
   password: Scalars['String']['input'];
 };
 
+export type MarkAsDelayedDto = {
+  delayReason: Scalars['String']['input'];
+  estimatedCompletionDate: Scalars['DateTime']['input'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   calculateShippingFee: ShippingFee;
@@ -388,6 +402,7 @@ export type Mutation = {
   createCartItem: CartItemEntity;
   createCategory: CategoryEntity;
   createCheckQuality: CheckQuality;
+  createFactoryProgressReport: FactoryProgressReport;
   createNotification: NotificationEntity;
   createNotificationForManyUsers: Array<NotificationEntity>;
   createOrder: CustomerOrderEntity;
@@ -409,6 +424,7 @@ export type Mutation = {
   logout: Scalars['String']['output'];
   markFactoryOrderAsDelayed: FactoryOrder;
   markNotificationAsRead: NotificationEntity;
+  markOnDoneProduction: FactoryOrder;
   refreshToken: AuthResponseDto;
   register: AuthResponseDto;
   removePaymentTransaction: PaymentTransaction;
@@ -477,6 +493,11 @@ export type MutationCreateCheckQualityArgs = {
   status: QualityCheckStatus;
   taskId: Scalars['ID']['input'];
   totalChecked: Scalars['Float']['input'];
+};
+
+
+export type MutationCreateFactoryProgressReportArgs = {
+  input: CreateFactoryProgressReportDto;
 };
 
 
@@ -579,11 +600,17 @@ export type MutationLoginArgs = {
 
 export type MutationMarkFactoryOrderAsDelayedArgs = {
   id: Scalars['ID']['input'];
+  input: MarkAsDelayedDto;
 };
 
 
 export type MutationMarkNotificationAsReadArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type MutationMarkOnDoneProductionArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -763,11 +790,13 @@ export enum OrderStatus {
   Accepted = 'ACCEPTED',
   AssignedToFactory = 'ASSIGNED_TO_FACTORY',
   Canceled = 'CANCELED',
-  Completed = 'COMPLETED',
   Delivered = 'DELIVERED',
+  DoneProduction = 'DONE_PRODUCTION',
   InProduction = 'IN_PRODUCTION',
   PaymentReceived = 'PAYMENT_RECEIVED',
-  Pending = 'PENDING'
+  Pending = 'PENDING',
+  WaitingFillInformation = 'WAITING_FILL_INFORMATION',
+  WaitingPayment = 'WAITING_PAYMENT'
 }
 
 export type PaymentEntity = {
@@ -934,6 +963,8 @@ export type Query = {
   factoryOrders: Array<FactoryOrder>;
   factoryOrdersByCustomerOrder: Array<FactoryOrder>;
   factoryOrdersByFactory: Array<FactoryOrder>;
+  factoryProgressReport: FactoryProgressReport;
+  factoryProgressReports: Array<FactoryProgressReport>;
   getAllDiscountByProductId: Array<SystemConfigDiscountEntity>;
   getApplicableDiscount: Scalars['Float']['output'];
   getCartItem: CartItemEntity;
@@ -1030,6 +1061,16 @@ export type QueryFactoryOrderArgs = {
 
 export type QueryFactoryOrdersByCustomerOrderArgs = {
   customerOrderId: Scalars['ID']['input'];
+};
+
+
+export type QueryFactoryProgressReportArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryFactoryProgressReportsArgs = {
+  factoryOrderId: Scalars['ID']['input'];
 };
 
 
@@ -1190,7 +1231,7 @@ export type StaffTask = {
   id: Scalars['ID']['output'];
   note?: Maybe<Scalars['String']['output']>;
   status: Scalars['String']['output'];
-  task: TaskEntity;
+  task?: Maybe<TaskEntity>;
   taskId: Scalars['ID']['output'];
   user: UserEntity;
   userId: Scalars['ID']['output'];
@@ -1559,6 +1600,28 @@ export type UpdateFactoryOrderStatusMutationVariables = Exact<{
 
 export type UpdateFactoryOrderStatusMutation = { __typename?: 'Mutation', updateFactoryOrderStatus: { __typename?: 'FactoryOrder', id: string } };
 
+export type CreateFactoryProgressReportMutationVariables = Exact<{
+  input: CreateFactoryProgressReportDto;
+}>;
+
+
+export type CreateFactoryProgressReportMutation = { __typename?: 'Mutation', createFactoryProgressReport: { __typename?: 'FactoryProgressReport', id: string } };
+
+export type MarkFactoryOrderAsDelayedMutationVariables = Exact<{
+  markFactoryOrderAsDelayedId: Scalars['ID']['input'];
+  input: MarkAsDelayedDto;
+}>;
+
+
+export type MarkFactoryOrderAsDelayedMutation = { __typename?: 'Mutation', markFactoryOrderAsDelayed: { __typename?: 'FactoryOrder', id: string } };
+
+export type MarkOnDoneProductionMutationVariables = Exact<{
+  markOnDoneProductionId: Scalars['ID']['input'];
+}>;
+
+
+export type MarkOnDoneProductionMutation = { __typename?: 'Mutation', markOnDoneProduction: { __typename?: 'FactoryOrder', id: string } };
+
 export type MyNotificationsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1608,7 +1671,7 @@ export type GetFactoryOrderQueryVariables = Exact<{
 }>;
 
 
-export type GetFactoryOrderQuery = { __typename?: 'Query', factoryOrder: { __typename?: 'FactoryOrder', acceptanceDeadline: any, factoryId: string, id: string, status: FactoryOrderStatus, createdAt: any, updatedAt?: any | null, totalProductionCost: number, totalItems: number, rejectionReason?: string | null, assignedAt: any, completedAt?: any | null, acceptedAt?: any | null, currentProgress?: number | null, delayReason?: string | null, estimatedCompletionDate?: any | null, isDelayed: boolean, lastUpdated?: any | null, customerOrder?: { __typename?: 'CustomerOrderEntity', id: string, orderDate: any, orderDetails?: Array<{ __typename?: 'CustomerOrderDetailEntity', design?: { __typename?: 'ProductDesignEntity', designPositions?: Array<{ __typename?: 'DesignPositionEntity', designId: string, designJSON?: any | null, productPositionTypeId: string, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string } | null }> | null } | null }> | null } | null, progressReports?: Array<{ __typename?: 'FactoryProgressReport', completedQty: number, estimatedCompletion: any, factoryOrderId: string, id: string, notes: string, photoUrls: Array<string>, reportDate: any }> | null, orderDetails?: Array<{ __typename?: 'FactoryOrderDetailEntity', completedQty: number, createdAt: any, factoryOrderId: string, id: string, orderDetailId: string, price: number, productionCost: number, qualityCheckedAt?: any | null, qualityCheckedBy?: string | null, qualityStatus?: QualityCheckStatus | null, quantity: number, rejectedQty: number, status: OrderStatus, updatedAt?: any | null, checkQualities?: Array<{ __typename?: 'CheckQuality', checkedAt: any, checkedBy?: string | null, factoryOrderDetailId?: string | null, failedQuantity: number, id: string, note?: string | null, orderDetailId: string, passedQuantity: number, reworkRequired: boolean, status: QualityCheckStatus, taskId: string, totalChecked: number }> | null }> | null } };
+export type GetFactoryOrderQuery = { __typename?: 'Query', factoryOrder: { __typename?: 'FactoryOrder', acceptanceDeadline: any, factoryId: string, id: string, status: FactoryOrderStatus, createdAt: any, updatedAt?: any | null, totalProductionCost: number, totalItems: number, rejectionReason?: string | null, assignedAt: any, completedAt?: any | null, acceptedAt?: any | null, currentProgress?: number | null, delayReason?: string | null, estimatedCompletionDate?: any | null, isDelayed: boolean, lastUpdated?: any | null, customerOrder?: { __typename?: 'CustomerOrderEntity', id: string, orderDate: any, orderDetails?: Array<{ __typename?: 'CustomerOrderDetailEntity', design?: { __typename?: 'ProductDesignEntity', designPositions?: Array<{ __typename?: 'DesignPositionEntity', designId: string, designJSON?: any | null, productPositionTypeId: string, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string } | null }> | null } | null }> | null } | null, progressReports?: Array<{ __typename?: 'FactoryProgressReport', completedQty: number, estimatedCompletion: any, factoryOrderId: string, id: string, notes?: string | null, photoUrls: Array<string>, reportDate: any }> | null, orderDetails?: Array<{ __typename?: 'FactoryOrderDetailEntity', completedQty: number, createdAt: any, factoryOrderId: string, id: string, orderDetailId: string, price: number, productionCost: number, qualityCheckedAt?: any | null, qualityCheckedBy?: string | null, qualityStatus?: QualityCheckStatus | null, quantity: number, rejectedQty: number, status: OrderStatus, updatedAt?: any | null, checkQualities?: Array<{ __typename?: 'CheckQuality', checkedAt: any, checkedBy?: string | null, factoryOrderDetailId?: string | null, failedQuantity: number, id: string, note?: string | null, orderDetailId: string, passedQuantity: number, reworkRequired: boolean, status: QualityCheckStatus, taskId: string, totalChecked: number }> | null }> | null } };
 
 export type ProductDesignByIdQueryVariables = Exact<{
   productDesignId: Scalars['ID']['input'];
@@ -1741,14 +1804,14 @@ export type RemoveSystemConfigBankMutation = { __typename?: 'Mutation', removeSy
 export type GetMyStaffTasksQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMyStaffTasksQuery = { __typename?: 'Query', myStaffTasks: Array<{ __typename?: 'StaffTask', status: string, note?: string | null, completedDate?: any | null, assignedDate: any, id: string, task: { __typename?: 'TaskEntity', assignedBy?: string | null, description: string, expiredTime: any, id: string, qualityCheckStatus: QualityCheckStatus, startDate: any, status: string, taskType?: string | null, taskname: string, checkQualities: Array<{ __typename?: 'CheckQuality', checkedAt: any, checkedBy?: string | null, failedQuantity: number, id: string, note?: string | null, passedQuantity: number, reworkRequired: boolean, status: QualityCheckStatus, taskId: string, totalChecked: number, factoryOrderDetail?: { __typename?: 'FactoryOrderDetailEntity', completedQty: number, createdAt: any, designId: string, factoryOrderId: string, id: string, orderDetailId: string, price: number, productionCost: number, qualityCheckedAt?: any | null, qualityCheckedBy?: string | null, qualityStatus?: QualityCheckStatus | null, quantity: number, rejectedQty: number, status: OrderStatus, updatedAt?: any | null, factoryOrder?: { __typename?: 'FactoryOrder', status: FactoryOrderStatus, isDelayed: boolean, estimatedCompletionDate?: any | null, completedAt?: any | null, acceptanceDeadline: any, factoryId: string, createdAt: any, updatedAt?: any | null } | null } | null, orderDetail?: { __typename?: 'CustomerOrderDetailEntity', id: string, orderId: string, price: number, qualityCheckStatus: string, quantity: number, reworkStatus: string, status: string, design?: { __typename?: 'ProductDesignEntity', isTemplate: boolean, isPublic: boolean, isFinalized: boolean, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designId: string, designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', model?: string | null, size?: string | null, price?: number | null, product: { __typename?: 'ProductEntity', name: string, weight?: number | null, imageUrl?: string | null } } | null } | null } | null }> } }> };
+export type GetMyStaffTasksQuery = { __typename?: 'Query', myStaffTasks: Array<{ __typename?: 'StaffTask', status: string, note?: string | null, completedDate?: any | null, assignedDate: any, id: string, task?: { __typename?: 'TaskEntity', assignedBy?: string | null, description: string, expiredTime: any, id: string, qualityCheckStatus: QualityCheckStatus, startDate: any, status: string, taskType?: string | null, taskname: string, checkQualities: Array<{ __typename?: 'CheckQuality', checkedAt: any, checkedBy?: string | null, failedQuantity: number, id: string, note?: string | null, passedQuantity: number, reworkRequired: boolean, status: QualityCheckStatus, taskId: string, totalChecked: number, factoryOrderDetail?: { __typename?: 'FactoryOrderDetailEntity', completedQty: number, createdAt: any, designId: string, factoryOrderId: string, id: string, orderDetailId: string, price: number, productionCost: number, qualityCheckedAt?: any | null, qualityCheckedBy?: string | null, qualityStatus?: QualityCheckStatus | null, quantity: number, rejectedQty: number, status: OrderStatus, updatedAt?: any | null, factoryOrder?: { __typename?: 'FactoryOrder', status: FactoryOrderStatus, isDelayed: boolean, estimatedCompletionDate?: any | null, completedAt?: any | null, acceptanceDeadline: any, factoryId: string, createdAt: any, updatedAt?: any | null } | null } | null, orderDetail?: { __typename?: 'CustomerOrderDetailEntity', id: string, orderId: string, price: number, qualityCheckStatus: string, quantity: number, reworkStatus: string, status: string, design?: { __typename?: 'ProductDesignEntity', isTemplate: boolean, isPublic: boolean, isFinalized: boolean, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designId: string, designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', model?: string | null, size?: string | null, price?: number | null, product: { __typename?: 'ProductEntity', name: string, weight?: number | null, imageUrl?: string | null } } | null } | null } | null }> } | null }> };
 
 export type GetStaffTaskDetailQueryVariables = Exact<{
   staffTaskId: Scalars['ID']['input'];
 }>;
 
 
-export type GetStaffTaskDetailQuery = { __typename?: 'Query', staffTask: { __typename?: 'StaffTask', status: string, note?: string | null, completedDate?: any | null, assignedDate: any, id: string, task: { __typename?: 'TaskEntity', assignedBy?: string | null, description: string, expiredTime: any, id: string, qualityCheckStatus: QualityCheckStatus, startDate: any, status: string, taskType?: string | null, taskname: string, checkQualities: Array<{ __typename?: 'CheckQuality', checkedAt: any, checkedBy?: string | null, failedQuantity: number, id: string, note?: string | null, passedQuantity: number, reworkRequired: boolean, status: QualityCheckStatus, taskId: string, totalChecked: number, factoryOrderDetail?: { __typename?: 'FactoryOrderDetailEntity', completedQty: number, createdAt: any, designId: string, factoryOrderId: string, id: string, orderDetailId: string, price: number, productionCost: number, qualityCheckedAt?: any | null, qualityCheckedBy?: string | null, qualityStatus?: QualityCheckStatus | null, quantity: number, rejectedQty: number, status: OrderStatus, updatedAt?: any | null, factoryOrder?: { __typename?: 'FactoryOrder', status: FactoryOrderStatus, isDelayed: boolean, estimatedCompletionDate?: any | null, completedAt?: any | null, acceptanceDeadline: any, factoryId: string, createdAt: any, updatedAt?: any | null } | null } | null, orderDetail?: { __typename?: 'CustomerOrderDetailEntity', id: string, orderId: string, price: number, qualityCheckStatus: string, quantity: number, reworkStatus: string, status: string, design?: { __typename?: 'ProductDesignEntity', isTemplate: boolean, isPublic: boolean, isFinalized: boolean, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designId: string, designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', model?: string | null, size?: string | null, price?: number | null, product: { __typename?: 'ProductEntity', name: string, weight?: number | null, imageUrl?: string | null } } | null } | null } | null }> } } };
+export type GetStaffTaskDetailQuery = { __typename?: 'Query', staffTask: { __typename?: 'StaffTask', status: string, note?: string | null, completedDate?: any | null, assignedDate: any, id: string, task?: { __typename?: 'TaskEntity', assignedBy?: string | null, description: string, expiredTime: any, id: string, qualityCheckStatus: QualityCheckStatus, startDate: any, status: string, taskType?: string | null, taskname: string, checkQualities: Array<{ __typename?: 'CheckQuality', checkedAt: any, checkedBy?: string | null, failedQuantity: number, id: string, note?: string | null, passedQuantity: number, reworkRequired: boolean, status: QualityCheckStatus, taskId: string, totalChecked: number, factoryOrderDetail?: { __typename?: 'FactoryOrderDetailEntity', completedQty: number, createdAt: any, designId: string, factoryOrderId: string, id: string, orderDetailId: string, price: number, productionCost: number, qualityCheckedAt?: any | null, qualityCheckedBy?: string | null, qualityStatus?: QualityCheckStatus | null, quantity: number, rejectedQty: number, status: OrderStatus, updatedAt?: any | null, factoryOrder?: { __typename?: 'FactoryOrder', status: FactoryOrderStatus, isDelayed: boolean, estimatedCompletionDate?: any | null, completedAt?: any | null, acceptanceDeadline: any, factoryId: string, createdAt: any, updatedAt?: any | null } | null } | null, orderDetail?: { __typename?: 'CustomerOrderDetailEntity', id: string, orderId: string, price: number, qualityCheckStatus: string, quantity: number, reworkStatus: string, status: string, design?: { __typename?: 'ProductDesignEntity', isTemplate: boolean, isPublic: boolean, isFinalized: boolean, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designId: string, designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', model?: string | null, size?: string | null, price?: number | null, product: { __typename?: 'ProductEntity', name: string, weight?: number | null, imageUrl?: string | null } } | null } | null } | null }> } | null } };
 
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2723,6 +2786,106 @@ export function useUpdateFactoryOrderStatusMutation(baseOptions?: Apollo.Mutatio
 export type UpdateFactoryOrderStatusMutationHookResult = ReturnType<typeof useUpdateFactoryOrderStatusMutation>;
 export type UpdateFactoryOrderStatusMutationResult = Apollo.MutationResult<UpdateFactoryOrderStatusMutation>;
 export type UpdateFactoryOrderStatusMutationOptions = Apollo.BaseMutationOptions<UpdateFactoryOrderStatusMutation, UpdateFactoryOrderStatusMutationVariables>;
+export const CreateFactoryProgressReportDocument = gql`
+    mutation CreateFactoryProgressReport($input: CreateFactoryProgressReportDto!) {
+  createFactoryProgressReport(input: $input) {
+    id
+  }
+}
+    `;
+export type CreateFactoryProgressReportMutationFn = Apollo.MutationFunction<CreateFactoryProgressReportMutation, CreateFactoryProgressReportMutationVariables>;
+
+/**
+ * __useCreateFactoryProgressReportMutation__
+ *
+ * To run a mutation, you first call `useCreateFactoryProgressReportMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateFactoryProgressReportMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createFactoryProgressReportMutation, { data, loading, error }] = useCreateFactoryProgressReportMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateFactoryProgressReportMutation(baseOptions?: Apollo.MutationHookOptions<CreateFactoryProgressReportMutation, CreateFactoryProgressReportMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateFactoryProgressReportMutation, CreateFactoryProgressReportMutationVariables>(CreateFactoryProgressReportDocument, options);
+      }
+export type CreateFactoryProgressReportMutationHookResult = ReturnType<typeof useCreateFactoryProgressReportMutation>;
+export type CreateFactoryProgressReportMutationResult = Apollo.MutationResult<CreateFactoryProgressReportMutation>;
+export type CreateFactoryProgressReportMutationOptions = Apollo.BaseMutationOptions<CreateFactoryProgressReportMutation, CreateFactoryProgressReportMutationVariables>;
+export const MarkFactoryOrderAsDelayedDocument = gql`
+    mutation MarkFactoryOrderAsDelayed($markFactoryOrderAsDelayedId: ID!, $input: MarkAsDelayedDto!) {
+  markFactoryOrderAsDelayed(id: $markFactoryOrderAsDelayedId, input: $input) {
+    id
+  }
+}
+    `;
+export type MarkFactoryOrderAsDelayedMutationFn = Apollo.MutationFunction<MarkFactoryOrderAsDelayedMutation, MarkFactoryOrderAsDelayedMutationVariables>;
+
+/**
+ * __useMarkFactoryOrderAsDelayedMutation__
+ *
+ * To run a mutation, you first call `useMarkFactoryOrderAsDelayedMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkFactoryOrderAsDelayedMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markFactoryOrderAsDelayedMutation, { data, loading, error }] = useMarkFactoryOrderAsDelayedMutation({
+ *   variables: {
+ *      markFactoryOrderAsDelayedId: // value for 'markFactoryOrderAsDelayedId'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useMarkFactoryOrderAsDelayedMutation(baseOptions?: Apollo.MutationHookOptions<MarkFactoryOrderAsDelayedMutation, MarkFactoryOrderAsDelayedMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MarkFactoryOrderAsDelayedMutation, MarkFactoryOrderAsDelayedMutationVariables>(MarkFactoryOrderAsDelayedDocument, options);
+      }
+export type MarkFactoryOrderAsDelayedMutationHookResult = ReturnType<typeof useMarkFactoryOrderAsDelayedMutation>;
+export type MarkFactoryOrderAsDelayedMutationResult = Apollo.MutationResult<MarkFactoryOrderAsDelayedMutation>;
+export type MarkFactoryOrderAsDelayedMutationOptions = Apollo.BaseMutationOptions<MarkFactoryOrderAsDelayedMutation, MarkFactoryOrderAsDelayedMutationVariables>;
+export const MarkOnDoneProductionDocument = gql`
+    mutation MarkOnDoneProduction($markOnDoneProductionId: ID!) {
+  markOnDoneProduction(id: $markOnDoneProductionId) {
+    id
+  }
+}
+    `;
+export type MarkOnDoneProductionMutationFn = Apollo.MutationFunction<MarkOnDoneProductionMutation, MarkOnDoneProductionMutationVariables>;
+
+/**
+ * __useMarkOnDoneProductionMutation__
+ *
+ * To run a mutation, you first call `useMarkOnDoneProductionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkOnDoneProductionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markOnDoneProductionMutation, { data, loading, error }] = useMarkOnDoneProductionMutation({
+ *   variables: {
+ *      markOnDoneProductionId: // value for 'markOnDoneProductionId'
+ *   },
+ * });
+ */
+export function useMarkOnDoneProductionMutation(baseOptions?: Apollo.MutationHookOptions<MarkOnDoneProductionMutation, MarkOnDoneProductionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MarkOnDoneProductionMutation, MarkOnDoneProductionMutationVariables>(MarkOnDoneProductionDocument, options);
+      }
+export type MarkOnDoneProductionMutationHookResult = ReturnType<typeof useMarkOnDoneProductionMutation>;
+export type MarkOnDoneProductionMutationResult = Apollo.MutationResult<MarkOnDoneProductionMutation>;
+export type MarkOnDoneProductionMutationOptions = Apollo.BaseMutationOptions<MarkOnDoneProductionMutation, MarkOnDoneProductionMutationVariables>;
 export const MyNotificationsDocument = gql`
     query MyNotifications {
   myNotifications {

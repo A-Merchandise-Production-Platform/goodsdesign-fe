@@ -72,3 +72,22 @@ mutation UpdateFactoryOrderStatus(
     id
   }
 }
+
+
+mutation CreateFactoryProgressReport($input: CreateFactoryProgressReportDto!) {
+  createFactoryProgressReport(input: $input) {
+    id
+  }
+}
+
+mutation MarkFactoryOrderAsDelayed($markFactoryOrderAsDelayedId: ID!, $input: MarkAsDelayedDto!) {
+  markFactoryOrderAsDelayed(id: $markFactoryOrderAsDelayedId, input: $input) {
+    id
+  }
+}
+
+mutation MarkOnDoneProduction($markOnDoneProductionId: ID!) {
+  markOnDoneProduction(id: $markOnDoneProductionId) {
+    id
+  }
+}
