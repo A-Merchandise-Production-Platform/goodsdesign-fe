@@ -13,8 +13,10 @@ export default function Home() {
     .sort((a, b) => (a.id ?? '').localeCompare(b.id ?? ''));
 
   return (
-    <div className="grid grid-cols-1 gap-4 pt-4 pb-2 px-4 md:grid-cols-[200px_1fr]">
-      <div><Sidebar /></div>
+    <div className="grid grid-cols-1 gap-4 px-4 pt-4 pb-2 md:grid-cols-[200px_1fr]">
+      <div>
+        <Sidebar />
+      </div>
       <div className="px-4 py-8">
         <PromotionalBanner />
 
