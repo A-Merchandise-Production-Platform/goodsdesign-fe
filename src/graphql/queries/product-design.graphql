@@ -1,5 +1,36 @@
+query ProductDesigns {
+  productDesigns {
+    id
+    thumbnailUrl
+    designPositions {
+      positionType {
+        id
+        positionName
+        basePrice
+      }
+      designJSON
+    }
+  }
+}
+
+query ProductDesignsByUser {
+  productDesignsByUser {
+    id
+    thumbnailUrl
+    designPositions {
+      positionType {
+        id
+        positionName
+        basePrice
+      }
+      designJSON
+    }
+  }
+}
+
 query ProductDesignById($productDesignId: ID!) {
   productDesign(id: $productDesignId) {
+    thumbnailUrl
     systemConfigVariant {
       id
       price
@@ -29,6 +60,7 @@ mutation UpdateProductDesign(
   $input: UpdateProductDesignDto!
 ) {
   updateProductDesign(id: $updateProductDesignId, input: $input) {
+    thumbnailUrl
     systemConfigVariant {
       id
       price

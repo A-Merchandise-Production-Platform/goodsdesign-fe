@@ -108,15 +108,35 @@ export interface TshirtModelProps {
   texture: THREE.CanvasTexture | null;
   view: string;
   color: string;
+  onExport?: (dataUrl: string) => void;
 }
 
 export default function TshirtModel({
   texture,
   view,
   color,
+  onExport,
 }: TshirtModelProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Handle export when ready
+  useEffect(() => {
+    if (onExport && canvasRef.current) {
+      // Wait for scene to be fully rendered
+      requestAnimationFrame(() => {
+        const dataUrl = canvasRef.current?.toDataURL('image/png');
+        if (dataUrl) {
+          onExport(dataUrl);
+        }
+      });
+    }
+  }, [onExport]);
   return (
-    <Canvas camera={{ fov: 85 }} className="bg-muted h-full w-full border">
+    <Canvas
+      camera={{ fov: 85 }}
+      className="bg-muted h-full w-full border"
+      ref={canvasRef}
+    >
       <Suspense fallback={null}>
         <Model texture={texture} view={view} color={color} />
       </Suspense>

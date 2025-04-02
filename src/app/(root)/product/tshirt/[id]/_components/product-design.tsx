@@ -64,6 +64,24 @@ export default function ProductDesigner({
   cartLoading,
   designId,
 }: ProductDesignerComponentProps) {
+  // State for 3D model export
+  const [modelExportCallback, setModelExportCallback] = useState<
+    ((dataUrl: string) => void) | undefined
+  >();
+
+  // Handle export of 3D model
+  const handleExport = () => {
+    const handleModelCapture = (dataUrl: string) => {
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `tshirt-3d-${view}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setModelExportCallback(undefined);
+    };
+    setModelExportCallback(() => handleModelCapture);
+  };
   const [view, setView] = useState('front');
   const [currentTexture, setCurrentTexture] = useState<string>(
     SHIRT_COLORS[0].path,
@@ -334,7 +352,6 @@ export default function ProductDesigner({
     debounceTextureUpdate();
   };
 
-  // Update texture on 3D model
   const updateTextureOnModel = () => {
     if (!fabricCanvasRef.current || !tempCanvasRef.current) return;
 
@@ -884,7 +901,7 @@ export default function ProductDesigner({
 
   return (
     <div className="flex h-screen flex-col">
-      <DesignHeader onSave={saveCurrentDesign} />
+      <DesignHeader onSave={saveCurrentDesign} onExport={handleExport} />
 
       <div className="flex flex-1">
         <DesignSidebar
@@ -971,6 +988,7 @@ export default function ProductDesigner({
             canvasRef={canvasRef as any}
             view={view}
             texture={texture}
+            onExport={modelExportCallback}
           />
         </div>
       </div>
