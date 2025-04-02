@@ -1,0 +1,23 @@
+query MyNotifications {
+  myNotifications {
+    content
+    createdAt
+    id
+    isRead
+    title
+    updatedAt
+    url
+  }
+}
+
+mutation MarkNotificationAsRead($markNotificationAsReadId: String!) {
+  markNotificationAsRead(id: $markNotificationAsReadId) {
+    content
+    createdAt
+    id
+    isRead
+    title
+    updatedAt
+    url
+  }
+}

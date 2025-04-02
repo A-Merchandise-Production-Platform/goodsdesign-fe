@@ -70,7 +70,7 @@ export type CalculateShippingFeeDto = {
 export type CartItemEntity = {
   __typename?: 'CartItemEntity';
   createdAt: Scalars['DateTime']['output'];
-  design?: Maybe<ProductDesignEntity>;
+  design: ProductDesignEntity;
   id: Scalars['ID']['output'];
   quantity: Scalars['Int']['output'];
   userId: Scalars['String']['output'];
@@ -133,12 +133,12 @@ export type CreateCategoryDto = {
   name: Scalars['String']['input'];
 };
 
-export type CreateNotificationDto = {
-  content?: InputMaybe<Scalars['String']['input']>;
-  isRead?: Scalars['Boolean']['input'];
-  title?: InputMaybe<Scalars['String']['input']>;
-  url?: InputMaybe<Scalars['String']['input']>;
-  userId: Scalars['String']['input'];
+export type CreateFactoryProgressReportDto = {
+  completedQty: Scalars['Float']['input'];
+  estimatedCompletion: Scalars['DateTime']['input'];
+  factoryOrderId: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  photoUrls: Array<Scalars['String']['input']>;
 };
 
 export type CreateOrderDetailDto = {
@@ -349,6 +349,7 @@ export enum FactoryOrderStatus {
   Accepted = 'ACCEPTED',
   Cancelled = 'CANCELLED',
   Completed = 'COMPLETED',
+  DoneProduction = 'DONE_PRODUCTION',
   Expired = 'EXPIRED',
   InProduction = 'IN_PRODUCTION',
   PendingAcceptance = 'PENDING_ACCEPTANCE',
@@ -372,7 +373,7 @@ export type FactoryProgressReport = {
   factoryOrder?: Maybe<FactoryOrder>;
   factoryOrderId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
-  notes: Scalars['String']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
   photoUrls: Array<Scalars['String']['output']>;
   reportDate: Scalars['DateTime']['output'];
 };
@@ -400,6 +401,11 @@ export type LoginDto = {
   password: Scalars['String']['input'];
 };
 
+export type MarkAsDelayedDto = {
+  delayReason: Scalars['String']['input'];
+  estimatedCompletionDate: Scalars['DateTime']['input'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   calculateShippingFee: ShippingFee;
@@ -409,7 +415,9 @@ export type Mutation = {
   createCartItem: CartItemEntity;
   createCategory: CategoryEntity;
   createCheckQuality: CheckQuality;
+  createFactoryProgressReport: FactoryProgressReport;
   createNotification: NotificationEntity;
+  createNotificationForManyUsers: Array<NotificationEntity>;
   createOrder: CustomerOrderEntity;
   createPayment: Scalars['String']['output'];
   createPaymentTransaction: PaymentTransaction;
@@ -427,12 +435,11 @@ export type Mutation = {
   deleteUser: UserEntity;
   login: AuthResponseDto;
   logout: Scalars['String']['output'];
-  markAllNotificationsAsRead: Array<NotificationEntity>;
   markFactoryOrderAsDelayed: FactoryOrder;
   markNotificationAsRead: NotificationEntity;
+  markOnDoneProduction: FactoryOrder;
   refreshToken: AuthResponseDto;
   register: AuthResponseDto;
-  removeNotification: NotificationEntity;
   removePaymentTransaction: PaymentTransaction;
   removeProductDesign: ProductDesignEntity;
   removeProductPositionType: ProductPositionTypeEntity;
@@ -451,7 +458,6 @@ export type Mutation = {
   updateDesignPosition: DesignPositionEntity;
   updateFactoryInfo: FactoryEntity;
   updateFactoryOrderStatus: FactoryOrder;
-  updateNotification: NotificationEntity;
   updatePaymentTransaction: PaymentTransaction;
   updateProduct: ProductEntity;
   updateProductDesign: ProductDesignEntity;
@@ -496,8 +502,22 @@ export type MutationCreateCheckQualityArgs = {
   totalChecked: Scalars['Float']['input'];
 };
 
+export type MutationCreateFactoryProgressReportArgs = {
+  input: CreateFactoryProgressReportDto;
+};
+
 export type MutationCreateNotificationArgs = {
-  input: CreateNotificationDto;
+  content: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+  url?: InputMaybe<Scalars['String']['input']>;
+  userId: Scalars['String']['input'];
+};
+
+export type MutationCreateNotificationForManyUsersArgs = {
+  content: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+  url?: InputMaybe<Scalars['String']['input']>;
+  userIds: Array<Scalars['String']['input']>;
 };
 
 export type MutationCreateOrderArgs = {
@@ -567,9 +587,14 @@ export type MutationLoginArgs = {
 
 export type MutationMarkFactoryOrderAsDelayedArgs = {
   id: Scalars['ID']['input'];
+  input: MarkAsDelayedDto;
 };
 
 export type MutationMarkNotificationAsReadArgs = {
+  id: Scalars['String']['input'];
+};
+
+export type MutationMarkOnDoneProductionArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -579,10 +604,6 @@ export type MutationRefreshTokenArgs = {
 
 export type MutationRegisterArgs = {
   registerInput: RegisterDto;
-};
-
-export type MutationRemoveNotificationArgs = {
-  id: Scalars['ID']['input'];
 };
 
 export type MutationRemovePaymentTransactionArgs = {
@@ -662,10 +683,6 @@ export type MutationUpdateFactoryOrderStatusArgs = {
   status: Scalars['String']['input'];
 };
 
-export type MutationUpdateNotificationArgs = {
-  input: UpdateNotificationDto;
-};
-
 export type MutationUpdatePaymentTransactionArgs = {
   id: Scalars['ID']['input'];
   input: UpdatePaymentTransactionInput;
@@ -722,18 +739,19 @@ export type NotificationEntity = {
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   url?: Maybe<Scalars['String']['output']>;
   user?: Maybe<UserEntity>;
-  userId: Scalars['String']['output'];
 };
 
 export enum OrderStatus {
   Accepted = 'ACCEPTED',
   AssignedToFactory = 'ASSIGNED_TO_FACTORY',
   Canceled = 'CANCELED',
-  Completed = 'COMPLETED',
   Delivered = 'DELIVERED',
+  DoneProduction = 'DONE_PRODUCTION',
   InProduction = 'IN_PRODUCTION',
   PaymentReceived = 'PAYMENT_RECEIVED',
   Pending = 'PENDING',
+  WaitingFillInformation = 'WAITING_FILL_INFORMATION',
+  WaitingPayment = 'WAITING_PAYMENT',
 }
 
 export type PaymentEntity = {
@@ -900,15 +918,19 @@ export type Query = {
   factoryOrders: Array<FactoryOrder>;
   factoryOrdersByCustomerOrder: Array<FactoryOrder>;
   factoryOrdersByFactory: Array<FactoryOrder>;
+  factoryProgressReport: FactoryProgressReport;
+  factoryProgressReports: Array<FactoryProgressReport>;
   getAllDiscountByProductId: Array<SystemConfigDiscountEntity>;
   getApplicableDiscount: Scalars['Float']['output'];
   getCartItem: CartItemEntity;
   getCartItemCount: Scalars['Float']['output'];
   getMe: UserEntity;
   getMyFactory: FactoryEntity;
+  myNotifications: Array<NotificationEntity>;
   myStaffTasks: Array<StaffTask>;
   notification: NotificationEntity;
   notifications: Array<NotificationEntity>;
+  notificationsByUserId: Array<NotificationEntity>;
   paymentTransaction?: Maybe<PaymentTransaction>;
   paymentTransactions: Array<PaymentTransaction>;
   paymentTransactionsByCustomer: Array<PaymentTransaction>;
@@ -985,6 +1007,14 @@ export type QueryFactoryOrdersByCustomerOrderArgs = {
   customerOrderId: Scalars['ID']['input'];
 };
 
+export type QueryFactoryProgressReportArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type QueryFactoryProgressReportsArgs = {
+  factoryOrderId: Scalars['ID']['input'];
+};
+
 export type QueryGetAllDiscountByProductIdArgs = {
   productId: Scalars['String']['input'];
 };
@@ -999,7 +1029,11 @@ export type QueryGetCartItemArgs = {
 };
 
 export type QueryNotificationArgs = {
-  id: Scalars['ID']['input'];
+  id: Scalars['String']['input'];
+};
+
+export type QueryNotificationsByUserIdArgs = {
+  isRead?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type QueryPaymentTransactionArgs = {
@@ -1116,7 +1150,7 @@ export type StaffTask = {
   id: Scalars['ID']['output'];
   note?: Maybe<Scalars['String']['output']>;
   status: Scalars['String']['output'];
-  task: TaskEntity;
+  task?: Maybe<TaskEntity>;
   taskId: Scalars['ID']['output'];
   user: UserEntity;
   userId: Scalars['ID']['output'];
@@ -1236,15 +1270,6 @@ export type UpdateFactoryInfoDto = {
   taxIdentificationNumber?: InputMaybe<Scalars['String']['input']>;
   totalEmployees?: InputMaybe<Scalars['Int']['input']>;
   website?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type UpdateNotificationDto = {
-  content?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['ID']['input'];
-  isRead?: InputMaybe<Scalars['Boolean']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-  url?: InputMaybe<Scalars['String']['input']>;
-  userId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdatePaymentTransactionInput = {
@@ -1557,7 +1582,7 @@ export type GetUserCartItemsQuery = {
     userId: string;
     quantity: number;
     id: string;
-    design?: {
+    design: {
       __typename?: 'ProductDesignEntity';
       isTemplate: boolean;
       isPublic: boolean;
@@ -1593,7 +1618,7 @@ export type GetUserCartItemsQuery = {
           basePrice: number;
         } | null;
       }> | null;
-    } | null;
+    };
   }>;
 };
 
@@ -1796,6 +1821,71 @@ export type UpdateFactoryOrderStatusMutationVariables = Exact<{
 export type UpdateFactoryOrderStatusMutation = {
   __typename?: 'Mutation';
   updateFactoryOrderStatus: { __typename?: 'FactoryOrder'; id: string };
+};
+
+export type CreateFactoryProgressReportMutationVariables = Exact<{
+  input: CreateFactoryProgressReportDto;
+}>;
+
+export type CreateFactoryProgressReportMutation = {
+  __typename?: 'Mutation';
+  createFactoryProgressReport: {
+    __typename?: 'FactoryProgressReport';
+    id: string;
+  };
+};
+
+export type MarkFactoryOrderAsDelayedMutationVariables = Exact<{
+  markFactoryOrderAsDelayedId: Scalars['ID']['input'];
+  input: MarkAsDelayedDto;
+}>;
+
+export type MarkFactoryOrderAsDelayedMutation = {
+  __typename?: 'Mutation';
+  markFactoryOrderAsDelayed: { __typename?: 'FactoryOrder'; id: string };
+};
+
+export type MarkOnDoneProductionMutationVariables = Exact<{
+  markOnDoneProductionId: Scalars['ID']['input'];
+}>;
+
+export type MarkOnDoneProductionMutation = {
+  __typename?: 'Mutation';
+  markOnDoneProduction: { __typename?: 'FactoryOrder'; id: string };
+};
+
+export type MyNotificationsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type MyNotificationsQuery = {
+  __typename?: 'Query';
+  myNotifications: Array<{
+    __typename?: 'NotificationEntity';
+    content?: string | null;
+    createdAt: any;
+    id: string;
+    isRead: boolean;
+    title?: string | null;
+    updatedAt?: any | null;
+    url?: string | null;
+  }>;
+};
+
+export type MarkNotificationAsReadMutationVariables = Exact<{
+  markNotificationAsReadId: Scalars['String']['input'];
+}>;
+
+export type MarkNotificationAsReadMutation = {
+  __typename?: 'Mutation';
+  markNotificationAsRead: {
+    __typename?: 'NotificationEntity';
+    content?: string | null;
+    createdAt: any;
+    id: string;
+    isRead: boolean;
+    title?: string | null;
+    updatedAt?: any | null;
+    url?: string | null;
+  };
 };
 
 export type CreateOrderMutationVariables = Exact<{
@@ -2002,7 +2092,7 @@ export type GetFactoryOrderQuery = {
       estimatedCompletion: any;
       factoryOrderId: string;
       id: string;
-      notes: string;
+      notes?: string | null;
       photoUrls: Array<string>;
       reportDate: any;
     }> | null;
@@ -2383,7 +2473,7 @@ export type GetMyStaffTasksQuery = {
     completedDate?: any | null;
     assignedDate: any;
     id: string;
-    task: {
+    task?: {
       __typename?: 'TaskEntity';
       assignedBy?: string | null;
       description: string;
@@ -2474,7 +2564,7 @@ export type GetMyStaffTasksQuery = {
           } | null;
         } | null;
       }>;
-    };
+    } | null;
   }>;
 };
 
@@ -2491,7 +2581,7 @@ export type GetStaffTaskDetailQuery = {
     completedDate?: any | null;
     assignedDate: any;
     id: string;
-    task: {
+    task?: {
       __typename?: 'TaskEntity';
       assignedBy?: string | null;
       description: string;
@@ -2582,7 +2672,7 @@ export type GetStaffTaskDetailQuery = {
           } | null;
         } | null;
       }>;
-    };
+    } | null;
   };
 };
 
@@ -4128,6 +4218,303 @@ export type UpdateFactoryOrderStatusMutationOptions =
     UpdateFactoryOrderStatusMutation,
     UpdateFactoryOrderStatusMutationVariables
   >;
+export const CreateFactoryProgressReportDocument = gql`
+  mutation CreateFactoryProgressReport(
+    $input: CreateFactoryProgressReportDto!
+  ) {
+    createFactoryProgressReport(input: $input) {
+      id
+    }
+  }
+`;
+export type CreateFactoryProgressReportMutationFn = Apollo.MutationFunction<
+  CreateFactoryProgressReportMutation,
+  CreateFactoryProgressReportMutationVariables
+>;
+
+/**
+ * __useCreateFactoryProgressReportMutation__
+ *
+ * To run a mutation, you first call `useCreateFactoryProgressReportMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateFactoryProgressReportMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createFactoryProgressReportMutation, { data, loading, error }] = useCreateFactoryProgressReportMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateFactoryProgressReportMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateFactoryProgressReportMutation,
+    CreateFactoryProgressReportMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateFactoryProgressReportMutation,
+    CreateFactoryProgressReportMutationVariables
+  >(CreateFactoryProgressReportDocument, options);
+}
+export type CreateFactoryProgressReportMutationHookResult = ReturnType<
+  typeof useCreateFactoryProgressReportMutation
+>;
+export type CreateFactoryProgressReportMutationResult =
+  Apollo.MutationResult<CreateFactoryProgressReportMutation>;
+export type CreateFactoryProgressReportMutationOptions =
+  Apollo.BaseMutationOptions<
+    CreateFactoryProgressReportMutation,
+    CreateFactoryProgressReportMutationVariables
+  >;
+export const MarkFactoryOrderAsDelayedDocument = gql`
+  mutation MarkFactoryOrderAsDelayed(
+    $markFactoryOrderAsDelayedId: ID!
+    $input: MarkAsDelayedDto!
+  ) {
+    markFactoryOrderAsDelayed(id: $markFactoryOrderAsDelayedId, input: $input) {
+      id
+    }
+  }
+`;
+export type MarkFactoryOrderAsDelayedMutationFn = Apollo.MutationFunction<
+  MarkFactoryOrderAsDelayedMutation,
+  MarkFactoryOrderAsDelayedMutationVariables
+>;
+
+/**
+ * __useMarkFactoryOrderAsDelayedMutation__
+ *
+ * To run a mutation, you first call `useMarkFactoryOrderAsDelayedMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkFactoryOrderAsDelayedMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markFactoryOrderAsDelayedMutation, { data, loading, error }] = useMarkFactoryOrderAsDelayedMutation({
+ *   variables: {
+ *      markFactoryOrderAsDelayedId: // value for 'markFactoryOrderAsDelayedId'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useMarkFactoryOrderAsDelayedMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    MarkFactoryOrderAsDelayedMutation,
+    MarkFactoryOrderAsDelayedMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    MarkFactoryOrderAsDelayedMutation,
+    MarkFactoryOrderAsDelayedMutationVariables
+  >(MarkFactoryOrderAsDelayedDocument, options);
+}
+export type MarkFactoryOrderAsDelayedMutationHookResult = ReturnType<
+  typeof useMarkFactoryOrderAsDelayedMutation
+>;
+export type MarkFactoryOrderAsDelayedMutationResult =
+  Apollo.MutationResult<MarkFactoryOrderAsDelayedMutation>;
+export type MarkFactoryOrderAsDelayedMutationOptions =
+  Apollo.BaseMutationOptions<
+    MarkFactoryOrderAsDelayedMutation,
+    MarkFactoryOrderAsDelayedMutationVariables
+  >;
+export const MarkOnDoneProductionDocument = gql`
+  mutation MarkOnDoneProduction($markOnDoneProductionId: ID!) {
+    markOnDoneProduction(id: $markOnDoneProductionId) {
+      id
+    }
+  }
+`;
+export type MarkOnDoneProductionMutationFn = Apollo.MutationFunction<
+  MarkOnDoneProductionMutation,
+  MarkOnDoneProductionMutationVariables
+>;
+
+/**
+ * __useMarkOnDoneProductionMutation__
+ *
+ * To run a mutation, you first call `useMarkOnDoneProductionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkOnDoneProductionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markOnDoneProductionMutation, { data, loading, error }] = useMarkOnDoneProductionMutation({
+ *   variables: {
+ *      markOnDoneProductionId: // value for 'markOnDoneProductionId'
+ *   },
+ * });
+ */
+export function useMarkOnDoneProductionMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    MarkOnDoneProductionMutation,
+    MarkOnDoneProductionMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    MarkOnDoneProductionMutation,
+    MarkOnDoneProductionMutationVariables
+  >(MarkOnDoneProductionDocument, options);
+}
+export type MarkOnDoneProductionMutationHookResult = ReturnType<
+  typeof useMarkOnDoneProductionMutation
+>;
+export type MarkOnDoneProductionMutationResult =
+  Apollo.MutationResult<MarkOnDoneProductionMutation>;
+export type MarkOnDoneProductionMutationOptions = Apollo.BaseMutationOptions<
+  MarkOnDoneProductionMutation,
+  MarkOnDoneProductionMutationVariables
+>;
+export const MyNotificationsDocument = gql`
+  query MyNotifications {
+    myNotifications {
+      content
+      createdAt
+      id
+      isRead
+      title
+      updatedAt
+      url
+    }
+  }
+`;
+
+/**
+ * __useMyNotificationsQuery__
+ *
+ * To run a query within a React component, call `useMyNotificationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMyNotificationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMyNotificationsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMyNotificationsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    MyNotificationsQuery,
+    MyNotificationsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<MyNotificationsQuery, MyNotificationsQueryVariables>(
+    MyNotificationsDocument,
+    options,
+  );
+}
+export function useMyNotificationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    MyNotificationsQuery,
+    MyNotificationsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    MyNotificationsQuery,
+    MyNotificationsQueryVariables
+  >(MyNotificationsDocument, options);
+}
+export function useMyNotificationsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        MyNotificationsQuery,
+        MyNotificationsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    MyNotificationsQuery,
+    MyNotificationsQueryVariables
+  >(MyNotificationsDocument, options);
+}
+export type MyNotificationsQueryHookResult = ReturnType<
+  typeof useMyNotificationsQuery
+>;
+export type MyNotificationsLazyQueryHookResult = ReturnType<
+  typeof useMyNotificationsLazyQuery
+>;
+export type MyNotificationsSuspenseQueryHookResult = ReturnType<
+  typeof useMyNotificationsSuspenseQuery
+>;
+export type MyNotificationsQueryResult = Apollo.QueryResult<
+  MyNotificationsQuery,
+  MyNotificationsQueryVariables
+>;
+export const MarkNotificationAsReadDocument = gql`
+  mutation MarkNotificationAsRead($markNotificationAsReadId: String!) {
+    markNotificationAsRead(id: $markNotificationAsReadId) {
+      content
+      createdAt
+      id
+      isRead
+      title
+      updatedAt
+      url
+    }
+  }
+`;
+export type MarkNotificationAsReadMutationFn = Apollo.MutationFunction<
+  MarkNotificationAsReadMutation,
+  MarkNotificationAsReadMutationVariables
+>;
+
+/**
+ * __useMarkNotificationAsReadMutation__
+ *
+ * To run a mutation, you first call `useMarkNotificationAsReadMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkNotificationAsReadMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markNotificationAsReadMutation, { data, loading, error }] = useMarkNotificationAsReadMutation({
+ *   variables: {
+ *      markNotificationAsReadId: // value for 'markNotificationAsReadId'
+ *   },
+ * });
+ */
+export function useMarkNotificationAsReadMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    MarkNotificationAsReadMutation,
+    MarkNotificationAsReadMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    MarkNotificationAsReadMutation,
+    MarkNotificationAsReadMutationVariables
+  >(MarkNotificationAsReadDocument, options);
+}
+export type MarkNotificationAsReadMutationHookResult = ReturnType<
+  typeof useMarkNotificationAsReadMutation
+>;
+export type MarkNotificationAsReadMutationResult =
+  Apollo.MutationResult<MarkNotificationAsReadMutation>;
+export type MarkNotificationAsReadMutationOptions = Apollo.BaseMutationOptions<
+  MarkNotificationAsReadMutation,
+  MarkNotificationAsReadMutationVariables
+>;
 export const CreateOrderDocument = gql`
   mutation CreateOrder($createOrderInput: CreateOrderDto!) {
     createOrder(createOrderInput: $createOrderInput) {

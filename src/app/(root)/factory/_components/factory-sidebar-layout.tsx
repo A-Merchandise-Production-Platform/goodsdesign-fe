@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  CogIcon,
-  HomeIcon,
-  Pen,
-  ShoppingBag,
-  ShoppingCartIcon,
-  UsersIcon,
-} from 'lucide-react';
+import { HomeIcon, Pen, ShoppingBag } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 import { MySidebar, NavItem } from '@/components/shared/my-sidebar';

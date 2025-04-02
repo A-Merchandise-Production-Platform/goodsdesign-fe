@@ -213,7 +213,7 @@ export default function CartPage() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-10">
+      <div className="container mx-auto py-8">
         <h1 className="mb-6 text-2xl font-bold">Shopping Cart</h1>
         <Card className="p-8 text-center">
           <ShoppingCart className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
