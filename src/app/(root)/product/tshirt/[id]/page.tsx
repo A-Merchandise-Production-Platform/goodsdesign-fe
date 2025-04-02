@@ -1,14 +1,11 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   useCreateCartItemMutation,
   useProductDesignByIdQuery,
-  useUpdateCartItemMutation,
   useUpdateDesignPositionMutation,
 } from '@/graphql/generated/graphql';
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
