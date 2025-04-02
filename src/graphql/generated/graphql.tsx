@@ -425,6 +425,7 @@ export type Mutation = {
   deleteAddress: AddressEntity;
   deleteCartItem: CartItemEntity;
   deleteCategory: CategoryEntity;
+  deleteFile: Scalars['Boolean']['output'];
   deleteProduct: ProductEntity;
   deleteUser: UserEntity;
   login: AuthResponseDto;
@@ -451,6 +452,7 @@ export type Mutation = {
   updateCheckQualityStatus: CheckQuality;
   updateDesignPosition: DesignPositionEntity;
   updateFactoryInfo: FactoryEntity;
+  updateFactoryOrderDetailStatus: FactoryOrder;
   updateFactoryOrderStatus: FactoryOrder;
   updatePaymentTransaction: PaymentTransaction;
   updateProduct: ProductEntity;
@@ -590,6 +592,11 @@ export type MutationDeleteCategoryArgs = {
 };
 
 
+export type MutationDeleteFileArgs = {
+  fileUrl: Scalars['String']['input'];
+};
+
+
 export type MutationDeleteProductArgs = {
   id: Scalars['String']['input'];
 };
@@ -720,6 +727,11 @@ export type MutationUpdateFactoryInfoArgs = {
 };
 
 
+export type MutationUpdateFactoryOrderDetailStatusArgs = {
+  input: UpdateOrderDetailStatusDto;
+};
+
+
 export type MutationUpdateFactoryOrderStatusArgs = {
   id: Scalars['ID']['input'];
   status: Scalars['String']['input'];
@@ -793,6 +805,7 @@ export type NotificationEntity = {
   user?: Maybe<UserEntity>;
 };
 
+/** Status of a factory order detail item */
 export enum OrderDetailStatus {
   Completed = 'COMPLETED',
   InProduction = 'IN_PRODUCTION',
@@ -1362,6 +1375,15 @@ export type UpdateFactoryInfoDto = {
   website?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateOrderDetailStatusDto = {
+  /** Optional note about the status change */
+  note?: InputMaybe<Scalars['String']['input']>;
+  /** The ID of the factory order detail to update */
+  orderDetailId: Scalars['String']['input'];
+  /** The new status to set for the order detail */
+  status: OrderDetailStatus;
+};
+
 export type UpdatePaymentTransactionInput = {
   amount?: InputMaybe<Scalars['Int']['input']>;
   customerId?: InputMaybe<Scalars['String']['input']>;
@@ -1681,6 +1703,13 @@ export type GetFactoryOrderQueryVariables = Exact<{
 
 
 export type GetFactoryOrderQuery = { __typename?: 'Query', factoryOrder: { __typename?: 'FactoryOrder', acceptanceDeadline: any, factoryId: string, id: string, status: FactoryOrderStatus, createdAt: any, updatedAt?: any | null, totalProductionCost: number, totalItems: number, rejectionReason?: string | null, assignedAt: any, completedAt?: any | null, acceptedAt?: any | null, currentProgress?: number | null, delayReason?: string | null, estimatedCompletionDate?: any | null, isDelayed: boolean, lastUpdated?: any | null, customerOrder?: { __typename?: 'CustomerOrderEntity', id: string, orderDate: any, orderDetails?: Array<{ __typename?: 'CustomerOrderDetailEntity', design?: { __typename?: 'ProductDesignEntity', designPositions?: Array<{ __typename?: 'DesignPositionEntity', designId: string, designJSON?: any | null, productPositionTypeId: string, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string } | null }> | null } | null }> | null } | null, progressReports?: Array<{ __typename?: 'FactoryProgressReport', completedQty: number, estimatedCompletion: any, factoryOrderId: string, id: string, notes?: string | null, photoUrls: Array<string>, reportDate: any }> | null, orderDetails?: Array<{ __typename?: 'FactoryOrderDetailEntity', completedQty: number, createdAt: any, factoryOrderId: string, id: string, orderDetailId: string, price: number, productionCost: number, qualityCheckedAt?: any | null, qualityCheckedBy?: string | null, qualityStatus?: QualityCheckStatus | null, quantity: number, rejectedQty: number, status: OrderDetailStatus, updatedAt?: any | null, checkQualities?: Array<{ __typename?: 'CheckQuality', checkedAt: any, checkedBy?: string | null, factoryOrderDetailId?: string | null, failedQuantity: number, id: string, note?: string | null, orderDetailId: string, passedQuantity: number, reworkRequired: boolean, status: QualityCheckStatus, taskId: string, totalChecked: number }> | null }> | null } };
+
+export type UpdateFactoryOrderDetailStatusMutationVariables = Exact<{
+  input: UpdateOrderDetailStatusDto;
+}>;
+
+
+export type UpdateFactoryOrderDetailStatusMutation = { __typename?: 'Mutation', updateFactoryOrderDetailStatus: { __typename?: 'FactoryOrder', id: string } };
 
 export type ProductDesignByIdQueryVariables = Exact<{
   productDesignId: Scalars['ID']['input'];
@@ -3362,6 +3391,39 @@ export type GetFactoryOrderQueryHookResult = ReturnType<typeof useGetFactoryOrde
 export type GetFactoryOrderLazyQueryHookResult = ReturnType<typeof useGetFactoryOrderLazyQuery>;
 export type GetFactoryOrderSuspenseQueryHookResult = ReturnType<typeof useGetFactoryOrderSuspenseQuery>;
 export type GetFactoryOrderQueryResult = Apollo.QueryResult<GetFactoryOrderQuery, GetFactoryOrderQueryVariables>;
+export const UpdateFactoryOrderDetailStatusDocument = gql`
+    mutation UpdateFactoryOrderDetailStatus($input: UpdateOrderDetailStatusDto!) {
+  updateFactoryOrderDetailStatus(input: $input) {
+    id
+  }
+}
+    `;
+export type UpdateFactoryOrderDetailStatusMutationFn = Apollo.MutationFunction<UpdateFactoryOrderDetailStatusMutation, UpdateFactoryOrderDetailStatusMutationVariables>;
+
+/**
+ * __useUpdateFactoryOrderDetailStatusMutation__
+ *
+ * To run a mutation, you first call `useUpdateFactoryOrderDetailStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateFactoryOrderDetailStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateFactoryOrderDetailStatusMutation, { data, loading, error }] = useUpdateFactoryOrderDetailStatusMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateFactoryOrderDetailStatusMutation(baseOptions?: Apollo.MutationHookOptions<UpdateFactoryOrderDetailStatusMutation, UpdateFactoryOrderDetailStatusMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateFactoryOrderDetailStatusMutation, UpdateFactoryOrderDetailStatusMutationVariables>(UpdateFactoryOrderDetailStatusDocument, options);
+      }
+export type UpdateFactoryOrderDetailStatusMutationHookResult = ReturnType<typeof useUpdateFactoryOrderDetailStatusMutation>;
+export type UpdateFactoryOrderDetailStatusMutationResult = Apollo.MutationResult<UpdateFactoryOrderDetailStatusMutation>;
+export type UpdateFactoryOrderDetailStatusMutationOptions = Apollo.BaseMutationOptions<UpdateFactoryOrderDetailStatusMutation, UpdateFactoryOrderDetailStatusMutationVariables>;
 export const ProductDesignByIdDocument = gql`
     query ProductDesignById($productDesignId: ID!) {
   productDesign(id: $productDesignId) {
