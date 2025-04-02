@@ -85,7 +85,12 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { useCreateFactoryProgressReportMutation, useGetFactoryOrderQuery, useMarkFactoryOrderAsDelayedMutation, useMarkOnDoneProductionMutation } from '@/graphql/generated/graphql';
+import {
+  useCreateFactoryProgressReportMutation,
+  useGetFactoryOrderQuery,
+  useMarkFactoryOrderAsDelayedMutation,
+  useMarkOnDoneProductionMutation,
+} from '@/graphql/generated/graphql';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -107,47 +112,54 @@ export default function FactoryOrderDetails() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // First, complete the createFactoryProgressReport mutation
-const [createFactoryProgressReport, { loading: createFactoryProgressReportLoading }] = useCreateFactoryProgressReportMutation({
-  variables: {
-    input: {
-      completedQty: parseInt(progressQty),
-      estimatedCompletion: progressDate?.toISOString(),
-      factoryOrderId: id,
-      photoUrls: progressPhotos,
-      notes: progressNotes,
-    }
-  },
-  refetchQueries: ["GetFactoryOrder"],
-  onError: (e) => {
-    toast.error(e.message)
-  }
-})
-
-// Next, complete the markFactoryOrderAsDelayed mutation
-const [markFactoryOrderAsDelayed, { loading: markFactoryOrderAsDelayedLoading }] = useMarkFactoryOrderAsDelayedMutation({
-  variables: {
-    input: {
-      delayReason: delayReason,
-      estimatedCompletionDate: estimatedCompletion?.toISOString()
+  const [
+    createFactoryProgressReport,
+    { loading: createFactoryProgressReportLoading },
+  ] = useCreateFactoryProgressReportMutation({
+    variables: {
+      input: {
+        completedQty: parseInt(progressQty),
+        estimatedCompletion: progressDate?.toISOString(),
+        factoryOrderId: id,
+        photoUrls: progressPhotos,
+        notes: progressNotes,
+      },
     },
-    markFactoryOrderAsDelayedId: id
-  },
-  refetchQueries: ["GetFactoryOrder"],
-  onError: (e) => {
-    toast.error(e.message)
-  }
-})
+    refetchQueries: ['GetFactoryOrder'],
+    onError: e => {
+      toast.error(e.message);
+    },
+  });
 
-// Finally, complete the markOnDoneProduction mutation
-const [markOnDoneProduction, { loading: markOnDoneProductionLoading }] = useMarkOnDoneProductionMutation({
-  variables: {
-    markOnDoneProductionId: id
-  },
-  refetchQueries: ["GetFactoryOrder"],
-  onError: (e) => {
-    toast.error(e.message)
-  }
-})
+  // Next, complete the markFactoryOrderAsDelayed mutation
+  const [
+    markFactoryOrderAsDelayed,
+    { loading: markFactoryOrderAsDelayedLoading },
+  ] = useMarkFactoryOrderAsDelayedMutation({
+    variables: {
+      input: {
+        delayReason: delayReason,
+        estimatedCompletionDate: estimatedCompletion?.toISOString(),
+      },
+      markFactoryOrderAsDelayedId: id,
+    },
+    refetchQueries: ['GetFactoryOrder'],
+    onError: e => {
+      toast.error(e.message);
+    },
+  });
+
+  // Finally, complete the markOnDoneProduction mutation
+  const [markOnDoneProduction, { loading: markOnDoneProductionLoading }] =
+    useMarkOnDoneProductionMutation({
+      variables: {
+        markOnDoneProductionId: id,
+      },
+      refetchQueries: ['GetFactoryOrder'],
+      onError: e => {
+        toast.error(e.message);
+      },
+    });
 
   const { data, loading, error } = useGetFactoryOrderQuery({
     variables: {
@@ -315,7 +327,7 @@ const [markOnDoneProduction, { loading: markOnDoneProductionLoading }] = useMark
 
   const handleAddProgressReport = async () => {
     if (!progressQty || !progressDate) return;
-  
+
     setIsSubmitting(true);
     try {
       await createFactoryProgressReport({
@@ -326,10 +338,10 @@ const [markOnDoneProduction, { loading: markOnDoneProductionLoading }] = useMark
             factoryOrderId: id,
             photoUrls: progressPhotos,
             notes: progressNotes,
-          }
-        }
+          },
+        },
       });
-      
+
       setProgressQty('');
       setProgressNotes('');
       setProgressPhotos([]);
@@ -340,22 +352,22 @@ const [markOnDoneProduction, { loading: markOnDoneProductionLoading }] = useMark
       setIsSubmitting(false);
     }
   };
-  
+
   const handleMarkAsDelayed = async () => {
     if (!delayReason || !estimatedCompletion) return;
-  
+
     setIsSubmitting(true);
     try {
       await markFactoryOrderAsDelayed({
         variables: {
           input: {
             delayReason: delayReason,
-            estimatedCompletionDate: estimatedCompletion.toISOString()
+            estimatedCompletionDate: estimatedCompletion.toISOString(),
           },
-          markFactoryOrderAsDelayedId: id
-        }
+          markFactoryOrderAsDelayedId: id,
+        },
       });
-      
+
       setDelayReason('');
       setEstimatedCompletion(new Date());
     } catch (error: any) {
@@ -364,16 +376,15 @@ const [markOnDoneProduction, { loading: markOnDoneProductionLoading }] = useMark
       setIsSubmitting(false);
     }
   };
-  
+
   const handleMarkAsCompleted = async () => {
     setIsSubmitting(true);
     try {
       await markOnDoneProduction({
         variables: {
-          markOnDoneProductionId: id
-        }
+          markOnDoneProductionId: id,
+        },
       });
-      
     } catch (error: any) {
       console.error('Failed to mark order as completed:', error);
     } finally {
@@ -1468,7 +1479,7 @@ const [markOnDoneProduction, { loading: markOnDoneProductionLoading }] = useMark
                         />
                       </div>
                       <div className="grid gap-2">
-                      <Label>Estimated Completion</Label>
+                        <Label>Estimated Completion</Label>
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button
