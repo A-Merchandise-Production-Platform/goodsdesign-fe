@@ -24,7 +24,7 @@ import {
 import { useGetMyOrdersQuery } from '@/graphql/generated/graphql';
 import { formatDate, formatPrice } from '@/lib/utils';
 
-export default function MyOrdersPage() {
+export default function MyOrderPage() {
   const { data, loading } = useGetMyOrdersQuery();
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
