@@ -13,22 +13,7 @@ import { SHIRT_COLORS } from './shirt-colors';
 import ViewSelector from './view-selector';
 
 // Types
-interface DesignObject {
-  type: string;
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-  scaleX: number;
-  scaleY: number;
-  angle: number;
-  view: string;
-  src?: string;
-  text?: string;
-  fontSize?: number;
-  fill?: string;
-  fontFamily?: string;
-}
+import { DesignObject } from '@/types/design-object';
 
 interface SerializedDesign {
   [key: string]: DesignObject[];
@@ -128,7 +113,7 @@ export default function ProductDesigner({
 
   // Refs for canvas management
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
+  const fabricCanvasRef = useRef<any>(null);
   const textureCache = useRef<Record<string, HTMLImageElement>>({});
   const tempCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -209,7 +194,7 @@ export default function ProductDesigner({
   };
 
   // Check if an object is fully outside the design zone
-  const isObjectFullyOutside = (obj: fabric.Object, view: string) => {
+  const isObjectFullyOutside = (obj: any, view: string) => {
     const limits = getDesignZoneLimits(view);
     const objBounds = obj.getBoundingRect();
 
@@ -222,14 +207,14 @@ export default function ProductDesigner({
   };
 
   // Apply clip path to object
-  const applyClipPathToObject = (obj: fabric.Object, view: string) => {
+  const applyClipPathToObject = (obj: any, view: string) => {
     if (!fabricCanvasRef.current) return;
 
     // Get the design zone limits for the CURRENT view only
     const limits = getDesignZoneLimits(view);
 
     // Create a clip path for the object based on the CURRENT view's design zone
-    const clipPath = new fabric.Rect({
+    const clipPath = new (fabric as any).Rect({
       left: limits.minX,
       top: limits.minY,
       width: limits.maxX - limits.minX,
@@ -252,7 +237,7 @@ export default function ProductDesigner({
     // Remove existing design zone indicator
     const existingIndicator = fabricCanvasRef.current
       .getObjects()
-      .find(obj => obj.get('data')?.type === 'designZone');
+      .find((obj: any) => obj.get('data')?.type === 'designZone');
     if (existingIndicator) {
       fabricCanvasRef.current.remove(existingIndicator);
     }
@@ -261,7 +246,7 @@ export default function ProductDesigner({
     const limits = getDesignZoneLimits(view);
 
     // Create design zone indicator with a more visible style
-    const designZone = new fabric.Rect({
+    const designZone = new (fabric as any).Rect({
       left: limits.minX,
       top: limits.minY,
       width: limits.maxX - limits.minX,
@@ -311,7 +296,7 @@ export default function ProductDesigner({
     if (!fabricCanvasRef.current) return;
 
     // Create a fabric image object
-    const fabricImage = new fabric.Image(img);
+    const fabricImage = new (fabric as any).Image(img);
 
     // Calculate scale to fit canvas while maintaining aspect ratio
     const canvasAspect =
@@ -363,7 +348,7 @@ export default function ProductDesigner({
 
     // First, draw the current background
     if (fabricCanvasRef.current.backgroundImage) {
-      const bgImage = fabricCanvasRef.current.backgroundImage as fabric.Image;
+      const bgImage = fabricCanvasRef.current.backgroundImage as any;
       const bgElement = bgImage._element as HTMLImageElement;
 
       if (bgElement) {
@@ -512,15 +497,17 @@ export default function ProductDesigner({
   const saveCurrentDesign = () => {
     if (!fabricCanvasRef.current) return;
 
-    const objects = fabricCanvasRef.current.getObjects().filter(obj => {
+    const objects = fabricCanvasRef.current.getObjects().filter((obj: any) => {
       // Filter out design zone indicator
       return obj.get('data')?.type !== 'designZone';
     });
 
     // Map canvas objects directly to our design objects format
-    const currentDesigns = objects.map(obj => {
+    const currentDesigns = objects.map((obj: any) => {
       const base: DesignObject = {
+        view: obj.get('data')?.view || view,
         type: obj.type || '',
+        layer: obj.layer || 1,
         left: obj.left || 0,
         top: obj.top || 0,
         width: obj.width || 0,
@@ -528,14 +515,13 @@ export default function ProductDesigner({
         scaleX: obj.scaleX || 1,
         scaleY: obj.scaleY || 1,
         angle: obj.angle || 0,
-        view: obj.get('data')?.view || view, // Store the view this object belongs to
       };
 
-      if (obj instanceof fabric.Image) {
+      if (obj instanceof (fabric as any).Image) {
         const imgElement = obj.getElement() as HTMLImageElement;
         base.src = imgElement.src;
         base.type = 'image';
-      } else if (obj instanceof fabric.IText) {
+      } else if (obj instanceof (fabric as any).IText) {
         base.type = 'textbox';
         base.text = obj.text || '';
         base.fontSize = obj.fontSize || 40;
@@ -593,7 +579,7 @@ export default function ProductDesigner({
 
     // Clear current objects except design zone
     const objects = fabricCanvasRef.current.getObjects();
-    objects.forEach(obj => {
+    objects.forEach((obj: any) => {
       if (obj.get('data')?.type !== 'designZone') {
         fabricCanvasRef.current?.remove(obj);
       }
@@ -602,7 +588,7 @@ export default function ProductDesigner({
     // Load saved objects for the CURRENT view only
     savedDesign.forEach((objData: DesignObject) => {
       if (objData.type === 'textbox' && objData.text) {
-        const text = new fabric.IText(objData.text, {
+        const text = new (fabric as any).IText(objData.text, {
           left: objData.left,
           top: objData.top,
           fontSize: objData.fontSize,
@@ -611,6 +597,7 @@ export default function ProductDesigner({
           scaleX: objData.scaleX,
           scaleY: objData.scaleY,
           angle: objData.angle,
+          layer: objData.layer || 1,
         });
         // Store the view with the object
         text.set('data', { view: objData.view || view });
@@ -622,13 +609,14 @@ export default function ProductDesigner({
         const imgElement = new Image();
         imgElement.crossOrigin = 'anonymous';
         imgElement.onload = () => {
-          const fabricImage = new fabric.Image(imgElement);
+          const fabricImage = new (fabric as any).Image(imgElement);
           fabricImage.set({
             left: objData.left,
             top: objData.top,
             scaleX: objData.scaleX,
             scaleY: objData.scaleY,
             angle: objData.angle,
+            layer: objData.layer || 1,
           });
           // Store the view with the object
           fabricImage.set('data', { view: objData.view || view });
@@ -657,7 +645,7 @@ export default function ProductDesigner({
     }
 
     // Create new Fabric.js canvas
-    fabricCanvasRef.current = new fabric.Canvas(canvasRef.current, {
+    fabricCanvasRef.current = new (fabric as any).Canvas(canvasRef.current, {
       width: CANVAS_SIZE,
       height: CANVAS_SIZE,
       selection: true,
@@ -677,8 +665,8 @@ export default function ProductDesigner({
       }
     });
 
-    fabricCanvasRef.current.on('object:added', e => {
-      const obj = e.target as fabric.Object;
+    fabricCanvasRef.current.on('object:added', (e: any) => {
+      const obj = e.target;
       applyClipPathToObject(obj, view);
 
       // Store the current view with the object
@@ -692,10 +680,10 @@ export default function ProductDesigner({
       debounceTextureUpdate();
     });
 
-    fabricCanvasRef.current.on('mouse:down', e => {
+    fabricCanvasRef.current.on('mouse:down', (e: any) => {
       if (!e.target) return;
 
-      const obj = e.target as fabric.Object;
+      const obj = e.target;
 
       // If object is fully outside, remove it
       if (isObjectFullyOutside(obj, view)) {
@@ -706,8 +694,8 @@ export default function ProductDesigner({
     });
 
     // Handle scaling boundary check
-    fabricCanvasRef.current.on('object:scaling', e => {
-      const obj = e.target as fabric.Object;
+    fabricCanvasRef.current.on('object:scaling', (e: any) => {
+      const obj = e.target;
 
       // If object is fully outside after scaling, remove it
       if (isObjectFullyOutside(obj, view)) {
@@ -790,7 +778,7 @@ export default function ProductDesigner({
     imageElement.src = imageUrl;
 
     imageElement.onload = () => {
-      const fabricImage = new fabric.Image(imageElement);
+      const fabricImage = new (fabric as any).Image(imageElement);
       const limits = getDesignZoneLimits(view);
       const maxWidth = limits.maxX - limits.minX;
       const maxHeight = limits.maxY - limits.minY;
@@ -806,6 +794,7 @@ export default function ProductDesigner({
         scaleY: scale,
         left: limits.minX + (maxWidth - (fabricImage.width ?? 0) * scale) / 2,
         top: limits.minY + (maxHeight - (fabricImage.height ?? 0) * scale) / 2,
+        layer: 1, // Initialize with default layer 1
       });
 
       // Store the current view with the image
@@ -837,7 +826,7 @@ export default function ProductDesigner({
     if (event.key === 'Delete' && fabricCanvasRef.current) {
       const activeObjects = fabricCanvasRef.current.getActiveObjects();
       if (activeObjects.length > 0) {
-        activeObjects.forEach(object => {
+        activeObjects.forEach((object: any) => {
           fabricCanvasRef.current?.remove(object);
         });
         fabricCanvasRef.current.discardActiveObject();
@@ -855,7 +844,7 @@ export default function ProductDesigner({
     if (!fabricCanvasRef.current) return;
 
     const limits = getDesignZoneLimits(view);
-    const text = new fabric.IText('Edit this text', {
+    const text = new (fabric as any).IText('Edit this text', {
       left: limits.minX + 20, // Add some padding from the left edge
       top: limits.minY + 20, // Add some padding from the top edge
       fontFamily: 'Arial',
@@ -865,6 +854,7 @@ export default function ProductDesigner({
       originY: 'top',
       selectable: true,
       evented: true,
+      layer: 1, // Initialize with default layer 1
     });
 
     // Store the current view with the text object
@@ -925,15 +915,15 @@ export default function ProductDesigner({
             const canvas = fabricCanvasRef.current;
             const objects = canvas
               .getObjects()
-              .filter(obj => obj.get('data')?.type !== 'designZone');
+              .filter((obj: any) => obj.get('data')?.type !== 'designZone');
 
             // Clear canvas except design zone
-            objects.forEach(obj => canvas.remove(obj));
+            objects.forEach((obj: any) => canvas.remove(obj));
 
             // Add objects in new order
             currentDesigns.forEach(design => {
               if (design.type === 'textbox' && design.text) {
-                const text = new fabric.IText(design.text, {
+                const text = new (fabric as any).IText(design.text, {
                   left: design.left,
                   top: design.top,
                   fontSize: design.fontSize,
@@ -942,6 +932,7 @@ export default function ProductDesigner({
                   scaleX: design.scaleX,
                   scaleY: design.scaleY,
                   angle: design.angle,
+                  layer: design.layer || 1,
                 });
                 text.set('data', { view: design.view });
                 applyClipPathToObject(text, view);
@@ -950,13 +941,14 @@ export default function ProductDesigner({
                 const imgElement = new Image();
                 imgElement.crossOrigin = 'anonymous';
                 imgElement.onload = () => {
-                  const fabricImage = new fabric.Image(imgElement);
+                  const fabricImage = new (fabric as any).Image(imgElement);
                   fabricImage.set({
                     left: design.left,
                     top: design.top,
                     scaleX: design.scaleX,
                     scaleY: design.scaleY,
                     angle: design.angle,
+                    layer: design.layer || 1,
                   });
                   fabricImage.set('data', { view: design.view });
                   applyClipPathToObject(fabricImage, view);
