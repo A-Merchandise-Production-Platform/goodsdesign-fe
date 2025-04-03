@@ -150,7 +150,7 @@ function NotificationItem({
             </div>
           </DropdownMenuItem>
         </TooltipTrigger>
-        <TooltipContent side="right" className="max-w-[300px]">
+        <TooltipContent side="right" align="start" className="max-w-[300px]">
           <div className="space-y-2">
             <p className="font-medium">{notification.title}</p>
             <p className="text-sm">{notification.content}</p>
