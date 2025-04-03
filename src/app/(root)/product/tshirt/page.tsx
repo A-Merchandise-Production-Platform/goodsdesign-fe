@@ -16,7 +16,6 @@ import { formatPrice } from '@/lib/utils';
 
 import { ColorSelector } from '../_components/color-selector';
 import { ModelSelector } from '../_components/model-selector';
-import { PrintingTechniqueSelector } from '../_components/printing-technique-selector';
 import { ProductImageGallery } from '../_components/product-image-gallery';
 import { VolumeDiscount } from '../_components/volume-discount';
 
@@ -99,7 +98,7 @@ export default function TShirtPage() {
   const product: TShirtProduct = {
     name: infoData?.product.name || 'T-Shirt',
     price: selectedVariantPrice,
-    image: '/assets/tshirt-thumbnail.png',
+    image: infoData?.product.imageUrl || '/assets/tshirt-thumbnail.png',
     sizes: infoData?.product.variants
       ? Array.from(
           new Set(
@@ -175,6 +174,8 @@ export default function TShirtPage() {
             isFinalized: false,
             isPublic: false,
             isTemplate: false,
+            thumbnailUrl:
+              'https://res.cloudinary.com/drzhutfzg/image/upload/v1743667680/files/nzqefspirtnzateljqzo.png',
           },
         },
       });
@@ -224,9 +225,9 @@ export default function TShirtPage() {
               value={selectedColor}
               onValueChange={setSelectedColor}
             />
-            <PrintingTechniqueSelector
+            {/* <PrintingTechniqueSelector
               techniques={product.printingTechniques}
-            />
+            /> */}
           </div>
 
           <VolumeDiscount

@@ -4,11 +4,16 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 
 interface HeaderProps {
-  onSave: () => void;
+  onSave: () => Promise<void>;
   onExport?: () => void;
+  onThumbnail?: () => void;
 }
 
-const DesignHeader: React.FC<HeaderProps> = ({ onSave, onExport }) => {
+const DesignHeader: React.FC<HeaderProps> = ({
+  onSave,
+  onExport,
+  onThumbnail,
+}) => {
   return (
     <header className="z-40 flex h-14 items-center justify-between px-6">
       <div className="flex items-center gap-4">
@@ -24,7 +29,10 @@ const DesignHeader: React.FC<HeaderProps> = ({ onSave, onExport }) => {
         <Button
           variant="ghost"
           size="icon"
-          onClick={onSave}
+          onClick={() => {
+            onSave();
+            onThumbnail?.(); // Call thumbnail update if provided
+          }}
           title="Save current design"
         >
           <Save className="h-4 w-4" />
