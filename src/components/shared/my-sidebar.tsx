@@ -18,7 +18,7 @@ export function MySidebar({ navItems, children }: MySidebarProps) {
   const pathname = usePathname();
 
   return (
-    <div className="grid grid-cols-1 gap-4 px-4 pt-4 pb-2 md:grid-cols-[200px_1fr]">
+    <div className="grid grid-cols-1 gap-4 pt-4 pb-2 md:grid-cols-[200px_1fr]">
       <nav className="bg-background space-y-1 rounded-xl">
         {navItems.map(item => {
           const isActive = pathname === item.href;
