@@ -5,3 +5,6 @@ coverage
 # Ignore all HTML files:
 *.html
 
+# Ignore generated GraphQL files
+**/*.graphql.tsx
+

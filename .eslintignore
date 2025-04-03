@@ -1,2 +1,5 @@
 # Ignore all files in src/components/ui
 src/components/ui/**/*
+
+# Ignore generated GraphQL files
+**/*.graphql.tsx
