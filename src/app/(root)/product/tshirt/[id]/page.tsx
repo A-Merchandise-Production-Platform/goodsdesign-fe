@@ -40,6 +40,7 @@ export default function Page() {
       setCurrentThumbnailUrl(proDesData.productDesign.thumbnailUrl);
     }
   }, [proDesData]);
+      console.log(proDesData);
 
   const handleThumbnail = async (
     event: React.ChangeEvent<HTMLInputElement>,

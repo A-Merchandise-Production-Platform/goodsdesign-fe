@@ -80,25 +80,7 @@ export default function ProductDesigner({
         // Convert dataUrl to File
         const response = await fetch(dataUrl);
         const blob = await response.blob();
-        const file = new File([blob], `tshirt-3d-${view}.png`, {
-          type: 'image/png',
-        });
-
-        // Create a mock event with the file
-        const mockEvent = {
-          target: {
-            files: [file],
-          },
-        } as unknown as React.ChangeEvent<HTMLInputElement>;
-
-        // Upload thumbnail using the provided callback
-        if (onThumbnail) {
-          const thumbnailUrl = await onThumbnail(mockEvent);
-          if (thumbnailUrl) {
-            // Success - the thumbnail has been uploaded and URL returned
-            console.log('Thumbnail uploaded:', thumbnailUrl);
-          }
-        }
+        const file = new File([blob], `tshirt-3d-${view}.png`, { type: 'image/png' });
 
         // Still provide download functionality
         const link = document.createElement('a');
@@ -934,7 +916,41 @@ export default function ProductDesigner({
 
   return (
     <div className="flex h-screen flex-col">
-      <DesignHeader onSave={saveCurrentDesign} onExport={handleExport} />
+      <DesignHeader
+        onSave={async () => {
+          saveCurrentDesign();
+          
+          // Then capture and update thumbnail
+          const captureCallback = async (dataUrl: string) => {
+            try {
+              // Convert dataUrl to File
+              const response = await fetch(dataUrl);
+              const blob = await response.blob();
+              const file = new File([blob], `tshirt-3d-${view}.png`, { type: 'image/png' });
+
+              // Create a mock event with the file
+              const mockEvent = {
+                target: {
+                  files: [file]
+                }
+              } as unknown as React.ChangeEvent<HTMLInputElement>;
+
+              // Upload thumbnail using the provided callback
+              if (onThumbnail) {
+                await onThumbnail(mockEvent);
+              }
+            } catch (error) {
+              console.error('Error capturing thumbnail:', error);
+            } finally {
+              setModelExportCallback(undefined);
+            }
+          };
+
+          // Set the callback to capture the model view
+          setModelExportCallback(() => captureCallback);
+        }}
+        onExport={handleExport}  // Keep the download button functionality
+      />
 
       <div className="flex flex-1">
         <DesignSidebar
