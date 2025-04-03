@@ -124,7 +124,7 @@ const httpLink = new HttpLink({
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link: errorLink.concat(authLink.concat(httpLink)),
+  link: authLink.concat(httpLink),
 });
 
 export default client;
