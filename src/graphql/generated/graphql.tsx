@@ -2188,6 +2188,14 @@ export type ProductDesignsQuery = {
     __typename?: 'ProductDesignEntity';
     id: string;
     thumbnailUrl?: string | null;
+    systemConfigVariant?: {
+      __typename?: 'SystemConfigVariantEntity';
+      product: {
+        __typename?: 'ProductEntity';
+        name: string;
+        category?: { __typename?: 'CategoryEntity'; name: string } | null;
+      };
+    } | null;
     designPositions?: Array<{
       __typename?: 'DesignPositionEntity';
       designJSON?: any | null;
@@ -2211,6 +2219,14 @@ export type ProductDesignsByUserQuery = {
     __typename?: 'ProductDesignEntity';
     id: string;
     thumbnailUrl?: string | null;
+    systemConfigVariant?: {
+      __typename?: 'SystemConfigVariantEntity';
+      product: {
+        __typename?: 'ProductEntity';
+        name: string;
+        category?: { __typename?: 'CategoryEntity'; name: string } | null;
+      };
+    } | null;
     designPositions?: Array<{
       __typename?: 'DesignPositionEntity';
       designJSON?: any | null;
@@ -2291,6 +2307,21 @@ export type UpdateProductDesignMutation = {
         basePrice: number;
       } | null;
     }> | null;
+  };
+};
+
+export type UpdateThumbnailProductDesignMutationVariables = Exact<{
+  updateProductDesignId: Scalars['String']['input'];
+  input: UpdateProductDesignDto;
+  fileUrl: Scalars['String']['input'];
+}>;
+
+export type UpdateThumbnailProductDesignMutation = {
+  __typename?: 'Mutation';
+  deleteFile: boolean;
+  updateProductDesign: {
+    __typename?: 'ProductDesignEntity';
+    thumbnailUrl?: string | null;
   };
 };
 
@@ -2375,6 +2406,7 @@ export type GetProductInformationByIdQuery = {
   __typename?: 'Query';
   product: {
     __typename?: 'ProductEntity';
+    imageUrl?: string | null;
     name: string;
     variants?: Array<{
       __typename?: 'SystemConfigVariantEntity';
@@ -5241,6 +5273,14 @@ export const ProductDesignsDocument = gql`
     productDesigns {
       id
       thumbnailUrl
+      systemConfigVariant {
+        product {
+          name
+          category {
+            name
+          }
+        }
+      }
       designPositions {
         positionType {
           id
@@ -5327,6 +5367,14 @@ export const ProductDesignsByUserDocument = gql`
     productDesignsByUser {
       id
       thumbnailUrl
+      systemConfigVariant {
+        product {
+          name
+          category {
+            name
+          }
+        }
+      }
       designPositions {
         positionType {
           id
@@ -5624,6 +5672,64 @@ export type UpdateProductDesignMutationOptions = Apollo.BaseMutationOptions<
   UpdateProductDesignMutation,
   UpdateProductDesignMutationVariables
 >;
+export const UpdateThumbnailProductDesignDocument = gql`
+  mutation UpdateThumbnailProductDesign(
+    $updateProductDesignId: String!
+    $input: UpdateProductDesignDto!
+    $fileUrl: String!
+  ) {
+    updateProductDesign(id: $updateProductDesignId, input: $input) {
+      thumbnailUrl
+    }
+    deleteFile(fileUrl: $fileUrl)
+  }
+`;
+export type UpdateThumbnailProductDesignMutationFn = Apollo.MutationFunction<
+  UpdateThumbnailProductDesignMutation,
+  UpdateThumbnailProductDesignMutationVariables
+>;
+
+/**
+ * __useUpdateThumbnailProductDesignMutation__
+ *
+ * To run a mutation, you first call `useUpdateThumbnailProductDesignMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateThumbnailProductDesignMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateThumbnailProductDesignMutation, { data, loading, error }] = useUpdateThumbnailProductDesignMutation({
+ *   variables: {
+ *      updateProductDesignId: // value for 'updateProductDesignId'
+ *      input: // value for 'input'
+ *      fileUrl: // value for 'fileUrl'
+ *   },
+ * });
+ */
+export function useUpdateThumbnailProductDesignMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateThumbnailProductDesignMutation,
+    UpdateThumbnailProductDesignMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateThumbnailProductDesignMutation,
+    UpdateThumbnailProductDesignMutationVariables
+  >(UpdateThumbnailProductDesignDocument, options);
+}
+export type UpdateThumbnailProductDesignMutationHookResult = ReturnType<
+  typeof useUpdateThumbnailProductDesignMutation
+>;
+export type UpdateThumbnailProductDesignMutationResult =
+  Apollo.MutationResult<UpdateThumbnailProductDesignMutation>;
+export type UpdateThumbnailProductDesignMutationOptions =
+  Apollo.BaseMutationOptions<
+    UpdateThumbnailProductDesignMutation,
+    UpdateThumbnailProductDesignMutationVariables
+  >;
 export const GetAllDiscountByProductIdDocument = gql`
   query GetAllDiscountByProductId($productId: String!) {
     getAllDiscountByProductId(productId: $productId) {
@@ -5918,6 +6024,7 @@ export type DeleteProductMutationOptions = Apollo.BaseMutationOptions<
 export const GetProductInformationByIdDocument = gql`
   query GetProductInformationById($productId: String!) {
     product(id: $productId) {
+      imageUrl
       name
       variants {
         id

@@ -14,27 +14,11 @@ export function ProductImageGallery(props: ProductImageGalleryProps) {
     <div className="space-y-6">
       <div className="relative aspect-square overflow-hidden rounded-lg border">
         <Image
-          src={props.image || '/placeholder.svg'}
+          src={props.image || '/assets/tshirt-thumbnail.png'}
           alt={props.name}
           fill
           className="object-cover"
         />
-      </div>
-
-      <div className="grid grid-cols-4 gap-2">
-        {[1, 2, 3, 4].map(i => (
-          <div
-            key={i}
-            className="hover:border-primary relative aspect-square cursor-pointer overflow-hidden rounded-md border"
-          >
-            <Image
-              src={props.image || '/placeholder.svg'}
-              alt={`${props.name} view ${i}`}
-              fill
-              className="object-cover"
-            />
-          </div>
-        ))}
       </div>
     </div>
   );

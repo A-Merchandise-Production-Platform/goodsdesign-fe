@@ -6,21 +6,21 @@ export function DesignSection() {
     price: number;
     image: string;
     description: string;
-    category: 'T-shirt' | 'Phone Case';
+    category: 'T-Shirt' | 'Phone Case';
   }> = [
     {
       name: 'Floral Pattern',
       price: 9.99,
       image: '/assets/tshirt-thumbnail.png',
       description: 'Elegant floral design with vibrant colors',
-      category: 'T-shirt',
+      category: 'T-Shirt',
     },
     {
       name: 'Geometric Shapes',
       price: 8.99,
       image: '/assets/tshirt-thumbnail.png',
       description: 'Modern geometric pattern with bold lines',
-      category: 'T-shirt',
+      category: 'T-Shirt',
     },
     {
       name: 'Abstract Art',
@@ -41,7 +41,7 @@ export function DesignSection() {
       price: 10.99,
       image: '/assets/tshirt-thumbnail.png',
       description: 'Retro-inspired logo with distressed effects',
-      category: 'T-shirt',
+      category: 'T-Shirt',
     },
     {
       name: 'Nature Inspired',
@@ -55,14 +55,14 @@ export function DesignSection() {
       price: 8.99,
       image: '/assets/tshirt-thumbnail.png',
       description: 'Creative typography and inspirational quotes',
-      category: 'T-shirt',
+      category: 'T-Shirt',
     },
     {
       name: 'Custom Upload',
       price: 14.99,
       image: '/assets/tshirt-thumbnail.png',
       description: 'Upload your own design for a personalized product',
-      category: 'T-shirt',
+      category: 'T-Shirt',
     },
   ];
 

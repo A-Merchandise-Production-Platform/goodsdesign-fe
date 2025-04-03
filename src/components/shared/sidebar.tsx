@@ -17,7 +17,6 @@ export function Sidebar() {
     () => [
       { href: '/', label: 'Home' },
       { href: '/my-design', label: 'My Designs' },
-      { href: '/my-order', label: 'My Orders' },
     ],
     [],
   );
