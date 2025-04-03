@@ -1,6 +1,12 @@
 query GetMyFactory {
   getMyFactory {
-    addressId
+    address {
+      id
+      districtID
+      provinceID
+      street
+      wardCode
+    }
     businessLicenseUrl
     contactPersonName
     contactPersonPhone
@@ -33,7 +39,13 @@ query GetMyFactory {
 
 mutation UpdateFactoryInfo($updateFactoryInfoInput: UpdateFactoryInfoDto!) {
   updateFactoryInfo(updateFactoryInfoInput: $updateFactoryInfoInput) {
-    addressId
+    address {
+      id
+      districtID
+      provinceID
+      street
+      wardCode
+    }
     businessLicenseUrl
     contactPersonName
     contactPersonPhone

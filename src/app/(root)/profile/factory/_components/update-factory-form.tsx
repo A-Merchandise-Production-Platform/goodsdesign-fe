@@ -8,7 +8,10 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useGetMyFactoryQuery } from '@/graphql/generated/graphql';
+import {
+  useGetMyFactoryQuery,
+  useUpdateFactoryInfoMutation,
+} from '@/graphql/generated/graphql';
 
 import {
   defaultValues,
@@ -22,6 +25,7 @@ import {
   OperationalDetails,
   QualitySpecialization,
 } from './sections';
+import { toast } from 'sonner';
 
 export default function UpdateFactoryForm() {
   const [isNotificationOpen, setIsNotificationOpen] = useState(true);
@@ -43,7 +47,14 @@ export default function UpdateFactoryForm() {
         businessLicenseUrl: data.getMyFactory.businessLicenseUrl ?? '',
         taxIdentificationNumber:
           data.getMyFactory.taxIdentificationNumber ?? '',
-        addressId: data.getMyFactory.addressId ?? '',
+        addressInput: data.getMyFactory.address
+          ? {
+              provinceId: data.getMyFactory.address.provinceID ?? 202,
+              districtId: data.getMyFactory.address.districtID ?? 1442,
+              wardCode: data.getMyFactory.address.wardCode ?? '20102',
+              street: data.getMyFactory.address.street ?? '123 Main St',
+            }
+          : undefined,
         totalEmployees: data.getMyFactory.totalEmployees ?? 0,
         maxPrintingCapacity: data.getMyFactory.maxPrintingCapacity ?? 0,
         operationalHours: data.getMyFactory.operationalHours ?? '',
@@ -54,13 +65,35 @@ export default function UpdateFactoryForm() {
         specializations: data.getMyFactory.specializations ?? [],
         contactPersonName: data.getMyFactory.contactPersonName ?? '',
         contactPersonPhone: data.getMyFactory.contactPersonPhone ?? '',
-        submit: data.getMyFactory.isSubmitted ?? false,
       });
     }
   }, [data, form]);
 
+  const [updateFactoryInfo, { loading: updateFactoryInfoLoading }] =
+    useUpdateFactoryInfoMutation({
+      onCompleted: () => {
+        toast.success('Factory information updated successfully');
+      },
+      onError: () => {
+        toast.error('Failed to update factory information');
+      },
+      refetchQueries: ['GetMyFactory'],
+    });
+
   function onSubmit(data: FactoryFormValues) {
-    console.log('Form submitted with values:', data);
+    updateFactoryInfo({
+      variables: {
+        updateFactoryInfoInput: {
+          ...data,
+          addressInput: {
+            provinceID: data.addressInput.provinceId,
+            districtID: data.addressInput.districtId,
+            wardCode: data.addressInput.wardCode,
+            street: data.addressInput.street,
+          },
+        },
+      },
+    });
   }
 
   const handleTabChange = (value: string) => {
@@ -84,10 +117,11 @@ export default function UpdateFactoryForm() {
   return (
     <div className="space-y-4">
       {isNotificationOpen && (
-        <div className="flex flex-1 items-center gap-2 rounded-md bg-green-500/50 px-4 py-2 text-white shadow-md">
+        <div className="flex flex-1 items-center gap-2 rounded-md bg-green-500/20 px-4 py-2 text-white shadow-md">
           <div className="flex-1">
-            Your factory currently are not allowed to work in our system, please
-            fill as much as possible fields to be approved.
+            Your factory currently are{' '}
+            <span className="text-red-400">not allowed</span> to work in our
+            system, please fill as much as possible fields to be approved.
           </div>
           <X
             className="size-4 cursor-pointer"
@@ -108,11 +142,30 @@ export default function UpdateFactoryForm() {
               className="w-full"
             >
               <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="basics">Basic Information</TabsTrigger>
-                <TabsTrigger value="legal">Legal</TabsTrigger>
-                <TabsTrigger value="quality">Quality & Expertise</TabsTrigger>
-                <TabsTrigger value="operations">Operations</TabsTrigger>
-                <TabsTrigger value="contact">Contact</TabsTrigger>
+                <TabsTrigger disabled={updateFactoryInfoLoading} value="basics">
+                  Basic Information
+                </TabsTrigger>
+                <TabsTrigger disabled={updateFactoryInfoLoading} value="legal">
+                  Legal
+                </TabsTrigger>
+                <TabsTrigger
+                  disabled={updateFactoryInfoLoading}
+                  value="quality"
+                >
+                  Quality & Expertise
+                </TabsTrigger>
+                <TabsTrigger
+                  disabled={updateFactoryInfoLoading}
+                  value="operations"
+                >
+                  Operations
+                </TabsTrigger>
+                <TabsTrigger
+                  disabled={updateFactoryInfoLoading}
+                  value="contact"
+                >
+                  Contact
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="basics">
@@ -190,7 +243,11 @@ export default function UpdateFactoryForm() {
                     <ArrowLeft className="size-4" />
                     Previous
                   </Button>
-                  <Button type="submit">Submit</Button>
+                  <Button type="submit" disabled={updateFactoryInfoLoading}>
+                    {updateFactoryInfoLoading
+                      ? 'Updating...'
+                      : 'Update Factory'}
+                  </Button>
                 </div>
               </TabsContent>
             </Tabs>

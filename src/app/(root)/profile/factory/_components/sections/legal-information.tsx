@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/tooltip';
 
 import { FactoryFormValues } from '../factory-form-schema';
+import { AddressSelector } from '@/components/shared/address/address-selector';
 
 interface LegalInformationProps {
   form: UseFormReturn<FactoryFormValues>;
@@ -116,33 +117,34 @@ export function LegalInformation({ form }: LegalInformationProps) {
 
         <FormField
           control={form.control}
-          name="addressId"
+          name="addressInput"
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center gap-2">
-                <FormLabel>Address ID</FormLabel>
+                <FormLabel>Address</FormLabel>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="text-muted-foreground h-4 w-4" />
                   </TooltipTrigger>
                   <TooltipContent className="max-w-80">
                     <p>
-                      Enter the unique identifier for your factory&apos;s
-                      address in our system. If you&apos;ve previously
-                      registered an address, use that ID. If not, you&apos;ll
-                      need to create a new address record first.
+                      Enter your factory&apos;s address details including
+                      province, district, ward, and street.
                     </p>
                   </TooltipContent>
                 </Tooltip>
               </div>
               <FormControl>
-                <Input placeholder="Enter address identifier" {...field} />
+                <AddressSelector
+                  value={field.value}
+                  onChange={field.onChange}
+                />
               </FormControl>
-              {form.formState.errors.addressId ? (
+              {form.formState.errors.addressInput ? (
                 <FormMessage />
               ) : (
                 <FormDescription>
-                  The unique ID of your registered address in our system
+                  Your factory&apos;s complete address details
                 </FormDescription>
               )}
             </FormItem>
