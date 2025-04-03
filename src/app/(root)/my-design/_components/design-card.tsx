@@ -5,15 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatPrice } from '@/lib/utils';
 
-type DesignCategory = 'T-shirt' | 'Phone Case';
-
 interface DesignCardProps {
   id: string;
   name?: string;
   price?: number;
   image?: string;
   description?: string;
-  category?: DesignCategory;
+  category?: string;
 }
 
 export function DesignCard({
@@ -25,8 +23,8 @@ export function DesignCard({
   category,
 }: DesignCardProps) {
   const router = useRouter();
-  const categoryStyles: Record<DesignCategory, string> = {
-    'T-shirt': 'bg-blue-100 text-blue-800',
+  const categoryStyles: any = {
+    'T-Shirt': 'bg-blue-100 text-blue-800',
     'Phone Case': 'bg-purple-100 text-purple-800',
   };
 
@@ -35,7 +33,12 @@ export function DesignCard({
       className="h-full cursor-pointer overflow-hidden pt-0 transition-all hover:shadow-md"
       onClick={() => {
         if (!category || !id) return;
-        const route = category === 'T-shirt' ? 'tshirt' : 'phonecase';
+        const route =
+          category === 'T-Shirt'
+            ? 'tshirt'
+            : category === 'Phone Case'
+              ? 'phonecase'
+              : category;
         router.push(`product/${route}/${id}`);
       }}
     >

@@ -2,6 +2,14 @@ query ProductDesigns {
   productDesigns {
     id
     thumbnailUrl
+    systemConfigVariant {
+      product {
+        name
+        category {
+          name
+        }
+      }
+    }
     designPositions {
       positionType {
         id
@@ -17,6 +25,14 @@ query ProductDesignsByUser {
   productDesignsByUser {
     id
     thumbnailUrl
+    systemConfigVariant {
+      product {
+        name
+        category {
+          name
+        }
+      }
+    }
     designPositions {
       positionType {
         id
@@ -77,4 +93,17 @@ mutation UpdateProductDesign(
       designJSON
     }
   }
+}
+
+mutation UpdateThumbnailProductDesign(
+  $updateProductDesignId: String!
+  $input: UpdateProductDesignDto!
+
+  # Delete url
+  $fileUrl: String!
+) {
+  updateProductDesign(id: $updateProductDesignId, input: $input) {
+    thumbnailUrl
+  }
+  deleteFile(fileUrl: $fileUrl)
 }

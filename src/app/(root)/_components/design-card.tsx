@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatPrice } from '@/lib/utils';
 
-type DesignCategory = 'T-shirt' | 'Phone Case';
+type DesignCategory = 'T-Shirt' | 'Phone Case';
 
 interface DesignCardProps {
   name: string;
@@ -22,7 +22,7 @@ export function DesignCard({
   category,
 }: DesignCardProps) {
   const categoryStyles: Record<DesignCategory, string> = {
-    'T-shirt': 'bg-blue-100 text-blue-800',
+    'T-Shirt': 'bg-blue-100 text-blue-800',
     'Phone Case': 'bg-purple-100 text-purple-800',
   };
 

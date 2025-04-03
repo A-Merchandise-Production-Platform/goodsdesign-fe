@@ -35,6 +35,9 @@ interface ProductDesignerComponentProps {
   onUpload?: (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => Promise<string | null | undefined>;
+  onThumbnail?: (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => Promise<string | null | undefined>;
   onUpdatePosition?: (options: {
     variables: {
       input: {
@@ -59,6 +62,7 @@ interface ProductDesignerComponentProps {
 export default function ProductDesigner({
   initialDesigns = [],
   onUpload,
+  onThumbnail,
   onUpdatePosition,
   onCreateCartItem,
   cartLoading,
@@ -71,14 +75,41 @@ export default function ProductDesigner({
 
   // Handle export of 3D model
   const handleExport = () => {
-    const handleModelCapture = (dataUrl: string) => {
-      const link = document.createElement('a');
-      link.href = dataUrl;
-      link.download = `tshirt-3d-${view}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setModelExportCallback(undefined);
+    const handleModelCapture = async (dataUrl: string) => {
+      try {
+        // Convert dataUrl to File
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        const file = new File([blob], `tshirt-3d-${view}.png`, { type: 'image/png' });
+
+        // Create a mock event with the file
+        const mockEvent = {
+          target: {
+            files: [file]
+          }
+        } as unknown as React.ChangeEvent<HTMLInputElement>;
+
+        // Upload thumbnail using the provided callback
+        if (onThumbnail) {
+          const thumbnailUrl = await onThumbnail(mockEvent);
+          if (thumbnailUrl) {
+            // Success - the thumbnail has been uploaded and URL returned
+            console.log('Thumbnail uploaded:', thumbnailUrl);
+          }
+        }
+
+        // Still provide download functionality
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = `tshirt-3d-${view}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error('Error handling export:', error);
+      } finally {
+        setModelExportCallback(undefined);
+      }
     };
     setModelExportCallback(() => handleModelCapture);
   };
