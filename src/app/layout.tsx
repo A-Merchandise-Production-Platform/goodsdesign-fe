@@ -116,7 +116,7 @@ export default function RootLayout({
             >
               <AuthProvider>
                 <ScrollArea className="h-screen">
-                  <main className="mx-auto pt-16">
+                  <main className="container mx-auto pt-16">
                     <Header />
                     {children}
                     <Footer />
