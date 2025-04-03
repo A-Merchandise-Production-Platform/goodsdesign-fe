@@ -80,7 +80,7 @@ query GetMyStaffTasks {
       id
       qualityCheckStatus
       startDate
-      
+
       taskType
       taskname
     }
@@ -183,7 +183,10 @@ query GetStaffTaskDetail($staffTaskId: ID!) {
   }
 }
 
-mutation DoneCheckQuality($doneCheckQualityId: ID!, $input: DoneCheckQualityDto!) {
+mutation DoneCheckQuality(
+  $doneCheckQualityId: ID!
+  $input: DoneCheckQualityDto!
+) {
   doneCheckQuality(id: $doneCheckQualityId, input: $input) {
     id
   }
