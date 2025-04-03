@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 
 import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 import { useAuthStore } from '@/stores/auth.store';
+import { Roles } from '@/graphql/generated/graphql';
 
 export default function ProfileLayout({
   children,
@@ -21,7 +22,7 @@ export default function ProfileLayout({
       { href: '/profile/display', label: 'Display' },
     ];
 
-    if (user?.factory) {
+    if (user?.role === Roles.Factoryowner) {
       items.splice(1, 0, { href: '/profile/factory', label: 'Factory' });
     }
 

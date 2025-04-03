@@ -201,10 +201,6 @@ export function BasicInformation({ form }: BasicInformationProps) {
                       onSelect={field.onChange}
                       disabled={date => date > new Date()}
                       defaultMonth={field.value}
-                      initialFocus
-                      captionLayout="dropdown-buttons"
-                      fromYear={1900}
-                      toYear={new Date().getFullYear()}
                       showOutsideDays
                     />
                   </PopoverContent>

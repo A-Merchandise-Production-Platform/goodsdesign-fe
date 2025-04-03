@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -24,6 +24,7 @@ import {
 } from './sections';
 
 export default function UpdateFactoryForm() {
+  const [isNotificationOpen, setIsNotificationOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('basics');
   const { data, loading } = useGetMyFactoryQuery();
 
@@ -81,7 +82,19 @@ export default function UpdateFactoryForm() {
   };
 
   return (
-    <>
+    <div className="space-y-4">
+      {isNotificationOpen && (
+        <div className="flex flex-1 items-center gap-2 rounded-md bg-green-500/50 px-4 py-2 text-white shadow-md">
+          <div className="flex-1">
+            Your factory currently are not allowed to work in our system, please
+            fill as much as possible fields to be approved.
+          </div>
+          <X
+            className="size-4 cursor-pointer"
+            onClick={() => setIsNotificationOpen(false)}
+          />
+        </div>
+      )}
       {loading ? (
         <div className="flex min-h-[300px] items-center justify-center">
           <div className="border-primary h-10 w-10 animate-spin rounded-full border-t-2 border-b-2"></div>
@@ -184,6 +197,6 @@ export default function UpdateFactoryForm() {
           </form>
         </Form>
       )}
-    </>
+    </div>
   );
 }

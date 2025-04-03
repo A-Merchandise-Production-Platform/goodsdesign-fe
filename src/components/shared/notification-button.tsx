@@ -29,7 +29,9 @@ import {
 import { Separator } from '@/components/ui/separator';
 
 export default function NotificationButton() {
-  const { data, loading, refetch } = useMyNotificationsQuery();
+  const { data, loading, refetch } = useMyNotificationsQuery({
+    fetchPolicy: 'no-cache',
+  });
   const { socket } = useSocketStore();
   const unreadCount = data?.myNotifications.filter(n => !n.isRead).length ?? 0;
 
