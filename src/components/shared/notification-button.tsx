@@ -20,6 +20,13 @@ import { useSocketStore } from '@/stores/socket-io-store';
 import { formatDistanceToNow } from 'date-fns';
 import { Bell, CheckCheckIcon } from 'lucide-react';
 import { useEffect } from 'react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Separator } from '@/components/ui/separator';
 
 export default function NotificationButton() {
   const { data, loading, refetch } = useMyNotificationsQuery();
@@ -83,7 +90,7 @@ export default function NotificationButton() {
           )}
         </ScrollArea>
         <div className="rounded-none">
-          <Button className="w-full rounded-none" variant={'outline'}>
+          <Button className="w-full rounded-none" variant={'outline'} disabled>
             <CheckCheckIcon className="h-4 w-4" />
             Mark all as read
           </Button>
@@ -101,36 +108,60 @@ function NotificationItem({
   const [markNotificationAsRead] = useMarkNotificationAsReadMutation({
     refetchQueries: ['MyNotifications'],
   });
+
+  const handleMouseEnter = () => {
+    if (!notification.isRead) {
+      markNotificationAsRead({
+        variables: {
+          markNotificationAsReadId: notification.id,
+        },
+      });
+    }
+  };
+
   return (
-    <DropdownMenuItem
-      className={cn(
-        'flex cursor-pointer items-start gap-3 rounded-none border-b px-4 py-3',
-        !notification.isRead && 'bg-accent/50',
-      )}
-      onSelect={e => {
-        e.preventDefault();
-        markNotificationAsRead({
-          variables: {
-            markNotificationAsReadId: notification.id,
-          },
-        });
-      }}
-    >
-      <div className="flex-1 space-y-2">
-        <div className="flex items-start gap-2">
-          <p className="line-clamp-1 flex-1 text-sm leading-none font-medium">
-            {notification.title}
-          </p>
-          <span className="text-muted-foreground text-xs">
-            {formatDistanceToNow(new Date(notification.createdAt), {
-              addSuffix: true,
-            })}
-          </span>
-        </div>
-        <p className="text-muted-foreground line-clamp-2 text-sm">
-          {notification.content}
-        </p>
-      </div>
-    </DropdownMenuItem>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DropdownMenuItem
+            className={cn(
+              'flex cursor-pointer items-start gap-3 rounded-none border-b px-4 py-3',
+              !notification.isRead && 'bg-accent/50',
+            )}
+            onMouseEnter={handleMouseEnter}
+            onSelect={e => {
+              e.preventDefault();
+            }}
+          >
+            <div className="flex-1 space-y-2">
+              <div className="flex items-start gap-2">
+                <p className="line-clamp-1 flex-1 text-sm leading-none font-medium">
+                  {notification.title}
+                </p>
+                <span className="text-muted-foreground text-xs">
+                  {formatDistanceToNow(new Date(notification.createdAt), {
+                    addSuffix: true,
+                  })}
+                </span>
+              </div>
+              <p className="text-muted-foreground line-clamp-2 text-sm">
+                {notification.content}
+              </p>
+            </div>
+          </DropdownMenuItem>
+        </TooltipTrigger>
+        <TooltipContent side="right" className="max-w-[300px]">
+          <div className="space-y-2">
+            <p className="font-medium">{notification.title}</p>
+            <p className="text-sm">{notification.content}</p>
+            <p className="text-muted-foreground text-xs">
+              {formatDistanceToNow(new Date(notification.createdAt), {
+                addSuffix: true,
+              })}
+            </p>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
