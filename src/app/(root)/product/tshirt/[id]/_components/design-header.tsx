@@ -1,13 +1,14 @@
-import { Redo2, Save, Undo2 } from 'lucide-react';
+import { Download, Redo2, Save, Undo2 } from 'lucide-react';
 import React from 'react';
 
 import { Button } from '@/components/ui/button';
 
 interface HeaderProps {
   onSave: () => void;
+  onExport?: () => void;
 }
 
-const DesignHeader: React.FC<HeaderProps> = ({ onSave }) => {
+const DesignHeader: React.FC<HeaderProps> = ({ onSave, onExport }) => {
   return (
     <header className="z-40 flex h-14 items-center justify-between px-6">
       <div className="flex items-center gap-4">
@@ -28,6 +29,16 @@ const DesignHeader: React.FC<HeaderProps> = ({ onSave }) => {
         >
           <Save className="h-4 w-4" />
         </Button>
+        {onExport && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onExport}
+            title="Export as image"
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+        )}
       </div>
     </header>
   );

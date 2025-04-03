@@ -68,6 +68,8 @@ export function LayerItem({ id, designObject }: LayerItemProps) {
                 <Image
                   src={imagePreview}
                   alt="Layer preview"
+                  width={40}
+                  height={40}
                   className="bg-secondary/10 h-full w-full object-contain"
                 />
               </div>

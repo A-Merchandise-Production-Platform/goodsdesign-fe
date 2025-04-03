@@ -85,8 +85,17 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { useGetFactoryOrderQuery } from '@/graphql/generated/graphql';
+import {
+  FactoryOrderStatus,
+  OrderDetailStatus,
+  useCreateFactoryProgressReportMutation,
+  useGetFactoryOrderQuery,
+  useMarkFactoryOrderAsDelayedMutation,
+  useMarkOnDoneProductionMutation,
+  useUpdateFactoryOrderDetailStatusMutation,
+} from '@/graphql/generated/graphql';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export default function FactoryOrderDetails() {
   const { id } = useParams<{ id: string }>();
@@ -105,11 +114,93 @@ export default function FactoryOrderDetails() {
   >(new Date());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // First, complete the createFactoryProgressReport mutation
+  const [
+    createFactoryProgressReport,
+    { loading: createFactoryProgressReportLoading },
+  ] = useCreateFactoryProgressReportMutation({
+    variables: {
+      input: {
+        completedQty: parseInt(progressQty),
+        estimatedCompletion: progressDate?.toISOString(),
+        factoryOrderId: id,
+        photoUrls: progressPhotos,
+        notes: progressNotes,
+      },
+    },
+    refetchQueries: ['GetFactoryOrder'],
+    onError: e => {
+      toast.error(e.message);
+    },
+  });
+
+  // Next, complete the markFactoryOrderAsDelayed mutation
+  const [
+    markFactoryOrderAsDelayed,
+    { loading: markFactoryOrderAsDelayedLoading },
+  ] = useMarkFactoryOrderAsDelayedMutation({
+    variables: {
+      input: {
+        delayReason: delayReason,
+        estimatedCompletionDate: estimatedCompletion?.toISOString(),
+      },
+      markFactoryOrderAsDelayedId: id,
+    },
+    refetchQueries: ['GetFactoryOrder'],
+    onError: e => {
+      toast.error(e.message);
+    },
+  });
+
+  // Finally, complete the markOnDoneProduction mutation
+  const [markOnDoneProduction, { loading: markOnDoneProductionLoading }] =
+    useMarkOnDoneProductionMutation({
+      variables: {
+        markOnDoneProductionId: id,
+      },
+      refetchQueries: ['GetFactoryOrder'],
+      onError: e => {
+        toast.error(e.message);
+      },
+    });
+
   const { data, loading, error } = useGetFactoryOrderQuery({
     variables: {
       factoryOrderId: id,
     },
   });
+
+  // First, complete the updateFactoryOrderDetailStatus mutation
+  const [updateFactoryOrderDetailStatus, { loading: updateStatusLoading }] =
+    useUpdateFactoryOrderDetailStatusMutation({
+      refetchQueries: ['GetFactoryOrder'],
+      onError: e => {
+        toast.error(e.message);
+      },
+      onCompleted: () => {
+        toast.success('Order detail status updated successfully');
+      },
+    });
+
+  // Add this function to handle status updates for a specific order detail
+  const handleUpdateDetailStatus = async (detailId: string, note = '') => {
+    setIsSubmitting(true);
+    try {
+      await updateFactoryOrderDetailStatus({
+        variables: {
+          input: {
+            orderDetailId: detailId,
+            status: OrderDetailStatus.Completed,
+            note: note,
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Failed to update order detail status:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const factoryOrder = data?.factoryOrder;
 
@@ -247,7 +338,6 @@ export default function FactoryOrderDetails() {
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      alert('Order accepted successfully!');
       // Here you would typically call a mutation to update the order status
     }, 1000);
   };
@@ -257,7 +347,6 @@ export default function FactoryOrderDetails() {
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      alert('Order rejected successfully!');
       // Here you would typically call a mutation to update the order status
     }, 1000);
   };
@@ -267,51 +356,75 @@ export default function FactoryOrderDetails() {
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      alert('Production started successfully!');
       // Here you would typically call a mutation to update the order status
     }, 1000);
   };
 
-  const handleMarkAsCompleted = () => {
-    setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      alert('Order marked as completed successfully!');
-      // Here you would typically call a mutation to update the order status
-    }, 1000);
-  };
-
-  const handleAddProgressReport = () => {
+  const handleAddProgressReport = async () => {
     if (!progressQty || !progressDate) return;
 
     setIsSubmitting(true);
+    try {
+      await createFactoryProgressReport({
+        variables: {
+          input: {
+            completedQty: parseInt(progressQty),
+            estimatedCompletion: progressDate.toISOString(),
+            factoryOrderId: id,
+            photoUrls: progressPhotos,
+            notes: progressNotes,
+          },
+        },
+      });
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
       setProgressQty('');
       setProgressNotes('');
       setProgressPhotos([]);
       setProgressDate(new Date());
-      // Here you would typically call a mutation to add a progress report
-      alert('Progress report added successfully!');
-    }, 1000);
+    } catch (error: any) {
+      console.error('Failed to add progress report:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleMarkAsDelayed = () => {
+  const handleMarkAsDelayed = async () => {
     if (!delayReason || !estimatedCompletion) return;
 
     setIsSubmitting(true);
+    try {
+      await markFactoryOrderAsDelayed({
+        variables: {
+          input: {
+            delayReason: delayReason,
+            estimatedCompletionDate: estimatedCompletion.toISOString(),
+          },
+          markFactoryOrderAsDelayedId: id,
+        },
+      });
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
       setDelayReason('');
       setEstimatedCompletion(new Date());
-      // Here you would typically call a mutation to mark the order as delayed
-      alert('Order marked as delayed successfully!');
-    }, 1000);
+    } catch (error: any) {
+      console.error('Failed to mark order as delayed:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleMarkAsCompleted = async () => {
+    setIsSubmitting(true);
+    try {
+      await markOnDoneProduction({
+        variables: {
+          markOnDoneProductionId: id,
+        },
+      });
+    } catch (error: any) {
+      console.error('Failed to mark order as completed:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -955,7 +1068,7 @@ export default function FactoryOrderDetails() {
                           />
                         </div>
                         <div className="grid gap-2">
-                          <Label>Report Date</Label>
+                          <Label>Estimated Completion</Label>
                           <Popover>
                             <PopoverTrigger asChild>
                               <Button
@@ -1117,6 +1230,7 @@ export default function FactoryOrderDetails() {
                       <TableHead>Quality Status</TableHead>
                       <TableHead>Production Cost</TableHead>
                       <TableHead>Price</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -1142,6 +1256,76 @@ export default function FactoryOrderDetails() {
                             detail.price || 0,
                           )}
                         </TableCell>
+                        <TableCell>
+                          {detail.status !== 'COMPLETED' &&
+                            factoryOrder.status !=
+                              FactoryOrderStatus.Rejected && (
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button size="sm" variant="outline">
+                                    <CheckSquare className="mr-2 h-4 w-4" />
+                                    Mark Complete
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md">
+                                  <DialogHeader>
+                                    <DialogTitle>
+                                      Update Order Detail Status
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                      Are you sure you want to mark this item as
+                                      completed?
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <div className="grid gap-4 py-4">
+                                    <div className="grid gap-2">
+                                      <Label htmlFor="status-note">
+                                        Note (Optional)
+                                      </Label>
+                                      <Textarea
+                                        id="status-note"
+                                        placeholder="Add any notes about this status update..."
+                                        value={progressNotes}
+                                        onChange={e =>
+                                          setProgressNotes(e.target.value)
+                                        }
+                                      />
+                                    </div>
+                                  </div>
+                                  <DialogFooter>
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => setProgressNotes('')}
+                                    >
+                                      Cancel
+                                    </Button>
+                                    <Button
+                                      onClick={() => {
+                                        handleUpdateDetailStatus(
+                                          detail.id,
+                                          progressNotes,
+                                        );
+                                        setProgressNotes('');
+                                      }}
+                                      disabled={isSubmitting}
+                                    >
+                                      {isSubmitting ? (
+                                        <>
+                                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                          Processing...
+                                        </>
+                                      ) : (
+                                        <>
+                                          <CheckSquare className="mr-2 h-4 w-4" />
+                                          Confirm
+                                        </>
+                                      )}
+                                    </Button>
+                                  </DialogFooter>
+                                </DialogContent>
+                              </Dialog>
+                            )}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -1150,6 +1334,7 @@ export default function FactoryOrderDetails() {
             </CardContent>
           </Card>
 
+          {/* Rest of the Details Tab content remains the same */}
           <Card>
             <CardHeader>
               <CardTitle>Customer Order Information</CardTitle>
@@ -1401,7 +1586,7 @@ export default function FactoryOrderDetails() {
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label>Report Date</Label>
+                        <Label>Estimated Completion</Label>
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button

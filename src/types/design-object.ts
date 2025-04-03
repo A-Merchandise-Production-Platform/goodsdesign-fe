@@ -1,5 +1,7 @@
 export interface DesignObject {
+  view: string;
   type: string;
+  layer: number;
   left: number;
   top: number;
   width: number;
@@ -10,7 +12,6 @@ export interface DesignObject {
   src?: string;
   text?: string;
   fontSize?: number;
-  fill?: string | null;
+  fill?: string;
   fontFamily?: string;
-  view: string;
 }

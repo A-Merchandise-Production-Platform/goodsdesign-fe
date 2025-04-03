@@ -1,14 +1,11 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   useCreateCartItemMutation,
   useProductDesignByIdQuery,
-  useUpdateCartItemMutation,
   useUpdateDesignPositionMutation,
 } from '@/graphql/generated/graphql';
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
@@ -76,7 +73,7 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="container mx-auto min-h-screen">
       <ProductDesigner
         initialDesigns={proDesData?.productDesign?.designPositions}
         onUpload={handleUploadFile}

@@ -203,9 +203,9 @@ export default function OrderDetailsPage() {
                                   <div className="text-sm">
                                     <p>
                                       <span className="font-medium">Type:</span>{' '}
-                                      {position.designJSON.type}
+                                      {position.designJSON?.type}
                                     </p>
-                                    {position.designJSON.type === 'text' ? (
+                                    {position.designJSON?.type === 'text' ? (
                                       <>
                                         <p>
                                           <span className="font-medium">
@@ -233,14 +233,14 @@ export default function OrderDetailsPage() {
                                           <span className="font-medium">
                                             Image URL:
                                           </span>{' '}
-                                          {position.designJSON.url}
+                                          {position?.designJSON?.url}
                                         </p>
                                         <p>
                                           <span className="font-medium">
                                             Dimensions:
                                           </span>{' '}
-                                          {position.designJSON.width}x
-                                          {position.designJSON.height}
+                                          {position?.designJSON?.width}x
+                                          {position?.designJSON?.height}
                                         </p>
                                       </>
                                     )}
@@ -248,14 +248,14 @@ export default function OrderDetailsPage() {
                                       <span className="font-medium">
                                         Position:
                                       </span>{' '}
-                                      X: {position.designJSON.position.x}, Y:{' '}
-                                      {position.designJSON.position.y}
+                                      X: {position?.designJSON?.position?.x}, Y:{' '}
+                                      {position?.designJSON?.position?.y}
                                     </p>
                                     <p>
                                       <span className="font-medium">
                                         Rotation:
                                       </span>{' '}
-                                      {position.designJSON.rotation}°
+                                      {position?.designJSON?.rotation}°
                                     </p>
                                   </div>
                                 </CardContent>

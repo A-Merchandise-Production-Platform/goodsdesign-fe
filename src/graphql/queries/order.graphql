@@ -190,3 +190,9 @@ query GetFactoryOrder($factoryOrderId: ID!) {
     }
   }
 }
+
+mutation UpdateFactoryOrderDetailStatus($input: UpdateOrderDetailStatusDto!) {
+  updateFactoryOrderDetailStatus(input: $input) {
+    id
+  }
+}
