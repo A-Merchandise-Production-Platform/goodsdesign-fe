@@ -1,12 +1,14 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   useCreateCartItemMutation,
   useProductDesignByIdQuery,
   useUpdateDesignPositionMutation,
+  useUpdateThumbnailProductDesignMutation,
 } from '@/graphql/generated/graphql';
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
 
@@ -26,6 +28,58 @@ export default function Page() {
   const [updateDesignPosition] = useUpdateDesignPositionMutation();
   const [createCartItem, { loading: cartLoading }] =
     useCreateCartItemMutation();
+  const [updateThumbnailProductDesign] =
+    useUpdateThumbnailProductDesignMutation();
+
+  // Keep track of current thumbnail URL to handle deletion
+  const [currentThumbnailUrl, setCurrentThumbnailUrl] = useState<string>('');
+
+  // Update currentThumbnailUrl when proDesData is available
+  useEffect(() => {
+    if (proDesData?.productDesign?.thumbnailUrl) {
+      setCurrentThumbnailUrl(proDesData.productDesign.thumbnailUrl);
+    }
+  }, [proDesData]);
+  console.log(proDesData);
+
+  const handleThumbnail = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return null;
+
+    try {
+      // Upload the file
+      const uploadResult = await uploadFile({
+        variables: { file },
+      });
+
+      const newThumbnailUrl = uploadResult.data?.uploadFile?.url;
+      if (!newThumbnailUrl) {
+        toast.error('Upload completed but no URL was returned');
+        return null;
+      }
+      // Update the thumbnail
+      await updateThumbnailProductDesign({
+        variables: {
+          updateProductDesignId: id,
+          input: { thumbnailUrl: newThumbnailUrl },
+          fileUrl: currentThumbnailUrl,
+        },
+      });
+
+      // Update state and show success message
+      setCurrentThumbnailUrl(newThumbnailUrl);
+      toast.success('Thumbnail updated successfully');
+      return newThumbnailUrl;
+    } catch (error) {
+      console.error('Thumbnail operation failed:', error);
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to process thumbnail',
+      );
+      return null;
+    }
+  };
 
   const handleUploadFile = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -77,6 +131,7 @@ export default function Page() {
       <ProductDesigner
         initialDesigns={proDesData?.productDesign?.designPositions}
         onUpload={handleUploadFile}
+        onThumbnail={handleThumbnail}
         onUpdatePosition={updateDesignPosition}
         onCreateCartItem={createCartItem}
         cartLoading={cartLoading}
