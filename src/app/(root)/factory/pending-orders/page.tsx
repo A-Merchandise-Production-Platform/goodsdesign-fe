@@ -124,7 +124,7 @@ export default function FactoryOrdersPage() {
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
                     <TableCell>{formatDate(order.createdAt)}</TableCell>
                     <TableCell>
-                      {formatDate(order.acceptanceDeadline)}
+                      {formatDate(order?.acceptanceDeadline)}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button

@@ -160,7 +160,7 @@ export default function OrderDetailsPage() {
                   <Clock className="mr-1 h-4 w-4" /> Acceptance Deadline
                 </span>
                 <span className="font-medium">
-                  {formatDate(order.acceptanceDeadline)}
+                  {formatDate(order?.acceptanceDeadline)}
                 </span>
               </div>
             </div>

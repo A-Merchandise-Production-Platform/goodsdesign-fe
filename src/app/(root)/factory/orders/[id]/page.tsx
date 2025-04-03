@@ -953,7 +953,7 @@ export default function FactoryOrderDetails() {
                     <span className="text-muted-foreground text-sm">
                       Acceptance Deadline:
                     </span>
-                    <span>{formatDate(factoryOrder.acceptanceDeadline)}</span>
+                    <span>{formatDate(factoryOrder?.acceptanceDeadline)}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground text-sm">
