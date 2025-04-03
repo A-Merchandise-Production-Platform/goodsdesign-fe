@@ -98,7 +98,6 @@ mutation UpdateProductDesign(
 mutation UpdateThumbnailProductDesign(
   $updateProductDesignId: String!
   $input: UpdateProductDesignDto!
-
   # Delete url
   $fileUrl: String!
 ) {

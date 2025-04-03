@@ -4,11 +4,12 @@ const steps = [
   {
     step: 1,
     title: 'Pick your item',
-    description: 'Choose from accessories, drinkware, home decor, and apparel pieces.',
+    description:
+      'Choose from accessories, drinkware, home decor, and apparel pieces.',
     image: {
       src: '/assets/step-1.svg',
-      alt: 'Product selection'
-    }
+      alt: 'Product selection',
+    },
   },
   {
     step: 2,
@@ -16,18 +17,19 @@ const steps = [
     description: 'Upload designs or make your own with our free tools',
     image: {
       src: '/assets/step-2.svg',
-      alt: 'Design creation'
-    }
+      alt: 'Design creation',
+    },
   },
   {
     step: 3,
     title: 'Order and enjoy',
-    description: 'Simply order more items to automatically receive bigger discounts at checkout.',
+    description:
+      'Simply order more items to automatically receive bigger discounts at checkout.',
     image: {
       src: '/assets/step-3.svg',
-      alt: 'Order and save'
-    }
-  }
+      alt: 'Order and save',
+    },
+  },
 ];
 
 export function PromotionalBanner() {
@@ -41,8 +43,8 @@ export function PromotionalBanner() {
         </div>
         <div className="p-4 md:col-span-3">
           <div className="bg-background/50 grid h-full gap-4 rounded-l-xl md:grid-cols-3">
-            {steps.map((step) => (
-              <div key={step.step} className="rounded-lg p-6 flex flex-col">
+            {steps.map(step => (
+              <div key={step.step} className="flex flex-col rounded-lg p-6">
                 <div>
                   <h3 className="mb-1 font-medium">Step {step.step}</h3>
                   <h4 className="mb-2 text-xl font-bold">{step.title}</h4>
@@ -53,7 +55,7 @@ export function PromotionalBanner() {
                     src={step.image.src}
                     alt={step.image.alt}
                     fill
-                    className="object-bottom object-contain"
+                    className="object-contain object-bottom"
                   />
                 </div>
               </div>

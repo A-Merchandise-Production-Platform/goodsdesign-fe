@@ -9,7 +9,11 @@ interface HeaderProps {
   onThumbnail?: () => void;
 }
 
-const DesignHeader: React.FC<HeaderProps> = ({ onSave, onExport, onThumbnail }) => {
+const DesignHeader: React.FC<HeaderProps> = ({
+  onSave,
+  onExport,
+  onThumbnail,
+}) => {
   return (
     <header className="z-40 flex h-14 items-center justify-between px-6">
       <div className="flex items-center gap-4">
