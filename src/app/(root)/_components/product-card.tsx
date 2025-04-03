@@ -9,7 +9,7 @@ interface ProductCardProps {
   name: string;
   price: number;
   image?: string;
-  description: string;
+  description?: string;
 }
 
 export function ProductCard({

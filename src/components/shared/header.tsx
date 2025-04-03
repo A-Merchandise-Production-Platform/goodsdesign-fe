@@ -11,7 +11,7 @@ type MenuItem = {
   href: Route;
 };
 
-const menuItems: MenuItem[] = [{ title: 'Home', href: '/' }];
+const menuItems: MenuItem[] = [];
 
 export default function Header() {
   const pathname = usePathname();

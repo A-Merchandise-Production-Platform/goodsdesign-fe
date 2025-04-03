@@ -170,6 +170,7 @@ export type CreateProductDesignDto = {
   isPublic?: Scalars['Boolean']['input'];
   isTemplate?: Scalars['Boolean']['input'];
   systemConfigVariantId: Scalars['String']['input'];
+  thumbnailUrl?: InputMaybe<Scalars['String']['input']>;
   userId?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -844,6 +845,7 @@ export type ProductDesignEntity = {
   isTemplate: Scalars['Boolean']['output'];
   systemConfigVariant?: Maybe<SystemConfigVariantEntity>;
   systemConfigVariantId: Scalars['String']['output'];
+  thumbnailUrl?: Maybe<Scalars['String']['output']>;
   user?: Maybe<UserEntity>;
   userId: Scalars['String']['output'];
 };
@@ -1317,6 +1319,7 @@ export type UpdateProductDesignDto = {
   isPublic?: InputMaybe<Scalars['Boolean']['input']>;
   isTemplate?: InputMaybe<Scalars['Boolean']['input']>;
   systemConfigVariantId?: InputMaybe<Scalars['String']['input']>;
+  thumbnailUrl?: InputMaybe<Scalars['String']['input']>;
   userId?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -2169,6 +2172,50 @@ export type UpdateFactoryOrderDetailStatusMutation = {
   updateFactoryOrderDetailStatus: { __typename?: 'FactoryOrder'; id: string };
 };
 
+export type ProductDesignsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ProductDesignsQuery = {
+  __typename?: 'Query';
+  productDesigns: Array<{
+    __typename?: 'ProductDesignEntity';
+    id: string;
+    thumbnailUrl?: string | null;
+    designPositions?: Array<{
+      __typename?: 'DesignPositionEntity';
+      designJSON?: any | null;
+      positionType?: {
+        __typename?: 'ProductPositionTypeEntity';
+        id: string;
+        positionName: string;
+        basePrice: number;
+      } | null;
+    }> | null;
+  }>;
+};
+
+export type ProductDesignsByUserQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type ProductDesignsByUserQuery = {
+  __typename?: 'Query';
+  productDesignsByUser: Array<{
+    __typename?: 'ProductDesignEntity';
+    id: string;
+    thumbnailUrl?: string | null;
+    designPositions?: Array<{
+      __typename?: 'DesignPositionEntity';
+      designJSON?: any | null;
+      positionType?: {
+        __typename?: 'ProductPositionTypeEntity';
+        id: string;
+        positionName: string;
+        basePrice: number;
+      } | null;
+    }> | null;
+  }>;
+};
+
 export type ProductDesignByIdQueryVariables = Exact<{
   productDesignId: Scalars['ID']['input'];
 }>;
@@ -2177,6 +2224,7 @@ export type ProductDesignByIdQuery = {
   __typename?: 'Query';
   productDesign: {
     __typename?: 'ProductDesignEntity';
+    thumbnailUrl?: string | null;
     systemConfigVariant?: {
       __typename?: 'SystemConfigVariantEntity';
       id: string;
@@ -2216,6 +2264,7 @@ export type UpdateProductDesignMutation = {
   __typename?: 'Mutation';
   updateProductDesign: {
     __typename?: 'ProductDesignEntity';
+    thumbnailUrl?: string | null;
     systemConfigVariant?: {
       __typename?: 'SystemConfigVariantEntity';
       id: string;
@@ -5179,9 +5228,182 @@ export type UpdateFactoryOrderDetailStatusMutationOptions =
     UpdateFactoryOrderDetailStatusMutation,
     UpdateFactoryOrderDetailStatusMutationVariables
   >;
+export const ProductDesignsDocument = gql`
+  query ProductDesigns {
+    productDesigns {
+      id
+      thumbnailUrl
+      designPositions {
+        positionType {
+          id
+          positionName
+          basePrice
+        }
+        designJSON
+      }
+    }
+  }
+`;
+
+/**
+ * __useProductDesignsQuery__
+ *
+ * To run a query within a React component, call `useProductDesignsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProductDesignsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useProductDesignsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useProductDesignsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ProductDesignsQuery,
+    ProductDesignsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ProductDesignsQuery, ProductDesignsQueryVariables>(
+    ProductDesignsDocument,
+    options,
+  );
+}
+export function useProductDesignsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ProductDesignsQuery,
+    ProductDesignsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<ProductDesignsQuery, ProductDesignsQueryVariables>(
+    ProductDesignsDocument,
+    options,
+  );
+}
+export function useProductDesignsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ProductDesignsQuery,
+        ProductDesignsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ProductDesignsQuery,
+    ProductDesignsQueryVariables
+  >(ProductDesignsDocument, options);
+}
+export type ProductDesignsQueryHookResult = ReturnType<
+  typeof useProductDesignsQuery
+>;
+export type ProductDesignsLazyQueryHookResult = ReturnType<
+  typeof useProductDesignsLazyQuery
+>;
+export type ProductDesignsSuspenseQueryHookResult = ReturnType<
+  typeof useProductDesignsSuspenseQuery
+>;
+export type ProductDesignsQueryResult = Apollo.QueryResult<
+  ProductDesignsQuery,
+  ProductDesignsQueryVariables
+>;
+export const ProductDesignsByUserDocument = gql`
+  query ProductDesignsByUser {
+    productDesignsByUser {
+      id
+      thumbnailUrl
+      designPositions {
+        positionType {
+          id
+          positionName
+          basePrice
+        }
+        designJSON
+      }
+    }
+  }
+`;
+
+/**
+ * __useProductDesignsByUserQuery__
+ *
+ * To run a query within a React component, call `useProductDesignsByUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProductDesignsByUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useProductDesignsByUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useProductDesignsByUserQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ProductDesignsByUserQuery,
+    ProductDesignsByUserQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ProductDesignsByUserQuery,
+    ProductDesignsByUserQueryVariables
+  >(ProductDesignsByUserDocument, options);
+}
+export function useProductDesignsByUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ProductDesignsByUserQuery,
+    ProductDesignsByUserQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ProductDesignsByUserQuery,
+    ProductDesignsByUserQueryVariables
+  >(ProductDesignsByUserDocument, options);
+}
+export function useProductDesignsByUserSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ProductDesignsByUserQuery,
+        ProductDesignsByUserQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ProductDesignsByUserQuery,
+    ProductDesignsByUserQueryVariables
+  >(ProductDesignsByUserDocument, options);
+}
+export type ProductDesignsByUserQueryHookResult = ReturnType<
+  typeof useProductDesignsByUserQuery
+>;
+export type ProductDesignsByUserLazyQueryHookResult = ReturnType<
+  typeof useProductDesignsByUserLazyQuery
+>;
+export type ProductDesignsByUserSuspenseQueryHookResult = ReturnType<
+  typeof useProductDesignsByUserSuspenseQuery
+>;
+export type ProductDesignsByUserQueryResult = Apollo.QueryResult<
+  ProductDesignsByUserQuery,
+  ProductDesignsByUserQueryVariables
+>;
 export const ProductDesignByIdDocument = gql`
   query ProductDesignById($productDesignId: ID!) {
     productDesign(id: $productDesignId) {
+      thumbnailUrl
       systemConfigVariant {
         id
         price
@@ -5331,6 +5553,7 @@ export const UpdateProductDesignDocument = gql`
     $input: UpdateProductDesignDto!
   ) {
     updateProductDesign(id: $updateProductDesignId, input: $input) {
+      thumbnailUrl
       systemConfigVariant {
         id
         price

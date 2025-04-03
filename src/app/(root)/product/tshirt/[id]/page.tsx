@@ -73,7 +73,7 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="container mx-auto min-h-screen">
       <ProductDesigner
         initialDesigns={proDesData?.productDesign?.designPositions}
         onUpload={handleUploadFile}

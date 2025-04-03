@@ -7,12 +7,14 @@ interface DesignCanvasProps {
   canvasRef: React.RefObject<HTMLCanvasElement>;
   view: string;
   texture: THREE.CanvasTexture | null;
+  onExport?: (dataUrl: string) => void;
 }
 
 const DesignCanvas: React.FC<DesignCanvasProps> = ({
   canvasRef,
   view,
   texture,
+  onExport,
 }) => {
   return (
     <div className="relative flex h-[32rem] w-[64rem] flex-1 gap-4 pt-4">
@@ -61,7 +63,12 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
 
       {/* 3D Model Area */}
       <div className="relative z-20 h-[32rem] flex-grow">
-        <TshirtModel texture={texture} view={view} color="#FFFFFF" />
+        <TshirtModel
+          texture={texture}
+          view={view}
+          color="#FFFFFF"
+          onExport={onExport}
+        />
       </div>
     </div>
   );

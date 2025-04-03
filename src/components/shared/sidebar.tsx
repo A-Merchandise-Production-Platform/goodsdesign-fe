@@ -2,11 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-interface MySidebarProps {
-  navItems: NavItem[];
-  children: React.ReactNode;
-}
+import { useMemo } from 'react';
 
 export interface NavItem {
   href: string;
@@ -14,11 +10,20 @@ export interface NavItem {
   icon?: React.ReactNode;
 }
 
-export function MySidebar({ navItems, children }: MySidebarProps) {
+export function Sidebar() {
   const pathname = usePathname();
 
+  const navItems: NavItem[] = useMemo(
+    () => [
+      { href: '/', label: 'Home' },
+      { href: '/my-design', label: 'My Designs' },
+      { href: '/my-order', label: 'My Orders' },
+    ],
+    [],
+  );
+
   return (
-    <div className="grid grid-cols-1 gap-4 px-4 pt-4 pb-2 md:grid-cols-[200px_1fr]">
+    <div className="md:fixed md:w-[200px]">
       <nav className="bg-background space-y-1 rounded-xl">
         {navItems.map(item => {
           const isActive = pathname === item.href;
@@ -40,7 +45,6 @@ export function MySidebar({ navItems, children }: MySidebarProps) {
           );
         })}
       </nav>
-      <div className="h-full rounded-xl">{children}</div>
     </div>
   );
 }
