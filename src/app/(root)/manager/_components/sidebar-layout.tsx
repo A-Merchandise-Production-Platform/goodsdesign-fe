@@ -20,22 +20,22 @@ export default function ManagerSidebarLayout({
   const pathname = usePathname();
   const navItems: NavItem[] = [
     {
-      href: '/manger',
+      href: '/manager',
       label: 'Dashboard',
       icon: <HomeIcon className="size-4" />,
     },
     {
-      href: '/manger/orders',
+      href: '/manager/orders',
       label: 'Orders',
       icon: <ShoppingBag className="size-4" />,
     },
     {
-      href: '/manger/factory',
+      href: '/manager/factory',
       label: 'Factory Management',
       icon: <HouseIcon className="size-4" />,
     },
     {
-      href: '/manger/staff',
+      href: '/manager/staff',
       label: 'Staff Management',
       icon: <User2Icon className="size-4" />,
     },
