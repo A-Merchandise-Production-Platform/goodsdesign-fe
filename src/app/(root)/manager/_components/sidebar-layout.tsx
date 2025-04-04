@@ -3,6 +3,7 @@
 import {
   HomeIcon,
   HouseIcon,
+  ListIcon,
   PenSquareIcon,
   ShoppingBag,
   User2Icon,
@@ -39,9 +40,9 @@ export default function ManagerSidebarLayout({
       icon: <User2Icon className="size-4" />,
     },
     {
-      href: '/manger/orders',
-      label: 'Tickets',
-      icon: <PenSquareIcon className="size-4" />,
+      href: '/manager/assign',
+      label: 'Need Assign',
+      icon: <ListIcon className="size-4" />,
     },
   ];
 
