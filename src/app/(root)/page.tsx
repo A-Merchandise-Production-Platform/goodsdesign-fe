@@ -1,6 +1,9 @@
 'use client';
 
-import { useGetAllProductsQuery } from '@/graphql/generated/graphql';
+import {
+  useGetAllProductsQuery,
+  useProductDesignTemplatesQuery,
+} from '@/graphql/generated/graphql';
 import { DesignSection } from './_components/design-section';
 import { ProductSection } from './_components/product-section';
 import { PromotionalBanner } from './_components/promotional-banner';
@@ -11,6 +14,12 @@ export default function Home() {
   const sortedProducts = proData?.products
     ?.slice()
     .sort((a, b) => (a.id ?? '').localeCompare(b.id ?? ''));
+  const { data: proDesData, loading: proDesLoading } =
+    useProductDesignTemplatesQuery();
+  const filteredTemplates =
+    proDesData?.productDesigns?.filter(
+      design => design.isPublic && design.isTemplate,
+    ) ?? [];
 
   return (
     <div className="grid grid-cols-1 gap-4 px-4 pt-4 pb-2 md:grid-cols-[200px_1fr]">
@@ -27,7 +36,7 @@ export default function Home() {
 
         <ProductSection products={sortedProducts} />
 
-        <DesignSection />
+        <DesignSection designs={filteredTemplates} />
       </div>
     </div>
   );
