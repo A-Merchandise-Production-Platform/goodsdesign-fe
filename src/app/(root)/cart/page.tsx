@@ -302,7 +302,7 @@ export default function CartPage() {
                         <p className="text-muted-foreground text-sm">
                           Positions: {positions}
                         </p>
-                        {item.design.isTemplate && (
+                        {item?.design?.isTemplate && (
                           <Badge variant="outline" className="mt-1">
                             Template Design
                           </Badge>

@@ -61,9 +61,9 @@ export default function MyStaffTasksPage() {
       const query = searchQuery.toLowerCase();
       result = result.filter(
         task =>
-          task.task.taskname.toLowerCase().includes(query) ||
-          (task.task.description &&
-            task.task.description.toLowerCase().includes(query)),
+          task?.task?.taskname.toLowerCase().includes(query) ||
+          (task?.task?.description &&
+            task?.task.description.toLowerCase().includes(query)),
       );
     }
 
@@ -78,8 +78,8 @@ export default function MyStaffTasksPage() {
 
       switch (sortBy) {
         case 'taskname':
-          valueA = a.task.taskname.toLowerCase();
-          valueB = b.task.taskname.toLowerCase();
+          valueA = a.task?.taskname?.toLowerCase() ?? '';
+          valueB = b.task?.taskname?.toLowerCase() ?? '';
           break;
         case 'status':
           valueA = a.status;
@@ -90,16 +90,16 @@ export default function MyStaffTasksPage() {
           valueB = new Date(b.assignedDate).getTime();
           break;
         case 'deadline':
-          valueA = a.task.expiredTime
+          valueA = a.task?.expiredTime
             ? new Date(a.task.expiredTime).getTime()
             : Number.POSITIVE_INFINITY;
-          valueB = b.task.expiredTime
+          valueB = b.task?.expiredTime
             ? new Date(b.task.expiredTime).getTime()
             : Number.POSITIVE_INFINITY;
           break;
         default:
-          valueA = a.task.taskname.toLowerCase();
-          valueB = b.task.taskname.toLowerCase();
+          valueA = a.task?.taskname?.toLowerCase() ?? '';
+          valueB = b.task?.taskname?.toLowerCase() ?? '';
       }
 
       if (sortOrder === 'asc') {
@@ -331,9 +331,9 @@ export default function MyStaffTasksPage() {
                     <TableRow key={staffTask.id}>
                       <TableCell className="font-medium">
                         <div className="space-y-1">
-                          <div>{staffTask.task.taskname}</div>
+                          <div>{staffTask.task?.taskname}</div>
                           <div className="text-muted-foreground text-sm">
-                            {staffTask.task.description}
+                            {staffTask.task?.description}
                           </div>
                         </div>
                       </TableCell>
@@ -346,15 +346,15 @@ export default function MyStaffTasksPage() {
                       </TableCell>
                       <TableCell>
                         <div
-                          className={`flex items-center gap-1 text-sm ${isExpired(staffTask.task.expiredTime) ? 'text-red-500' : ''}`}
+                          className={`flex items-center gap-1 text-sm ${isExpired(staffTask.task?.expiredTime) ? 'text-red-500' : ''}`}
                         >
-                          {isExpired(staffTask.task.expiredTime) ? (
+                          {isExpired(staffTask.task?.expiredTime) ? (
                             <AlertTriangle className="h-4 w-4" />
                           ) : (
                             <Clock className="text-muted-foreground h-4 w-4" />
                           )}
-                          {formatDate(staffTask.task.expiredTime)}
-                          {isExpired(staffTask.task.expiredTime) && (
+                          {formatDate(staffTask.task?.expiredTime)}
+                          {isExpired(staffTask.task?.expiredTime) && (
                             <span className="ml-1 text-xs font-medium">
                               (Expired)
                             </span>
@@ -388,7 +388,7 @@ export default function MyStaffTasksPage() {
           <CardContent>
             <div className="space-y-6">
               {filteredTasks.map(staffTask => {
-                const checkQuality = staffTask.task.checkQualities?.[0];
+                const checkQuality = staffTask.task?.checkQualities?.[0];
                 const factoryOrderDetail = checkQuality?.factoryOrderDetail;
 
                 return (
@@ -399,10 +399,10 @@ export default function MyStaffTasksPage() {
                     <div className="flex items-start justify-between">
                       <div>
                         <h3 className="text-lg font-semibold">
-                          {staffTask.task.taskname}
+                          {staffTask.task?.taskname}
                         </h3>
                         <p className="text-muted-foreground">
-                          {staffTask.task.description}
+                          {staffTask.task?.description}
                         </p>
                       </div>
                       {getStatusBadge(staffTask.status)}

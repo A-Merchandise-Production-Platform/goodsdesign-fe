@@ -21,7 +21,7 @@ export default function ProfileLayout({
       { href: '/profile/display', label: 'Display' },
     ];
 
-    if (user?.factory) {
+    if (user?.ownedFactory) {
       items.splice(1, 0, { href: '/profile/factory', label: 'Factory' });
     }
 
