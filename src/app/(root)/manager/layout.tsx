@@ -5,8 +5,8 @@ import ManagerGuardProvider from '@/providers/manager-guard-provider';
 import ManagerSidebarLayout from './_components/sidebar-layout';
 
 export const metadata: Metadata = {
-  title: 'Admin',
-  description: 'Admin panel',
+  title: 'Manager',
+  description: 'Manager panel',
 };
 
 export default function AdminLayout({
