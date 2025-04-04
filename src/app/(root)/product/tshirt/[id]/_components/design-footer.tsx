@@ -40,7 +40,10 @@ const DesignFooter: React.FC<DesignFooterProps> = ({
   onCreateCartItem,
 }) => {
   const activePositions = designPositions.filter(pos => pos.hasDesigns);
-  const designsPositionsPrice = activePositions.reduce((total, pos) => total + pos.price, 0);
+  const designsPositionsPrice = activePositions.reduce(
+    (total, pos) => total + pos.price,
+    0,
+  );
   const totalPrice = variantPrice + designsPositionsPrice;
 
   return (
@@ -64,12 +67,19 @@ const DesignFooter: React.FC<DesignFooterProps> = ({
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Base Price:</span>
-                      <span className="text-muted-foreground">{formatPrice(variantPrice)}</span>
+                      <span className="text-muted-foreground">
+                        {formatPrice(variantPrice)}
+                      </span>
                     </div>
                     {activePositions.map(pos => (
-                      <div key={pos.name} className="flex items-center justify-between">
+                      <div
+                        key={pos.name}
+                        className="flex items-center justify-between"
+                      >
                         <span className="text-sm capitalize">{pos.name}:</span>
-                        <span className="text-muted-foreground">+{formatPrice(pos.price)}</span>
+                        <span className="text-muted-foreground">
+                          +{formatPrice(pos.price)}
+                        </span>
                       </div>
                     ))}
                     <div className="border-t pt-2">

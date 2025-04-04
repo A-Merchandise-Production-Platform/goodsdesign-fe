@@ -20,14 +20,16 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({
   view,
   onViewChange,
   designPositions,
-  designs
+  designs,
 }) => {
   const renderPrice = (positionName: string) => {
     const hasDesigns = designs[positionName.toLowerCase()]?.length > 0;
     if (!hasDesigns) return null;
 
     const position = designPositions?.find(
-      pos => pos.positionType?.positionName.toLowerCase() === positionName.toLowerCase()
+      pos =>
+        pos.positionType?.positionName.toLowerCase() ===
+        positionName.toLowerCase(),
     );
     const price = position?.positionType?.basePrice || 0;
 
