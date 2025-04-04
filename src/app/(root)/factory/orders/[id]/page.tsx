@@ -1257,9 +1257,8 @@ export default function FactoryOrderDetails() {
                           )}
                         </TableCell>
                         <TableCell>
-                          {detail.status !== 'COMPLETED' &&
-                            factoryOrder.status !=
-                              FactoryOrderStatus.Rejected && (
+                          {detail.status !== OrderDetailStatus.Pending &&
+                            factoryOrder.status !== FactoryOrderStatus.Rejected && (
                               <Dialog>
                                 <DialogTrigger asChild>
                                   <Button size="sm" variant="outline">
