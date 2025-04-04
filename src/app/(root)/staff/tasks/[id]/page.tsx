@@ -123,7 +123,7 @@ export default function MyStaffTaskDetails() {
         toast.error(`Error submitting quality check: ${error.message}`);
         setIsSubmitting(false);
       },
-      refetchQueries: ["GetStaffTaskDetail"]
+      refetchQueries: ['GetStaffTaskDetail'],
     });
 
   const staffTask = data?.staffTask;
