@@ -375,11 +375,14 @@ export enum FactoryOrderStatus {
   Accepted = 'ACCEPTED',
   Cancelled = 'CANCELLED',
   Completed = 'COMPLETED',
+  DoneCheckQuality = 'DONE_CHECK_QUALITY',
   DoneProduction = 'DONE_PRODUCTION',
   Expired = 'EXPIRED',
   InProduction = 'IN_PRODUCTION',
   PendingAcceptance = 'PENDING_ACCEPTANCE',
   Rejected = 'REJECTED',
+  ReworkCompleted = 'REWORK_COMPLETED',
+  ReworkRequired = 'REWORK_REQUIRED',
   Shipped = 'SHIPPED',
   WaitingForCheckingQuality = 'WAITING_FOR_CHECKING_QUALITY',
   WaitingForManagerAssignStaff = 'WAITING_FOR_MANAGER_ASSIGN_STAFF',
@@ -466,6 +469,7 @@ export type Mutation = {
   deleteProduct: ProductEntity;
   deleteUser: UserEntity;
   doneCheckQuality: CheckQuality;
+  duplicateProductDesign: ProductDesignEntity;
   login: AuthResponseDto;
   logout: Scalars['String']['output'];
   markFactoryOrderAsDelayed: FactoryOrder;
@@ -619,6 +623,10 @@ export type MutationDeleteUserArgs = {
 export type MutationDoneCheckQualityArgs = {
   id: Scalars['ID']['input'];
   input: DoneCheckQualityDto;
+};
+
+export type MutationDuplicateProductDesignArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export type MutationLoginArgs = {
@@ -2341,6 +2349,32 @@ export type UpdateThumbnailProductDesignMutation = {
     __typename?: 'ProductDesignEntity';
     thumbnailUrl?: string | null;
   };
+};
+
+export type ProductDesignTemplatesQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type ProductDesignTemplatesQuery = {
+  __typename?: 'Query';
+  productDesigns: Array<{
+    __typename?: 'ProductDesignEntity';
+    id: string;
+    isPublic: boolean;
+    isTemplate: boolean;
+    isFinalized: boolean;
+    thumbnailUrl?: string | null;
+    designPositions?: Array<{
+      __typename?: 'DesignPositionEntity';
+      designJSON?: any | null;
+      positionType?: {
+        __typename?: 'ProductPositionTypeEntity';
+        id: string;
+        positionName: string;
+        basePrice: number;
+      } | null;
+    }> | null;
+  }>;
 };
 
 export type GetAllDiscountByProductIdQueryVariables = Exact<{
@@ -5758,6 +5792,95 @@ export type UpdateThumbnailProductDesignMutationOptions =
     UpdateThumbnailProductDesignMutation,
     UpdateThumbnailProductDesignMutationVariables
   >;
+export const ProductDesignTemplatesDocument = gql`
+  query ProductDesignTemplates {
+    productDesigns {
+      id
+      isPublic
+      isTemplate
+      isFinalized
+      thumbnailUrl
+      designPositions {
+        positionType {
+          id
+          positionName
+          basePrice
+        }
+        designJSON
+      }
+    }
+  }
+`;
+
+/**
+ * __useProductDesignTemplatesQuery__
+ *
+ * To run a query within a React component, call `useProductDesignTemplatesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProductDesignTemplatesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useProductDesignTemplatesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useProductDesignTemplatesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ProductDesignTemplatesQuery,
+    ProductDesignTemplatesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ProductDesignTemplatesQuery,
+    ProductDesignTemplatesQueryVariables
+  >(ProductDesignTemplatesDocument, options);
+}
+export function useProductDesignTemplatesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ProductDesignTemplatesQuery,
+    ProductDesignTemplatesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ProductDesignTemplatesQuery,
+    ProductDesignTemplatesQueryVariables
+  >(ProductDesignTemplatesDocument, options);
+}
+export function useProductDesignTemplatesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ProductDesignTemplatesQuery,
+        ProductDesignTemplatesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ProductDesignTemplatesQuery,
+    ProductDesignTemplatesQueryVariables
+  >(ProductDesignTemplatesDocument, options);
+}
+export type ProductDesignTemplatesQueryHookResult = ReturnType<
+  typeof useProductDesignTemplatesQuery
+>;
+export type ProductDesignTemplatesLazyQueryHookResult = ReturnType<
+  typeof useProductDesignTemplatesLazyQuery
+>;
+export type ProductDesignTemplatesSuspenseQueryHookResult = ReturnType<
+  typeof useProductDesignTemplatesSuspenseQuery
+>;
+export type ProductDesignTemplatesQueryResult = Apollo.QueryResult<
+  ProductDesignTemplatesQuery,
+  ProductDesignTemplatesQueryVariables
+>;
 export const GetAllDiscountByProductIdDocument = gql`
   query GetAllDiscountByProductId($productId: String!) {
     getAllDiscountByProductId(productId: $productId) {
