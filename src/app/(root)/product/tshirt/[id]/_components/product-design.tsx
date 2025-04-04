@@ -639,42 +639,42 @@ export default function ProductDesigner({
       return base;
     });
 
+    const previousDesigns = designs[view] || [];
+    const hasChanges =
+      JSON.stringify(previousDesigns) !== JSON.stringify(currentDesigns);
+
     // Update state directly with the new designs
     setDesigns(prev => {
-      const newDesigns: SerializedDesign = {
+      return {
         ...prev,
         [view]: currentDesigns,
       };
+    });
 
+    // Then, if there are changes, call onUpdatePosition in a separate effect
+    if (hasChanges && onUpdatePosition && designId) {
       // Find the current position type for this view
       const currentPosition = initialDesigns?.find(
         position => position?.positionType?.positionName.toLowerCase() === view,
       );
 
-      // Check if designs changed before calling onUpdatePosition
-      const hasChanges =
-        JSON.stringify(prev[view]) !== JSON.stringify(currentDesigns);
+      if (currentPosition?.positionType?.id) {
+        const positionTypeId = currentPosition.positionType.id;
 
-      // Update position if we have all required data and there are changes
-      if (
-        hasChanges &&
-        onUpdatePosition &&
-        designId &&
-        currentPosition?.positionType?.id
-      ) {
-        onUpdatePosition({
-          variables: {
-            input: {
-              designId: designId,
-              productPositionTypeId: currentPosition.positionType.id,
-              designJSON: currentDesigns,
+        // Use setTimeout to push this to the next tick, avoiding the setState in render error
+        setTimeout(() => {
+          onUpdatePosition({
+            variables: {
+              input: {
+                designId: designId,
+                productPositionTypeId: positionTypeId,
+                designJSON: currentDesigns,
+              },
             },
-          },
-        });
+          });
+        }, 0);
       }
-
-      return newDesigns;
-    });
+    }
   };
 
   // Load saved design
@@ -1121,7 +1121,12 @@ export default function ProductDesigner({
         />
 
         <div className="flex flex-1 flex-col">
-          <ViewSelector view={view} onViewChange={handleViewChange} />
+          <ViewSelector
+            view={view}
+            onViewChange={handleViewChange}
+            designPositions={initialDesigns}
+            designs={designs}
+          />
 
           <DesignCanvas
             canvasRef={canvasRef as any}
@@ -1133,6 +1138,21 @@ export default function ProductDesigner({
       </div>
 
       <DesignFooter
+        variantPrice={productVariant?.price ?? 0}
+        designPositions={['front', 'back', 'left sleeve', 'right sleeve'].map(
+          pos => {
+            const position = initialDesigns?.find(
+              p =>
+                p.positionType?.positionName.toLowerCase() ===
+                pos.toLowerCase(),
+            );
+            return {
+              name: pos,
+              price: position?.positionType?.basePrice || 0,
+              hasDesigns: Boolean(designs[pos]?.length),
+            };
+          },
+        )}
         quantity={cartQuantity}
         onIncrement={() => setCartQuantity(prev => Math.min(prev + 1, 99))}
         onDecrement={() => setCartQuantity(prev => Math.max(prev - 1, 1))}

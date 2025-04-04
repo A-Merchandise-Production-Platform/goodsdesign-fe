@@ -147,8 +147,8 @@ export default function TshirtModel({
         enablePan={false}
         minPolarAngle={Math.PI / 3.5}
         maxPolarAngle={Math.PI / 1.5}
-        minDistance={0.2}
-        maxDistance={0.5}
+        minDistance={0.24}
+        maxDistance={0.4}
       />
     </Canvas>
   );

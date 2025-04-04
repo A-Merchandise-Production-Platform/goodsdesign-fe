@@ -1,13 +1,43 @@
 import React from 'react';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { formatPrice } from '@/lib/utils';
+import { DesignObject } from '@/types/design-object';
 
 interface ViewSelectorProps {
   view: string;
   onViewChange: (view: string) => void;
+  designPositions?: Array<{
+    positionType?: {
+      positionName: string;
+      basePrice: number;
+    } | null;
+  }> | null;
+  designs: Record<string, DesignObject[]>;
 }
 
-const ViewSelector: React.FC<ViewSelectorProps> = ({ view, onViewChange }) => {
+const ViewSelector: React.FC<ViewSelectorProps> = ({
+  view,
+  onViewChange,
+  designPositions,
+  designs
+}) => {
+  const renderPrice = (positionName: string) => {
+    const hasDesigns = designs[positionName.toLowerCase()]?.length > 0;
+    if (!hasDesigns) return null;
+
+    const position = designPositions?.find(
+      pos => pos.positionType?.positionName.toLowerCase() === positionName.toLowerCase()
+    );
+    const price = position?.positionType?.basePrice || 0;
+
+    return (
+      <span className="text-muted-foreground text-xs">
+        (+{formatPrice(price)})
+      </span>
+    );
+  };
+
   return (
     <Tabs
       value={view}
@@ -15,10 +45,22 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({ view, onViewChange }) => {
       className="w-[64rem] border-b"
     >
       <TabsList className="z-40 w-full justify-start rounded-none">
-        <TabsTrigger value="front">Front</TabsTrigger>
-        <TabsTrigger value="back">Back</TabsTrigger>
-        <TabsTrigger value="left sleeve">Left sleeve</TabsTrigger>
-        <TabsTrigger value="right sleeve">Right sleeve</TabsTrigger>
+        <TabsTrigger value="front">
+          Front
+          {renderPrice('front')}
+        </TabsTrigger>
+        <TabsTrigger value="back">
+          Back
+          {renderPrice('back')}
+        </TabsTrigger>
+        <TabsTrigger value="left sleeve">
+          Left sleeve
+          {renderPrice('left sleeve')}
+        </TabsTrigger>
+        <TabsTrigger value="right sleeve">
+          Right sleeve
+          {renderPrice('right sleeve')}
+        </TabsTrigger>
       </TabsList>
     </Tabs>
   );

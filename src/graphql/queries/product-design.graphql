@@ -106,3 +106,21 @@ mutation UpdateThumbnailProductDesign(
   }
   deleteFile(fileUrl: $fileUrl)
 }
+
+query ProductDesignTemplates {
+  productDesigns {
+    id
+    isPublic
+    isTemplate
+    isFinalized
+    thumbnailUrl
+    designPositions {
+      positionType {
+        id
+        positionName
+        basePrice
+      }
+      designJSON
+    }
+  }
+}

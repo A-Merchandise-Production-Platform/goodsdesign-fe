@@ -29,7 +29,7 @@ export function DesignCard({
   return (
     <Card className="h-full overflow-hidden pt-0 transition-all hover:shadow-md">
       <CardContent className="flex h-full flex-col p-0">
-        <div className="group relative h-[180px] w-full">
+        <div className="group relative h-[320px] w-full">
           <Image
             src={image || '/placeholder.svg'}
             alt={name}
