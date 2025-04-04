@@ -161,9 +161,19 @@ export default function ProductDesigner({
   }, [infoData]);
 
   const getVariant = (size: string, color: string) => {
-    return infoData?.product.variants?.find(
+    const variant = infoData?.product.variants?.find(
       v => v.size === size && v.color === color,
     );
+
+    if (!variant) return undefined;
+
+    return {
+      id: variant.id,
+      price: variant.price ?? 0, // Provide default value for nullable price
+      color: variant.color ?? '', // Provide default value for nullable color
+      size: variant.size ?? '', // Provide default value for nullable size
+      model: variant.model ?? '', // Provide default value for nullable model
+    };
   };
 
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
