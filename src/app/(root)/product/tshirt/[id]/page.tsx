@@ -8,6 +8,7 @@ import {
   useCreateCartItemMutation,
   useProductDesignByIdQuery,
   useUpdateDesignPositionMutation,
+  useUpdateProductDesignMutation,
   useUpdateThumbnailProductDesignMutation,
 } from '@/graphql/generated/graphql';
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
@@ -28,6 +29,7 @@ export default function Page() {
   const [updateDesignPosition] = useUpdateDesignPositionMutation();
   const [createCartItem, { loading: cartLoading }] =
     useCreateCartItemMutation();
+  const [updateVariant] = useUpdateProductDesignMutation();
   const [updateThumbnailProductDesign] =
     useUpdateThumbnailProductDesignMutation();
 
@@ -40,7 +42,7 @@ export default function Page() {
       setCurrentThumbnailUrl(proDesData.productDesign.thumbnailUrl);
     }
   }, [proDesData]);
-  console.log(proDesData);
+  // console.log(proDesData);
 
   const handleThumbnail = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -96,7 +98,6 @@ export default function Page() {
       if (result.data?.uploadFile?.url) {
         const fileUrl = result.data.uploadFile.url;
         toast.success(`File uploaded successfully!`);
-        console.log('Upload successful, URL:', fileUrl);
         return fileUrl;
       } else {
         toast.error('Upload completed but no URL was returned');
@@ -130,8 +131,10 @@ export default function Page() {
     <div className="container mx-auto min-h-screen">
       <ProductDesigner
         initialDesigns={proDesData?.productDesign?.designPositions}
+        productVariant={proDesData?.productDesign?.systemConfigVariant}
         onUpload={handleUploadFile}
         onThumbnail={handleThumbnail}
+        onUpdateVariant={updateVariant}
         onUpdatePosition={updateDesignPosition}
         onCreateCartItem={createCartItem}
         cartLoading={cartLoading}

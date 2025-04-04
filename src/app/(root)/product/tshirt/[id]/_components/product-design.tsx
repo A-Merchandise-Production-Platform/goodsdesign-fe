@@ -4,6 +4,7 @@ import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import * as THREE from 'three';
+import { useGetProductInformationByIdQuery } from '@/graphql/generated/graphql';
 
 import DesignCanvas from './design-canvas';
 import DesignFooter from './design-footer';
@@ -30,14 +31,30 @@ interface DesignPosition {
   } | null;
 }
 
+interface ProductVariant {
+  id: string;
+  price?: number | null;
+  color?: string | null;
+  size?: string | null;
+  model?: string | null;
+  __typename?: 'SystemConfigVariantEntity';
+}
+
 interface ProductDesignerComponentProps {
   initialDesigns?: DesignPosition[] | null;
+  productVariant?: ProductVariant | null;
   onUpload?: (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => Promise<string | null | undefined>;
   onThumbnail?: (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => Promise<string | null | undefined>;
+  onUpdateVariant?: (options: {
+    variables: {
+      updateProductDesignId: string;
+      input: { systemConfigVariantId: string };
+    };
+  }) => void;
   onUpdatePosition?: (options: {
     variables: {
       input: {
@@ -61,8 +78,10 @@ interface ProductDesignerComponentProps {
 
 export default function ProductDesigner({
   initialDesigns = [],
+  productVariant,
   onUpload,
   onThumbnail,
+  onUpdateVariant,
   onUpdatePosition,
   onCreateCartItem,
   cartLoading,
@@ -99,10 +118,54 @@ export default function ProductDesigner({
     };
     setModelExportCallback(() => handleModelCapture);
   };
+  const { data: infoData } = useGetProductInformationByIdQuery({
+    variables: {
+      productId: 'prod001',
+    },
+  });
+
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [selectedColor, setSelectedColor] = useState<string>('');
   const [view, setView] = useState('front');
-  const [currentTexture, setCurrentTexture] = useState<string>(
-    SHIRT_COLORS[0].path,
-  );
+  const [currentTexture, setCurrentTexture] = useState<string>(() => {
+    if (productVariant?.color) {
+      // Find matching color in SHIRT_COLORS
+      const matchingColor = SHIRT_COLORS.find(
+        color =>
+          color.color.toLowerCase() === productVariant.color?.toLowerCase(),
+      );
+      return matchingColor?.path || SHIRT_COLORS[0].path;
+    }
+    return SHIRT_COLORS[0].path;
+  });
+
+  useEffect(() => {
+    if (productVariant?.color) {
+      const matchingColor = SHIRT_COLORS.find(
+        color =>
+          color.name.toLowerCase() === productVariant.color?.toLowerCase(),
+      );
+      if (matchingColor?.path) {
+        setCurrentTexture(matchingColor.path);
+        setSelectedColor(productVariant.color);
+      }
+    }
+  }, [productVariant]);
+
+  useEffect(() => {
+    if (infoData?.product.variants && infoData.product.variants.length > 0) {
+      const firstVariant = infoData.product.variants[0];
+      if (firstVariant.size) setSelectedSize(firstVariant.size);
+      if (firstVariant.color) setSelectedColor(firstVariant.color);
+    }
+  }, [infoData]);
+
+  const getVariant = (size: string, color: string) => {
+    return infoData?.product.variants?.find(
+      v => v.size === size && v.color === color,
+    );
+  };
+
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
   const [showColorDialog, setShowColorDialog] = useState(false);
   const [designsInitialized, setDesignsInitialized] = useState(false);
@@ -749,8 +812,6 @@ export default function ProductDesigner({
     // Add keyboard event listener
     document.addEventListener('keydown', handleKeyDown);
 
-    fabricCanvasRef.current.renderAll();
-
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       if (fabricCanvasRef.current) {
@@ -762,13 +823,21 @@ export default function ProductDesigner({
         clearTimeout(textureUpdateTimeoutRef.current);
       }
     };
-  }, [view, currentTexture]);
+  }, [view]);
+
+  // This useEffect only handles texture changes
+  useEffect(() => {
+    if (!fabricCanvasRef.current) return;
+
+    // Load background texture
+    loadBackgroundTexture(currentTexture);
+  }, [currentTexture, fabricCanvasRef.current]);
 
   // Load saved design when view changes or after initialization delay
   useEffect(() => {
     if (!fabricCanvasRef.current || !designsInitialized) return;
     loadSavedDesign();
-  }, [view, designsInitialized]);
+  }, [view, designsInitialized, currentTexture]);
 
   // Update 3D model when designs change
   useEffect(() => {
@@ -965,6 +1034,13 @@ export default function ProductDesigner({
           onImageUpload={handleImageUpload}
           onAddText={addText}
           designs={designs[view] || []}
+          productInfo={infoData?.product}
+          selectedSize={selectedSize}
+          selectedColor={selectedColor}
+          onSizeChange={setSelectedSize}
+          getVariant={getVariant}
+          onUpdateVariant={onUpdateVariant}
+          designId={designId}
           onReorderLayers={(startIndex: number, endIndex: number) => {
             if (!fabricCanvasRef.current) return;
 
