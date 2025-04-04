@@ -4,14 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatPrice } from '@/lib/utils';
 
-type DesignCategory = 'T-Shirt' | 'Phone Case';
-
 interface DesignCardProps {
   name: string;
   price?: number;
   image?: string;
   description?: string;
-  category: DesignCategory;
+  category: string;
 }
 
 export function DesignCard({
@@ -21,7 +19,7 @@ export function DesignCard({
   description,
   category,
 }: DesignCardProps) {
-  const categoryStyles: Record<DesignCategory, string> = {
+  const categoryStyles: any = {
     'T-Shirt': 'bg-blue-100 text-blue-800',
     'Phone Case': 'bg-purple-100 text-purple-800',
   };
