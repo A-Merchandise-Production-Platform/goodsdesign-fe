@@ -34,7 +34,7 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({
     const price = position?.positionType?.basePrice || 0;
 
     return (
-      <span className="text-muted-foreground text-xs">
+      <span className="text-muted-foreground text-sm">
         (+{formatPrice(price)})
       </span>
     );
@@ -47,19 +47,19 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({
       className="w-[64rem] border-b"
     >
       <TabsList className="z-40 w-full justify-start rounded-none">
-        <TabsTrigger value="front">
+        <TabsTrigger className="text-base" value="front">
           Front
           {renderPrice('front')}
         </TabsTrigger>
-        <TabsTrigger value="back">
+        <TabsTrigger className="text-base" value="back">
           Back
           {renderPrice('back')}
         </TabsTrigger>
-        <TabsTrigger value="left sleeve">
+        <TabsTrigger className="text-base" value="left sleeve">
           Left sleeve
           {renderPrice('left sleeve')}
         </TabsTrigger>
-        <TabsTrigger value="right sleeve">
+        <TabsTrigger className="text-base" value="right sleeve">
           Right sleeve
           {renderPrice('right sleeve')}
         </TabsTrigger>

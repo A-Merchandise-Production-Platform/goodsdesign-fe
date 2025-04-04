@@ -1,6 +1,12 @@
 'use client';
 
-import { MinusCircle, PlusCircle, ShoppingCart, Trash2 } from 'lucide-react';
+import {
+  Info,
+  MinusCircle,
+  PlusCircle,
+  ShoppingCart,
+  Trash2,
+} from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -9,6 +15,11 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   CartItemEntity,
   DesignPositionEntity,
@@ -84,9 +95,15 @@ export default function CartPage() {
       };
     }
     const blankPrice = item.design.systemConfigVariant.price || 0;
+    // Calculate total for positions that have designs
     const positionPrices = item.design.designPositions.reduce(
-      (total: number, position: DesignPositionEntity) =>
-        total + (position?.positionType?.basePrice || 0),
+      (total: number, position: DesignPositionEntity) => {
+        // Only add price if position has designJSON (has design)
+        if (position.designJSON && position.designJSON.length > 0) {
+          return total + (position.positionType?.basePrice || 0);
+        }
+        return total;
+      },
       0,
     );
 
@@ -252,11 +269,15 @@ export default function CartPage() {
             const product = item?.design?.systemConfigVariant?.product;
             const variant = item?.design?.systemConfigVariant;
 
-            const positions = item?.design?.designPositions
-              ?.map(
-                (pos: DesignPositionEntity) => pos.positionType?.positionName,
-              )
-              .join(', ');
+            // Filter positions that have designs and get their names and prices
+            const activePositions = item?.design?.designPositions
+              ?.filter(pos => pos.designJSON && pos.designJSON.length > 0)
+              ?.map((pos: DesignPositionEntity) => ({
+                name: pos.positionType?.positionName || '',
+                price: pos.positionType?.basePrice || 0,
+              }));
+
+            const positionNames = activePositions?.map(p => p.name).join(', ');
 
             return (
               <Card key={item.id} className="mb-4 overflow-hidden">
@@ -268,14 +289,13 @@ export default function CartPage() {
                       onCheckedChange={checked =>
                         handleItemSelect(item.id, !!checked)
                       }
-                      className="border-white"
                     />
                   </div>
 
                   <div className="bg-muted relative mx-auto h-32 w-32 flex-shrink-0 rounded-md sm:mx-0">
                     <Image
                       src={
-                        product?.imageUrl ||
+                        item.design?.thumbnailUrl ||
                         '/placeholder.svg?height=128&width=128'
                       }
                       alt={product?.name || 'Product image'}
@@ -290,17 +310,18 @@ export default function CartPage() {
                         <h3 className="text-lg font-semibold">
                           {product?.name}
                         </h3>
-                        <p className="text-muted-foreground mt-1 text-sm">
-                          Size: {variant?.size} • Color:{' '}
+                        <div className="mt-1 flex items-center gap-2">
+                          <p className="text-muted-foreground text-sm">Size:</p>
+                          <p>{variant?.size}</p>
+                        </div>
+                        <p className="text-muted-foreground mt-1 flex items-center gap-2 text-sm">
+                          Color:
                           <span
-                            className="inline-block h-3 w-3 rounded-full border"
+                            className="mt-[2px] inline-block h-4 w-4 rounded-full border"
                             style={{
                               backgroundColor: variant?.color || '#ffffff',
                             }}
                           ></span>
-                        </p>
-                        <p className="text-muted-foreground text-sm">
-                          Positions: {positions}
                         </p>
                         {item?.design?.isTemplate && (
                           <Badge variant="outline" className="mt-1">
@@ -310,11 +331,49 @@ export default function CartPage() {
                       </div>
 
                       <div className="mt-2 text-right sm:mt-0">
-                        <div className="font-semibold">
-                          {formatPrice(totalPrice)}
-                        </div>
-                        <div className="text-muted-foreground text-sm">
-                          {formatPrice(unitPrice)} each
+                        <div className="flex items-center justify-end gap-2">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button className="hover:text-primary">
+                                <Info className="h-4 w-4" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-[200px] space-y-2"
+                              align="end"
+                            >
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm">Base Price:</span>
+                                  <span className="text-muted-foreground">
+                                    {formatPrice(variant?.price || 0)}
+                                  </span>
+                                </div>
+                                {activePositions?.map(pos => (
+                                  <div
+                                    key={pos.name}
+                                    className="flex items-center justify-between"
+                                  >
+                                    <span className="text-sm capitalize">
+                                      {pos.name}:
+                                    </span>
+                                    <span className="text-muted-foreground">
+                                      +{formatPrice(pos.price)}
+                                    </span>
+                                  </div>
+                                ))}
+                                <div className="border-t pt-2">
+                                  <div className="flex items-center justify-between font-medium">
+                                    <span className="text-sm">Per Item:</span>
+                                    <span>{formatPrice(unitPrice)}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                          <span className="font-semibold">
+                            {formatPrice(totalPrice)}
+                          </span>
                         </div>
                         {discountApplied && (
                           <Badge variant="secondary" className="mt-1">
