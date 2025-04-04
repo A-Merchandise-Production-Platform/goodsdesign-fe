@@ -53,9 +53,9 @@ const DesignFooter: React.FC<DesignFooterProps> = ({
           <TShirt className="h-full w-full p-4" />
         </div>
         <div>
-          <h3 className="font-semibold">T-Shirt</h3>
-          <div className="flex items-center gap-2 text-sm text-gray-400">
-            <span>{formatPrice(totalPrice)}</span>
+          <h3 className="text-lg font-semibold">T-Shirt</h3>
+          <div className="flex items-center gap-2">
+            <span className="text-gray-400">{formatPrice(totalPrice)}</span>
             {activePositions.length > 0 && (
               <Popover>
                 <PopoverTrigger asChild>

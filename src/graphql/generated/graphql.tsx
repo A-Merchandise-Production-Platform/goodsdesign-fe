@@ -1645,29 +1645,25 @@ export type GetUserCartItemsQuery = {
   __typename?: 'Query';
   userCartItems: Array<{
     __typename?: 'CartItemEntity';
-    userId: string;
-    quantity: number;
     id: string;
+    quantity: number;
     design?: {
       __typename?: 'ProductDesignEntity';
-      isTemplate: boolean;
-      isPublic: boolean;
-      isFinalized: boolean;
+      thumbnailUrl?: string | null;
       systemConfigVariant?: {
         __typename?: 'SystemConfigVariantEntity';
-        color?: string | null;
         id: string;
+        price?: number | null;
+        color?: string | null;
+        size?: string | null;
+        model?: string | null;
         isActive: boolean;
         isDeleted: boolean;
-        model?: string | null;
-        price?: number | null;
-        productId: string;
-        size?: string | null;
         product: {
           __typename?: 'ProductEntity';
+          id: string;
           name: string;
           imageUrl?: string | null;
-          id: string;
           discounts?: Array<{
             __typename?: 'SystemConfigDiscountEntity';
             minQuantity: number;
@@ -1678,8 +1674,10 @@ export type GetUserCartItemsQuery = {
       } | null;
       designPositions?: Array<{
         __typename?: 'DesignPositionEntity';
+        designJSON?: any | null;
         positionType?: {
           __typename?: 'ProductPositionTypeEntity';
+          id: string;
           positionName: string;
           basePrice: number;
         } | null;
@@ -3576,21 +3574,20 @@ export type GetMeQueryResult = Apollo.QueryResult<
 export const GetUserCartItemsDocument = gql`
   query GetUserCartItems {
     userCartItems {
-      userId
-      quantity
       id
+      quantity
       design {
-        isTemplate
-        isPublic
-        isFinalized
+        thumbnailUrl
         systemConfigVariant {
-          color
           id
+          price
+          color
+          size
+          model
           isActive
           isDeleted
-          model
-          price
           product {
+            id
             name
             imageUrl
             discounts {
@@ -3598,16 +3595,15 @@ export const GetUserCartItemsDocument = gql`
               name
               discountPercent
             }
-            id
           }
-          productId
-          size
         }
         designPositions {
           positionType {
+            id
             positionName
             basePrice
           }
+          designJSON
         }
       }
     }
