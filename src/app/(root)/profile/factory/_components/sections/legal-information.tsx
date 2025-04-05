@@ -28,9 +28,10 @@ import { AddressSelector } from '@/components/shared/address/address-selector';
 
 interface LegalInformationProps {
   form: UseFormReturn<FactoryFormValues>;
+  disabled?: boolean;
 }
 
-export function LegalInformation({ form }: LegalInformationProps) {
+export function LegalInformation({ form, disabled }: LegalInformationProps) {
   return (
     <Card>
       <CardHeader>
@@ -66,6 +67,7 @@ export function LegalInformation({ form }: LegalInformationProps) {
                   <Input
                     placeholder="Link to your business license document"
                     {...field}
+                    disabled={disabled}
                   />
                 </FormControl>
                 {form.formState.errors.businessLicenseUrl ? (
@@ -101,7 +103,11 @@ export function LegalInformation({ form }: LegalInformationProps) {
                   </Tooltip>
                 </div>
                 <FormControl>
-                  <Input placeholder="Enter TIN" {...field} />
+                  <Input
+                    placeholder="Enter TIN"
+                    {...field}
+                    disabled={disabled}
+                  />
                 </FormControl>
                 {form.formState.errors.taxIdentificationNumber ? (
                   <FormMessage />
@@ -138,6 +144,7 @@ export function LegalInformation({ form }: LegalInformationProps) {
                 <AddressSelector
                   value={field.value}
                   onChange={field.onChange}
+                  disabled={disabled}
                 />
               </FormControl>
               {form.formState.errors.addressInput ? (

@@ -23,6 +23,7 @@ import {
 import { useAuthStore } from '@/stores/auth.store';
 import { useSocketIo } from '@/hooks/io/useSocketIO';
 import { useSocketStore } from '@/stores/socket-io-store';
+import MyAvatar from '@/components/shared/my-avatar';
 
 interface UserDropdownMenuProps {
   user: UserEntity;
@@ -50,12 +51,7 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
           variant="ghost"
           className="bg-muted relative h-9 w-9 rounded-full"
         >
-          <Avatar className="h-9 w-9 rounded-md">
-            <AvatarImage src={user.imageUrl || ''} alt={user.name || ''} />
-            <AvatarFallback>
-              {user.name?.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <MyAvatar imageUrl={user.imageUrl || ''} name={user.name || ''} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>

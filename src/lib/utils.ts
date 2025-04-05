@@ -30,3 +30,22 @@ export function formatDate(dateString: string) {
     minute: '2-digit',
   }).format(date);
 }
+
+export function getContrastColor(backgroundColor: string): string {
+  // Remove the hash if it exists
+  const color = backgroundColor.replace('#', '');
+
+  // Convert hex to RGB
+  const r = Number.parseInt(color.substring(0, 2), 16);
+  const g = Number.parseInt(color.substring(2, 4), 16);
+  const b = Number.parseInt(color.substring(4, 6), 16);
+
+  // Calculate perceived brightness using the formula:
+  // (R * 0.299 + G * 0.587 + B * 0.114)
+  // This formula is based on human perception of color
+  const brightness = r * 0.299 + g * 0.587 + b * 0.114;
+
+  // Use black text on light backgrounds, white text on dark backgrounds
+  // 128 is the middle value (out of 255)
+  return brightness > 128 ? '#000000' : '#ffffff';
+}

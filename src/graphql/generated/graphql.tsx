@@ -120,6 +120,13 @@ export type CreateCategoryDto = {
   name: Scalars['String']['input'];
 };
 
+export type CreateFactoryProductInput = {
+  estimatedProductionTime: Scalars['Int']['input'];
+  factoryId: Scalars['String']['input'];
+  productionCapacity: Scalars['Int']['input'];
+  systemConfigVariantId: Scalars['String']['input'];
+};
+
 export type CreateFactoryProgressReportDto = {
   /** The quantity of items completed in this progress report */
   completedQty: Scalars['Float']['input'];
@@ -276,7 +283,7 @@ export type FactoryEntity = {
   operationalHours?: Maybe<Scalars['String']['output']>;
   owner: UserEntity;
   printingMethods: Array<Scalars['String']['output']>;
-  products: Array<FactoryProductEntity>;
+  products?: Maybe<Array<FactoryProductEntity>>;
   qualityCertifications?: Maybe<Scalars['String']['output']>;
   reviewedAt?: Maybe<Scalars['DateTime']['output']>;
   reviewedBy?: Maybe<Scalars['String']['output']>;
@@ -354,9 +361,10 @@ export enum FactoryOrderStatus {
 export type FactoryProductEntity = {
   __typename?: 'FactoryProductEntity';
   estimatedProductionTime: Scalars['Int']['output'];
+  factory?: Maybe<FactoryEntity>;
   factoryId: Scalars['String']['output'];
-  id: Scalars['String']['output'];
   productionCapacity: Scalars['Int']['output'];
+  systemConfigVariant?: Maybe<SystemConfigVariantEntity>;
   systemConfigVariantId: Scalars['String']['output'];
 };
 
@@ -412,6 +420,7 @@ export type Mutation = {
   createCartItem: CartItemEntity;
   createCategory: CategoryEntity;
   createCheckQuality: CheckQuality;
+  createFactoryProduct: FactoryProductEntity;
   createFactoryProgressReport: FactoryProgressReport;
   createNotification: NotificationEntity;
   createNotificationForManyUsers: Array<NotificationEntity>;
@@ -428,6 +437,7 @@ export type Mutation = {
   deleteAddress: AddressEntity;
   deleteCartItem: CartItemEntity;
   deleteCategory: CategoryEntity;
+  deleteFactoryProduct: FactoryProductEntity;
   deleteFile: Scalars['Boolean']['output'];
   deleteProduct: ProductEntity;
   deleteUser: UserEntity;
@@ -457,6 +467,7 @@ export type Mutation = {
   updateFactoryInfo: FactoryEntity;
   updateFactoryOrderDetailStatus: FactoryOrder;
   updateFactoryOrderStatus: FactoryOrder;
+  updateFactoryProduct: FactoryProductEntity;
   updatePaymentTransaction: PaymentTransaction;
   updateProduct: ProductEntity;
   updateProductDesign: ProductDesignEntity;
@@ -511,6 +522,11 @@ export type MutationCreateCheckQualityArgs = {
   status: QualityCheckStatus;
   taskId: Scalars['ID']['input'];
   totalChecked: Scalars['Float']['input'];
+};
+
+
+export type MutationCreateFactoryProductArgs = {
+  data: CreateFactoryProductInput;
 };
 
 
@@ -598,6 +614,12 @@ export type MutationDeleteCartItemArgs = {
 
 export type MutationDeleteCategoryArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteFactoryProductArgs = {
+  factoryId: Scalars['String']['input'];
+  systemConfigVariantId: Scalars['String']['input'];
 };
 
 
@@ -744,6 +766,13 @@ export type MutationUpdateFactoryOrderDetailStatusArgs = {
 export type MutationUpdateFactoryOrderStatusArgs = {
   id: Scalars['ID']['input'];
   status: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateFactoryProductArgs = {
+  data: UpdateFactoryProductInput;
+  factoryId: Scalars['String']['input'];
+  systemConfigVariantId: Scalars['String']['input'];
 };
 
 
@@ -994,6 +1023,8 @@ export type Query = {
   factoryOrders: Array<FactoryOrder>;
   factoryOrdersByCustomerOrder: Array<FactoryOrder>;
   factoryOrdersByFactory: Array<FactoryOrder>;
+  factoryProduct: FactoryProductEntity;
+  factoryProducts: Array<FactoryProductEntity>;
   factoryProgressReport: FactoryProgressReport;
   factoryProgressReports: Array<FactoryProgressReport>;
   getAllDiscountByProductId: Array<SystemConfigDiscountEntity>;
@@ -1094,6 +1125,12 @@ export type QueryFactoryOrderArgs = {
 
 export type QueryFactoryOrdersByCustomerOrderArgs = {
   customerOrderId: Scalars['ID']['input'];
+};
+
+
+export type QueryFactoryProductArgs = {
+  factoryId: Scalars['String']['input'];
+  systemConfigVariantId: Scalars['String']['input'];
 };
 
 
@@ -1379,9 +1416,17 @@ export type UpdateFactoryInfoDto = {
   printingMethods?: InputMaybe<Array<Scalars['String']['input']>>;
   qualityCertifications?: InputMaybe<Scalars['String']['input']>;
   specializations?: InputMaybe<Array<Scalars['String']['input']>>;
+  systemConfigVariantIds?: InputMaybe<Array<Scalars['String']['input']>>;
   taxIdentificationNumber?: InputMaybe<Scalars['String']['input']>;
   totalEmployees?: InputMaybe<Scalars['Int']['input']>;
   website?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateFactoryProductInput = {
+  estimatedProductionTime?: InputMaybe<Scalars['Int']['input']>;
+  factoryId?: InputMaybe<Scalars['String']['input']>;
+  productionCapacity?: InputMaybe<Scalars['Int']['input']>;
+  systemConfigVariantId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateOrderDetailStatusDto = {
@@ -1625,14 +1670,14 @@ export type UpdateDesignPositionMutation = { __typename?: 'Mutation', updateDesi
 export type GetMyFactoryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMyFactoryQuery = { __typename?: 'Query', getMyFactory: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null }, products: Array<{ __typename?: 'FactoryProductEntity', id: string }> } };
+export type GetMyFactoryQuery = { __typename?: 'Query', getMyFactory: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null }, products?: Array<{ __typename?: 'FactoryProductEntity', estimatedProductionTime: number, productionCapacity: number, systemConfigVariantId: string, factoryId: string }> | null } };
 
 export type UpdateFactoryInfoMutationVariables = Exact<{
   updateFactoryInfoInput: UpdateFactoryInfoDto;
 }>;
 
 
-export type UpdateFactoryInfoMutation = { __typename?: 'Mutation', updateFactoryInfo: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null }, products: Array<{ __typename?: 'FactoryProductEntity', id: string }> } };
+export type UpdateFactoryInfoMutation = { __typename?: 'Mutation', updateFactoryInfo: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null }, products?: Array<{ __typename?: 'FactoryProductEntity', estimatedProductionTime: number, productionCapacity: number, systemConfigVariantId: string, factoryId: string }> | null } };
 
 export type UpdateFactoryOrderStatusMutationVariables = Exact<{
   updateFactoryOrderStatusId: Scalars['ID']['input'];
@@ -1868,6 +1913,18 @@ export type RemoveSystemConfigBankMutationVariables = Exact<{
 
 
 export type RemoveSystemConfigBankMutation = { __typename?: 'Mutation', removeSystemConfigBank: { __typename?: 'SystemConfigBankEntity', bin: string, id: string, code: string, isActive: boolean, isDeleted: boolean, logo: string, name: string, shortName: string } };
+
+export type GetSystemConfigVariantsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetSystemConfigVariantsQuery = { __typename?: 'Query', systemConfigVariants: Array<{ __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, size?: string | null, product: { __typename?: 'ProductEntity', id: string, imageUrl?: string | null, name: string, description?: string | null } }> };
+
+export type GetSystemConfigVariantsByProductQueryVariables = Exact<{
+  productId: Scalars['String']['input'];
+}>;
+
+
+export type GetSystemConfigVariantsByProductQuery = { __typename?: 'Query', systemConfigVariantsByProduct: Array<{ __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, size?: string | null, product: { __typename?: 'ProductEntity', id: string, imageUrl?: string | null, name: string, description?: string | null } }> };
 
 export type GetMyStaffTasksQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2724,7 +2781,10 @@ export const GetMyFactoryDocument = gql`
     }
     printingMethods
     products {
-      id
+      estimatedProductionTime
+      productionCapacity
+      systemConfigVariantId
+      factoryId
     }
     qualityCertifications
     specializations
@@ -2796,7 +2856,10 @@ export const UpdateFactoryInfoDocument = gql`
     }
     printingMethods
     products {
-      id
+      estimatedProductionTime
+      productionCapacity
+      systemConfigVariantId
+      factoryId
     }
     qualityCertifications
     specializations
@@ -4440,6 +4503,109 @@ export function useRemoveSystemConfigBankMutation(baseOptions?: Apollo.MutationH
 export type RemoveSystemConfigBankMutationHookResult = ReturnType<typeof useRemoveSystemConfigBankMutation>;
 export type RemoveSystemConfigBankMutationResult = Apollo.MutationResult<RemoveSystemConfigBankMutation>;
 export type RemoveSystemConfigBankMutationOptions = Apollo.BaseMutationOptions<RemoveSystemConfigBankMutation, RemoveSystemConfigBankMutationVariables>;
+export const GetSystemConfigVariantsDocument = gql`
+    query GetSystemConfigVariants {
+  systemConfigVariants {
+    color
+    id
+    isActive
+    isDeleted
+    model
+    price
+    product {
+      id
+      imageUrl
+      name
+      description
+    }
+    size
+  }
+}
+    `;
+
+/**
+ * __useGetSystemConfigVariantsQuery__
+ *
+ * To run a query within a React component, call `useGetSystemConfigVariantsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSystemConfigVariantsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSystemConfigVariantsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetSystemConfigVariantsQuery(baseOptions?: Apollo.QueryHookOptions<GetSystemConfigVariantsQuery, GetSystemConfigVariantsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetSystemConfigVariantsQuery, GetSystemConfigVariantsQueryVariables>(GetSystemConfigVariantsDocument, options);
+      }
+export function useGetSystemConfigVariantsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSystemConfigVariantsQuery, GetSystemConfigVariantsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetSystemConfigVariantsQuery, GetSystemConfigVariantsQueryVariables>(GetSystemConfigVariantsDocument, options);
+        }
+export function useGetSystemConfigVariantsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetSystemConfigVariantsQuery, GetSystemConfigVariantsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetSystemConfigVariantsQuery, GetSystemConfigVariantsQueryVariables>(GetSystemConfigVariantsDocument, options);
+        }
+export type GetSystemConfigVariantsQueryHookResult = ReturnType<typeof useGetSystemConfigVariantsQuery>;
+export type GetSystemConfigVariantsLazyQueryHookResult = ReturnType<typeof useGetSystemConfigVariantsLazyQuery>;
+export type GetSystemConfigVariantsSuspenseQueryHookResult = ReturnType<typeof useGetSystemConfigVariantsSuspenseQuery>;
+export type GetSystemConfigVariantsQueryResult = Apollo.QueryResult<GetSystemConfigVariantsQuery, GetSystemConfigVariantsQueryVariables>;
+export const GetSystemConfigVariantsByProductDocument = gql`
+    query GetSystemConfigVariantsByProduct($productId: String!) {
+  systemConfigVariantsByProduct(productId: $productId) {
+    color
+    id
+    isActive
+    isDeleted
+    model
+    price
+    product {
+      id
+      imageUrl
+      name
+      description
+    }
+    size
+  }
+}
+    `;
+
+/**
+ * __useGetSystemConfigVariantsByProductQuery__
+ *
+ * To run a query within a React component, call `useGetSystemConfigVariantsByProductQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSystemConfigVariantsByProductQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSystemConfigVariantsByProductQuery({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *   },
+ * });
+ */
+export function useGetSystemConfigVariantsByProductQuery(baseOptions: Apollo.QueryHookOptions<GetSystemConfigVariantsByProductQuery, GetSystemConfigVariantsByProductQueryVariables> & ({ variables: GetSystemConfigVariantsByProductQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetSystemConfigVariantsByProductQuery, GetSystemConfigVariantsByProductQueryVariables>(GetSystemConfigVariantsByProductDocument, options);
+      }
+export function useGetSystemConfigVariantsByProductLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSystemConfigVariantsByProductQuery, GetSystemConfigVariantsByProductQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetSystemConfigVariantsByProductQuery, GetSystemConfigVariantsByProductQueryVariables>(GetSystemConfigVariantsByProductDocument, options);
+        }
+export function useGetSystemConfigVariantsByProductSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetSystemConfigVariantsByProductQuery, GetSystemConfigVariantsByProductQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetSystemConfigVariantsByProductQuery, GetSystemConfigVariantsByProductQueryVariables>(GetSystemConfigVariantsByProductDocument, options);
+        }
+export type GetSystemConfigVariantsByProductQueryHookResult = ReturnType<typeof useGetSystemConfigVariantsByProductQuery>;
+export type GetSystemConfigVariantsByProductLazyQueryHookResult = ReturnType<typeof useGetSystemConfigVariantsByProductLazyQuery>;
+export type GetSystemConfigVariantsByProductSuspenseQueryHookResult = ReturnType<typeof useGetSystemConfigVariantsByProductSuspenseQuery>;
+export type GetSystemConfigVariantsByProductQueryResult = Apollo.QueryResult<GetSystemConfigVariantsByProductQuery, GetSystemConfigVariantsByProductQueryVariables>;
 export const GetMyStaffTasksDocument = gql`
     query GetMyStaffTasks {
   myStaffTasks {

@@ -37,9 +37,10 @@ import { FactoryFormValues } from '../factory-form-schema';
 
 interface BasicInformationProps {
   form: UseFormReturn<FactoryFormValues>;
+  disabled?: boolean;
 }
 
-export function BasicInformation({ form }: BasicInformationProps) {
+export function BasicInformation({ form, disabled }: BasicInformationProps) {
   return (
     <Card>
       <CardHeader>
@@ -68,7 +69,11 @@ export function BasicInformation({ form }: BasicInformationProps) {
                 </Tooltip>
               </div>
               <FormControl>
-                <Input placeholder="Enter factory name" {...field} />
+                <Input
+                  placeholder="Enter factory name"
+                  {...field}
+                  disabled={disabled}
+                />
               </FormControl>
               {form.formState.errors.name ? (
                 <FormMessage />
@@ -106,6 +111,7 @@ export function BasicInformation({ form }: BasicInformationProps) {
                   placeholder="Describe your factory and its capabilities"
                   className="min-h-32"
                   {...field}
+                  disabled={disabled}
                 />
               </FormControl>
               {form.formState.errors.description ? (
@@ -142,7 +148,11 @@ export function BasicInformation({ form }: BasicInformationProps) {
                   </Tooltip>
                 </div>
                 <FormControl>
-                  <Input placeholder="https://yourfactory.com" {...field} />
+                  <Input
+                    placeholder="https://yourfactory.com"
+                    {...field}
+                    disabled={disabled}
+                  />
                 </FormControl>
                 {form.formState.errors.website ? (
                   <FormMessage />

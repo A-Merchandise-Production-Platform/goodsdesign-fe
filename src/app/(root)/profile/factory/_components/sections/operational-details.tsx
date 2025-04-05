@@ -27,9 +27,13 @@ import { FactoryFormValues } from '../factory-form-schema';
 
 interface OperationalDetailsProps {
   form: UseFormReturn<FactoryFormValues>;
+  disabled?: boolean;
 }
 
-export function OperationalDetails({ form }: OperationalDetailsProps) {
+export function OperationalDetails({
+  form,
+  disabled,
+}: OperationalDetailsProps) {
   return (
     <Card>
       <CardHeader>
@@ -66,6 +70,7 @@ export function OperationalDetails({ form }: OperationalDetailsProps) {
                     min={1}
                     placeholder="Number of employees"
                     {...field}
+                    disabled={disabled}
                     onChange={e =>
                       field.onChange(
                         e.target.value ? parseInt(e.target.value) : undefined,
@@ -111,6 +116,7 @@ export function OperationalDetails({ form }: OperationalDetailsProps) {
                     min={0}
                     placeholder="Units per day"
                     {...field}
+                    disabled={disabled}
                     onChange={e =>
                       field.onChange(
                         e.target.value ? parseInt(e.target.value) : undefined,
@@ -155,6 +161,7 @@ export function OperationalDetails({ form }: OperationalDetailsProps) {
                 <Input
                   placeholder="e.g., Mon-Fri: 9AM-5PM, Sat: 9AM-12PM"
                   {...field}
+                  disabled={disabled}
                 />
               </FormControl>
               {form.formState.errors.operationalHours ? (
@@ -196,6 +203,7 @@ export function OperationalDetails({ form }: OperationalDetailsProps) {
                     type="number"
                     placeholder="Average production time in days"
                     {...field}
+                    disabled={disabled}
                     onChange={e =>
                       field.onChange(
                         e.target.value ? parseInt(e.target.value) : undefined,
@@ -239,6 +247,7 @@ export function OperationalDetails({ form }: OperationalDetailsProps) {
                     type="number"
                     placeholder="Minimum units per order"
                     {...field}
+                    disabled={disabled}
                     onChange={e =>
                       field.onChange(
                         e.target.value ? parseInt(e.target.value) : undefined,

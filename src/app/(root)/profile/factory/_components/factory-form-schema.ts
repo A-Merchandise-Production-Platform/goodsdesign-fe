@@ -44,6 +44,9 @@ export const factoryFormSchema = z.object({
   contactPersonName: z.string().optional(),
   contactPersonRole: z.string().optional(),
   contactPersonPhone: z.string().optional(),
+
+  // Product Variants
+  systemConfigVariantIds: z.array(z.string()).optional(),
 });
 
 export type FactoryFormValues = z.infer<typeof factoryFormSchema>;
@@ -72,4 +75,5 @@ export const defaultValues: Partial<FactoryFormValues> = {
   operationalHours: '',
   leadTime: undefined,
   minimumOrderQuantity: undefined,
+  systemConfigVariantIds: [],
 };
