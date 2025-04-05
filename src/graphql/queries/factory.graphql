@@ -1,6 +1,12 @@
 query GetMyFactory {
   getMyFactory {
-    addressId
+    address {
+      id
+      districtID
+      provinceID
+      street
+      wardCode
+    }
     businessLicenseUrl
     contactPersonName
     contactPersonPhone
@@ -21,7 +27,10 @@ query GetMyFactory {
     }
     printingMethods
     products {
-      id
+      estimatedProductionTime
+      productionCapacity
+      systemConfigVariantId
+      factoryId
     }
     qualityCertifications
     specializations
@@ -33,7 +42,13 @@ query GetMyFactory {
 
 mutation UpdateFactoryInfo($updateFactoryInfoInput: UpdateFactoryInfoDto!) {
   updateFactoryInfo(updateFactoryInfoInput: $updateFactoryInfoInput) {
-    addressId
+    address {
+      id
+      districtID
+      provinceID
+      street
+      wardCode
+    }
     businessLicenseUrl
     contactPersonName
     contactPersonPhone
@@ -54,7 +69,10 @@ mutation UpdateFactoryInfo($updateFactoryInfoInput: UpdateFactoryInfoDto!) {
     }
     printingMethods
     products {
-      id
+      estimatedProductionTime
+      productionCapacity
+      systemConfigVariantId
+      factoryId
     }
     qualityCertifications
     specializations

@@ -4,6 +4,7 @@ import { HomeIcon, ListIcon, Pen, ShoppingBag } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
+import FactoryStatusCheck from '@/app/(root)/factory/_components/factory-status-check';
 
 export default function FactoryOwnerSidebarLayout({
   children,
@@ -34,5 +35,9 @@ export default function FactoryOwnerSidebarLayout({
     },
   ];
 
-  return <MySidebar navItems={navItems}>{children}</MySidebar>;
+  return (
+    <FactoryStatusCheck>
+      <MySidebar navItems={navItems}>{children}</MySidebar>
+    </FactoryStatusCheck>
+  );
 }

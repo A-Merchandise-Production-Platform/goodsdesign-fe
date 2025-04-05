@@ -191,7 +191,13 @@ query GetFactoryOrder($factoryOrderId: ID!) {
     rejectedHistory {
       id
       factory {
-        addressId
+        address {
+          id
+          districtID
+          provinceID
+          street
+          wardCode
+        }
         businessLicenseUrl
         contactPersonName
         contactPersonPhone

@@ -26,6 +26,7 @@ export default function AuthProvider({
       console.log(error);
       toast.error(error.message);
     },
+    fetchPolicy: 'no-cache',
   });
 
   useEffect(() => {

@@ -24,17 +24,22 @@ import {
 } from '@/components/ui/tooltip';
 
 import { FactoryFormValues } from '../factory-form-schema';
+import { PhoneInput } from '@/components/ui/phone-input';
 
 interface ContactInformationProps {
   form: UseFormReturn<FactoryFormValues>;
+  disabled?: boolean;
 }
 
-export function ContactInformation({ form }: ContactInformationProps) {
+export function ContactInformation({
+  form,
+  disabled,
+}: ContactInformationProps) {
   return (
     <Card>
       <CardHeader>
         <CardTitle>Contact Information</CardTitle>
-        <CardDescription>Details of the primary contact person</CardDescription>
+        <CardDescription>Factory contact details</CardDescription>
       </CardHeader>
       <CardContent className="space-y-8 pt-4">
         <FormField
@@ -50,97 +55,107 @@ export function ContactInformation({ form }: ContactInformationProps) {
                   </TooltipTrigger>
                   <TooltipContent className="max-w-80">
                     <p>
-                      Enter the full name of the primary person responsible for
-                      handling client inquiries and orders. This should be
-                      someone who is authorized to provide information and make
-                      decisions.
+                      Enter the name of the primary contact person at your
+                      factory. This person will be responsible for communication
+                      with customers.
                     </p>
                   </TooltipContent>
                 </Tooltip>
               </div>
               <FormControl>
-                <Input placeholder="Full name of contact person" {...field} />
+                <Input
+                  placeholder="Enter contact person name"
+                  {...field}
+                  disabled={disabled}
+                />
               </FormControl>
               {form.formState.errors.contactPersonName ? (
                 <FormMessage />
               ) : (
                 <FormDescription>
-                  The name of the primary contact person for inquiries
+                  Name of the primary contact person
                 </FormDescription>
               )}
             </FormItem>
           )}
         />
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="contactPersonRole"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex items-center gap-2">
-                  <FormLabel>Role/Position</FormLabel>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <HelpCircle className="text-muted-foreground h-4 w-4" />
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-80">
-                      <p>
-                        Specify the job title or position of the contact person
-                        within your organization. This helps clients understand
-                        their authority level and responsibilities.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <FormControl>
-                  <Input placeholder="e.g., Production Manager" {...field} />
-                </FormControl>
-                {form.formState.errors.contactPersonRole ? (
-                  <FormMessage />
-                ) : (
-                  <FormDescription>
-                    The job title or position of the contact person
-                  </FormDescription>
-                )}
-              </FormItem>
-            )}
-          />
+        <FormField
+          control={form.control}
+          name="contactPersonRole"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-center gap-2">
+                <FormLabel>Contact Person Role</FormLabel>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="text-muted-foreground h-4 w-4" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-80">
+                    <p>
+                      Enter the role or position of the contact person at your
+                      factory. This helps customers understand who they are
+                      communicating with.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <FormControl>
+                <Input
+                  placeholder="Enter contact person role"
+                  {...field}
+                  disabled={disabled}
+                />
+              </FormControl>
+              {form.formState.errors.contactPersonRole ? (
+                <FormMessage />
+              ) : (
+                <FormDescription>
+                  Role or position of the contact person
+                </FormDescription>
+              )}
+            </FormItem>
+          )}
+        />
 
-          <FormField
-            control={form.control}
-            name="contactPersonPhone"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex items-center gap-2">
-                  <FormLabel>Phone Number</FormLabel>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <HelpCircle className="text-muted-foreground h-4 w-4" />
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-80">
-                      <p>
-                        Provide a direct phone number for business inquiries,
-                        including the country code. This should be a number that
-                        is regularly monitored during business hours.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <FormControl>
-                  <Input placeholder="+1 (555) 123-4567" {...field} />
-                </FormControl>
-                {form.formState.errors.contactPersonPhone ? (
-                  <FormMessage />
-                ) : (
-                  <FormDescription>
-                    Direct phone number for business inquiries
-                  </FormDescription>
-                )}
-              </FormItem>
-            )}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="contactPersonPhone"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-center gap-2">
+                <FormLabel>Contact Person Phone</FormLabel>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="text-muted-foreground h-4 w-4" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-80">
+                    <p>
+                      Enter the phone number of the contact person. This should
+                      be a number where they can be reached during business
+                      hours.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <FormControl>
+                <PhoneInput
+                  placeholder="Enter contact person phone"
+                  {...field}
+                  disabled={disabled}
+                  defaultCountry="VN"
+                />
+              </FormControl>
+              {form.formState.errors.contactPersonPhone ? (
+                <FormMessage />
+              ) : (
+                <FormDescription>
+                  Phone number of the contact person
+                </FormDescription>
+              )}
+            </FormItem>
+          )}
+        />
       </CardContent>
     </Card>
   );

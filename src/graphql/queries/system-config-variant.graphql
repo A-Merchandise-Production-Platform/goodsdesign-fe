@@ -1,0 +1,35 @@
+query GetSystemConfigVariants {
+  systemConfigVariants {
+    color
+    id
+    isActive
+    isDeleted
+    model
+    price
+    product {
+      id
+      imageUrl
+      name
+      description
+    }
+    size
+  }
+}
+
+query GetSystemConfigVariantsByProduct($productId: String!) {
+  systemConfigVariantsByProduct(productId: $productId) {
+    color
+    id
+    isActive
+    isDeleted
+    model
+    price
+    product {
+      id
+      imageUrl
+      name
+      description
+    }
+    size
+  }
+}

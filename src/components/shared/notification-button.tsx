@@ -27,9 +27,12 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 
 export default function NotificationButton() {
-  const { data, loading, refetch } = useMyNotificationsQuery();
+  const { data, loading, refetch } = useMyNotificationsQuery({
+    fetchPolicy: 'no-cache',
+  });
   const { socket } = useSocketStore();
   const unreadCount = data?.myNotifications.filter(n => !n.isRead).length ?? 0;
 
@@ -53,9 +56,15 @@ export default function NotificationButton() {
         <Button variant="outline" size="icon" className="relative">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
-              {unreadCount}
-            </span>
+            // <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
+            //   {unreadCount}
+            // </span>
+            <Badge
+              variant="destructive"
+              className="absolute -top-2 -right-2 h-5 min-w-5 rounded-full px-1.5 text-xs"
+            >
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </Badge>
           )}
         </Button>
       </DropdownMenuTrigger>
@@ -70,7 +79,7 @@ export default function NotificationButton() {
             </span>
           )}
         </div>
-        <ScrollArea className="h-[400px] flex-1">
+        <ScrollArea className="flex max-h-[400px] flex-col overflow-y-auto">
           {!data?.myNotifications?.length ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <Bell className="text-muted-foreground/50 h-12 w-12" />
@@ -154,7 +163,7 @@ function NotificationItem({
           <div className="space-y-2">
             <p className="font-medium">{notification.title}</p>
             <p className="text-sm">{notification.content}</p>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs">
               {formatDistanceToNow(new Date(notification.createdAt), {
                 addSuffix: true,
               })}

@@ -28,15 +28,19 @@ import { FactoryFormValues } from '../factory-form-schema';
 
 interface QualitySpecializationProps {
   form: UseFormReturn<FactoryFormValues>;
+  disabled?: boolean;
 }
 
-export function QualitySpecialization({ form }: QualitySpecializationProps) {
+export function QualitySpecialization({
+  form,
+  disabled,
+}: QualitySpecializationProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Quality and Specialization</CardTitle>
+        <CardTitle>Quality & Specialization</CardTitle>
         <CardDescription>
-          Your factory&apos;s expertise and quality standards
+          Quality certifications and specializations
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-8 pt-4">
@@ -53,25 +57,26 @@ export function QualitySpecialization({ form }: QualitySpecializationProps) {
                   </TooltipTrigger>
                   <TooltipContent className="max-w-80">
                     <p>
-                      List all quality certifications your factory has obtained
-                      such as ISO 9001, FSC, GMP, HACCP, or industry-specific
-                      certifications. Include the certification name, issue
-                      date, and validitity period where applicable.
+                      List your factory&apos;s quality certifications. These
+                      demonstrate your commitment to quality standards and
+                      manufacturing excellence.
                     </p>
                   </TooltipContent>
                 </Tooltip>
               </div>
               <FormControl>
                 <Textarea
-                  placeholder="List your quality certifications (e.g., ISO 9001, FSC, etc.)"
+                  placeholder="List your quality certifications"
+                  className="min-h-32"
                   {...field}
+                  disabled={disabled}
                 />
               </FormControl>
               {form.formState.errors.qualityCertifications ? (
                 <FormMessage />
               ) : (
                 <FormDescription>
-                  List all quality certifications your factory has obtained
+                  List your factory&apos;s quality certifications
                 </FormDescription>
               )}
             </FormItem>
@@ -91,27 +96,26 @@ export function QualitySpecialization({ form }: QualitySpecializationProps) {
                   </TooltipTrigger>
                   <TooltipContent className="max-w-80">
                     <p>
-                      Select all printing methods your factory is capable of
-                      providing. This helps potential customers understand your
-                      technical capabilities and match their project
-                      requirements to your services.
+                      Select the printing methods your factory specializes in.
+                      This helps customers understand your technical
+                      capabilities.
                     </p>
                   </TooltipContent>
                 </Tooltip>
               </div>
               <FormControl>
                 <TagsInput
-                  value={field.value || []}
-                  onChange={field.onChange}
                   placeholder="Add printing methods"
+                  value={field.value ?? []}
+                  onChange={field.onChange}
+                  disabled={disabled}
                 />
               </FormControl>
               {form.formState.errors.printingMethods ? (
                 <FormMessage />
               ) : (
                 <FormDescription>
-                  Common methods: Digital, Offset, Screen, Flexography, Gravure,
-                  Letterpress, 3D
+                  Select the printing methods your factory specializes in
                 </FormDescription>
               )}
             </FormItem>
@@ -131,27 +135,26 @@ export function QualitySpecialization({ form }: QualitySpecializationProps) {
                   </TooltipTrigger>
                   <TooltipContent className="max-w-80">
                     <p>
-                      Indicate the types of products your factory specializes in
-                      producing. Your specializations help customers find
-                      factories that are experienced in manufacturing their
-                      specific product types.
+                      List your factory&apos;s specializations. These are unique
+                      capabilities or areas of expertise that set you apart from
+                      competitors.
                     </p>
                   </TooltipContent>
                 </Tooltip>
               </div>
               <FormControl>
                 <TagsInput
-                  value={field.value || []}
-                  onChange={field.onChange}
                   placeholder="Add specializations"
+                  value={field.value ?? []}
+                  onChange={field.onChange}
+                  disabled={disabled}
                 />
               </FormControl>
               {form.formState.errors.specializations ? (
                 <FormMessage />
               ) : (
                 <FormDescription>
-                  Examples: Packaging, Books, Magazines, Brochures, Labels,
-                  Large Format
+                  List your factory&apos;s specializations
                 </FormDescription>
               )}
             </FormItem>

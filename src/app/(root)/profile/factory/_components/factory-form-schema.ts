@@ -21,7 +21,12 @@ export const factoryFormSchema = z.object({
     .optional()
     .or(z.literal('')),
   taxIdentificationNumber: z.string().optional(),
-  addressId: z.string().optional(),
+  addressInput: z.object({
+    provinceId: z.number().int().positive(),
+    districtId: z.number().int().positive(),
+    wardCode: z.string().min(1),
+    street: z.string().min(1),
+  }),
 
   // Operational Details
   totalEmployees: z.number().int().positive().optional(),
@@ -40,8 +45,8 @@ export const factoryFormSchema = z.object({
   contactPersonRole: z.string().optional(),
   contactPersonPhone: z.string().optional(),
 
-  // Submission
-  submit: z.boolean().optional(),
+  // Product Variants
+  systemConfigVariantIds: z.array(z.string()).optional(),
 });
 
 export type FactoryFormValues = z.infer<typeof factoryFormSchema>;
@@ -53,7 +58,12 @@ export const defaultValues: Partial<FactoryFormValues> = {
   website: '',
   businessLicenseUrl: '',
   taxIdentificationNumber: '',
-  addressId: '',
+  addressInput: {
+    provinceId: 202,
+    districtId: 1442,
+    wardCode: '20102',
+    street: '123 Main St',
+  },
   totalEmployees: undefined,
   maxPrintingCapacity: undefined,
   qualityCertifications: '',
@@ -65,5 +75,5 @@ export const defaultValues: Partial<FactoryFormValues> = {
   operationalHours: '',
   leadTime: undefined,
   minimumOrderQuantity: undefined,
-  submit: false,
+  systemConfigVariantIds: [],
 };
