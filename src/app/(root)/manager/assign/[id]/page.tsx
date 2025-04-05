@@ -600,9 +600,6 @@ export default function FactoryOrderDetails() {
                               Report from {formatDate(report?.reportDate)}
                             </h3>
                           </div>
-                          <Badge variant="outline" className="mt-2 md:mt-0">
-                            {report?.completedQty} items completed
-                          </Badge>
                         </div>
 
                         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">

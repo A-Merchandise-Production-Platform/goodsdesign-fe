@@ -999,17 +999,6 @@ export default function FactoryOrderDetails() {
                         )}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground text-sm">
-                        Latest Completed:
-                      </span>
-                      <span>
-                        {factoryOrder.progressReports[
-                          factoryOrder.progressReports.length - 1
-                        ]?.completedQty || 0}{' '}
-                        items
-                      </span>
-                    </div>
                   </div>
                 ) : (
                   <div className="text-muted-foreground py-2 text-center">
@@ -1722,14 +1711,6 @@ export default function FactoryOrderDetails() {
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                           <div>
                             <div className="space-y-2">
-                              <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground text-sm">
-                                  Completed Quantity:
-                                </span>
-                                <span className="font-medium">
-                                  {report.completedQty}
-                                </span>
-                              </div>
                               <div className="flex items-center justify-between">
                                 <span className="text-muted-foreground text-sm">
                                   Estimated Completion:
