@@ -87,7 +87,6 @@ query FactoryDashboard {
       }
       id
       progressReports {
-        completedQty
         estimatedCompletion
         factoryOrderId
         id
