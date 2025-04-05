@@ -1,5 +1,6 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   AlertCircle,
   ArrowLeft,
@@ -11,17 +12,14 @@ import {
   Info,
   Loader2,
   Package,
-  RefreshCw,
   ShieldAlert,
   Truck,
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { z } from 'zod';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import React from 'react';
+import { z } from 'zod';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -42,25 +40,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Progress } from '@/components/ui/progress';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  QualityCheckStatus,
-  useDoneCheckQualityMutation,
-  useGetStaffTaskDetailQuery,
-} from '@/graphql/generated/graphql';
-import {
   Form,
   FormControl,
   FormDescription,
@@ -70,7 +49,15 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  useDoneCheckQualityMutation,
+  useGetStaffTaskDetailQuery,
+} from '@/graphql/generated/graphql';
 
 // Define the form schema with Zod
 const qualityCheckFormSchema = z.object({
@@ -151,7 +138,6 @@ export default function MyStaffTaskDetails() {
         input: {
           passedQuantity: values.passedQuantity,
           failedQuantity: values.failedQuantity,
-          reworkRequired: values.reworkRequired,
           note: values.note || undefined,
         },
       },
@@ -587,12 +573,6 @@ export default function MyStaffTaskDetails() {
                         {checkQuality.failedQuantity || 0}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground text-sm">
-                        Rework Required:
-                      </span>
-                      <span>{checkQuality.reworkRequired ? 'Yes' : 'No'}</span>
-                    </div>
                   </div>
                 ) : (
                   <div className="text-muted-foreground py-2 text-center">
@@ -639,14 +619,6 @@ export default function MyStaffTaskDetails() {
                         {new Intl.NumberFormat('en-US').format(
                           orderDetail.price || 0,
                         )}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground text-sm">
-                        Quality Status:
-                      </span>
-                      <span>
-                        {getStatusBadge(orderDetail.qualityCheckStatus)}
                       </span>
                     </div>
                   </div>
@@ -788,31 +760,6 @@ export default function MyStaffTaskDetails() {
                         </div>
                       </div>
                     </div>
-
-                    <div className="space-y-2">
-                      <h3 className="text-muted-foreground text-sm font-medium">
-                        Rework Information
-                      </h3>
-                      <div className="bg-muted rounded-md p-3">
-                        <div className="mb-2 flex items-center justify-between">
-                          <span>Rework Required:</span>
-                          <Badge
-                            variant={
-                              checkQuality.reworkRequired
-                                ? 'destructive'
-                                : 'outline'
-                            }
-                            className="font-normal"
-                          >
-                            {checkQuality.reworkRequired ? 'Yes' : 'No'}
-                          </Badge>
-                        </div>
-                        <div className="mb-2 flex items-center justify-between">
-                          <span>Order Rework Status:</span>
-                          <span>{orderDetail?.reworkStatus || 'N/A'}</span>
-                        </div>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Quality Check Notes */}
@@ -912,28 +859,6 @@ export default function MyStaffTaskDetails() {
                             )}
                           />
                         </div>
-
-                        <FormField
-                          control={form.control}
-                          name="reworkRequired"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl>
-                              <div className="space-y-1 leading-none">
-                                <FormLabel>Rework Required</FormLabel>
-                                <FormDescription>
-                                  Check this if the failed items need to be
-                                  reworked
-                                </FormDescription>
-                              </div>
-                            </FormItem>
-                          )}
-                        />
 
                         <FormField
                           control={form.control}
@@ -1050,20 +975,6 @@ export default function MyStaffTaskDetails() {
                                 orderDetail.price || 0,
                               )}
                             </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell className="font-medium">
-                              Quality Check Status
-                            </TableCell>
-                            <TableCell>
-                              {getStatusBadge(orderDetail.qualityCheckStatus)}
-                            </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell className="font-medium">
-                              Rework Status
-                            </TableCell>
-                            <TableCell>{orderDetail.reworkStatus}</TableCell>
                           </TableRow>
                         </TableBody>
                       </Table>

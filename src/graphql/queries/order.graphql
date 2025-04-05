@@ -14,9 +14,7 @@ query GetMyOrders {
       id
       orderId
       price
-      qualityCheckStatus
       quantity
-      reworkStatus
       status
     }
     shippingPrice
@@ -36,9 +34,7 @@ query GetUserOrder($userOrderId: String!) {
       id
       orderId
       price
-      qualityCheckStatus
       quantity
-      reworkStatus
       status
     }
     shippingPrice
@@ -142,7 +138,6 @@ query GetFactoryOrder($factoryOrderId: ID!) {
     totalItems
     rejectionReason
     progressReports {
-      completedQty
       estimatedCompletion
       factoryOrderId
       id
@@ -173,6 +168,7 @@ query GetFactoryOrder($factoryOrderId: ID!) {
         taskId
         totalChecked
       }
+      isRework
       completedQty
       createdAt
       factoryOrderId
@@ -274,7 +270,6 @@ query GetAllFactoryOrders {
     totalItems
     rejectionReason
     progressReports {
-      completedQty
       estimatedCompletion
       factoryOrderId
       id

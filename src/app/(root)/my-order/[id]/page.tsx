@@ -189,41 +189,6 @@ export default function OrderDetailsPage() {
     }
   };
 
-  // Get rework status badge
-  const getReworkStatusBadge = (status: string) => {
-    switch (status) {
-      case 'NOT_REQUIRED':
-        return (
-          <Badge
-            variant="outline"
-            className="bg-green-100 text-green-800 hover:bg-green-100"
-          >
-            Not Required
-          </Badge>
-        );
-      case 'IN_PROGRESS':
-        return (
-          <Badge
-            variant="outline"
-            className="bg-blue-100 text-blue-800 hover:bg-blue-100"
-          >
-            In Progress
-          </Badge>
-        );
-      case 'COMPLETED':
-        return (
-          <Badge
-            variant="outline"
-            className="bg-green-100 text-green-800 hover:bg-green-100"
-          >
-            Completed
-          </Badge>
-        );
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  };
-
   // Get payment status badge
   const getPaymentStatusBadge = (status: string) => {
     switch (status) {
@@ -618,12 +583,6 @@ export default function OrderDetailsPage() {
                         <TableHead className="hidden md:table-cell">
                           Status
                         </TableHead>
-                        <TableHead className="hidden lg:table-cell">
-                          Quality Check
-                        </TableHead>
-                        <TableHead className="hidden lg:table-cell">
-                          Rework
-                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -640,12 +599,6 @@ export default function OrderDetailsPage() {
                             <TableCell>{formatPrice(item.price)}</TableCell>
                             <TableCell className="hidden md:table-cell">
                               {getStatusBadge(item.status)}
-                            </TableCell>
-                            <TableCell className="hidden lg:table-cell">
-                              {getQualityCheckBadge(item.qualityCheckStatus)}
-                            </TableCell>
-                            <TableCell className="hidden lg:table-cell">
-                              {getReworkStatusBadge(item.reworkStatus)}
                             </TableCell>
                           </TableRow>
                         ))}

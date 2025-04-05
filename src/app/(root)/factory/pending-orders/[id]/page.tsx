@@ -386,7 +386,7 @@ export default function OrderDetailsPage() {
                         Processing...
                       </>
                     ) : (
-                      <>Mark as Completed</>
+                      <></>
                     )}
                   </Button>
                 )}

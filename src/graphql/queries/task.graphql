@@ -69,9 +69,7 @@ query GetMyStaffTasks {
           id
           orderId
           price
-          qualityCheckStatus
           quantity
-          reworkStatus
           status
         }
       }
@@ -163,9 +161,7 @@ query GetStaffTaskDetail($staffTaskId: ID!) {
           id
           orderId
           price
-          qualityCheckStatus
           quantity
-          reworkStatus
           status
         }
       }

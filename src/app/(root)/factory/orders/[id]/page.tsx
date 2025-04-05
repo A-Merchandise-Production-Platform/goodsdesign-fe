@@ -999,17 +999,6 @@ export default function FactoryOrderDetails() {
                         )}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground text-sm">
-                        Latest Completed:
-                      </span>
-                      <span>
-                        {factoryOrder.progressReports[
-                          factoryOrder.progressReports.length - 1
-                        ]?.completedQty || 0}{' '}
-                        items
-                      </span>
-                    </div>
                   </div>
                 ) : (
                   <div className="text-muted-foreground py-2 text-center">
@@ -1230,6 +1219,7 @@ export default function FactoryOrderDetails() {
                       <TableHead>Quality Status</TableHead>
                       <TableHead>Production Cost</TableHead>
                       <TableHead>Price</TableHead>
+                      <TableHead>Rework</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -1257,7 +1247,18 @@ export default function FactoryOrderDetails() {
                           )}
                         </TableCell>
                         <TableCell>
-                          {detail.status !== OrderDetailStatus.Pending &&
+                          {detail.isRework ? (
+                            <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                              Yes
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100">
+                              No
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {detail.status === OrderDetailStatus.Pending &&
                             factoryOrder.status !==
                               FactoryOrderStatus.Rejected && (
                               <Dialog>
@@ -1722,14 +1723,6 @@ export default function FactoryOrderDetails() {
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                           <div>
                             <div className="space-y-2">
-                              <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground text-sm">
-                                  Completed Quantity:
-                                </span>
-                                <span className="font-medium">
-                                  {report.completedQty}
-                                </span>
-                              </div>
                               <div className="flex items-center justify-between">
                                 <span className="text-muted-foreground text-sm">
                                   Estimated Completion:
