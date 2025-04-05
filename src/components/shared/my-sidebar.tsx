@@ -1,5 +1,6 @@
 'use client';
 
+import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -12,16 +13,19 @@ export interface NavItem {
   href: string;
   label: string;
   icon?: React.ReactNode;
+  isActive?: boolean;
 }
 
 export function MySidebar({ navItems, children }: MySidebarProps) {
   const pathname = usePathname();
 
   return (
-    <div className="grid grid-cols-1 gap-4 pt-4 pb-2 md:grid-cols-[200px_1fr]">
-      <nav className="space-y-1 rounded-xl">
+    <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-[200px_1fr]">
+      <nav className="border-border space-y-1">
         {navItems.map(item => {
-          const isActive = pathname === item.href;
+          const isActive = item.isActive
+            ? item.isActive
+            : pathname === item.href;
           return (
             <Link
               key={item.label}

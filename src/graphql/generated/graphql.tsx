@@ -341,6 +341,7 @@ export type FactoryEntity = {
   contractUrl?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   establishedDate?: Maybe<Scalars['DateTime']['output']>;
+  factoryOwnerId: Scalars['ID']['output'];
   factoryStatus?: Maybe<FactoryStatus>;
   isSubmitted?: Maybe<Scalars['Boolean']['output']>;
   leadTime?: Maybe<Scalars['Int']['output']>;
@@ -1136,9 +1137,11 @@ export type Query = {
   factoryProgressReport: FactoryProgressReport;
   factoryProgressReports: Array<FactoryProgressReport>;
   getAllDiscountByProductId: Array<SystemConfigDiscountEntity>;
+  getAllFactories: Array<FactoryEntity>;
   getApplicableDiscount: Scalars['Float']['output'];
   getCartItem: CartItemEntity;
   getCartItemCount: Scalars['Float']['output'];
+  getFactoryById: FactoryEntity;
   getMe: UserEntity;
   getMyFactory: FactoryEntity;
   managerDashboard: ManagerDashboardResponse;

@@ -31,12 +31,160 @@ query GetMyFactory {
       productionCapacity
       systemConfigVariantId
       factoryId
+      systemConfigVariant {
+        color
+        id
+        isActive
+        model
+        price
+        productId
+        size
+      }
     }
     qualityCertifications
     specializations
     taxIdentificationNumber
     totalEmployees
     website
+    contactPersonRole
+    contractAccepted
+    reviewedBy
+    reviewedAt
+    staff {
+      id
+      imageUrl
+      email
+      name
+    }
+    contractAcceptedAt
+    factoryOwnerId
+  }
+}
+
+query GetFactories {
+  getAllFactories {
+    address {
+      id
+      districtID
+      provinceID
+      street
+      wardCode
+    }
+    businessLicenseUrl
+    contactPersonName
+    contactPersonPhone
+    contractUrl
+    description
+    establishedDate
+    factoryStatus
+    isSubmitted
+    leadTime
+    maxPrintingCapacity
+    minimumOrderQuantity
+    name
+    operationalHours
+    owner {
+      email
+      name
+      imageUrl
+    }
+    printingMethods
+    products {
+      estimatedProductionTime
+      productionCapacity
+      systemConfigVariantId
+      factoryId
+      systemConfigVariant {
+        color
+        id
+        isActive
+        model
+        price
+        productId
+        size
+      }
+    }
+    qualityCertifications
+    specializations
+    taxIdentificationNumber
+    totalEmployees
+    website
+    contactPersonRole
+    contractAccepted
+    reviewedBy
+    reviewedAt
+    staff {
+      id
+      imageUrl
+      email
+      name
+    }
+    contractAcceptedAt
+    factoryOwnerId
+  }
+}
+
+query GetFactoryById($factoryId: String!) {
+  getFactoryById(factoryId: $factoryId) {
+    address {
+      id
+      districtID
+      provinceID
+      street
+      wardCode
+    }
+    businessLicenseUrl
+    contactPersonName
+    contactPersonPhone
+    contractUrl
+    description
+    establishedDate
+    factoryStatus
+    isSubmitted
+    leadTime
+    maxPrintingCapacity
+    minimumOrderQuantity
+    name
+    operationalHours
+    owner {
+      id
+      email
+      name
+      imageUrl
+    }
+    printingMethods
+    products {
+      estimatedProductionTime
+      productionCapacity
+      systemConfigVariantId
+      factoryId
+      systemConfigVariant {
+        color
+        id
+        isActive
+        model
+        price
+        productId
+        size
+      }
+    }
+    qualityCertifications
+    specializations
+    taxIdentificationNumber
+    totalEmployees
+    website
+    contactPersonRole
+    contractAccepted
+    reviewedBy
+    reviewedAt
+    staff {
+      id
+      imageUrl
+      email
+      name
+    }
+    contractAcceptedAt
+    factoryOwnerId
   }
 }
 
@@ -73,12 +221,33 @@ mutation UpdateFactoryInfo($updateFactoryInfoInput: UpdateFactoryInfoDto!) {
       productionCapacity
       systemConfigVariantId
       factoryId
+      systemConfigVariant {
+        color
+        id
+        isActive
+        model
+        price
+        productId
+        size
+      }
     }
     qualityCertifications
     specializations
     taxIdentificationNumber
     totalEmployees
     website
+    contactPersonRole
+    contractAccepted
+    reviewedBy
+    reviewedAt
+    staff {
+      id
+      imageUrl
+      email
+      name
+    }
+    contractAcceptedAt
+    factoryOwnerId
   }
 }
 

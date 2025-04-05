@@ -33,6 +33,7 @@ export default function ManagerSidebarLayout({
       href: '/manager/factory',
       label: 'Factory Management',
       icon: <HouseIcon className="size-4" />,
+      isActive: pathname.includes('/manager/factory'),
     },
     {
       href: '/manager/staff',
