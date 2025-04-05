@@ -1,6 +1,8 @@
 import { ShirtIcon as TShirt, Type, Upload } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
 
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -21,6 +23,35 @@ interface DesignSidebarProps {
   onAddText: () => void;
   designs: DesignObject[];
   onReorderLayers: (startIndex: number, endIndex: number) => void;
+  productInfo?: {
+    variants?: Array<{
+      id: string;
+      size?: string | null;
+      color?: string | null;
+    }> | null;
+  };
+  selectedSize?: string;
+  selectedColor?: string;
+  onSizeChange: (size: string) => void;
+  getVariant: (
+    size: string,
+    color: string,
+  ) =>
+    | {
+        id: string;
+        price: number;
+        color: string;
+        size: string;
+        model: string;
+      }
+    | undefined;
+  onUpdateVariant?: (options: {
+    variables: {
+      updateProductDesignId: string;
+      input: { systemConfigVariantId: string };
+    };
+  }) => void;
+  designId?: string;
 }
 
 const DesignSidebar: React.FC<DesignSidebarProps> = ({
@@ -32,7 +63,17 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
   onAddText,
   designs,
   onReorderLayers,
+  productInfo,
+  selectedSize,
+  selectedColor,
+  onSizeChange,
+  getVariant,
+  onUpdateVariant,
+  designId,
 }) => {
+  const [tempColor, setTempColor] = useState<
+    { path: string; color: string } | undefined
+  >();
   const handleUploadClick = () => {
     const input = document.querySelector('#image-upload') as HTMLInputElement;
     input?.click();
@@ -54,28 +95,111 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
         <Dialog open={showColorDialog} onOpenChange={setShowColorDialog}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Choose T-Shirt Color</DialogTitle>
+              <DialogTitle>Product Options</DialogTitle>
             </DialogHeader>
-            <div className="grid grid-cols-3 gap-4 py-4">
-              {SHIRT_COLORS.map(colorOption => (
-                <button
-                  key={colorOption.name}
-                  className={`hover:bg-accent flex flex-col items-center gap-2 rounded-lg border p-3 ${
-                    currentTexture === colorOption.path
-                      ? 'border-primary'
-                      : 'border-border'
-                  }`}
-                  onClick={() => onColorChange(colorOption.path)}
-                >
-                  <div
-                    className="h-12 w-12 rounded-full border"
-                    style={{ backgroundColor: colorOption.color }}
-                  />
-                  <span className="text-sm font-medium">
-                    {colorOption.name}
-                  </span>
-                </button>
-              ))}
+            <div className="space-y-6">
+              {/* Size Selection */}
+              <div className="space-y-4">
+                <h3 className="font-medium">Size</h3>
+                <div className="flex flex-wrap gap-2">
+                  {productInfo?.variants
+                    ? Array.from(
+                        new Set(
+                          productInfo.variants
+                            .map((v: { size?: string | null }) => v.size)
+                            .filter(
+                              (
+                                size: string | null | undefined,
+                              ): size is string => Boolean(size),
+                            ),
+                        ),
+                      ).map((size: string) => (
+                        <button
+                          key={size}
+                          onClick={() => onSizeChange(size)}
+                          className={`flex h-10 items-center justify-center rounded-md border px-3 ${
+                            selectedSize === size
+                              ? 'border-primary text-primary'
+                              : 'border-muted text-muted-foreground hover:bg-primary/5'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))
+                    : null}
+                </div>
+              </div>
+
+              {/* Color Selection */}
+              <div className="space-y-4">
+                <h3 className="font-medium">Color</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  {SHIRT_COLORS.map(colorOption => (
+                    <button
+                      key={colorOption.name}
+                      className={`hover:bg-accent flex flex-col items-center gap-2 rounded-lg border p-3 ${
+                        tempColor?.path === colorOption.path
+                          ? 'border-primary'
+                          : 'border-border'
+                      }`}
+                      onClick={() =>
+                        setTempColor({
+                          path: colorOption.path,
+                          color: colorOption.color,
+                        })
+                      }
+                    >
+                      <div
+                        className="h-12 w-12 rounded-full border"
+                        style={{ backgroundColor: colorOption.color }}
+                      />
+                      <span className="text-sm font-medium">
+                        {colorOption.name}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Update Button */}
+              <Button
+                className="mt-6 w-full"
+                onClick={() => {
+                  if (!tempColor || !selectedSize) {
+                    toast.error('Please select both size and color');
+                    return;
+                  }
+
+                  const variant = getVariant(selectedSize, tempColor.color);
+                  if (!variant?.id) {
+                    toast.error('Selected combination is not available');
+                    return;
+                  }
+
+                  if (designId && onUpdateVariant) {
+                    try {
+                      onUpdateVariant({
+                        variables: {
+                          updateProductDesignId: designId,
+                          input: { systemConfigVariantId: variant.id },
+                        },
+                      });
+                      onColorChange(tempColor.path);
+                      setTempColor(undefined);
+                      setShowColorDialog(false);
+                      toast.success('Product options updated successfully');
+                    } catch (error) {
+                      toast.error('Failed to update product options');
+                    }
+                    onColorChange(tempColor.path);
+                    setShowColorDialog(false);
+                    setTempColor(undefined);
+                  }
+                }}
+                disabled={!selectedSize || !tempColor}
+              >
+                Update Product Options
+              </Button>
             </div>
           </DialogContent>
         </Dialog>

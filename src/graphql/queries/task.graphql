@@ -80,7 +80,7 @@ query GetMyStaffTasks {
       id
       qualityCheckStatus
       startDate
-      status
+
       taskType
       taskname
     }
@@ -156,7 +156,9 @@ query GetStaffTaskDetail($staffTaskId: ID!) {
                 weight
                 imageUrl
               }
+              color
             }
+            thumbnailUrl
           }
           id
           orderId
@@ -172,12 +174,20 @@ query GetStaffTaskDetail($staffTaskId: ID!) {
       id
       qualityCheckStatus
       startDate
-      status
       taskType
       taskname
     }
     completedDate
     assignedDate
+    id
+  }
+}
+
+mutation DoneCheckQuality(
+  $doneCheckQualityId: ID!
+  $input: DoneCheckQualityDto!
+) {
+  doneCheckQuality(id: $doneCheckQualityId, input: $input) {
     id
   }
 }

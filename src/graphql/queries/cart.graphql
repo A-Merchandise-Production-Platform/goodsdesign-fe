@@ -1,20 +1,19 @@
 query GetUserCartItems {
   userCartItems {
-    userId
-    quantity
     id
+    quantity
     design {
-      isTemplate
-      isPublic
-      isFinalized
+      thumbnailUrl
       systemConfigVariant {
-        color
         id
+        price
+        color
+        size
+        model
         isActive
         isDeleted
-        model
-        price
         product {
+          id
           name
           imageUrl
           discounts {
@@ -22,16 +21,15 @@ query GetUserCartItems {
             name
             discountPercent
           }
-          id
         }
-        productId
-        size
       }
       designPositions {
         positionType {
+          id
           positionName
           basePrice
         }
+        designJSON
       }
     }
   }

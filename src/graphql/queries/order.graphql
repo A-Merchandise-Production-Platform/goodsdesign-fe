@@ -188,11 +188,149 @@ query GetFactoryOrder($factoryOrderId: ID!) {
       status
       updatedAt
     }
+    rejectedHistory {
+      id
+      factory {
+        address {
+          id
+          districtID
+          provinceID
+          street
+          wardCode
+        }
+        businessLicenseUrl
+        contactPersonName
+        contactPersonPhone
+        contactPersonRole
+        contractAccepted
+        contractAcceptedAt
+        contractUrl
+        description
+        establishedDate
+        factoryStatus
+        isSubmitted
+        leadTime
+        maxPrintingCapacity
+        minimumOrderQuantity
+        name
+        operationalHours
+        owner {
+          name
+          email
+          imageUrl
+        }
+        printingMethods
+        qualityCertifications
+        reviewedAt
+        reviewedBy
+        specializations
+        staff {
+          imageUrl
+          name
+          email
+        }
+        statusNote
+        taxIdentificationNumber
+        totalEmployees
+        website
+      }
+      rejectedAt
+      reason
+    }
   }
 }
 
 mutation UpdateFactoryOrderDetailStatus($input: UpdateOrderDetailStatusDto!) {
   updateFactoryOrderDetailStatus(input: $input) {
+    id
+  }
+}
+
+query GetAllFactoryOrders {
+  factoryOrders {
+    acceptanceDeadline
+    factoryId
+    id
+    status
+    createdAt
+    updatedAt
+    customerOrder {
+      id
+      orderDate
+      orderDetails {
+        design {
+          designPositions {
+            designId
+            designJSON
+            positionType {
+              positionName
+            }
+            productPositionTypeId
+          }
+        }
+      }
+    }
+    totalProductionCost
+    totalItems
+    rejectionReason
+    progressReports {
+      completedQty
+      estimatedCompletion
+      factoryOrderId
+      id
+      notes
+      photoUrls
+      reportDate
+    }
+    assignedAt
+    completedAt
+    acceptedAt
+    currentProgress
+    delayReason
+    estimatedCompletionDate
+    isDelayed
+    lastUpdated
+    orderDetails {
+      checkQualities {
+        checkedAt
+        checkedBy
+        factoryOrderDetailId
+        failedQuantity
+        id
+        note
+        orderDetailId
+        passedQuantity
+        reworkRequired
+        status
+        taskId
+        totalChecked
+      }
+      completedQty
+      createdAt
+      factoryOrderId
+      id
+      orderDetailId
+      price
+      productionCost
+      qualityCheckedAt
+      qualityCheckedBy
+      qualityStatus
+      quantity
+      rejectedQty
+      status
+      updatedAt
+    }
+  }
+}
+
+mutation AssignFactoryToOrder($factoryId: ID!, $factoryOrderId: ID!) {
+  assignFactoryToOrder(factoryId: $factoryId, factoryOrderId: $factoryOrderId) {
+    id
+  }
+}
+
+mutation AssignStaffToOrder($factoryOrderId: ID!, $staffId: ID!) {
+  assignStaffToOrder(factoryOrderId: $factoryOrderId, staffId: $staffId) {
     id
   }
 }

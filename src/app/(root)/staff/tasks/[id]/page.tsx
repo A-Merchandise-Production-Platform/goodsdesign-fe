@@ -7,23 +7,23 @@ import {
   CheckCircle2,
   ClipboardList,
   Clock,
-  ExternalLink,
-  FileText,
   Home,
   Info,
   Loader2,
   Package,
   RefreshCw,
-  Send,
   ShieldAlert,
   Truck,
 } from 'lucide-react';
-import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 import React from 'react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import {
   Breadcrumb,
@@ -55,14 +55,44 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { useGetStaffTaskDetailQuery } from '@/graphql/generated/graphql';
+import {
+  QualityCheckStatus,
+  useDoneCheckQualityMutation,
+  useGetStaffTaskDetailQuery,
+} from '@/graphql/generated/graphql';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+
+// Define the form schema with Zod
+const qualityCheckFormSchema = z.object({
+  passedQuantity: z.coerce
+    .number()
+    .min(0, 'Passed quantity must be at least 0'),
+  failedQuantity: z.coerce
+    .number()
+    .min(0, 'Failed quantity must be at least 0'),
+  reworkRequired: z.boolean().default(false),
+  note: z.string().optional(),
+});
+
+type QualityCheckFormValues = z.infer<typeof qualityCheckFormSchema>;
 
 export default function MyStaffTaskDetails() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = React.useState('overview');
-  const [updateNote, setUpdateNote] = React.useState('');
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [updateNote, setUpdateNote] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [qualityCheckId, setQualityCheckId] = useState<string | null>(null);
 
   const { data, loading, error } = useGetStaffTaskDetailQuery({
     variables: {
@@ -70,7 +100,63 @@ export default function MyStaffTaskDetails() {
     },
   });
 
+  // Initialize form with react-hook-form and zod validation
+  const form = useForm<QualityCheckFormValues>({
+    resolver: zodResolver(qualityCheckFormSchema),
+    defaultValues: {
+      passedQuantity: 0,
+      failedQuantity: 0,
+      reworkRequired: false,
+      note: '',
+    },
+  });
+
+  // Set up the mutation
+  const [doneCheckQuality, { loading: doneCheckQualityLoading }] =
+    useDoneCheckQualityMutation({
+      onCompleted: data => {
+        toast.success('Quality check submitted successfully');
+        form.reset();
+        setIsSubmitting(false);
+      },
+      onError: error => {
+        toast.error(`Error submitting quality check: ${error.message}`);
+        setIsSubmitting(false);
+      },
+      refetchQueries: ['GetStaffTaskDetail'],
+    });
+
   const staffTask = data?.staffTask;
+  const checkQuality = staffTask?.task?.checkQualities?.[0];
+
+  // Set quality check ID when data is loaded
+  useEffect(() => {
+    if (checkQuality?.id) {
+      setQualityCheckId(checkQuality.id);
+    }
+  }, [checkQuality]);
+
+  // Handle form submission
+  const onSubmit = (values: QualityCheckFormValues) => {
+    if (!qualityCheckId) {
+      toast.error('Quality check ID not found');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    doneCheckQuality({
+      variables: {
+        doneCheckQualityId: qualityCheckId,
+        input: {
+          passedQuantity: values.passedQuantity,
+          failedQuantity: values.failedQuantity,
+          reworkRequired: values.reworkRequired,
+          note: values.note || undefined,
+        },
+      },
+    });
+  };
 
   // Helper functions
   const formatDate = (dateString: string | null | undefined) => {
@@ -159,9 +245,6 @@ export default function MyStaffTaskDetails() {
     const checkQuality = task.task?.checkQualities?.[0];
     if (!checkQuality) return 0;
 
-    if (task.status === 'COMPLETED') return 100;
-    if (task.status === 'REJECTED') return 0;
-
     if (checkQuality.totalChecked && checkQuality.totalChecked > 0) {
       const factoryOrderDetail = checkQuality.factoryOrderDetail;
       if (factoryOrderDetail && factoryOrderDetail.quantity) {
@@ -170,23 +253,10 @@ export default function MyStaffTaskDetails() {
         );
       }
     }
-
-    // Default progress based on status
-    switch (task.status) {
-      case 'PENDING':
-        return 0;
-      case 'IN_PROGRESS':
-        return 50;
-      case 'PARTIAL_APPROVED':
-        return 75;
-      default:
-        return 25;
-    }
+    return 0;
   };
 
-  const handleSubmitUpdate = () => {
-    if (!updateNote.trim()) return;
-
+  const handleCompleteTask = () => {
     setIsSubmitting(true);
 
     // Simulate API call
@@ -194,7 +264,7 @@ export default function MyStaffTaskDetails() {
       setIsSubmitting(false);
       setUpdateNote('');
       // Here you would typically call a mutation to update the task
-      alert('Update submitted successfully!');
+      alert('Task marked as completed!');
     }, 1000);
   };
 
@@ -242,7 +312,6 @@ export default function MyStaffTaskDetails() {
 
   // Extract data for easier access
   const task = data?.staffTask?.task;
-  const checkQuality = task?.checkQualities?.[0];
   const factoryOrderDetail = checkQuality?.factoryOrderDetail;
   const orderDetail = checkQuality?.orderDetail;
   const factoryOrder = factoryOrderDetail?.factoryOrder;
@@ -290,49 +359,6 @@ export default function MyStaffTaskDetails() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Tasks
           </Button>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Update Status
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Update Task Status</DialogTitle>
-                <DialogDescription>
-                  Provide any additional notes or comments about this task
-                  update.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-4">
-                <Textarea
-                  placeholder="Add your notes here..."
-                  value={updateNote}
-                  onChange={e => setUpdateNote(e.target.value)}
-                  className="min-h-[100px]"
-                />
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setUpdateNote('')}>
-                  Cancel
-                </Button>
-                <Button onClick={handleSubmitUpdate} disabled={isSubmitting}>
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="mr-2 h-4 w-4" />
-                      Submit Update
-                    </>
-                  )}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
         </div>
       </div>
 
@@ -341,7 +367,9 @@ export default function MyStaffTaskDetails() {
         <CardContent className="pt-6">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Task Progress</span>
+              <span className="text-sm font-medium">
+                Quality Check Progress
+              </span>
               <span className="text-sm font-medium">
                 {getProgressPercentage(staffTask)}%
               </span>
@@ -371,11 +399,10 @@ export default function MyStaffTaskDetails() {
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList className="grid grid-cols-4 md:w-[600px]">
+        <TabsList className="grid grid-cols-3 md:w-[400px]">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="quality">Quality Check</TabsTrigger>
           <TabsTrigger value="order">Order Details</TabsTrigger>
-          <TabsTrigger value="history">History</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -672,7 +699,9 @@ export default function MyStaffTaskDetails() {
                       <span className="text-muted-foreground text-sm">
                         Acceptance Deadline:
                       </span>
-                      <span>{formatDate(factoryOrder.acceptanceDeadline)}</span>
+                      <span>
+                        {formatDate(factoryOrder?.acceptanceDeadline)}
+                      </span>
                     </div>
                   </div>
                 ) : (
@@ -839,16 +868,114 @@ export default function MyStaffTaskDetails() {
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex justify-end gap-2">
-                    <Button variant="outline">
-                      <FileText className="mr-2 h-4 w-4" />
-                      Generate Report
-                    </Button>
-                    <Button>
-                      <RefreshCw className="mr-2 h-4 w-4" />
-                      Request Re-check
-                    </Button>
+                  {/* Quality Check Form */}
+                  <div className="mt-6">
+                    <h3 className="text-muted-foreground mb-4 text-sm font-medium">
+                      Submit Quality Check
+                    </h3>
+                    <Form {...form}>
+                      <form
+                        onSubmit={form.handleSubmit(onSubmit)}
+                        className="space-y-4"
+                      >
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                          <FormField
+                            control={form.control}
+                            name="passedQuantity"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Passed Quantity</FormLabel>
+                                <FormControl>
+                                  <Input type="number" min={0} {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                  Number of items that passed quality check
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="failedQuantity"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Failed Quantity</FormLabel>
+                                <FormControl>
+                                  <Input type="number" min={0} {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                  Number of items that failed quality check
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={form.control}
+                          name="reworkRequired"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel>Rework Required</FormLabel>
+                                <FormDescription>
+                                  Check this if the failed items need to be
+                                  reworked
+                                </FormDescription>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="note"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Notes</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder="Add any notes about the quality check..."
+                                  className="min-h-[100px]"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Optional notes about the quality check
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="flex justify-end">
+                          <Button
+                            type="submit"
+                            disabled={isSubmitting || doneCheckQualityLoading}
+                          >
+                            {isSubmitting || doneCheckQualityLoading ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Submitting...
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle2 className="mr-2 h-4 w-4" />
+                                Submit Quality Check
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </form>
+                    </Form>
                   </div>
                 </div>
               ) : (
@@ -875,7 +1002,7 @@ export default function MyStaffTaskDetails() {
             <CardHeader>
               <CardTitle>Order Details</CardTitle>
               <CardDescription>
-                Comprehensive information about the order associated with this
+                Information about the order associated with this quality check
                 task.
               </CardDescription>
             </CardHeader>
@@ -975,26 +1102,6 @@ export default function MyStaffTaskDetails() {
                             </TableRow>
                             <TableRow>
                               <TableCell className="font-medium">
-                                Production Cost
-                              </TableCell>
-                              <TableCell>
-                                {new Intl.NumberFormat('en-US').format(
-                                  factoryOrderDetail.productionCost || 0,
-                                )}
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell className="font-medium">
-                                Price
-                              </TableCell>
-                              <TableCell>
-                                {new Intl.NumberFormat('en-US').format(
-                                  factoryOrderDetail.price || 0,
-                                )}
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell className="font-medium">
                                 Completed Quantity
                               </TableCell>
                               <TableCell>
@@ -1050,95 +1157,25 @@ export default function MyStaffTaskDetails() {
                             </div>
                           </div>
                           <div className="flex items-center justify-center md:col-span-2">
-                            <div className="flex h-40 w-full items-center justify-center rounded-md bg-white p-4 shadow-sm">
-                              <div className="text-muted-foreground text-center">
-                                <Package className="mx-auto mb-2 h-10 w-10" />
-                                <p>Design Preview Not Available</p>
+                            {design.thumbnailUrl ? (
+                              <img
+                                src={design.thumbnailUrl || '/placeholder.svg'}
+                                alt="Design Thumbnail"
+                                className="max-h-40 rounded-md object-contain"
+                              />
+                            ) : (
+                              <div className="flex h-40 w-full items-center justify-center rounded-md bg-white p-4 shadow-sm">
+                                <div className="text-muted-foreground text-center">
+                                  <Package className="mx-auto mb-2 h-10 w-10" />
+                                  <p>Design Preview Not Available</p>
+                                </div>
                               </div>
-                            </div>
+                            )}
                           </div>
                         </div>
                       </div>
                     </div>
                   )}
-
-                  {/* Factory Information */}
-                  {factoryOrder && (
-                    <div>
-                      <h3 className="text-muted-foreground mb-3 text-sm font-medium">
-                        Factory Information
-                      </h3>
-                      <div className="bg-muted rounded-md p-4">
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                          <div>
-                            <div className="mb-2 flex justify-between">
-                              <span className="text-muted-foreground">
-                                Factory ID:
-                              </span>
-                              <span>{factoryOrder.factoryId}</span>
-                            </div>
-                            <div className="mb-2 flex justify-between">
-                              <span className="text-muted-foreground">
-                                Status:
-                              </span>
-                              <span>{getStatusBadge(factoryOrder.status)}</span>
-                            </div>
-                            <div className="mb-2 flex justify-between">
-                              <span className="text-muted-foreground">
-                                Is Delayed:
-                              </span>
-                              <Badge
-                                variant={
-                                  factoryOrder.isDelayed
-                                    ? 'destructive'
-                                    : 'outline'
-                                }
-                                className="font-normal"
-                              >
-                                {factoryOrder.isDelayed ? 'Yes' : 'No'}
-                              </Badge>
-                            </div>
-                          </div>
-                          <div>
-                            <div className="mb-2 flex justify-between">
-                              <span className="text-muted-foreground">
-                                Created At:
-                              </span>
-                              <span>{formatDate(factoryOrder.createdAt)}</span>
-                            </div>
-                            <div className="mb-2 flex justify-between">
-                              <span className="text-muted-foreground">
-                                Est. Completion:
-                              </span>
-                              <span>
-                                {formatDate(
-                                  factoryOrder.estimatedCompletionDate,
-                                )}
-                              </span>
-                            </div>
-                            <div className="mb-2 flex justify-between">
-                              <span className="text-muted-foreground">
-                                Acceptance Deadline:
-                              </span>
-                              <span>
-                                {formatDate(factoryOrder.acceptanceDeadline)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Actions */}
-                  <div className="flex justify-end gap-2">
-                    <Link href={`/staff/orders/${orderDetail.id}`}>
-                      <Button>
-                        <ExternalLink className="mr-2 h-4 w-4" />
-                        View Full Order
-                      </Button>
-                    </Link>
-                  </div>
                 </div>
               ) : (
                 <div className="py-8 text-center">
@@ -1151,126 +1188,6 @@ export default function MyStaffTaskDetails() {
                   </p>
                 </div>
               )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* History Tab */}
-        <TabsContent value="history" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Task History</CardTitle>
-              <CardDescription>
-                Complete history of actions and updates for this task.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-8">
-                {/* Sample history entries - in a real app, these would come from the API */}
-                <div className="flex gap-4">
-                  <Avatar className="h-9 w-9">
-                    <AvatarImage
-                      src="/placeholder.svg?height=36&width=36"
-                      alt="Avatar"
-                    />
-                    <AvatarFallback>US</AvatarFallback>
-                  </Avatar>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">System</span>
-                      <span className="text-muted-foreground text-xs">
-                        {formatDate(staffTask?.assignedDate)}
-                      </span>
-                    </div>
-                    <p className="text-sm">
-                      Task was assigned to staff member.
-                    </p>
-                  </div>
-                </div>
-
-                {checkQuality?.checkedAt && (
-                  <div className="flex gap-4">
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage
-                        src="/placeholder.svg?height=36&width=36"
-                        alt="Avatar"
-                      />
-                      <AvatarFallback>
-                        {checkQuality.checkedBy
-                          ?.substring(0, 2)
-                          .toUpperCase() || 'QC'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">
-                          {checkQuality.checkedBy}
-                        </span>
-                        <span className="text-muted-foreground text-xs">
-                          {formatDate(checkQuality.checkedAt)}
-                        </span>
-                      </div>
-                      <p className="text-sm">
-                        Performed quality check. {checkQuality.passedQuantity}{' '}
-                        items passed, {checkQuality.failedQuantity} items
-                        failed.
-                      </p>
-                      {checkQuality.note && (
-                        <div className="bg-muted mt-2 rounded-md p-2 text-sm">
-                          <p>{checkQuality.note}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {staffTask?.completedDate && (
-                  <div className="flex gap-4">
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage
-                        src="/placeholder.svg?height=36&width=36"
-                        alt="Avatar"
-                      />
-                      <AvatarFallback>ST</AvatarFallback>
-                    </Avatar>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">Staff</span>
-                        <span className="text-muted-foreground text-xs">
-                          {formatDate(staffTask?.completedDate)}
-                        </span>
-                      </div>
-                      <p className="text-sm">Task was marked as completed.</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Add comment form */}
-                <div className="border-t pt-4">
-                  <h3 className="mb-2 text-sm font-medium">Add Comment</h3>
-                  <div className="flex gap-4">
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage
-                        src="/placeholder.svg?height=36&width=36"
-                        alt="Avatar"
-                      />
-                      <AvatarFallback>YO</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 space-y-2">
-                      <Textarea
-                        placeholder="Add a comment or note about this task..."
-                        className="min-h-[80px]"
-                      />
-                      <div className="flex justify-end">
-                        <Button>
-                          <Send className="mr-2 h-4 w-4" />
-                          Add Comment
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>

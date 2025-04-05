@@ -1,0 +1,136 @@
+query AdminDashboard {
+  adminDashboard {
+    activeFactories
+    factoryPerformance {
+      factoryId
+      orderCount
+      totalRevenue
+    }
+    pendingOrders
+    recentOrders {
+      factory {
+        factoryStatus
+        id
+        name
+      }
+      id
+      orderDate
+      status
+      totalPrice
+    }
+    totalCustomers
+    totalFactories
+    totalOrders
+    totalRevenue
+  }
+}
+
+query ManagerDashboard {
+  managerDashboard {
+    factoryOrdersByStatus {
+      count
+      status
+    }
+    pendingFactoryOrders
+    qualityIssues {
+      description
+      factoryOrder {
+        factory {
+          factoryStatus
+          id
+          name
+        }
+        id
+        status
+      }
+      id
+      issueType
+      reportedAt
+      status
+    }
+    recentFactoryOrders {
+      createdAt
+      customerOrder {
+        customer {
+          email
+          id
+          name
+        }
+        id
+        status
+        totalPrice
+      }
+      id
+      status
+      totalProductionCost
+    }
+    totalOrders
+    totalRevenue
+  }
+}
+
+query FactoryDashboard {
+  factoryDashboard {
+    inProductionOrders
+    pendingOrders
+    productionProgress {
+      createdAt
+      customerOrder {
+        customer {
+          email
+          id
+          name
+        }
+        id
+        status
+        totalPrice
+      }
+      id
+      progressReports {
+        completedQty
+        estimatedCompletion
+        factoryOrderId
+        id
+        notes
+        photoUrls
+        reportDate
+      }
+      status
+      totalProductionCost
+    }
+    qualityIssues {
+      description
+      factoryOrder {
+        factory {
+          factoryStatus
+          id
+          name
+        }
+        id
+        status
+      }
+      id
+      issueType
+      reportedAt
+      status
+    }
+    recentOrders {
+      createdAt
+      customerOrder {
+        customer {
+          email
+          id
+          name
+        }
+        id
+        status
+        totalPrice
+      }
+      id
+      status
+      totalProductionCost
+    }
+    totalOrders
+    totalRevenue
+  }
+}
