@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, ArrowRight, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
@@ -24,12 +25,9 @@ import {
   LegalInformation,
   OperationalDetails,
   QualitySpecialization,
-} from './sections';
-import { toast } from 'sonner';
-import {
   ProductSelection,
   FactoryInfoDisplay,
-} from '@/app/(root)/profile/factory/_components/sections';
+} from './sections';
 
 export default function UpdateFactoryForm() {
   const [isNotificationOpen, setIsNotificationOpen] = useState(true);

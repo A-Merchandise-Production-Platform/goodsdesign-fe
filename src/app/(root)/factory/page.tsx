@@ -237,7 +237,7 @@ export default function FactoryDashboard() {
                       </div>
                       {latestReport?.notes && (
                         <p className="border-muted mt-1 border-l-2 pl-2 text-xs italic">
-                          "{latestReport.notes}"
+                          &ldquo;{latestReport.notes}&rdquo;
                         </p>
                       )}
                     </div>

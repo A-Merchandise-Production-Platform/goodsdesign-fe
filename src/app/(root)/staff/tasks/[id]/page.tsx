@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import Image from 'next/image';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -1069,9 +1070,11 @@ export default function MyStaffTaskDetails() {
                           </div>
                           <div className="flex items-center justify-center md:col-span-2">
                             {design.thumbnailUrl ? (
-                              <img
+                              <Image
                                 src={design.thumbnailUrl || '/placeholder.svg'}
                                 alt="Design Thumbnail"
+                                width={160}
+                                height={160}
                                 className="max-h-40 rounded-md object-contain"
                               />
                             ) : (

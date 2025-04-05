@@ -62,6 +62,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import Image from 'next/image';
 
 export default function FactoryOrderDetails() {
   const router = useRouter();
@@ -141,7 +142,7 @@ export default function FactoryOrderDetails() {
               <AlertCircle className="text-muted-foreground mb-4 h-12 w-12" />
               <h3 className="mb-2 text-xl font-semibold">Order Not Found</h3>
               <p className="text-muted-foreground mb-4">
-                The factory order you're looking for doesn't exist or has been
+                The factory order you&apos;re looking for doesn&apos;t exist or has been
                 removed.
               </p>
               <Button onClick={handleGoBack}>
@@ -631,12 +632,14 @@ export default function FactoryOrderDetails() {
                                   key={index}
                                   className="overflow-hidden rounded-md border"
                                 >
-                                  <img
+                                  <Image
                                     src={
                                       url ||
                                       '/placeholder.svg?height=100&width=100'
                                     }
                                     alt={`Progress photo ${index + 1}`}
+                                    width={100}
+                                    height={100}
                                     className="h-24 w-full object-cover"
                                   />
                                 </div>

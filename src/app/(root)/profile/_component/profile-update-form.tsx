@@ -279,7 +279,6 @@ export default function ProfilePage() {
                               }
                               defaultMonth={field.value}
                               initialFocus
-                              captionLayout="dropdown-buttons"
                               fromYear={1900}
                               toYear={new Date().getFullYear()}
                               showOutsideDays

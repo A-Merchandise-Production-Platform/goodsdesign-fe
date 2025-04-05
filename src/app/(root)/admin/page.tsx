@@ -1,5 +1,13 @@
 'use client';
 
+import {
+  Building2,
+  DollarSign,
+  Package,
+  ShoppingCart,
+  Users,
+} from 'lucide-react';
+
 import { DashboardShell } from '@/components/dashboard-shell';
 import { FactoryPerformanceChart } from '@/components/factory-performance-chart';
 import { Badge } from '@/components/ui/badge';
@@ -14,13 +22,6 @@ import {
 } from '@/components/ui/table';
 import { useAdminDashboardQuery } from '@/graphql/generated/graphql';
 import { formatPrice } from '@/lib/utils';
-import {
-  Building2,
-  DollarSign,
-  Package,
-  ShoppingCart,
-  Users,
-} from 'lucide-react';
 
 export default function AdminDashboard() {
   const { data, loading } = useAdminDashboardQuery();

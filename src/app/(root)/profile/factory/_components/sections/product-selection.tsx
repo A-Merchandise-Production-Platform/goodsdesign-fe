@@ -1,8 +1,11 @@
+import { UseFormReturn } from 'react-hook-form';
+import { useState, useEffect } from 'react';
+import { Check, ChevronDown, Lock } from 'lucide-react';
+
 import {
   useGetSystemConfigVariantsQuery,
   useGetMyFactoryQuery,
 } from '@/graphql/generated/graphql';
-import { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -10,9 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { formatPrice, getContrastColor } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
-import { Check, ChevronDown, Lock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,8 +21,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { cn } from '@/lib/utils';
-import { UseFormReturn } from 'react-hook-form';
+import { formatPrice, getContrastColor, cn } from '@/lib/utils';
 import { FactoryFormValues } from '../factory-form-schema';
 
 interface ProductSelectionProps {
