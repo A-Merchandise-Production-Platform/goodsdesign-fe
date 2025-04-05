@@ -450,7 +450,8 @@ export default function FactoryDetailPage() {
                 <div className="rounded-md border border-dashed p-6 text-center">
                   <h3 className="text-lg font-medium">No Product Variants</h3>
                   <p className="text-muted-foreground mt-1 text-sm">
-                    This factory doesn&apos;t have any product variants configured.
+                    This factory doesn&apos;t have any product variants
+                    configured.
                   </p>
                   <Button className="mt-4" variant="outline">
                     Add Product Variants
@@ -589,7 +590,8 @@ export default function FactoryDetailPage() {
                     No Contact Information
                   </h3>
                   <p className="text-muted-foreground mt-1 text-sm">
-                    This factory doesn&apos;t have any contact details available.
+                    This factory doesn&apos;t have any contact details
+                    available.
                   </p>
                   <Button className="mt-4">
                     <User className="mr-2 h-4 w-4" />
@@ -653,8 +655,8 @@ export default function FactoryDetailPage() {
                   <div className="rounded-md border border-dashed p-6 text-center">
                     <h3 className="text-lg font-medium">No Staff Assigned</h3>
                     <p className="text-muted-foreground mt-1 text-sm">
-                      This factory doesn&apos;t currently have any staff assigned to
-                      manage operations.
+                      This factory doesn&apos;t currently have any staff
+                      assigned to manage operations.
                     </p>
                     <Button className="mt-4">
                       <User className="mr-2 h-4 w-4" />

@@ -142,8 +142,8 @@ export default function FactoryOrderDetails() {
               <AlertCircle className="text-muted-foreground mb-4 h-12 w-12" />
               <h3 className="mb-2 text-xl font-semibold">Order Not Found</h3>
               <p className="text-muted-foreground mb-4">
-                The factory order you&apos;re looking for doesn&apos;t exist or has been
-                removed.
+                The factory order you&apos;re looking for doesn&apos;t exist or
+                has been removed.
               </p>
               <Button onClick={handleGoBack}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
