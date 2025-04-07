@@ -1,15 +1,9 @@
 'use client';
 
 import {
-  AlertCircle,
-  ArrowRight,
-  CheckCircle,
-  Clock,
-  Loader2,
-  XCircle,
+  ArrowRight
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -29,79 +23,57 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useGetCurrentFactoryOrdersQuery } from '@/graphql/generated/graphql';
+import { useGetAllOrdersQuery } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
 
-export default function FactoryOrdersPage() {
-  const { data, loading } = useGetCurrentFactoryOrdersQuery();
+export default function ManagerOrdersPage() {
+  const { data, loading } = useGetAllOrdersQuery()
   const router = useRouter();
 
   const viewOrderDetails = (orderId: string) => {
-    router.push(`/factory/orders/${orderId}`);
+    router.push(`/manager/orders/${orderId}`);
   };
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'PENDING_ACCEPTANCE':
-        return (
-          <Badge
-            variant="outline"
-            className="border-yellow-200 bg-yellow-50 text-yellow-700"
-          >
-            <Clock className="mr-1 h-3 w-3" /> Pending
-          </Badge>
-        );
-      case 'ACCEPTED':
-        return (
-          <Badge
-            variant="outline"
-            className="border-green-200 bg-green-50 text-green-700"
-          >
-            <CheckCircle className="mr-1 h-3 w-3" /> Accepted
-          </Badge>
-        );
-      case 'IN_PRODUCTION':
-        return (
-          <Badge
-            variant="outline"
-            className="border-blue-200 bg-blue-50 text-blue-700"
-          >
-            <Loader2 className="mr-1 h-3 w-3" /> In Production
-          </Badge>
-        );
-      case 'REJECTED':
-        return (
-          <Badge
-            variant="outline"
-            className="border-red-200 bg-red-50 text-red-700"
-          >
-            <XCircle className="mr-1 h-3 w-3" /> Rejected
-          </Badge>
-        );
-      default:
-        return (
-          <Badge variant="outline">
-            <AlertCircle className="mr-1 h-3 w-3" /> {status}
-          </Badge>
-        );
+    const statusMap: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+      PENDING: { label: "Pending", variant: "outline" },
+      PROCESSING: { label: "Processing", variant: "secondary" },
+      COMPLETED: { label: "Completed", variant: "default" },
+      CANCELLED: { label: "Cancelled", variant: "destructive" },
+      SHIPPED: { label: "Shipped", variant: "default" },
+      PAID: { label: "Paid", variant: "default" },
+      UNPAID: { label: "Unpaid", variant: "outline" },
+      PAYMENT_RECEIVED: { label: "Payment Received", variant: "default" },
+      WAITING_FILL_INFORMATION: { label: "Waiting for Information", variant: "outline" },
+      NEED_MANAGER_HANDLE: { label: "Needs Manager", variant: "outline" },
+      PENDING_ACCEPTANCE: { label: "Pending Acceptance", variant: "outline" },
+      REJECTED: { label: "Rejected", variant: "destructive" },
+      IN_PRODUCTION: { label: "In Production", variant: "secondary" },
+      WAITING_FOR_CHECKING_QUALITY: { label: "Quality Check", variant: "outline" },
+      REWORK_REQUIRED: { label: "Rework Required", variant: "destructive" },
+      REWORK_IN_PROGRESS: { label: "Rework in Progress", variant: "secondary" },
+      WAITING_PAYMENT: { label: "Waiting Payment", variant: "outline" },
+      READY_FOR_SHIPPING: { label: "Ready for Shipping", variant: "secondary" },
     }
-  };
+  
+    const config = statusMap[status] || { label: status, variant: "outline" }
+  
+    return <Badge variant={config.variant}>{config.label}</Badge>
+  }
 
   if (loading) {
     return <OrdersLoadingSkeleton />;
   }
 
   const orders =
-    data?.factoryOrdersByFactory
-      .filter(o => o.status != 'PENDING_ACCEPTANCE')
-      .sort((a, b) => {
+    data?.orders ? [...data?.orders].sort((a, b) => {
         return (
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
         );
-      }) || [];
+      }) : [];
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto py-6">
       <Card>
         <CardHeader>
           <CardTitle>Factory Orders</CardTitle>
@@ -120,7 +92,7 @@ export default function FactoryOrdersPage() {
                 <TableRow>
                   <TableHead>Order ID</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead>Order Date</TableHead>
                   <TableHead>Deadline</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -132,7 +104,7 @@ export default function FactoryOrdersPage() {
                       {order.id.substring(0, 8)}...
                     </TableCell>
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
-                    <TableCell>{formatDate(order.createdAt)}</TableCell>
+                    <TableCell>{formatDate(order.orderDate)}</TableCell>
                     <TableCell>
                       {formatDate(order?.acceptanceDeadline)}
                     </TableCell>

@@ -12,13 +12,13 @@ export default function StaffSidebarLayout({
 }) {
   const pathname = usePathname();
   const navItems: NavItem[] = [
-    // {
-    //   href: '/staff',
-    //   label: 'Dashboard',
-    //   icon: <HomeIcon className="size-4" />,
-    // },
     {
       href: '/staff',
+      label: 'Dashboard',
+      icon: <HomeIcon className="size-4" />,
+    },
+    {
+      href: '/staff/tasks',
       label: 'Your task',
       icon: <PaperclipIcon className="size-4" />,
     },

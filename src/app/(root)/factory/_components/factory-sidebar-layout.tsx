@@ -19,19 +19,9 @@ export default function FactoryOwnerSidebarLayout({
       icon: <HomeIcon className="size-4" />,
     },
     {
-      href: '/factory/pending-orders',
-      label: 'Pending Orders',
-      icon: <ShoppingBag className="size-4" />,
-    },
-    {
       href: '/factory/orders',
       label: 'Orders',
       icon: <ShoppingBag className="size-4" />,
-    },
-    {
-      href: '/factory/ticket',
-      label: 'Write Ticket',
-      icon: <Pen className="size-4" />,
     },
   ];
 
