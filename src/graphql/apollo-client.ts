@@ -1,4 +1,9 @@
-import { ApolloClient, DefaultOptions, InMemoryCache, Observable } from '@apollo/client';
+import {
+  ApolloClient,
+  DefaultOptions,
+  InMemoryCache,
+  Observable,
+} from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { HttpLink } from '@apollo/client/link/http';
@@ -34,7 +39,7 @@ const errorLink = onError(
               uri: envConfig().apiUrl + '/graphql',
             }),
             cache: new InMemoryCache(),
-            defaultOptions
+            defaultOptions,
           });
 
           // Execute the refresh token mutation
@@ -84,7 +89,7 @@ const errorLink = onError(
             uri: envConfig().apiUrl + '/graphql',
           }),
           cache: new InMemoryCache(),
-          defaultOptions
+          defaultOptions,
         });
 
         return new Observable(observer => {
@@ -133,12 +138,12 @@ export const defaultOptions: DefaultOptions = {
     fetchPolicy: 'no-cache',
     errorPolicy: 'all',
   },
-}
+};
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
   link: authLink.concat(httpLink),
-  defaultOptions
+  defaultOptions,
 });
 
 export default client;

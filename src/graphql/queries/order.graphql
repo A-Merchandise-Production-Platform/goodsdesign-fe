@@ -917,13 +917,13 @@ mutation AcceptOrderForFactory($orderId: String!) {
 
 mutation RejectOrder($orderId: String!, $reason: String!) {
   rejectOrder(orderId: $orderId, reason: $reason) {
-  id  
+    id
   }
 }
 
 mutation DoneProductionOrderDetails($orderDetailId: String!) {
   doneProductionOrderDetails(orderDetailId: $orderDetailId) {
-  id  
+    id
   }
 }
 
@@ -939,7 +939,6 @@ mutation DoneReworkForOrderDetails($orderDetailId: String!) {
   }
 }
 
-
 mutation DoneCheckQuality($input: DoneCheckQualityInput!) {
   doneCheckQuality(input: $input) {
     id
@@ -948,7 +947,7 @@ mutation DoneCheckQuality($input: DoneCheckQualityInput!) {
 
 mutation ShippedOrder($orderId: String!) {
   shippedOrder(orderId: $orderId) {
-    id  
+    id
   }
 }
 
