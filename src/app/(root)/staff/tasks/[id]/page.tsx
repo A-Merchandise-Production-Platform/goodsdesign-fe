@@ -16,7 +16,7 @@ import {
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import type React from 'react';
-import { useEffect,useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -277,8 +277,8 @@ export default function StaffCheckQualityDetailsPage() {
                 <ShoppingBag className="text-muted-foreground mb-4 h-12 w-12" />
                 <h2 className="mb-2 text-xl font-semibold">Order Not Found</h2>
                 <p className="text-muted-foreground mx-auto mb-6 max-w-md">
-                  The order you&apos;re looking for doesn&apos;t exist or you don&apos;t have
-                  permission to view it.
+                  The order you&apos;re looking for doesn&apos;t exist or you
+                  don&apos;t have permission to view it.
                 </p>
               </>
             )}

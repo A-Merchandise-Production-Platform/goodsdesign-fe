@@ -1,5 +1,5 @@
 import { Check, ChevronDown, Lock } from 'lucide-react';
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
 import { Badge } from '@/components/ui/badge';
@@ -21,7 +21,7 @@ import {
   useGetMyFactoryQuery,
   useGetSystemConfigVariantsQuery,
 } from '@/graphql/generated/graphql';
-import { cn,formatPrice, getContrastColor } from '@/lib/utils';
+import { cn, formatPrice, getContrastColor } from '@/lib/utils';
 
 import { FactoryFormValues } from '../factory-form-schema';
 
