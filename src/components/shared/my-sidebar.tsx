@@ -1,8 +1,9 @@
 'use client';
 
-import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+
+import { Separator } from '@/components/ui/separator';
 
 interface MySidebarProps {
   navItems: NavItem[];

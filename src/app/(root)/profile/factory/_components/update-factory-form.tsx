@@ -22,11 +22,11 @@ import {
 import {
   BasicInformation,
   ContactInformation,
+  FactoryInfoDisplay,
   LegalInformation,
   OperationalDetails,
-  QualitySpecialization,
   ProductSelection,
-  FactoryInfoDisplay,
+  QualitySpecialization,
 } from './sections';
 
 export default function UpdateFactoryForm() {

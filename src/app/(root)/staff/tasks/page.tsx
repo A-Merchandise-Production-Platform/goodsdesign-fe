@@ -1,41 +1,5 @@
 'use client';
 
-import type React from 'react';
-
-import { useState } from 'react';
-import {
-  useDoneCheckQualityMutation,
-  useGetMyStaffOrdersQuery,
-} from '@/graphql/generated/graphql';
-import { toast } from 'sonner';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   AlertCircle,
   CheckCircle,
@@ -48,8 +12,44 @@ import {
   X,
 } from 'lucide-react';
 import Image from 'next/image';
-import { formatDate } from '@/lib/utils';
+import type React from 'react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  useDoneCheckQualityMutation,
+  useGetMyStaffOrdersQuery,
+} from '@/graphql/generated/graphql';
+import { formatDate } from '@/lib/utils';
 
 // Helper function to get status badge
 const getStatusBadge = (status: string) => {

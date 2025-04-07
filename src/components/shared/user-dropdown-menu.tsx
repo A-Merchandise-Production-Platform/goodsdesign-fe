@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
+import MyAvatar from '@/components/shared/my-avatar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,10 +21,9 @@ import {
   useLogoutMutation,
   UserEntity,
 } from '@/graphql/generated/graphql';
-import { useAuthStore } from '@/stores/auth.store';
 import { useSocketIo } from '@/hooks/io/useSocketIO';
+import { useAuthStore } from '@/stores/auth.store';
 import { useSocketStore } from '@/stores/socket-io-store';
-import MyAvatar from '@/components/shared/my-avatar';
 
 interface UserDropdownMenuProps {
   user: UserEntity;

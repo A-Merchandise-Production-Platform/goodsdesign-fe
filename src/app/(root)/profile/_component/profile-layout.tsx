@@ -3,8 +3,8 @@
 import React, { useMemo } from 'react';
 
 import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
-import { useAuthStore } from '@/stores/auth.store';
 import { Roles } from '@/graphql/generated/graphql';
+import { useAuthStore } from '@/stores/auth.store';
 
 export default function ProfileLayout({
   children,

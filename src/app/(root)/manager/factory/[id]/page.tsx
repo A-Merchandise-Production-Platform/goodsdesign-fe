@@ -375,7 +375,7 @@ export default function FactoryDetailPage() {
                                   {product.productionCapacity} units
                                 </td>
                                 <td className="p-3 text-sm">
-                                  {product.estimatedProductionTime} hours
+                                  {/* {product.productionCapacity} hours */}
                                 </td>
                                 <td className="p-3 font-mono text-sm text-xs">
                                   {product.systemConfigVariantId}
@@ -434,12 +434,12 @@ export default function FactoryDetailPage() {
                           Avg Production Time
                         </h4>
                         <p className="mt-1 text-2xl font-bold">
-                          {(
+                          {/* {(
                             factory.products.reduce(
-                              (acc, curr) => acc + curr.estimatedProductionTime,
+                              (acc, curr) => acc + curr?. || 0,
                               0,
                             ) / factory.products.length
-                          ).toFixed(1)}
+                          ).toFixed(1)} */}
                           h
                         </p>
                       </CardContent>

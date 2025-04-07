@@ -1,5 +1,6 @@
 'use client';
 import {
+  AlertTriangle,
   ArrowLeft,
   Calendar,
   CheckCircle2,
@@ -11,33 +12,30 @@ import {
   Upload,
   X,
   XCircle,
-  AlertTriangle,
 } from 'lucide-react';
-import type React from 'react';
-
-import { useParams, useRouter } from 'next/navigation';
-import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import { useParams, useRouter } from 'next/navigation';
+import type React from 'react';
+import { useEffect,useRef, useState } from 'react';
+import { toast } from 'sonner';
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from '@/components/ui/card';
-import {
-  useDoneCheckQualityMutation,
-  useGetOrderQuery,
-} from '@/graphql/generated/graphql';
-import { formatDate } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -46,6 +44,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -53,13 +52,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  useDoneCheckQualityMutation,
+  useGetOrderQuery,
+} from '@/graphql/generated/graphql';
+import { formatDate } from '@/lib/utils';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -278,7 +277,7 @@ export default function StaffCheckQualityDetailsPage() {
                 <ShoppingBag className="text-muted-foreground mb-4 h-12 w-12" />
                 <h2 className="mb-2 text-xl font-semibold">Order Not Found</h2>
                 <p className="text-muted-foreground mx-auto mb-6 max-w-md">
-                  The order you're looking for doesn't exist or you don't have
+                  The order you&apos;re looking for doesn&apos;t exist or you don&apos;t have
                   permission to view it.
                 </p>
               </>
@@ -321,7 +320,7 @@ export default function StaffCheckQualityDetailsPage() {
               No Quality Checks Found
             </h2>
             <p className="text-muted-foreground mx-auto mb-6 max-w-md">
-              This order doesn't have any quality checks assigned yet.
+              This order doesn&apos;t have any quality checks assigned yet.
             </p>
             <Button onClick={() => router.push('/staff/tasks')}>
               View All Tasks

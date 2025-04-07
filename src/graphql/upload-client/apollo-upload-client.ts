@@ -4,6 +4,7 @@ import createUploadLink from 'apollo-upload-client/createUploadLink.mjs';
 
 import { envConfig } from '@/constant';
 import { useAuthStore } from '@/stores/auth.store';
+
 import { defaultOptions } from '../apollo-client';
 
 const authLink = setContext((_, { headers }) => {

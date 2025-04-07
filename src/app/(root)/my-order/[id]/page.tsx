@@ -3,38 +3,48 @@ import {
   ArrowLeft,
   Calendar,
   CheckCircle2,
+  ClipboardList,
   Clock,
   CreditCard,
+  CreditCardIcon as PaymentIcon,
   DollarSign,
+  FileText,
+  History,
   Package,
   ShoppingBag,
   Truck,
   XCircle,
-  FileText,
-  ClipboardList,
-  History,
-  CreditCardIcon as PaymentIcon,
 } from 'lucide-react';
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import Image from 'next/image';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from '@/components/ui/card';
 import {
-  useCreatePaymentGatewayUrlMutation,
-  useGetOrderQuery,
-} from '@/graphql/generated/graphql';
-import { useToast } from '@/hooks/use-toast';
-import { formatDate } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Progress } from '@/components/ui/progress';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import {
   Table,
@@ -44,23 +54,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  useCreatePaymentGatewayUrlMutation,
+  useGetOrderQuery,
+} from '@/graphql/generated/graphql';
+import { useToast } from '@/hooks/use-toast';
+import { formatDate } from '@/lib/utils';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {

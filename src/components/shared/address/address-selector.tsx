@@ -404,7 +404,7 @@ export function AddressSelector({
         };
       }
     }
-  }, [isControlled, value]);
+  }, [isControlled, value, selectedDistrictId, selectedProvinceId, selectedWardCode, street]);
 
   return (
     <div className="flex flex-col gap-4">

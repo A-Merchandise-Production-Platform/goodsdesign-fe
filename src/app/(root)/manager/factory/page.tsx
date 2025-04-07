@@ -1,5 +1,10 @@
 'use client';
 
+import { format } from 'date-fns';
+import { Calendar, MapPin, Users } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
 import { DashboardShell } from '@/components/dashboard-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,10 +17,6 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGetFactoriesQuery } from '@/graphql/generated/graphql';
-import { format } from 'date-fns';
-import { Calendar, MapPin, Users } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 export default function Page() {
   const { data, loading, error } = useGetFactoriesQuery();

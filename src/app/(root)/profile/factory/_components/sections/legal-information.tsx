@@ -1,6 +1,7 @@
 import { HelpCircle } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
 
+import { AddressSelector } from '@/components/shared/address/address-selector';
 import {
   Card,
   CardContent,
@@ -24,7 +25,6 @@ import {
 } from '@/components/ui/tooltip';
 
 import { FactoryFormValues } from '../factory-form-schema';
-import { AddressSelector } from '@/components/shared/address/address-selector';
 
 interface LegalInformationProps {
   form: UseFormReturn<FactoryFormValues>;

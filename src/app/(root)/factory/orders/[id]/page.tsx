@@ -1,37 +1,60 @@
 'use client';
 import {
+  AlertTriangle,
   ArrowLeft,
   Calendar,
+  CheckCheck,
   CheckCircle2,
+  ClipboardList,
   Clock,
   CreditCard,
+  CreditCardIcon as PaymentIcon,
+  FileText,
+  History,
   Package,
+  Play,
   ShoppingBag,
+  ThumbsDown,
+  ThumbsUp,
   Truck,
   XCircle,
-  FileText,
-  ClipboardList,
-  History,
-  CreditCardIcon as PaymentIcon,
-  AlertTriangle,
-  ThumbsUp,
-  ThumbsDown,
-  Play,
-  CheckCheck,
 } from 'lucide-react';
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import Image from 'next/image';
+import { toast } from 'sonner';
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import {
   OrderDetailStatus,
   useAcceptOrderForFactoryMutation,
@@ -42,29 +65,6 @@ import {
   useStartReworkMutation,
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { toast } from 'sonner';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
