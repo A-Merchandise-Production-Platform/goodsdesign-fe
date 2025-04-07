@@ -11,14 +11,19 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useGetFactoriesQuery } from '@/graphql/generated/graphql';
+import {
+  FactoryStatus,
+  useGetFactoriesQuery,
+} from '@/graphql/generated/graphql';
 import { format } from 'date-fns';
 import { Calendar, MapPin, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function Page() {
-  const { data, loading, error } = useGetFactoriesQuery();
+  const { data, loading, error } = useGetFactoriesQuery({
+    fetchPolicy: 'no-cache',
+  });
   const router = useRouter();
 
   if (loading) {
@@ -56,9 +61,10 @@ export default function Page() {
   const factories = data?.getAllFactories || [];
   const pendingFactories = factories.filter(
     factory =>
-      factory.factoryStatus?.toString() === 'PENDING' ||
-      factory.factoryStatus?.toString() === 'UNDER_REVIEW',
+      factory.factoryStatus?.toString() === FactoryStatus.PendingApproval,
   );
+
+  console.log(factories);
 
   const renderFactoryGrid = (factoryList: typeof factories) => (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -78,23 +84,24 @@ export default function Page() {
                 {factory.description}
               </p>
             )}
-            <div className="flex items-center text-sm">
-              <MapPin className="text-muted-foreground mr-1 h-4 w-4" />
+            <div className="flex items-start gap-2 text-sm">
+              <MapPin className="text-muted-foreground h-4 w-4" />
               <span>
                 {factory.address?.street}, {factory.address?.wardCode}
               </span>
             </div>
             {factory.totalEmployees && (
-              <div className="flex items-center text-sm">
+              <div className="flex items-start gap-2 text-sm">
                 <Users className="text-muted-foreground mr-1 h-4 w-4" />
                 <span>{factory.totalEmployees} employees</span>
               </div>
             )}
             {factory.establishedDate && (
-              <div className="flex items-center text-sm">
+              <div className="flex items-start gap-2 text-sm">
                 <Calendar className="text-muted-foreground mr-1 h-4 w-4" />
                 <span>
-                  Est. {format(new Date(factory.establishedDate), 'MMM yyyy')}
+                  Est.{' '}
+                  {format(new Date(factory.establishedDate), 'dd MMM yyyy')}
                 </span>
               </div>
             )}
@@ -148,7 +155,7 @@ export default function Page() {
           <TabsTrigger value="pending">
             Pending Approval
             {pendingFactories.length > 0 && (
-              <Badge variant="secondary" className="ml-2">
+              <Badge variant="destructive" className="ml-2 rounded-full">
                 {pendingFactories.length}
               </Badge>
             )}
