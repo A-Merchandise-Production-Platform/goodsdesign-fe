@@ -27,7 +27,6 @@ query GetMyFactory {
     }
     printingMethods
     products {
-      estimatedProductionTime
       productionCapacity
       systemConfigVariantId
       factoryId
@@ -90,7 +89,6 @@ query GetFactories {
     }
     printingMethods
     products {
-      estimatedProductionTime
       productionCapacity
       systemConfigVariantId
       factoryId
@@ -154,7 +152,6 @@ query GetFactoryById($factoryId: String!) {
     }
     printingMethods
     products {
-      estimatedProductionTime
       productionCapacity
       systemConfigVariantId
       factoryId
@@ -217,7 +214,6 @@ mutation UpdateFactoryInfo($updateFactoryInfoInput: UpdateFactoryInfoDto!) {
     }
     printingMethods
     products {
-      estimatedProductionTime
       productionCapacity
       systemConfigVariantId
       factoryId
@@ -248,35 +244,5 @@ mutation UpdateFactoryInfo($updateFactoryInfoInput: UpdateFactoryInfoDto!) {
     }
     contractAcceptedAt
     factoryOwnerId
-  }
-}
-
-mutation UpdateFactoryOrderStatus(
-  $updateFactoryOrderStatusId: ID!
-  $status: String!
-) {
-  updateFactoryOrderStatus(id: $updateFactoryOrderStatusId, status: $status) {
-    id
-  }
-}
-
-mutation CreateFactoryProgressReport($input: CreateFactoryProgressReportDto!) {
-  createFactoryProgressReport(input: $input) {
-    id
-  }
-}
-
-mutation MarkFactoryOrderAsDelayed(
-  $markFactoryOrderAsDelayedId: ID!
-  $input: MarkAsDelayedDto!
-) {
-  markFactoryOrderAsDelayed(id: $markFactoryOrderAsDelayedId, input: $input) {
-    id
-  }
-}
-
-mutation MarkOnDoneProduction($markOnDoneProductionId: ID!) {
-  markOnDoneProduction(id: $markOnDoneProductionId) {
-    id
   }
 }
