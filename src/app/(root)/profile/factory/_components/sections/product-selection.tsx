@@ -40,11 +40,11 @@ export function ProductSelection({ form }: ProductSelectionProps) {
 
   // Initialize selected variants from form data
   useEffect(() => {
-    const formData = form.getValues();
-    if (formData.systemConfigVariantIds) {
-      setSelectedVariants(formData.systemConfigVariantIds);
+    const formValues = form.getValues('systemConfigVariantIds');
+    if (formValues && formValues.length > 0) {
+      setSelectedVariants(formValues);
     }
-  }, [form]);
+  }, []);
 
   // Initialize selected variants from factory data if available
   useEffect(() => {
@@ -52,21 +52,41 @@ export function ProductSelection({ form }: ProductSelectionProps) {
       const variantIds = factoryData.getMyFactory.products
         .map(product => product.systemConfigVariantId)
         .filter((id): id is string => id !== null);
-      setSelectedVariants(variantIds);
-      form.setValue('systemConfigVariantIds', variantIds, {
+
+      if (variantIds.length > 0) {
+        setSelectedVariants(variantIds);
+        form.setValue('systemConfigVariantIds', variantIds, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      }
+    }
+  }, [factoryData]);
+
+  // Update form when selected variants change
+  useEffect(() => {
+    if (selectedVariants.length > 0) {
+      form.setValue('systemConfigVariantIds', selectedVariants, {
         shouldValidate: true,
         shouldDirty: true,
       });
     }
-  }, [factoryData, form]);
+  }, [selectedVariants]);
 
-  // Update form when selected variants change
+  // Add a subscription to form value changes
   useEffect(() => {
-    form.setValue('systemConfigVariantIds', selectedVariants, {
-      shouldValidate: true,
-      shouldDirty: true,
+    const subscription = form.watch((value, { name }) => {
+      // Only react to changes in systemConfigVariantIds from outside this component
+      if (name === 'systemConfigVariantIds') {
+        const formVariants = value.systemConfigVariantIds || [];
+        if (JSON.stringify(formVariants) !== JSON.stringify(selectedVariants)) {
+          setSelectedVariants(formVariants as string[]);
+        }
+      }
     });
-  }, [selectedVariants, form]);
+
+    return () => subscription.unsubscribe();
+  }, [form, selectedVariants]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -74,7 +94,16 @@ export function ProductSelection({ form }: ProductSelectionProps) {
 
   // Group variants by product and color
   const variantsByProductAndColor = data.systemConfigVariants.reduce(
-    (acc, variant) => {
+    (
+      acc: Record<
+        string,
+        {
+          product: (typeof data.systemConfigVariants)[0]['product'];
+          colors: Record<string, typeof data.systemConfigVariants>;
+        }
+      >,
+      variant,
+    ) => {
       const productId = variant.product.id;
       const color = variant.color || 'No Color';
 
@@ -92,13 +121,7 @@ export function ProductSelection({ form }: ProductSelectionProps) {
       acc[productId].colors[color].push(variant);
       return acc;
     },
-    {} as Record<
-      string,
-      {
-        product: (typeof data.systemConfigVariants)[0]['product'];
-        colors: Record<string, typeof data.systemConfigVariants>;
-      }
-    >,
+    {},
   );
 
   const handleVariantSelect = (variantId: string) => {

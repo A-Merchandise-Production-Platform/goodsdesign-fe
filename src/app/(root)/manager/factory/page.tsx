@@ -11,7 +11,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useGetFactoriesQuery } from '@/graphql/generated/graphql';
+import {
+  FactoryStatus,
+  useGetFactoriesQuery,
+} from '@/graphql/generated/graphql';
 import { format } from 'date-fns';
 import { Calendar, MapPin, Users } from 'lucide-react';
 import Link from 'next/link';
@@ -19,7 +22,6 @@ import { useRouter } from 'next/navigation';
 
 export default function Page() {
   const { data, loading, error } = useGetFactoriesQuery();
-  const router = useRouter();
 
   if (loading) {
     return (
@@ -54,10 +56,14 @@ export default function Page() {
   }
 
   const factories = data?.getAllFactories || [];
+  const activeFactories = factories.filter(
+    factory =>
+      factory.factoryStatus?.toString() !== FactoryStatus.PendingApproval,
+  );
   const pendingFactories = factories.filter(
     factory =>
-      factory.factoryStatus?.toString() === 'PENDING' ||
-      factory.factoryStatus?.toString() === 'UNDER_REVIEW',
+      factory.factoryStatus?.toString() === FactoryStatus.PendingApproval &&
+      factory.isSubmitted,
   );
 
   const renderFactoryGrid = (factoryList: typeof factories) => (
@@ -144,19 +150,13 @@ export default function Page() {
     >
       <Tabs defaultValue="all">
         <TabsList className="">
-          <TabsTrigger value="all">All Factories</TabsTrigger>
-          <TabsTrigger value="pending">
-            Pending Approval
-            {pendingFactories.length > 0 && (
-              <Badge variant="secondary" className="ml-2">
-                {pendingFactories.length}
-              </Badge>
-            )}
-          </TabsTrigger>
+          <TabsTrigger value="all">Active Factories</TabsTrigger>
+          <TabsTrigger value="pending">Pending Approval</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="all">{renderFactoryGrid(factories)}</TabsContent>
-
+        <TabsContent value="all">
+          {renderFactoryGrid(activeFactories)}
+        </TabsContent>
         <TabsContent value="pending">
           {renderFactoryGrid(pendingFactories)}
         </TabsContent>

@@ -109,19 +109,21 @@ export default function UpdateFactoryForm() {
 
   const handleNextTab = () => {
     if (activeTab === 'basics') setActiveTab('legal');
-    else if (activeTab === 'legal') setActiveTab('quality');
+    else if (activeTab === 'legal') setActiveTab('product');
+    else if (activeTab === 'product') setActiveTab('quality');
     else if (activeTab === 'quality') setActiveTab('operations');
     else if (activeTab === 'operations') setActiveTab('contact');
-    else if (activeTab === 'contact') setActiveTab('product');
   };
 
   const handlePreviousTab = () => {
-    if (activeTab === 'product') setActiveTab('contact');
-    else if (activeTab === 'contact') setActiveTab('operations');
+    if (activeTab === 'contact') setActiveTab('operations');
     else if (activeTab === 'operations') setActiveTab('quality');
-    else if (activeTab === 'quality') setActiveTab('legal');
+    else if (activeTab === 'quality') setActiveTab('product');
+    else if (activeTab === 'product') setActiveTab('legal');
     else if (activeTab === 'legal') setActiveTab('basics');
   };
+
+  console.log(form.watch('systemConfigVariantIds'));
 
   if (loading) {
     return (

@@ -164,6 +164,7 @@ query GetFactoryById($factoryId: String!) {
         productId
         size
       }
+      productionTimeInMinutes
     }
     qualityCertifications
     specializations
@@ -244,5 +245,11 @@ mutation UpdateFactoryInfo($updateFactoryInfoInput: UpdateFactoryInfoDto!) {
     }
     contractAcceptedAt
     factoryOwnerId
+  }
+}
+
+mutation ChangeFactoryStatus($data: UpdateFactoryStatusDto!) {
+  changeFactoryStatus(data: $data) {
+    factoryStatus
   }
 }

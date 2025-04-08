@@ -11,6 +11,7 @@ import {
   User,
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 import { DashboardShell } from '@/components/dashboard-shell';
 import MyAvatar from '@/components/shared/my-avatar';
@@ -19,10 +20,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useGetFactoryByIdQuery } from '@/graphql/generated/graphql';
+import {
+  FactoryStatus,
+  useChangeFactoryStatusMutation,
+  useGetAvailableStaffForFactoryQuery,
+  useGetFactoryByIdQuery,
+} from '@/graphql/generated/graphql';
+import { toast } from 'sonner';
 
 export default function FactoryDetailPage() {
   const { id } = useParams<{ id: string }>();
+
   const router = useRouter();
   const { data: factoriesData } = useGetFactoryByIdQuery({
     variables: {
@@ -30,8 +38,55 @@ export default function FactoryDetailPage() {
     },
   });
 
+  const { data: staffs } = useGetAvailableStaffForFactoryQuery();
+  const [changeFactoryStatus, { loading }] = useChangeFactoryStatusMutation({
+    onCompleted: () => {
+      toast.success('Factory status updated successfully');
+      router.push('/manager/factory');
+    },
+    onError: () => {
+      toast.error('Failed to update factory status');
+    },
+    refetchQueries: ['GetFactories'],
+  });
+
   // Since we're using index for ID in the list page, get the factory by index
   const factory = factoriesData?.getFactoryById;
+
+  const [selectedStaffId, setSelectedStaffId] = useState<string>('');
+  const [isStaffSelected, setIsStaffSelected] = useState(false);
+
+  useEffect(() => {
+    if (selectedStaffId) {
+      setIsStaffSelected(true);
+    } else {
+      setIsStaffSelected(false);
+    }
+  }, [selectedStaffId]);
+
+  const handleApproveFactory = () => {
+    changeFactoryStatus({
+      variables: {
+        data: {
+          status: FactoryStatus.Approved,
+          factoryOwnerId: factory?.owner.id || '',
+          staffId: selectedStaffId,
+        },
+      },
+    });
+  };
+
+  const handleRejectFactory = () => {
+    changeFactoryStatus({
+      variables: {
+        data: {
+          status: FactoryStatus.Rejected,
+          factoryOwnerId: factory?.owner.id || '',
+          staffId: selectedStaffId,
+        },
+      },
+    });
+  };
 
   if (!factory) {
     return (
@@ -50,8 +105,6 @@ export default function FactoryDetailPage() {
       </DashboardShell>
     );
   }
-
-  console.log(factory);
 
   // Format the address for display
   const formattedAddress = factory.address
@@ -77,7 +130,7 @@ export default function FactoryDetailPage() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>Basic Information</CardTitle>
@@ -375,7 +428,7 @@ export default function FactoryDetailPage() {
                                   {product.productionCapacity} units
                                 </td>
                                 <td className="p-3 text-sm">
-                                  {product.estimatedProductionTime} hours
+                                  {product.productionTimeInMinutes} minutes
                                 </td>
                                 <td className="p-3 font-mono text-sm text-xs">
                                   {product.systemConfigVariantId}
@@ -436,7 +489,7 @@ export default function FactoryDetailPage() {
                         <p className="mt-1 text-2xl font-bold">
                           {(
                             factory.products.reduce(
-                              (acc, curr) => acc + curr.estimatedProductionTime,
+                              (acc, curr) => acc + curr.productionTimeInMinutes,
                               0,
                             ) / factory.products.length
                           ).toFixed(1)}
@@ -623,7 +676,6 @@ export default function FactoryDetailPage() {
                       <div>
                         <p className="font-medium">{factory.staff.name}</p>
                         <div className="flex items-center gap-1 text-sm text-gray-500">
-                          <Mail className="h-3 w-3" />
                           <span>{factory.staff.email}</span>
                         </div>
                       </div>
@@ -639,9 +691,13 @@ export default function FactoryDetailPage() {
                       </h3>
                     </div>
                     <div className="grid gap-3 sm:grid-cols-2">
-                      <Button variant="outline" className="w-full">
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => setSelectedStaffId('')}
+                      >
                         <User className="mr-2 h-4 w-4" />
-                        Assign New Staff
+                        Change Staff
                       </Button>
                       <Button variant="outline" className="w-full">
                         <Mail className="mr-2 h-4 w-4" />
@@ -649,6 +705,50 @@ export default function FactoryDetailPage() {
                       </Button>
                     </div>
                   </div>
+
+                  {selectedStaffId && (
+                    <div className="space-y-4">
+                      <Separator />
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-medium text-gray-500">
+                          Assign New Staff
+                        </h3>
+                      </div>
+                      <div className="max-h-[400px] overflow-y-auto">
+                        <div className="grid gap-4">
+                          {staffs?.availableStaffForFactory?.map(staff => (
+                            <div
+                              key={staff.id}
+                              className={`hover:bg-muted flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors ${selectedStaffId === staff.id ? 'border-primary bg-primary/10' : ''}`}
+                              onClick={() => {
+                                setSelectedStaffId(staff.id);
+                                console.log(`Selected staff ID: ${staff.id}`);
+                              }}
+                            >
+                              <MyAvatar
+                                imageUrl={staff.imageUrl || ''}
+                                name={staff.name || ''}
+                              />
+                              <div className="flex-1">
+                                <p className="font-medium">
+                                  {staff.name || 'Unnamed Staff'}
+                                </p>
+                                <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                                  <Mail className="h-3 w-3" />
+                                  <span>{staff.email || 'No email'}</span>
+                                </div>
+                              </div>
+                              {selectedStaffId === staff.id && (
+                                <Badge className="ml-auto" variant="secondary">
+                                  Selected
+                                </Badge>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -658,45 +758,90 @@ export default function FactoryDetailPage() {
                       This factory doesn&apos;t currently have any staff
                       assigned to manage operations.
                     </p>
-                    <Button className="mt-4">
-                      <User className="mr-2 h-4 w-4" />
-                      Assign Staff
-                    </Button>
                   </div>
 
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">
-                        Factory Management Structure
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between rounded-md border p-3">
-                          <div className="font-medium">Owner</div>
-                          <div>{factory.owner?.name || 'Not specified'}</div>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-medium text-gray-500">
+                        Available Staff
+                      </h3>
+                    </div>
+                    <div className="max-h-[400px] overflow-y-auto">
+                      {staffs?.availableStaffForFactory &&
+                      staffs.availableStaffForFactory.length > 0 ? (
+                        <div className="grid gap-4">
+                          {staffs.availableStaffForFactory.map(staff => (
+                            <div
+                              key={staff.id}
+                              className={`hover:bg-muted flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors ${selectedStaffId === staff.id ? 'border-primary bg-primary/10' : ''}`}
+                              onClick={() => {
+                                if (selectedStaffId === staff.id) {
+                                  setSelectedStaffId('');
+                                } else {
+                                  setSelectedStaffId(staff.id);
+                                }
+                                console.log(`Selected staff ID: ${staff.id}`);
+                              }}
+                            >
+                              <MyAvatar
+                                imageUrl={staff.imageUrl || ''}
+                                name={staff.name || ''}
+                              />
+                              <div className="flex-1">
+                                <p className="font-medium">
+                                  {staff.name || 'Unnamed Staff'}
+                                </p>
+                                <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                                  <span>{staff.email || 'No email'}</span>
+                                </div>
+                              </div>
+                              {selectedStaffId === staff.id && (
+                                <Badge className="ml-auto" variant="secondary">
+                                  Selected
+                                </Badge>
+                              )}
+                            </div>
+                          ))}
                         </div>
-                        <div className="flex justify-between rounded-md border p-3">
-                          <div className="font-medium">Factory Manager</div>
-                          <div className="text-muted-foreground">
-                            Not assigned
-                          </div>
+                      ) : (
+                        <div className="flex h-40 flex-col items-center justify-center rounded-lg border border-dashed p-6 text-center">
+                          <p className="text-lg font-medium">
+                            No Staff Available
+                          </p>
+                          <p className="text-muted-foreground mt-1 text-sm">
+                            There are currently no staff members available to
+                            assign.
+                          </p>
                         </div>
-                        <div className="flex justify-between rounded-md border p-3">
-                          <div className="font-medium">Contact Person</div>
-                          <div>
-                            {factory.contactPersonName || 'Not specified'}
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+      <div className="text-muted-foreground mt-4 text-sm">
+        Assign Staff for this factory before approving.
+      </div>
+      <div className="mt-4 flex w-full items-center gap-4">
+        <Button
+          variant="destructive"
+          className="flex-1"
+          disabled={!isStaffSelected || loading}
+          onClick={handleRejectFactory}
+        >
+          Reject Factory
+        </Button>
+        <Button
+          className="flex-1"
+          disabled={!isStaffSelected || loading}
+          onClick={handleApproveFactory}
+        >
+          Approve Factory
+        </Button>
+      </div>
     </DashboardShell>
   );
 }

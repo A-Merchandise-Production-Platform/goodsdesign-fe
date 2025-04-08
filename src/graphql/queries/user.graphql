@@ -77,3 +77,14 @@ mutation DeleteUser($deleteUserId: String!) {
     updatedAt
   }
 }
+
+query GetAvailableStaffForFactory {
+  availableStaffForFactory {
+    email
+    id
+    gender
+    imageUrl
+    name
+    role
+  }
+}
