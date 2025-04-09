@@ -1,6 +1,6 @@
-import { Check, ChevronDown, Lock } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { Check, ChevronDown, Lock } from 'lucide-react';
+import { useContext, useEffect, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,10 @@ import {
 import { cn, formatPrice, getContrastColor } from '@/lib/utils';
 
 import { FactoryFormValues } from '../factory-form-schema';
+import {
+  RequiredFieldsContext,
+  RequiredIndicator,
+} from '../update-factory-form';
 
 interface ProductSelectionProps {
   form: UseFormReturn<FactoryFormValues>;
@@ -36,16 +40,18 @@ export function ProductSelection({ form }: ProductSelectionProps) {
   const [expandedProducts, setExpandedProducts] = useState<
     Record<string, boolean>
   >({});
+  const requiredFields = useContext(RequiredFieldsContext);
+  const isRequired = (fieldName: string) => requiredFields.includes(fieldName);
 
   const isSubmitted = factoryData?.getMyFactory?.isSubmitted ?? false;
 
   // Initialize selected variants from form data
   useEffect(() => {
-    const formData = form.getValues();
-    if (formData.systemConfigVariantIds) {
-      setSelectedVariants(formData.systemConfigVariantIds);
+    const formValues = form.getValues('systemConfigVariantIds');
+    if (formValues && formValues.length > 0) {
+      setSelectedVariants(formValues);
     }
-  }, [form]);
+  }, []);
 
   // Initialize selected variants from factory data if available
   useEffect(() => {
@@ -53,21 +59,41 @@ export function ProductSelection({ form }: ProductSelectionProps) {
       const variantIds = factoryData.getMyFactory.products
         .map(product => product.systemConfigVariantId)
         .filter((id): id is string => id !== null);
-      setSelectedVariants(variantIds);
-      form.setValue('systemConfigVariantIds', variantIds, {
+
+      if (variantIds.length > 0) {
+        setSelectedVariants(variantIds);
+        form.setValue('systemConfigVariantIds', variantIds, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      }
+    }
+  }, [factoryData]);
+
+  // Update form when selected variants change
+  useEffect(() => {
+    if (selectedVariants.length > 0) {
+      form.setValue('systemConfigVariantIds', selectedVariants, {
         shouldValidate: true,
         shouldDirty: true,
       });
     }
-  }, [factoryData, form]);
+  }, [selectedVariants]);
 
-  // Update form when selected variants change
+  // Add a subscription to form value changes
   useEffect(() => {
-    form.setValue('systemConfigVariantIds', selectedVariants, {
-      shouldValidate: true,
-      shouldDirty: true,
+    const subscription = form.watch((value, { name }) => {
+      // Only react to changes in systemConfigVariantIds from outside this component
+      if (name === 'systemConfigVariantIds') {
+        const formVariants = value.systemConfigVariantIds || [];
+        if (JSON.stringify(formVariants) !== JSON.stringify(selectedVariants)) {
+          setSelectedVariants(formVariants as string[]);
+        }
+      }
     });
-  }, [selectedVariants, form]);
+
+    return () => subscription.unsubscribe();
+  }, [form, selectedVariants]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -75,7 +101,16 @@ export function ProductSelection({ form }: ProductSelectionProps) {
 
   // Group variants by product and color
   const variantsByProductAndColor = data.systemConfigVariants.reduce(
-    (acc, variant) => {
+    (
+      acc: Record<
+        string,
+        {
+          product: (typeof data.systemConfigVariants)[0]['product'];
+          colors: Record<string, typeof data.systemConfigVariants>;
+        }
+      >,
+      variant,
+    ) => {
       const productId = variant.product.id;
       const color = variant.color || 'No Color';
 
@@ -93,13 +128,7 @@ export function ProductSelection({ form }: ProductSelectionProps) {
       acc[productId].colors[color].push(variant);
       return acc;
     },
-    {} as Record<
-      string,
-      {
-        product: (typeof data.systemConfigVariants)[0]['product'];
-        colors: Record<string, typeof data.systemConfigVariants>;
-      }
-    >,
+    {},
   );
 
   const handleVariantSelect = (variantId: string) => {
@@ -154,7 +183,10 @@ export function ProductSelection({ form }: ProductSelectionProps) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Product Selection</CardTitle>
+            <CardTitle>
+              Product Selection
+              {isRequired('systemConfigVariantIds') && <RequiredIndicator />}
+            </CardTitle>
             <CardDescription>
               Select the products you want to offer
             </CardDescription>
@@ -220,84 +252,50 @@ export function ProductSelection({ form }: ProductSelectionProps) {
                                 </span>
                               </div>
                               <Button
+                                type="button"
                                 variant="outline"
                                 size="sm"
                                 className="text-xs"
                                 onClick={() => handleColorSelectAll(variants)}
                                 disabled={isSubmitted}
                               >
-                                {variants.every(v =>
-                                  selectedVariants.includes(v.id),
-                                )
-                                  ? 'Unselect All'
-                                  : 'Select All'}
+                                Select All
                               </Button>
                             </div>
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                              {variants.map(variant => {
-                                const isSelected = selectedVariants.includes(
-                                  variant.id,
-                                );
-                                return (
-                                  <div
-                                    key={variant.id}
-                                    className={cn(
-                                      'relative cursor-pointer rounded-lg border-2 transition-all duration-200',
-                                      isSelected
-                                        ? 'border-primary bg-primary/5'
-                                        : 'border-border',
-                                      isSubmitted &&
-                                        'cursor-not-allowed opacity-75',
-                                      !isSubmitted && 'hover:border-primary/50',
-                                    )}
-                                    onClick={() =>
-                                      handleVariantSelect(variant.id)
-                                    }
-                                  >
-                                    {isSelected && (
-                                      <div className="absolute top-2 right-2">
-                                        <div className="bg-primary text-primary-foreground rounded-full p-1">
-                                          <Check className="h-3 w-3" />
-                                        </div>
+                            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                              {variants.map(variant => (
+                                <div
+                                  key={variant.id}
+                                  className={cn(
+                                    'border-border group relative cursor-pointer rounded-lg border p-4 transition-all',
+                                    selectedVariants.includes(variant.id) &&
+                                      'border-primary',
+                                    isSubmitted && 'cursor-not-allowed',
+                                  )}
+                                  onClick={() =>
+                                    handleVariantSelect(variant.id)
+                                  }
+                                >
+                                  {selectedVariants.includes(variant.id) && (
+                                    <div className="bg-primary absolute top-2 right-2 rounded-full p-1 text-white">
+                                      <Check className="h-3 w-3" />
+                                    </div>
+                                  )}
+                                  <div className="space-y-2">
+                                    <div>
+                                      <div className="text-xs font-semibold uppercase">
+                                        {variant.size}
                                       </div>
-                                    )}
-                                    <div className="p-4">
-                                      <div className="space-y-2">
-                                        {variant.model && (
-                                          <div className="flex justify-between">
-                                            <span className="text-muted-foreground">
-                                              Model
-                                            </span>
-                                            <span className="font-medium">
-                                              {variant.model}
-                                            </span>
-                                          </div>
-                                        )}
-                                        {variant.size && (
-                                          <div className="flex gap-4">
-                                            <span className="font-medium">
-                                              {variant.size}
-                                            </span>
-                                          </div>
-                                        )}
-                                        {variant.price && (
-                                          <div className="flex justify-between pt-1">
-                                            <span className="text-muted-foreground">
-                                              Price
-                                            </span>
-                                            <span className="font-semibold">
-                                              {formatPrice(variant.price)}
-                                            </span>
-                                          </div>
-                                        )}
+                                      <div className="text-muted-foreground text-xs">
+                                        {formatPrice(variant.price || 0)}
                                       </div>
                                     </div>
                                   </div>
-                                );
-                              })}
+                                </div>
+                              ))}
                             </div>
                             {colorIndex < colorArray.length - 1 && (
-                              <Separator className="my-6" />
+                              <Separator className="my-4" />
                             )}
                           </div>
                         ),

@@ -57,6 +57,7 @@ query GetMyFactory {
     }
     contractAcceptedAt
     factoryOwnerId
+    formattedAddress
   }
 }
 
@@ -119,6 +120,7 @@ query GetFactories {
     }
     contractAcceptedAt
     factoryOwnerId
+    formattedAddress
   }
 }
 
@@ -164,6 +166,7 @@ query GetFactoryById($factoryId: String!) {
         productId
         size
       }
+      productionTimeInMinutes
     }
     qualityCertifications
     specializations
@@ -182,6 +185,7 @@ query GetFactoryById($factoryId: String!) {
     }
     contractAcceptedAt
     factoryOwnerId
+    formattedAddress
   }
 }
 
@@ -244,5 +248,12 @@ mutation UpdateFactoryInfo($updateFactoryInfoInput: UpdateFactoryInfoDto!) {
     }
     contractAcceptedAt
     factoryOwnerId
+    formattedAddress
+  }
+}
+
+mutation ChangeFactoryStatus($data: UpdateFactoryStatusDto!) {
+  changeFactoryStatus(data: $data) {
+    factoryStatus
   }
 }

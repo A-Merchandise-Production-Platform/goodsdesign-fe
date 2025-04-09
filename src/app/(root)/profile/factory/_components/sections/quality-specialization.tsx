@@ -1,5 +1,6 @@
 import { HelpCircle } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
+import { useContext } from 'react';
 
 import {
   Card,
@@ -25,6 +26,10 @@ import {
 } from '@/components/ui/tooltip';
 
 import { FactoryFormValues } from '../factory-form-schema';
+import {
+  RequiredFieldsContext,
+  RequiredIndicator,
+} from '../update-factory-form';
 
 interface QualitySpecializationProps {
   form: UseFormReturn<FactoryFormValues>;
@@ -35,6 +40,10 @@ export function QualitySpecialization({
   form,
   disabled,
 }: QualitySpecializationProps) {
+  const requiredFields = useContext(RequiredFieldsContext);
+
+  const isRequired = (fieldName: string) => requiredFields.includes(fieldName);
+
   return (
     <Card>
       <CardHeader>
@@ -50,7 +59,10 @@ export function QualitySpecialization({
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center gap-2">
-                <FormLabel>Quality Certifications</FormLabel>
+                <FormLabel>
+                  Quality Certifications
+                  {isRequired('qualityCertifications') && <RequiredIndicator />}
+                </FormLabel>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -89,7 +101,10 @@ export function QualitySpecialization({
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center gap-2">
-                <FormLabel>Printing Methods</FormLabel>
+                <FormLabel>
+                  Printing Methods
+                  {isRequired('printingMethods') && <RequiredIndicator />}
+                </FormLabel>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -128,7 +143,10 @@ export function QualitySpecialization({
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center gap-2">
-                <FormLabel>Specializations</FormLabel>
+                <FormLabel>
+                  Specializations
+                  {isRequired('specializations') && <RequiredIndicator />}
+                </FormLabel>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="text-muted-foreground h-4 w-4" />

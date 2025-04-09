@@ -1,5 +1,6 @@
 import { HelpCircle } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
+import { useContext } from 'react';
 
 import {
   Card,
@@ -25,6 +26,10 @@ import {
 } from '@/components/ui/tooltip';
 
 import { FactoryFormValues } from '../factory-form-schema';
+import {
+  RequiredFieldsContext,
+  RequiredIndicator,
+} from '../update-factory-form';
 
 interface ContactInformationProps {
   form: UseFormReturn<FactoryFormValues>;
@@ -35,6 +40,10 @@ export function ContactInformation({
   form,
   disabled,
 }: ContactInformationProps) {
+  const requiredFields = useContext(RequiredFieldsContext);
+
+  const isRequired = (fieldName: string) => requiredFields.includes(fieldName);
+
   return (
     <Card>
       <CardHeader>
@@ -48,7 +57,10 @@ export function ContactInformation({
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center gap-2">
-                <FormLabel>Contact Person Name</FormLabel>
+                <FormLabel>
+                  Contact Person Name
+                  {isRequired('contactPersonName') && <RequiredIndicator />}
+                </FormLabel>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -86,7 +98,10 @@ export function ContactInformation({
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center gap-2">
-                <FormLabel>Contact Person Role</FormLabel>
+                <FormLabel>
+                  Contact Person Role
+                  {isRequired('contactPersonRole') && <RequiredIndicator />}
+                </FormLabel>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -124,7 +139,10 @@ export function ContactInformation({
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center gap-2">
-                <FormLabel>Contact Person Phone</FormLabel>
+                <FormLabel>
+                  Contact Person Phone
+                  {isRequired('contactPersonPhone') && <RequiredIndicator />}
+                </FormLabel>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="text-muted-foreground h-4 w-4" />

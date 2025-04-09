@@ -42,3 +42,9 @@ query GetAddressDetails(
     wardName
   }
 }
+
+query FormatAddress($formatAddressInput: FormatAddressInput!) {
+  formatAddress(formatAddressInput: $formatAddressInput) {
+    text
+  }
+}
