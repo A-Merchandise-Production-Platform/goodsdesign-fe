@@ -28,6 +28,7 @@ export default function ManagerSidebarLayout({
       href: '/manager/orders',
       label: 'Orders',
       icon: <ShoppingBag className="size-4" />,
+      isActive: pathname.includes('/manager/orders'),
     },
     {
       href: '/manager/factory',
@@ -39,11 +40,6 @@ export default function ManagerSidebarLayout({
       href: '/manager/users',
       label: 'Users Management',
       icon: <User2Icon className="size-4" />,
-    },
-    {
-      href: '/manager/assign',
-      label: 'Need Assign',
-      icon: <ListIcon className="size-4" />,
     },
   ];
 

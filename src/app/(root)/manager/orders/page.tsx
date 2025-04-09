@@ -1,6 +1,12 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
+import {
+  ArrowRight,
+  ClipboardIcon,
+  ClockIcon,
+  DollarSignIcon,
+  PackageIcon,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +29,9 @@ import {
 } from '@/components/ui/table';
 import { useGetAllOrdersQuery } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
+import { StatCard } from '@/components/stat-card';
+import { calculateChange } from '@/lib/calculate-change';
+import { DashboardShell } from '@/components/dashboard-shell';
 
 export default function ManagerOrdersPage() {
   const { data, loading } = useGetAllOrdersQuery();
@@ -83,8 +92,93 @@ export default function ManagerOrdersPage() {
       })
     : [];
 
+  // Calculate current statistics
+  const totalOrders = orders.length;
+  const pendingOrders = orders.filter(
+    order => order.status === 'PENDING',
+  ).length;
+  const inProgressOrders = orders.filter(order =>
+    ['PROCESSING', 'IN_PRODUCTION', 'REWORK_IN_PROGRESS'].includes(
+      order.status,
+    ),
+  ).length;
+  const completedOrders = orders.filter(order =>
+    ['COMPLETED', 'SHIPPED', 'PAID', 'PAYMENT_RECEIVED'].includes(order.status),
+  ).length;
+
+  // Calculate changes from last month
+  const lastMonth = new Date();
+  lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+  const lastMonthOrders = orders.filter(
+    order => new Date(order.orderDate) < lastMonth,
+  ).length;
+
+  const lastMonthPending = orders.filter(
+    order =>
+      order.status === 'PENDING' && new Date(order.orderDate) < lastMonth,
+  ).length;
+
+  const lastMonthInProgress = orders.filter(
+    order =>
+      ['PROCESSING', 'IN_PRODUCTION', 'REWORK_IN_PROGRESS'].includes(
+        order.status,
+      ) && new Date(order.orderDate) < lastMonth,
+  ).length;
+
+  const lastMonthCompleted = orders.filter(
+    order =>
+      ['COMPLETED', 'SHIPPED', 'PAID', 'PAYMENT_RECEIVED'].includes(
+        order.status,
+      ) && new Date(order.orderDate) < lastMonth,
+  ).length;
+
+  // Calculate changes using the utility function
+  const totalChange = calculateChange(totalOrders, lastMonthOrders);
+  const pendingChange = calculateChange(pendingOrders, lastMonthPending);
+  const inProgressChange = calculateChange(
+    inProgressOrders,
+    lastMonthInProgress,
+  );
+  const completedChange = calculateChange(completedOrders, lastMonthCompleted);
+
   return (
-    <div className="container mx-auto py-6">
+    <DashboardShell
+      title="Orders Management"
+      subtitle="View and manage all orders"
+    >
+      {/* Stats Overview */}
+      <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Total Orders"
+          value={totalOrders.toString()}
+          change={totalChange.change}
+          changeType={totalChange.type}
+          icon={<ClipboardIcon className="h-5 w-5" />}
+        />
+        <StatCard
+          title="Pending Orders"
+          value={pendingOrders.toString()}
+          change={pendingChange.change}
+          changeType={pendingChange.type}
+          icon={<ClockIcon className="h-5 w-5" />}
+        />
+        <StatCard
+          title="In Progress"
+          value={inProgressOrders.toString()}
+          change={inProgressChange.change}
+          changeType={inProgressChange.type}
+          icon={<PackageIcon className="h-5 w-5" />}
+        />
+        <StatCard
+          title="Completed"
+          value={completedOrders.toString()}
+          change={completedChange.change}
+          changeType={completedChange.type}
+          icon={<DollarSignIcon className="h-5 w-5" />}
+        />
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Factory Orders</CardTitle>
@@ -135,13 +229,35 @@ export default function ManagerOrdersPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </DashboardShell>
   );
 }
 
 function OrdersLoadingSkeleton() {
   return (
-    <div className="container mx-auto py-6">
+    <div className="container mx-auto space-y-6">
+      {/* Stats Skeleton */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {Array(4)
+          .fill(0)
+          .map((_, i) => (
+            <Card key={i}>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="mt-2 h-8 w-16" />
+                  </div>
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                </div>
+                <div className="mt-4">
+                  <Skeleton className="h-4 w-20" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+      </div>
+
       <Card>
         <CardHeader>
           <Skeleton className="h-8 w-64" />

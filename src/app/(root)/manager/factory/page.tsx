@@ -1,7 +1,14 @@
 'use client';
 
 import { format } from 'date-fns';
-import { Calendar, MapPin, Users } from 'lucide-react';
+import {
+  Building2Icon,
+  Calendar,
+  CheckCircle2Icon,
+  MapPin,
+  Users,
+  XCircleIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -20,6 +27,8 @@ import {
   FactoryStatus,
   useGetFactoriesQuery,
 } from '@/graphql/generated/graphql';
+import { StatCard } from '@/components/stat-card';
+import { calculateChange } from '@/lib/calculate-change';
 
 export default function Page() {
   const { data, loading, error } = useGetFactoriesQuery();
@@ -30,6 +39,24 @@ export default function Page() {
         title="Factory Management"
         subtitle="View and manage all factories"
       >
+        <div className="mb-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="bg-muted h-4 w-24 rounded"></div>
+                    <div className="bg-muted mt-2 h-8 w-16 rounded"></div>
+                  </div>
+                  <div className="bg-muted h-10 w-10 rounded-full"></div>
+                </div>
+                <div className="mt-4">
+                  <div className="bg-muted h-4 w-20 rounded"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
             <Card key={i} className="animate-pulse">
@@ -68,6 +95,24 @@ export default function Page() {
   const rejectedFactories = factories.filter(
     factory => factory.factoryStatus?.toString() === FactoryStatus.Rejected,
   );
+
+  // Calculate statistics
+  const totalFactories = factories.length;
+  const activeCount = activeFactories.length;
+  const pendingCount = pendingFactories.length;
+  const rejectedCount = rejectedFactories.length;
+
+  // Calculate changes from last month (using sample data for now)
+  const lastMonthTotal = Math.floor(totalFactories * 0.9); // 10% decrease
+  const lastMonthActive = Math.floor(activeCount * 0.95); // 5% decrease
+  const lastMonthPending = Math.floor(pendingCount * 1.2); // 20% increase
+  const lastMonthRejected = Math.floor(rejectedCount * 0.8); // 20% decrease
+
+  // Calculate changes
+  const totalChange = calculateChange(totalFactories, lastMonthTotal);
+  const activeChange = calculateChange(activeCount, lastMonthActive);
+  const pendingChange = calculateChange(pendingCount, lastMonthPending);
+  const rejectedChange = calculateChange(rejectedCount, lastMonthRejected);
 
   const renderFactoryGrid = (factoryList: typeof factories) => (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -152,6 +197,38 @@ export default function Page() {
       title="Factory Management"
       subtitle="View and manage all factories"
     >
+      {/* Stats Overview */}
+      <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Total Factories"
+          value={totalFactories.toString()}
+          change={totalChange.change}
+          changeType={totalChange.type}
+          icon={<Building2Icon className="h-5 w-5" />}
+        />
+        <StatCard
+          title="Active Factories"
+          value={activeCount.toString()}
+          change={activeChange.change}
+          changeType={activeChange.type}
+          icon={<CheckCircle2Icon className="h-5 w-5" />}
+        />
+        <StatCard
+          title="Pending Approval"
+          value={pendingCount.toString()}
+          change={pendingChange.change}
+          changeType={pendingChange.type}
+          icon={<Calendar className="h-5 w-5" />}
+        />
+        <StatCard
+          title="Rejected"
+          value={rejectedCount.toString()}
+          change={rejectedChange.change}
+          changeType={rejectedChange.type}
+          icon={<XCircleIcon className="h-5 w-5" />}
+        />
+      </div>
+
       <Tabs defaultValue="all">
         <TabsList className="">
           <TabsTrigger value="all">Active Factories</TabsTrigger>

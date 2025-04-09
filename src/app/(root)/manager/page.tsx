@@ -26,6 +26,12 @@ import { Button } from '@/components/ui/button';
 import { FactoryPerformanceChart } from '@/components/factory-performance-chart';
 import { OrderStatusChart } from '@/components/order-status-chart';
 import { cn } from '@/lib/utils';
+import {
+  ChangeType,
+  useGetEnhancedManagerDashboardQuery,
+} from '@/graphql/generated/graphql';
+import { StatCard } from '@/components/stat-card';
+import { DashboardShell } from '@/components/dashboard-shell';
 
 // Dashboard data interface
 interface ManagerDashboardData {
@@ -169,36 +175,71 @@ const dashboardData: ManagerDashboardData = {
 };
 
 export default function Page() {
+  const { data, loading } = useGetEnhancedManagerDashboardQuery();
   return (
-    <div className="space-y-6">
+    <DashboardShell
+      title="Manager Dashboard"
+      subtitle="View and manage all your operations"
+    >
       {/* Stats Overview */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Factories"
-          value={dashboardData.stats.factories.total.toString()}
-          change={dashboardData.stats.factories.change}
-          changeType={dashboardData.stats.factories.changeType}
+          value={
+            data?.getEnhancedManagerDashboard.stats.factories.total.toString() ??
+            '0'
+          }
+          change={
+            data?.getEnhancedManagerDashboard.stats.factories.change ?? '0'
+          }
+          changeType={
+            data?.getEnhancedManagerDashboard.stats.factories.changeType ===
+            ChangeType.Positive
+              ? 'positive'
+              : 'negative'
+          }
           icon={<Building2Icon className="h-5 w-5" />}
         />
         <StatCard
           title="Active Orders"
-          value={dashboardData.stats.orders.active.toString()}
-          change={dashboardData.stats.orders.change}
-          changeType={dashboardData.stats.orders.changeType}
+          value={
+            data?.getEnhancedManagerDashboard.stats.orders.active.toString() ??
+            '0'
+          }
+          change={data?.getEnhancedManagerDashboard.stats.orders.change ?? '0'}
+          changeType={
+            data?.getEnhancedManagerDashboard.stats.orders.changeType ===
+            ChangeType.Positive
+              ? 'positive'
+              : 'negative'
+          }
           icon={<ClipboardIcon className="h-5 w-5" />}
         />
         <StatCard
           title="Staff Members"
-          value={dashboardData.stats.staff.total.toString()}
-          change={dashboardData.stats.staff.change}
-          changeType={dashboardData.stats.staff.changeType}
+          value={
+            data?.getEnhancedManagerDashboard.stats.staff.total.toString() ??
+            '0'
+          }
+          change={data?.getEnhancedManagerDashboard.stats.staff.change ?? '0'}
+          changeType={
+            data?.getEnhancedManagerDashboard.stats.staff.changeType ===
+            ChangeType.Positive
+              ? 'positive'
+              : 'negative'
+          }
           icon={<UsersIcon className="h-5 w-5" />}
         />
         <StatCard
           title="Monthly Revenue"
-          value={dashboardData.stats.revenue.monthly}
-          change={dashboardData.stats.revenue.change}
-          changeType={dashboardData.stats.revenue.changeType}
+          value={data?.getEnhancedManagerDashboard.stats.revenue.monthly ?? '0'}
+          change={data?.getEnhancedManagerDashboard.stats.revenue.change ?? '0'}
+          changeType={
+            data?.getEnhancedManagerDashboard.stats.revenue.changeType ===
+            ChangeType.Positive
+              ? 'positive'
+              : 'negative'
+          }
           icon={<DollarSignIcon className="h-5 w-5" />}
         />
       </div>
@@ -211,7 +252,9 @@ export default function Page() {
             <CardDescription>Orders and revenue by factory</CardDescription>
           </CardHeader>
           <CardContent>
-            <FactoryPerformanceChart data={dashboardData.factoryPerformance} />
+            <FactoryPerformanceChart
+              data={data?.getEnhancedManagerDashboard.factoryPerformance ?? []}
+            />
           </CardContent>
         </Card>
 
@@ -221,14 +264,16 @@ export default function Page() {
             <CardDescription>Distribution of order statuses</CardDescription>
           </CardHeader>
           <CardContent>
-            <OrderStatusChart data={dashboardData.orderStatus} />
+            <OrderStatusChart
+              data={data?.getEnhancedManagerDashboard.orderStatus ?? []}
+            />
           </CardContent>
         </Card>
       </div>
 
       {/* Recent Activities and Quick Actions */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <div>
               <CardTitle>Recent Activities</CardTitle>
@@ -243,77 +288,35 @@ export default function Page() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-4">
-              {dashboardData.recentActivities.map(activity => (
-                <li
-                  key={activity.id}
-                  className="flex items-start gap-4 border-b pb-4 last:border-0"
-                >
-                  <div
-                    className={cn(
-                      'rounded-full p-2',
-                      activityTypeStyles[activity.type].bgColor,
-                    )}
+              {data?.getEnhancedManagerDashboard.recentActivities.map(
+                activity => (
+                  <li
+                    key={activity.id}
+                    className="flex items-start gap-4 border-b pb-4 last:border-0"
                   >
-                    {activityTypeStyles[activity.type].icon}
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <p className="text-sm font-medium">{activity.title}</p>
-                    <p className="text-muted-foreground text-sm">
-                      {activity.description}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      {activity.time}
-                    </p>
-                  </div>
-                </li>
-              ))}
+                    <div className={cn('rounded-full p-2')}></div>
+                    <div className="flex-1 space-y-1">
+                      <p className="text-sm font-medium">{activity.title}</p>
+                      <p className="text-muted-foreground text-sm">
+                        {activity.description}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        {activity.time}
+                      </p>
+                    </div>
+                  </li>
+                ),
+              )}
             </ul>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Frequently used tools</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Button className="w-full justify-start" size="sm">
-              <PlusCircleIcon className="mr-2 h-4 w-4" />
-              Add New Factory
-            </Button>
-            <Button className="w-full justify-start" size="sm">
-              <UserPlusIcon className="mr-2 h-4 w-4" />
-              Hire Staff
-            </Button>
-            <Button className="w-full justify-start" size="sm">
-              <ClipboardIcon className="mr-2 h-4 w-4" />
-              Create Order
-            </Button>
-            <Button className="w-full justify-start" size="sm">
-              <BarChart3Icon className="mr-2 h-4 w-4" />
-              Generate Reports
-            </Button>
-            <Button className="w-full justify-start" size="sm">
-              <Settings2Icon className="mr-2 h-4 w-4" />
-              System Settings
-            </Button>
-          </CardContent>
-        </Card>
       </div>
-    </div>
+    </DashboardShell>
   );
 }
 
 // Type definitions
 type ActivityType = 'order' | 'factory' | 'staff' | 'system';
-
-interface StatCardProps {
-  title: string;
-  value: string;
-  change: string;
-  changeType: 'positive' | 'negative';
-  icon: React.ReactNode;
-}
 
 // Activity type styles
 const activityTypeStyles = {
@@ -334,44 +337,3 @@ const activityTypeStyles = {
     bgColor: 'bg-purple-500/20',
   },
 };
-
-// Stat Card Component
-function StatCard({
-  title,
-  value,
-  change,
-  changeType = 'positive',
-  icon,
-}: StatCardProps) {
-  return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-muted-foreground text-sm font-medium">{title}</p>
-            <h3 className="mt-1 text-2xl font-bold">{value}</h3>
-          </div>
-          <div className="bg-primary/10 rounded-full p-2">{icon}</div>
-        </div>
-        <div className="mt-4">
-          <span
-            className={cn(
-              'inline-flex items-center text-xs font-medium',
-              changeType === 'positive' ? 'text-green-600' : 'text-red-600',
-            )}
-          >
-            {changeType === 'positive' ? (
-              <ArrowUpIcon className="mr-1 h-3 w-3" />
-            ) : (
-              <ArrowDownIcon className="mr-1 h-3 w-3" />
-            )}
-            {change}
-          </span>
-          <span className="text-muted-foreground ml-1 text-xs">
-            vs. last month
-          </span>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
