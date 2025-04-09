@@ -1,13 +1,13 @@
 'use client';
 
-import { CalendarIcon, Factory, Mail, Phone, User } from 'lucide-react';
 import { format } from 'date-fns';
+import { CalendarIcon, Factory, Mail, Phone, User } from 'lucide-react';
 
+import MyAvatar from '@/components/shared/my-avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { GetMyFactoryQuery } from '@/graphql/generated/graphql';
-import MyAvatar from '@/components/shared/my-avatar';
 
 interface FactoryInfoDisplayProps {
   factoryData: GetMyFactoryQuery['getMyFactory'];
@@ -128,13 +128,13 @@ export function FactoryInfoDisplay({ factoryData }: FactoryInfoDisplayProps) {
           </h3>
           <div className="flex items-center gap-3">
             <MyAvatar
-              imageUrl={factoryData.owner.imageUrl || ''}
-              name={factoryData.owner.name || ''}
+              imageUrl={factoryData?.owner?.imageUrl || ''}
+              name={factoryData?.owner?.name || ''}
             />
             <div>
-              <p className="font-medium">{factoryData.owner.name}</p>
+              <p className="font-medium">{factoryData?.owner?.name}</p>
               <div className="flex items-center gap-1 text-sm text-gray-500">
-                <span>{factoryData.owner.email}</span>
+                <span>{factoryData?.owner?.email}</span>
               </div>
             </div>
           </div>

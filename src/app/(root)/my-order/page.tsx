@@ -29,8 +29,8 @@ export default function MyOrderPage() {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   // Sort orders by date
-  const sortedOrders = data?.userOrders
-    ? [...data.userOrders].sort((a, b) => {
+  const sortedOrders = data?.myOrders
+    ? [...data?.myOrders].sort((a, b) => {
         const dateA = new Date(a.orderDate).getTime();
         const dateB = new Date(b.orderDate).getTime();
         return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;

@@ -2,6 +2,7 @@ import { HelpCircle } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
 import { useContext } from 'react';
 
+import { AddressSelector } from '@/components/shared/address/address-selector';
 import {
   Card,
   CardContent,
@@ -29,7 +30,6 @@ import {
   RequiredFieldsContext,
   RequiredIndicator,
 } from '../update-factory-form';
-import { AddressSelector } from '@/components/shared/address/address-selector';
 
 interface LegalInformationProps {
   form: UseFormReturn<FactoryFormValues>;

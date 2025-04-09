@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { PhoneInput } from '@/components/ui/phone-input';
 import {
   Tooltip,
   TooltipContent,
@@ -29,7 +30,6 @@ import {
   RequiredFieldsContext,
   RequiredIndicator,
 } from '../update-factory-form';
-import { PhoneInput } from '@/components/ui/phone-input';
 
 interface ContactInformationProps {
   form: UseFormReturn<FactoryFormValues>;

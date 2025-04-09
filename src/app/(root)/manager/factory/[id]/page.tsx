@@ -491,12 +491,12 @@ export default function FactoryDetailPage() {
                           Avg Production Time
                         </h4>
                         <p className="mt-1 text-2xl font-bold">
-                          {(
+                          {/* {(
                             factory.products.reduce(
                               (acc, curr) => acc + curr.productionTimeInMinutes,
                               0,
                             ) / factory.products.length
-                          ).toFixed(1)}
+                          ).toFixed(1)} */}
                           h
                         </p>
                       </CardContent>

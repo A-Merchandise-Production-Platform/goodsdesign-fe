@@ -1,5 +1,10 @@
 'use client';
 
+import { formatDistanceToNow } from 'date-fns';
+import { Bell, CheckCheckIcon } from 'lucide-react';
+import { useEffect } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -9,6 +14,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import {
   MyNotificationsQuery,
   useMarkNotificationAsReadMutation,
@@ -17,17 +29,6 @@ import {
 import { NOTIFICATION_EVENT } from '@/hooks/io';
 import { cn } from '@/lib/utils';
 import { useSocketStore } from '@/stores/socket-io-store';
-import { formatDistanceToNow } from 'date-fns';
-import { Bell, CheckCheckIcon } from 'lucide-react';
-import { useEffect } from 'react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
 
 export default function NotificationButton() {
   const { data, loading, refetch } = useMyNotificationsQuery({

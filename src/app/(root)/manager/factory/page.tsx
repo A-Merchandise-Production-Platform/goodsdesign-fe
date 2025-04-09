@@ -1,5 +1,10 @@
 'use client';
 
+import { format } from 'date-fns';
+import { Calendar, MapPin, Users } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
 import { DashboardShell } from '@/components/dashboard-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,11 +20,6 @@ import {
   FactoryStatus,
   useGetFactoriesQuery,
 } from '@/graphql/generated/graphql';
-import { useFormatAddress } from '@/hooks/use-format-address';
-import { format } from 'date-fns';
-import { Calendar, MapPin, Users } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
 export default function Page() {
   const { data, loading, error } = useGetFactoriesQuery();

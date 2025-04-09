@@ -1,13 +1,14 @@
 'use client';
 
+import { Sidebar } from '@/components/shared/sidebar';
 import {
   useGetAllProductsQuery,
   useProductDesignTemplatesQuery,
 } from '@/graphql/generated/graphql';
+
 import { DesignSection } from './_components/design-section';
 import { ProductSection } from './_components/product-section';
 import { PromotionalBanner } from './_components/promotional-banner';
-import { Sidebar } from '@/components/shared/sidebar';
 
 export default function Home() {
   const { data: proData, loading: proLoading } = useGetAllProductsQuery();

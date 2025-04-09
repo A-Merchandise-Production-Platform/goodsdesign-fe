@@ -22,11 +22,11 @@ import {
 import {
   BasicInformation,
   ContactInformation,
+  FactoryInfoDisplay,
   LegalInformation,
   OperationalDetails,
-  QualitySpecialization,
   ProductSelection,
-  FactoryInfoDisplay,
+  QualitySpecialization,
 } from './sections';
 
 // Create a context to share required field info with form components

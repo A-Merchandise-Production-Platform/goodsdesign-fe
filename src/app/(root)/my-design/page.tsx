@@ -1,11 +1,13 @@
 'use client';
 
-import { useProductDesignsByUserQuery } from '@/graphql/generated/graphql';
-import { DesignCard } from './_components/design-card';
-import { Sidebar } from '@/components/shared/sidebar';
 import { Plus, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+
+import { Sidebar } from '@/components/shared/sidebar';
+import { Button } from '@/components/ui/button';
+import { useProductDesignsByUserQuery } from '@/graphql/generated/graphql';
+
+import { DesignCard } from './_components/design-card';
 
 export default function MyDesignPage() {
   const { data, loading } = useProductDesignsByUserQuery();

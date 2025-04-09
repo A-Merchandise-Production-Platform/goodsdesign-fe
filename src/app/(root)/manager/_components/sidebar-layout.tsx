@@ -36,8 +36,8 @@ export default function ManagerSidebarLayout({
       isActive: pathname.includes('/manager/factory'),
     },
     {
-      href: '/manager/staff',
-      label: 'Staff Management',
+      href: '/manager/users',
+      label: 'Users Management',
       icon: <User2Icon className="size-4" />,
     },
     {

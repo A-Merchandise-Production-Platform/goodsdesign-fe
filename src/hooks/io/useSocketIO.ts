@@ -45,7 +45,7 @@ export const useSocketIo = (): UseIo => {
         socket.current = null;
       }
     };
-  }, [isAuth]);
+  }, [isAuth, accessToken]);
 
   return {
     socket: socket.current,

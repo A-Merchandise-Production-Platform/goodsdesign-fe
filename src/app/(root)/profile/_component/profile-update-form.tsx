@@ -127,8 +127,8 @@ export default function ProfilePage() {
   }, [
     form,
     originalValues,
-    form.formState.dirtyFields,
-    form.formState.isDirty,
+    // form.formState.dirtyFields,
+    // form.formState.isDirty,
   ]);
 
   // Check if any fields have been changed
