@@ -34,6 +34,11 @@ import {
 import { cn } from '@/lib/utils';
 
 import { FactoryFormValues } from '../factory-form-schema';
+import {
+  RequiredFieldsContext,
+  RequiredIndicator,
+} from '../update-factory-form';
+import { useContext } from 'react';
 
 interface BasicInformationProps {
   form: UseFormReturn<FactoryFormValues>;
@@ -41,6 +46,10 @@ interface BasicInformationProps {
 }
 
 export function BasicInformation({ form, disabled }: BasicInformationProps) {
+  const requiredFields = useContext(RequiredFieldsContext);
+
+  const isRequired = (fieldName: string) => requiredFields.includes(fieldName);
+
   return (
     <Card>
       <CardHeader>
@@ -54,7 +63,10 @@ export function BasicInformation({ form, disabled }: BasicInformationProps) {
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center gap-2">
-                <FormLabel>Factory Name</FormLabel>
+                <FormLabel>
+                  Factory Name
+                  {isRequired('name') && <RequiredIndicator />}
+                </FormLabel>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -92,7 +104,10 @@ export function BasicInformation({ form, disabled }: BasicInformationProps) {
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center gap-2">
-                <FormLabel>Description</FormLabel>
+                <FormLabel>
+                  Description
+                  {isRequired('description') && <RequiredIndicator />}
+                </FormLabel>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -133,7 +148,10 @@ export function BasicInformation({ form, disabled }: BasicInformationProps) {
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center gap-2">
-                  <FormLabel>Website</FormLabel>
+                  <FormLabel>
+                    Website
+                    {isRequired('website') && <RequiredIndicator />}
+                  </FormLabel>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -171,7 +189,10 @@ export function BasicInformation({ form, disabled }: BasicInformationProps) {
             render={({ field }) => (
               <FormItem className="flex-1">
                 <div className="flex items-center gap-2">
-                  <FormLabel>Established Date</FormLabel>
+                  <FormLabel>
+                    Established Date
+                    {isRequired('establishedDate') && <RequiredIndicator />}
+                  </FormLabel>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -189,6 +210,7 @@ export function BasicInformation({ form, disabled }: BasicInformationProps) {
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
+                        type="button"
                         variant={'outline'}
                         className={cn(
                           'w-full pl-3 text-left font-normal',

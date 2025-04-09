@@ -1,5 +1,6 @@
 import { HelpCircle } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
+import { useContext } from 'react';
 
 import {
   Card,
@@ -24,6 +25,10 @@ import {
 } from '@/components/ui/tooltip';
 
 import { FactoryFormValues } from '../factory-form-schema';
+import {
+  RequiredFieldsContext,
+  RequiredIndicator,
+} from '../update-factory-form';
 import { AddressSelector } from '@/components/shared/address/address-selector';
 
 interface LegalInformationProps {
@@ -32,6 +37,10 @@ interface LegalInformationProps {
 }
 
 export function LegalInformation({ form, disabled }: LegalInformationProps) {
+  const requiredFields = useContext(RequiredFieldsContext);
+
+  const isRequired = (fieldName: string) => requiredFields.includes(fieldName);
+
   return (
     <Card>
       <CardHeader>
@@ -48,7 +57,10 @@ export function LegalInformation({ form, disabled }: LegalInformationProps) {
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center gap-2">
-                  <FormLabel>Business License URL</FormLabel>
+                  <FormLabel>
+                    Business License URL
+                    {isRequired('businessLicenseUrl') && <RequiredIndicator />}
+                  </FormLabel>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -87,7 +99,12 @@ export function LegalInformation({ form, disabled }: LegalInformationProps) {
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center gap-2">
-                  <FormLabel>Tax Identification Number</FormLabel>
+                  <FormLabel>
+                    Tax Identification Number
+                    {isRequired('taxIdentificationNumber') && (
+                      <RequiredIndicator />
+                    )}
+                  </FormLabel>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -127,7 +144,10 @@ export function LegalInformation({ form, disabled }: LegalInformationProps) {
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center gap-2">
-                <FormLabel>Address</FormLabel>
+                <FormLabel>
+                  Address
+                  {isRequired('addressInput') && <RequiredIndicator />}
+                </FormLabel>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="text-muted-foreground h-4 w-4" />

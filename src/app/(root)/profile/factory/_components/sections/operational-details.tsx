@@ -1,5 +1,6 @@
 import { HelpCircle } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
+import { useContext } from 'react';
 
 import {
   Card,
@@ -24,6 +25,10 @@ import {
 } from '@/components/ui/tooltip';
 
 import { FactoryFormValues } from '../factory-form-schema';
+import {
+  RequiredFieldsContext,
+  RequiredIndicator,
+} from '../update-factory-form';
 
 interface OperationalDetailsProps {
   form: UseFormReturn<FactoryFormValues>;
@@ -34,6 +39,10 @@ export function OperationalDetails({
   form,
   disabled,
 }: OperationalDetailsProps) {
+  const requiredFields = useContext(RequiredFieldsContext);
+
+  const isRequired = (fieldName: string) => requiredFields.includes(fieldName);
+
   return (
     <Card>
       <CardHeader>
@@ -50,7 +59,10 @@ export function OperationalDetails({
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center gap-2">
-                  <FormLabel>Total Employees</FormLabel>
+                  <FormLabel>
+                    Total Employees
+                    {isRequired('totalEmployees') && <RequiredIndicator />}
+                  </FormLabel>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -95,7 +107,10 @@ export function OperationalDetails({
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center gap-2">
-                  <FormLabel>Maximum Printing Capacity</FormLabel>
+                  <FormLabel>
+                    Maximum Printing Capacity
+                    {isRequired('maxPrintingCapacity') && <RequiredIndicator />}
+                  </FormLabel>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -143,7 +158,10 @@ export function OperationalDetails({
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center gap-2">
-                <FormLabel>Operational Hours</FormLabel>
+                <FormLabel>
+                  Operational Hours
+                  {isRequired('operationalHours') && <RequiredIndicator />}
+                </FormLabel>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -183,7 +201,10 @@ export function OperationalDetails({
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center gap-2">
-                  <FormLabel>Lead Time (Days)</FormLabel>
+                  <FormLabel>
+                    Lead Time (Days)
+                    {isRequired('leadTime') && <RequiredIndicator />}
+                  </FormLabel>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -228,7 +249,12 @@ export function OperationalDetails({
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center gap-2">
-                  <FormLabel>Minimum Order Quantity</FormLabel>
+                  <FormLabel>
+                    Minimum Order Quantity
+                    {isRequired('minimumOrderQuantity') && (
+                      <RequiredIndicator />
+                    )}
+                  </FormLabel>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="text-muted-foreground h-4 w-4" />
@@ -259,7 +285,7 @@ export function OperationalDetails({
                   <FormMessage />
                 ) : (
                   <FormDescription>
-                    The smallest order quantity you&apos;re willing to accept
+                    The minimum number of units required per order
                   </FormDescription>
                 )}
               </FormItem>

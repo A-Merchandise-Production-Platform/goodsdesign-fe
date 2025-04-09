@@ -237,13 +237,14 @@ export type FactoryEntity = {
   establishedDate?: Maybe<Scalars['DateTime']['output']>;
   factoryOwnerId: Scalars['ID']['output'];
   factoryStatus?: Maybe<FactoryStatus>;
+  formattedAddress?: Maybe<Scalars['String']['output']>;
   isSubmitted?: Maybe<Scalars['Boolean']['output']>;
   leadTime?: Maybe<Scalars['Int']['output']>;
   maxPrintingCapacity?: Maybe<Scalars['Int']['output']>;
   minimumOrderQuantity?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
   operationalHours?: Maybe<Scalars['String']['output']>;
-  owner: UserEntity;
+  owner?: Maybe<UserEntity>;
   printingMethods: Array<Scalars['String']['output']>;
   products?: Maybe<Array<FactoryProductEntity>>;
   qualityCertifications?: Maybe<Scalars['String']['output']>;
@@ -285,6 +286,19 @@ export type FileUploadResponse = {
   url: Scalars['String']['output'];
 };
 
+/** Format Address Input */
+export type FormatAddressInput = {
+  districtID: Scalars['Float']['input'];
+  provinceID: Scalars['Float']['input'];
+  street: Scalars['String']['input'];
+  wardCode: Scalars['String']['input'];
+};
+
+export type FormattedAddressModel = {
+  __typename?: 'FormattedAddressModel';
+  text: Scalars['String']['output'];
+};
+
 export type GetAvailableServicesDto = {
   fromDistrict: Scalars['Int']['input'];
   toDistrict: Scalars['Int']['input'];
@@ -309,6 +323,7 @@ export type Mutation = {
   createFactoryProduct: FactoryProductEntity;
   createNotification: NotificationEntity;
   createNotificationForManyUsers: Array<NotificationEntity>;
+  createNotificationForUsersByRoles: Array<NotificationEntity>;
   createOrder: OrderEntity;
   createPayment: Scalars['String']['output'];
   createPaymentTransaction: PaymentTransactionEntity;
@@ -419,6 +434,14 @@ export type MutationCreateNotificationForManyUsersArgs = {
   title: Scalars['String']['input'];
   url?: InputMaybe<Scalars['String']['input']>;
   userIds: Array<Scalars['String']['input']>;
+};
+
+
+export type MutationCreateNotificationForUsersByRolesArgs = {
+  content: Scalars['String']['input'];
+  roles: Array<Scalars['String']['input']>;
+  title: Scalars['String']['input'];
+  url?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -722,9 +745,23 @@ export type OrderDetailEntity = {
   quantity: Scalars['Int']['output'];
   rejectedQty: Scalars['Int']['output'];
   reworkTime: Scalars['Int']['output'];
-  status: Scalars['String']['output'];
+  status: OrderDetailStatus;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
+
+export enum OrderDetailStatus {
+  Completed = 'COMPLETED',
+  DoneCheckQuality = 'DONE_CHECK_QUALITY',
+  DoneProduction = 'DONE_PRODUCTION',
+  InProduction = 'IN_PRODUCTION',
+  Pending = 'PENDING',
+  ReadyForShipping = 'READY_FOR_SHIPPING',
+  ReworkDone = 'REWORK_DONE',
+  ReworkInProgress = 'REWORK_IN_PROGRESS',
+  ReworkRequired = 'REWORK_REQUIRED',
+  Shipped = 'SHIPPED',
+  WaitingForCheckingQuality = 'WAITING_FOR_CHECKING_QUALITY'
+}
 
 export type OrderEntity = {
   __typename?: 'OrderEntity';
@@ -759,7 +796,7 @@ export type OrderEntity = {
   rejectedHistory?: Maybe<Array<RejectedOrderEntity>>;
   shippedAt?: Maybe<Scalars['DateTime']['output']>;
   shippingPrice: Scalars['Int']['output'];
-  status: Scalars['String']['output'];
+  status: OrderStatus;
   tasks?: Maybe<Array<TaskEntity>>;
   totalItems: Scalars['Int']['output'];
   totalPrice: Scalars['Int']['output'];
@@ -777,23 +814,36 @@ export type OrderProgressReportEntity = {
   reportDate: Scalars['DateTime']['output'];
 };
 
+export enum OrderStatus {
+  Canceled = 'CANCELED',
+  Completed = 'COMPLETED',
+  InProduction = 'IN_PRODUCTION',
+  NeedManagerHandle = 'NEED_MANAGER_HANDLE',
+  PaymentReceived = 'PAYMENT_RECEIVED',
+  Pending = 'PENDING',
+  PendingAcceptance = 'PENDING_ACCEPTANCE',
+  ReadyForShipping = 'READY_FOR_SHIPPING',
+  Rejected = 'REJECTED',
+  ReworkInProgress = 'REWORK_IN_PROGRESS',
+  ReworkRequired = 'REWORK_REQUIRED',
+  Shipped = 'SHIPPED',
+  WaitingFillInformation = 'WAITING_FILL_INFORMATION',
+  WaitingForCheckingQuality = 'WAITING_FOR_CHECKING_QUALITY',
+  WaitingPayment = 'WAITING_PAYMENT'
+}
+
 export type PaymentEntity = {
   __typename?: 'PaymentEntity';
   amount: Scalars['Int']['output'];
-  createdAt?: Maybe<Scalars['String']['output']>;
   customer?: Maybe<UserEntity>;
   customerId: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  note?: Maybe<Scalars['String']['output']>;
   order?: Maybe<OrderEntity>;
   orderId: Scalars['String']['output'];
-  paidAt?: Maybe<Scalars['String']['output']>;
-  paidBy?: Maybe<Scalars['String']['output']>;
   paymentLog: Scalars['String']['output'];
   status: Scalars['String']['output'];
   transactions?: Maybe<Array<PaymentTransactionEntity>>;
   type: Scalars['String']['output'];
-  updatedAt?: Maybe<Scalars['String']['output']>;
 };
 
 /** Method of payment */
@@ -883,8 +933,10 @@ export type Query = {
   distinctVariantAttributes: VariantAttributes;
   district: District;
   districts: Array<District>;
+  factoryOrders: Array<OrderEntity>;
   factoryProduct: FactoryProductEntity;
   factoryProducts: Array<FactoryProductEntity>;
+  formatAddress: FormattedAddressModel;
   getAllFactories: Array<FactoryEntity>;
   getCartItem: CartItemEntity;
   getCartItemCount: Scalars['Float']['output'];
@@ -892,6 +944,7 @@ export type Query = {
   getMe: UserEntity;
   getMyFactory: FactoryEntity;
   myNotifications: Array<NotificationEntity>;
+  myOrders: Array<OrderEntity>;
   notification: NotificationEntity;
   notifications: Array<NotificationEntity>;
   notificationsByUserId: Array<NotificationEntity>;
@@ -910,6 +963,7 @@ export type Query = {
   products: Array<ProductEntity>;
   province: Province;
   provinces: Array<Province>;
+  staffOrders: Array<OrderEntity>;
   staffs: Array<UserEntity>;
   systemConfigBank: SystemConfigBankEntity;
   systemConfigBanks: Array<SystemConfigBankEntity>;
@@ -963,6 +1017,11 @@ export type QueryDistrictsArgs = {
 export type QueryFactoryProductArgs = {
   factoryId: Scalars['String']['input'];
   systemConfigVariantId: Scalars['String']['input'];
+};
+
+
+export type QueryFormatAddressArgs = {
+  formatAddressInput: FormatAddressInput;
 };
 
 
@@ -1372,6 +1431,13 @@ export type GetAddressDetailsQueryVariables = Exact<{
 
 export type GetAddressDetailsQuery = { __typename?: 'Query', province: { __typename?: 'Province', provinceId: number, provinceName: string }, district: { __typename?: 'District', districtId: number, districtName: string, provinceId: number }, ward: { __typename?: 'Ward', districtId: number, wardCode: string, wardName: string } };
 
+export type FormatAddressQueryVariables = Exact<{
+  formatAddressInput: FormatAddressInput;
+}>;
+
+
+export type FormatAddressQuery = { __typename?: 'Query', formatAddress: { __typename?: 'FormattedAddressModel', text: string } };
+
 export type LoginMutationVariables = Exact<{
   loginInput: LoginDto;
 }>;
@@ -1464,26 +1530,26 @@ export type UpdateDesignPositionMutation = { __typename?: 'Mutation', updateDesi
 export type GetMyFactoryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMyFactoryQuery = { __typename?: 'Query', getMyFactory: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null }, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null } };
+export type GetMyFactoryQuery = { __typename?: 'Query', getMyFactory: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, formattedAddress?: string | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null } | null, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null } };
 
 export type GetFactoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetFactoriesQuery = { __typename?: 'Query', getAllFactories: Array<{ __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null }, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null }> };
+export type GetFactoriesQuery = { __typename?: 'Query', getAllFactories: Array<{ __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, formattedAddress?: string | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null } | null, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null }> };
 
 export type GetFactoryByIdQueryVariables = Exact<{
   factoryId: Scalars['String']['input'];
 }>;
 
 
-export type GetFactoryByIdQuery = { __typename?: 'Query', getFactoryById: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner: { __typename?: 'UserEntity', id: string, email?: string | null, name?: string | null, imageUrl?: string | null }, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, productionTimeInMinutes: number, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null } };
+export type GetFactoryByIdQuery = { __typename?: 'Query', getFactoryById: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, formattedAddress?: string | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner?: { __typename?: 'UserEntity', id: string, email?: string | null, name?: string | null, imageUrl?: string | null } | null, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, productionTimeInMinutes: number, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null } };
 
 export type UpdateFactoryInfoMutationVariables = Exact<{
   updateFactoryInfoInput: UpdateFactoryInfoDto;
 }>;
 
 
-export type UpdateFactoryInfoMutation = { __typename?: 'Mutation', updateFactoryInfo: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null }, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null } };
+export type UpdateFactoryInfoMutation = { __typename?: 'Mutation', updateFactoryInfo: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, formattedAddress?: string | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null } | null, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null } };
 
 export type ChangeFactoryStatusMutationVariables = Exact<{
   data: UpdateFactoryStatusDto;
@@ -1874,6 +1940,46 @@ export type GetAddressDetailsQueryHookResult = ReturnType<typeof useGetAddressDe
 export type GetAddressDetailsLazyQueryHookResult = ReturnType<typeof useGetAddressDetailsLazyQuery>;
 export type GetAddressDetailsSuspenseQueryHookResult = ReturnType<typeof useGetAddressDetailsSuspenseQuery>;
 export type GetAddressDetailsQueryResult = Apollo.QueryResult<GetAddressDetailsQuery, GetAddressDetailsQueryVariables>;
+export const FormatAddressDocument = gql`
+    query FormatAddress($formatAddressInput: FormatAddressInput!) {
+  formatAddress(formatAddressInput: $formatAddressInput) {
+    text
+  }
+}
+    `;
+
+/**
+ * __useFormatAddressQuery__
+ *
+ * To run a query within a React component, call `useFormatAddressQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFormatAddressQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFormatAddressQuery({
+ *   variables: {
+ *      formatAddressInput: // value for 'formatAddressInput'
+ *   },
+ * });
+ */
+export function useFormatAddressQuery(baseOptions: Apollo.QueryHookOptions<FormatAddressQuery, FormatAddressQueryVariables> & ({ variables: FormatAddressQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FormatAddressQuery, FormatAddressQueryVariables>(FormatAddressDocument, options);
+      }
+export function useFormatAddressLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FormatAddressQuery, FormatAddressQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FormatAddressQuery, FormatAddressQueryVariables>(FormatAddressDocument, options);
+        }
+export function useFormatAddressSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<FormatAddressQuery, FormatAddressQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<FormatAddressQuery, FormatAddressQueryVariables>(FormatAddressDocument, options);
+        }
+export type FormatAddressQueryHookResult = ReturnType<typeof useFormatAddressQuery>;
+export type FormatAddressLazyQueryHookResult = ReturnType<typeof useFormatAddressLazyQuery>;
+export type FormatAddressSuspenseQueryHookResult = ReturnType<typeof useFormatAddressSuspenseQuery>;
+export type FormatAddressQueryResult = Apollo.QueryResult<FormatAddressQuery, FormatAddressQueryVariables>;
 export const LoginDocument = gql`
     mutation Login($loginInput: LoginDto!) {
   login(loginInput: $loginInput) {
@@ -2545,6 +2651,7 @@ export const GetMyFactoryDocument = gql`
     }
     contractAcceptedAt
     factoryOwnerId
+    formattedAddress
   }
 }
     `;
@@ -2640,6 +2747,7 @@ export const GetFactoriesDocument = gql`
     }
     contractAcceptedAt
     factoryOwnerId
+    formattedAddress
   }
 }
     `;
@@ -2737,6 +2845,7 @@ export const GetFactoryByIdDocument = gql`
     }
     contractAcceptedAt
     factoryOwnerId
+    formattedAddress
   }
 }
     `;
@@ -2833,6 +2942,7 @@ export const UpdateFactoryInfoDocument = gql`
     }
     contractAcceptedAt
     factoryOwnerId
+    formattedAddress
   }
 }
     `;

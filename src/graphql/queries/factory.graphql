@@ -57,6 +57,7 @@ query GetMyFactory {
     }
     contractAcceptedAt
     factoryOwnerId
+    formattedAddress
   }
 }
 
@@ -119,6 +120,7 @@ query GetFactories {
     }
     contractAcceptedAt
     factoryOwnerId
+    formattedAddress
   }
 }
 
@@ -183,6 +185,7 @@ query GetFactoryById($factoryId: String!) {
     }
     contractAcceptedAt
     factoryOwnerId
+    formattedAddress
   }
 }
 
@@ -245,6 +248,7 @@ mutation UpdateFactoryInfo($updateFactoryInfoInput: UpdateFactoryInfoDto!) {
     }
     contractAcceptedAt
     factoryOwnerId
+    formattedAddress
   }
 }
 

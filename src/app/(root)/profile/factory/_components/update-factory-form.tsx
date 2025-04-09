@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, ArrowRight, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -29,11 +29,24 @@ import {
   FactoryInfoDisplay,
 } from './sections';
 
+// Create a context to share required field info with form components
+export const RequiredFieldsContext = createContext<string[]>([]);
+
+// A component to indicate required fields
+export const RequiredIndicator = () => (
+  <span className="ml-1 text-red-500">*</span>
+);
+
 export default function UpdateFactoryForm() {
   const [isNotificationOpen, setIsNotificationOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('basics');
   const { data, loading, error } = useGetMyFactoryQuery();
   const isSubmitted = data?.getMyFactory?.isSubmitted ?? false;
+
+  // Determine required fields based on schema
+  const requiredFields = Object.entries(factoryFormSchema.shape)
+    .filter(([_, schema]) => !schema.isOptional?.())
+    .map(([fieldName]) => fieldName);
 
   const form = useForm<FactoryFormValues>({
     resolver: zodResolver(factoryFormSchema),
@@ -123,8 +136,6 @@ export default function UpdateFactoryForm() {
     else if (activeTab === 'legal') setActiveTab('basics');
   };
 
-  console.log(form.watch('systemConfigVariantIds'));
-
   if (loading) {
     return (
       <div className="flex min-h-[300px] items-center justify-center">
@@ -173,155 +184,169 @@ export default function UpdateFactoryForm() {
             />
           </div>
         )}
+
+        <div className="mb-2 flex justify-end">
+          <p className="text-muted-foreground text-sm">
+            <span className="text-red-500">*</span> Required field
+          </p>
+        </div>
+
         {loading ? (
           <div className="flex min-h-[300px] items-center justify-center">
             <div className="border-primary h-10 w-10 animate-spin rounded-full border-t-2 border-b-2"></div>
           </div>
         ) : (
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <Tabs
-                value={activeTab}
-                onValueChange={handleTabChange}
-                className="w-full"
+          <RequiredFieldsContext.Provider value={requiredFields}>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
               >
-                <TabsList className="grid w-full grid-cols-6">
-                  <TabsTrigger value="basics">Basic Information</TabsTrigger>
-                  <TabsTrigger value="legal">Legal</TabsTrigger>
-                  <TabsTrigger value="product">Product</TabsTrigger>
-                  <TabsTrigger value="quality">Quality & Expertise</TabsTrigger>
-                  <TabsTrigger value="operations">Operations</TabsTrigger>
-                  <TabsTrigger value="contact">Contact</TabsTrigger>
-                </TabsList>
+                <Tabs
+                  value={activeTab}
+                  onValueChange={handleTabChange}
+                  className="w-full"
+                >
+                  <TabsList className="grid w-full grid-cols-6">
+                    <TabsTrigger value="basics">Basic Information</TabsTrigger>
+                    <TabsTrigger value="legal">Legal</TabsTrigger>
+                    <TabsTrigger value="product">Product</TabsTrigger>
+                    <TabsTrigger value="quality">
+                      Quality & Expertise
+                    </TabsTrigger>
+                    <TabsTrigger value="operations">Operations</TabsTrigger>
+                    <TabsTrigger value="contact">Contact</TabsTrigger>
+                  </TabsList>
 
-                <TabsContent value="basics">
-                  <BasicInformation form={form} disabled={isSubmitted} />
-                  <div className="mt-4 flex justify-end">
-                    <Button
-                      type="button"
-                      onClick={handleNextTab}
-                      disabled={isSubmitted}
-                    >
-                      Next
-                      <ArrowRight className="size-4" />
-                    </Button>
-                  </div>
-                </TabsContent>
+                  <TabsContent value="basics">
+                    <BasicInformation form={form} disabled={isSubmitted} />
+                    <div className="mt-4 flex justify-end">
+                      <Button
+                        type="button"
+                        onClick={handleNextTab}
+                        disabled={isSubmitted}
+                      >
+                        Next
+                        <ArrowRight className="size-4" />
+                      </Button>
+                    </div>
+                  </TabsContent>
 
-                <TabsContent value="legal">
-                  <LegalInformation form={form} disabled={isSubmitted} />
-                  <div className="mt-4 flex justify-between">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handlePreviousTab}
-                      disabled={isSubmitted}
-                    >
-                      <ArrowLeft className="size-4" />
-                      Previous
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={handleNextTab}
-                      disabled={isSubmitted}
-                    >
-                      Next
-                      <ArrowRight className="size-4" />
-                    </Button>
-                  </div>
-                </TabsContent>
+                  <TabsContent value="legal">
+                    <LegalInformation form={form} disabled={isSubmitted} />
+                    <div className="mt-4 flex justify-between">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handlePreviousTab}
+                        disabled={isSubmitted}
+                      >
+                        <ArrowLeft className="size-4" />
+                        Previous
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={handleNextTab}
+                        disabled={isSubmitted}
+                      >
+                        Next
+                        <ArrowRight className="size-4" />
+                      </Button>
+                    </div>
+                  </TabsContent>
 
-                <TabsContent value="product">
-                  <ProductSelection form={form} />
-                  <div className="mt-4 flex justify-between">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handlePreviousTab}
-                      disabled={isSubmitted}
-                    >
-                      <ArrowLeft className="size-4" />
-                      Previous
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={handleNextTab}
-                      disabled={isSubmitted}
-                    >
-                      Next
-                      <ArrowRight className="size-4" />
-                    </Button>
-                  </div>
-                </TabsContent>
+                  <TabsContent value="product">
+                    <ProductSelection form={form} />
+                    <div className="mt-4 flex justify-between">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handlePreviousTab}
+                        disabled={isSubmitted}
+                      >
+                        <ArrowLeft className="size-4" />
+                        Previous
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={handleNextTab}
+                        disabled={isSubmitted}
+                      >
+                        Next
+                        <ArrowRight className="size-4" />
+                      </Button>
+                    </div>
+                  </TabsContent>
 
-                <TabsContent value="quality">
-                  <QualitySpecialization form={form} disabled={isSubmitted} />
-                  <div className="mt-4 flex justify-between">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handlePreviousTab}
-                      disabled={isSubmitted}
-                    >
-                      <ArrowLeft className="size-4" />
-                      Previous
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={handleNextTab}
-                      disabled={isSubmitted}
-                    >
-                      Next
-                      <ArrowRight className="size-4" />
-                    </Button>
-                  </div>
-                </TabsContent>
+                  <TabsContent value="quality">
+                    <QualitySpecialization form={form} disabled={isSubmitted} />
+                    <div className="mt-4 flex justify-between">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handlePreviousTab}
+                        disabled={isSubmitted}
+                      >
+                        <ArrowLeft className="size-4" />
+                        Previous
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={handleNextTab}
+                        disabled={isSubmitted}
+                      >
+                        Next
+                        <ArrowRight className="size-4" />
+                      </Button>
+                    </div>
+                  </TabsContent>
 
-                <TabsContent value="operations">
-                  <OperationalDetails form={form} disabled={isSubmitted} />
-                  <div className="mt-4 flex justify-between">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handlePreviousTab}
-                      disabled={isSubmitted}
-                    >
-                      <ArrowLeft className="size-4" />
-                      Previous
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={handleNextTab}
-                      disabled={isSubmitted}
-                    >
-                      Next
-                      <ArrowRight className="size-4" />
-                    </Button>
-                  </div>
-                </TabsContent>
+                  <TabsContent value="operations">
+                    <OperationalDetails form={form} disabled={isSubmitted} />
+                    <div className="mt-4 flex justify-between">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handlePreviousTab}
+                        disabled={isSubmitted}
+                      >
+                        <ArrowLeft className="size-4" />
+                        Previous
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={handleNextTab}
+                        disabled={isSubmitted}
+                      >
+                        Next
+                        <ArrowRight className="size-4" />
+                      </Button>
+                    </div>
+                  </TabsContent>
 
-                <TabsContent value="contact">
-                  <ContactInformation form={form} disabled={isSubmitted} />
-                  <div className="mt-4 flex justify-between">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handlePreviousTab}
-                      disabled={isSubmitted}
-                    >
-                      <ArrowLeft className="size-4" />
-                      Previous
-                    </Button>
-                    <Button type="submit">
-                      {updateFactoryInfoLoading
-                        ? 'Updating...'
-                        : 'Update Factory'}
-                    </Button>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </form>
-          </Form>
+                  <TabsContent value="contact">
+                    <ContactInformation form={form} disabled={isSubmitted} />
+                    <div className="mt-4 flex justify-between">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handlePreviousTab}
+                        disabled={isSubmitted}
+                      >
+                        <ArrowLeft className="size-4" />
+                        Previous
+                      </Button>
+                      <Button type="submit" disabled={isSubmitted}>
+                        {updateFactoryInfoLoading
+                          ? 'Updating...'
+                          : 'Update Factory'}
+                      </Button>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </form>
+            </Form>
+          </RequiredFieldsContext.Provider>
         )}
       </div>
     );

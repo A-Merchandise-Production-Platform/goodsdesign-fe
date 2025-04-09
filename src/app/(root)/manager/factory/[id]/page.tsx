@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   FactoryStatus,
   useChangeFactoryStatusMutation,
+  useFormatAddressLazyQuery,
   useGetAvailableStaffForFactoryQuery,
   useGetFactoryByIdQuery,
 } from '@/graphql/generated/graphql';
@@ -49,6 +50,8 @@ export default function FactoryDetailPage() {
     },
     refetchQueries: ['GetFactories'],
   });
+  const [formatAddressQuery, { loading: formatAddressLoading }] =
+    useFormatAddressLazyQuery();
 
   // Since we're using index for ID in the list page, get the factory by index
   const factory = factoriesData?.getFactoryById;
@@ -69,7 +72,7 @@ export default function FactoryDetailPage() {
       variables: {
         data: {
           status: FactoryStatus.Approved,
-          factoryOwnerId: factory?.owner.id || '',
+          factoryOwnerId: factory?.owner?.id || '',
           staffId: selectedStaffId,
         },
       },
@@ -81,8 +84,8 @@ export default function FactoryDetailPage() {
       variables: {
         data: {
           status: FactoryStatus.Rejected,
-          factoryOwnerId: factory?.owner.id || '',
-          staffId: selectedStaffId,
+          factoryOwnerId: factory?.owner?.id || '',
+          staffId: '',
         },
       },
     });
@@ -105,12 +108,6 @@ export default function FactoryDetailPage() {
       </DashboardShell>
     );
   }
-
-  // Format the address for display
-  const formattedAddress = factory.address
-    ? `${factory.address.street}, ${factory.address.wardCode}`
-    : 'No address provided';
-
   return (
     <DashboardShell title={factory.name} subtitle="Factory Details">
       <Tabs defaultValue="overview">
@@ -127,6 +124,11 @@ export default function FactoryDetailPage() {
           <TabsTrigger className="px-4" value="staff">
             Staff
           </TabsTrigger>
+          {factory.factoryStatus !== FactoryStatus.PendingApproval ? (
+            <TabsTrigger className="px-4" value="setting">
+              Setting
+            </TabsTrigger>
+          ) : null}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -160,7 +162,9 @@ export default function FactoryDetailPage() {
                   </h3>
                   <div className="flex items-center">
                     <MapPin className="text-muted-foreground mr-2 h-4 w-4" />
-                    <span>{formattedAddress}</span>
+                    <span className="line-clamp-2">
+                      {factory.formattedAddress}
+                    </span>
                   </div>
                 </div>
 
@@ -612,7 +616,9 @@ export default function FactoryDetailPage() {
                         <p className="text-muted-foreground text-sm">Address</p>
                         <div className="flex items-center">
                           <MapPin className="text-muted-foreground mr-2 h-4 w-4" />
-                          <p className="font-medium">{formattedAddress}</p>
+                          <p className="font-medium">
+                            {factory.formattedAddress}
+                          </p>
                         </div>
                       </div>
 
@@ -682,7 +688,7 @@ export default function FactoryDetailPage() {
                     </div>
                   </div>
 
-                  <Separator />
+                  {/* <Separator />
 
                   <div>
                     <div className="mb-3 flex items-center justify-between">
@@ -704,7 +710,7 @@ export default function FactoryDetailPage() {
                         Contact Staff
                       </Button>
                     </div>
-                  </div>
+                  </div> */}
 
                   {selectedStaffId && (
                     <div className="space-y-4">
@@ -821,27 +827,39 @@ export default function FactoryDetailPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="setting" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Factory Settings</CardTitle>
+            </CardHeader>
+          </Card>
+        </TabsContent>
       </Tabs>
-      <div className="text-muted-foreground mt-4 text-sm">
-        Assign Staff for this factory before approving.
-      </div>
-      <div className="mt-4 flex w-full items-center gap-4">
-        <Button
-          variant="destructive"
-          className="flex-1"
-          disabled={!isStaffSelected || loading}
-          onClick={handleRejectFactory}
-        >
-          Reject Factory
-        </Button>
-        <Button
-          className="flex-1"
-          disabled={!isStaffSelected || loading}
-          onClick={handleApproveFactory}
-        >
-          Approve Factory
-        </Button>
-      </div>
+      {factory.factoryStatus === FactoryStatus.PendingApproval ? (
+        <>
+          <div className="text-muted-foreground mt-4 text-sm">
+            Assign Staff for this factory before approving.
+          </div>
+          <div className="mt-4 flex w-full items-center gap-4">
+            <Button
+              variant="destructive"
+              className="flex-1"
+              disabled={loading}
+              onClick={handleRejectFactory}
+            >
+              Reject Factory
+            </Button>
+            <Button
+              className="flex-1"
+              disabled={!isStaffSelected || loading}
+              onClick={handleApproveFactory}
+            >
+              Approve Factory
+            </Button>
+          </div>
+        </>
+      ) : null}
     </DashboardShell>
   );
 }

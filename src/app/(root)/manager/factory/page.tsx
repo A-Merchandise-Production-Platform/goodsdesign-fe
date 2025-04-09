@@ -15,10 +15,11 @@ import {
   FactoryStatus,
   useGetFactoriesQuery,
 } from '@/graphql/generated/graphql';
+import { useFormatAddress } from '@/hooks/use-format-address';
 import { format } from 'date-fns';
 import { Calendar, MapPin, Users } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function Page() {
   const { data, loading, error } = useGetFactoriesQuery();
@@ -57,80 +58,83 @@ export default function Page() {
 
   const factories = data?.getAllFactories || [];
   const activeFactories = factories.filter(
-    factory =>
-      factory.factoryStatus?.toString() !== FactoryStatus.PendingApproval,
+    factory => factory.factoryStatus?.toString() === FactoryStatus.Approved,
   );
   const pendingFactories = factories.filter(
     factory =>
       factory.factoryStatus?.toString() === FactoryStatus.PendingApproval &&
       factory.isSubmitted,
   );
+  const rejectedFactories = factories.filter(
+    factory => factory.factoryStatus?.toString() === FactoryStatus.Rejected,
+  );
 
   const renderFactoryGrid = (factoryList: typeof factories) => (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {factoryList.map((factory, index) => (
-        <Card key={index} className="transition-shadow hover:shadow-md">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>{factory.name}</CardTitle>
-              <Badge variant={getStatusVariant(factory.factoryStatus)}>
-                {factory.factoryStatus}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="flex-1 space-y-2">
-            {factory.description && (
-              <p className="text-muted-foreground line-clamp-2 text-sm">
-                {factory.description}
-              </p>
-            )}
-            <div className="flex items-center text-sm">
-              <MapPin className="text-muted-foreground mr-1 h-4 w-4" />
-              <span>
-                {factory.address?.street}, {factory.address?.wardCode}
-              </span>
-            </div>
-            {factory.totalEmployees && (
-              <div className="flex items-center text-sm">
-                <Users className="text-muted-foreground mr-1 h-4 w-4" />
-                <span>{factory.totalEmployees} employees</span>
+      {factoryList.map((factory, index) => {
+        return (
+          <Card key={index} className="transition-shadow hover:shadow-md">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>{factory.name}</CardTitle>
+                <Badge variant={getStatusVariant(factory.factoryStatus)}>
+                  {factory.factoryStatus}
+                </Badge>
               </div>
-            )}
-            {factory.establishedDate && (
+            </CardHeader>
+            <CardContent className="flex-1 space-y-2">
+              {factory.description && (
+                <p className="text-muted-foreground line-clamp-2 text-sm">
+                  {factory.description}
+                </p>
+              )}
               <div className="flex items-center text-sm">
-                <Calendar className="text-muted-foreground mr-1 h-4 w-4" />
-                <span>
-                  Est. {format(new Date(factory.establishedDate), 'MMM yyyy')}
-                </span>
+                <MapPin className="text-muted-foreground mr-1 h-4 w-4" />
+                <span className="line-clamp-2">{factory.formattedAddress}</span>
               </div>
-            )}
-            {factory.specializations && factory.specializations.length > 0 && (
-              <div className="flex flex-wrap gap-1 pt-1">
-                {factory.specializations.slice(0, 3).map((spec, i) => (
-                  <Badge key={i} variant="outline" className="text-xs">
-                    {spec}
-                  </Badge>
-                ))}
-                {factory.specializations.length > 3 && (
-                  <Badge variant="outline" className="text-xs">
-                    +{factory.specializations.length - 3} more
-                  </Badge>
+              {factory.totalEmployees && (
+                <div className="flex items-center text-sm">
+                  <Users className="text-muted-foreground mr-1 h-4 w-4" />
+                  <span>{factory.totalEmployees} employees</span>
+                </div>
+              )}
+              {factory.establishedDate && (
+                <div className="flex items-center text-sm">
+                  <Calendar className="text-muted-foreground mr-1 h-4 w-4" />
+                  <span>
+                    Est. {format(new Date(factory.establishedDate), 'MMM yyyy')}
+                  </span>
+                </div>
+              )}
+              {factory.specializations &&
+                factory.specializations.length > 0 && (
+                  <div className="flex flex-wrap gap-1 pt-1">
+                    {factory.specializations.slice(0, 3).map((spec, i) => (
+                      <Badge key={i} variant="outline" className="text-xs">
+                        {spec}
+                      </Badge>
+                    ))}
+                    {factory.specializations.length > 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{factory.specializations.length - 3} more
+                      </Badge>
+                    )}
+                  </div>
                 )}
-              </div>
-            )}
-          </CardContent>
-          <CardFooter>
-            <Link
-              href={`/manager/factory/${factory.factoryOwnerId}`}
-              className="w-full"
-            >
-              <Button variant="secondary" className="w-full">
-                View Details
-              </Button>
-            </Link>
-          </CardFooter>
-        </Card>
-      ))}
+            </CardContent>
+            <CardFooter>
+              <Link
+                href={`/manager/factory/${factory.factoryOwnerId}`}
+                className="w-full"
+              >
+                <Button variant="secondary" className="w-full">
+                  View Details
+                </Button>
+              </Link>
+            </CardFooter>
+          </Card>
+        );
+      })}
 
       {factoryList.length === 0 && (
         <div className="col-span-full p-8 text-center">
@@ -152,6 +156,7 @@ export default function Page() {
         <TabsList className="">
           <TabsTrigger value="all">Active Factories</TabsTrigger>
           <TabsTrigger value="pending">Pending Approval</TabsTrigger>
+          <TabsTrigger value="rejected">Rejected</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all">
@@ -159,6 +164,9 @@ export default function Page() {
         </TabsContent>
         <TabsContent value="pending">
           {renderFactoryGrid(pendingFactories)}
+        </TabsContent>
+        <TabsContent value="rejected">
+          {renderFactoryGrid(rejectedFactories)}
         </TabsContent>
       </Tabs>
     </DashboardShell>
