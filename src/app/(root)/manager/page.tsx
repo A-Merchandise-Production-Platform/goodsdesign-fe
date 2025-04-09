@@ -245,7 +245,7 @@ export default function Page() {
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Factory Performance</CardTitle>
