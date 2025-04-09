@@ -24,7 +24,7 @@ export function DashboardShell({
           <p className="text-muted-foreground text-sm">{subtitle}</p>
         )}
       </div>
-      <main className="flex-1 py-6">{children}</main>
+      <main className="flex-1 space-y-4 py-6">{children}</main>
     </div>
   );
 }

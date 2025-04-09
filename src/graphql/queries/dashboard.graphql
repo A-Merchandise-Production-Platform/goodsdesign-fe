@@ -1,0 +1,44 @@
+query GetEnhancedManagerDashboard {
+  getEnhancedManagerDashboard {
+    stats {
+      factories {
+        total
+        change
+        changeType
+      }
+      orders {
+        active
+        change
+        changeType
+      }
+      staff {
+        total
+        change
+        changeType
+      }
+      revenue {
+        monthly
+        change
+        changeType
+      }
+    }
+    factoryPerformance {
+      factoryId
+      factoryName
+      orderCount
+      totalRevenue
+    }
+    orderStatus {
+      status
+      count
+    }
+    recentActivities {
+      id
+      type
+      title
+      description
+      time
+      relatedId
+    }
+  }
+}
