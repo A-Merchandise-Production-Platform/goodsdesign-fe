@@ -1140,6 +1140,7 @@ export type Query = {
   factoryOrders: Array<OrderEntity>;
   factoryProduct: FactoryProductEntity;
   factoryProducts: Array<FactoryProductEntity>;
+  findTasksByStaffId: Array<TaskEntity>;
   formatAddress: FormattedAddressModel;
   getAdminDashboard: AdminDashboardResponse;
   getAllFactories: Array<FactoryEntity>;
@@ -1227,6 +1228,11 @@ export type QueryDistrictsArgs = {
 export type QueryFactoryProductArgs = {
   factoryId: Scalars['String']['input'];
   systemConfigVariantId: Scalars['String']['input'];
+};
+
+
+export type QueryFindTasksByStaffIdArgs = {
+  staffId: Scalars['String']['input'];
 };
 
 
@@ -2076,6 +2082,13 @@ export type GetSystemConfigVariantsByProductQueryVariables = Exact<{
 
 
 export type GetSystemConfigVariantsByProductQuery = { __typename?: 'Query', systemConfigVariantsByProduct: Array<{ __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, size?: string | null, product: { __typename?: 'ProductEntity', id: string, imageUrl?: string | null, name: string, description?: string | null } }> };
+
+export type FindTasksByStaffIdQueryVariables = Exact<{
+  staffId: Scalars['String']['input'];
+}>;
+
+
+export type FindTasksByStaffIdQuery = { __typename?: 'Query', findTasksByStaffId: Array<{ __typename?: 'TaskEntity', assignedDate: any, completedDate?: any | null, description: string, expiredTime: any, id: string, note?: string | null, startDate: any, status: string, taskType: string, taskname: string, assignee?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null }>, user: { __typename?: 'UserEntity', createdAt: any, createdBy?: string | null, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, isDeleted: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, staffedFactory?: { __typename?: 'FactoryEntity', name: string } | null } };
 
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -6036,6 +6049,79 @@ export type GetSystemConfigVariantsByProductQueryHookResult = ReturnType<typeof 
 export type GetSystemConfigVariantsByProductLazyQueryHookResult = ReturnType<typeof useGetSystemConfigVariantsByProductLazyQuery>;
 export type GetSystemConfigVariantsByProductSuspenseQueryHookResult = ReturnType<typeof useGetSystemConfigVariantsByProductSuspenseQuery>;
 export type GetSystemConfigVariantsByProductQueryResult = Apollo.QueryResult<GetSystemConfigVariantsByProductQuery, GetSystemConfigVariantsByProductQueryVariables>;
+export const FindTasksByStaffIdDocument = gql`
+    query FindTasksByStaffId($staffId: String!) {
+  findTasksByStaffId(staffId: $staffId) {
+    assignedDate
+    assignee {
+      id
+      imageUrl
+      email
+      name
+    }
+    completedDate
+    description
+    expiredTime
+    id
+    note
+    startDate
+    status
+    taskType
+    taskname
+  }
+  user(id: $staffId) {
+    createdAt
+    createdBy
+    dateOfBirth
+    email
+    gender
+    id
+    imageUrl
+    isActive
+    isDeleted
+    name
+    phoneNumber
+    role
+    staffedFactory {
+      name
+    }
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useFindTasksByStaffIdQuery__
+ *
+ * To run a query within a React component, call `useFindTasksByStaffIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFindTasksByStaffIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFindTasksByStaffIdQuery({
+ *   variables: {
+ *      staffId: // value for 'staffId'
+ *   },
+ * });
+ */
+export function useFindTasksByStaffIdQuery(baseOptions: Apollo.QueryHookOptions<FindTasksByStaffIdQuery, FindTasksByStaffIdQueryVariables> & ({ variables: FindTasksByStaffIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FindTasksByStaffIdQuery, FindTasksByStaffIdQueryVariables>(FindTasksByStaffIdDocument, options);
+      }
+export function useFindTasksByStaffIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FindTasksByStaffIdQuery, FindTasksByStaffIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FindTasksByStaffIdQuery, FindTasksByStaffIdQueryVariables>(FindTasksByStaffIdDocument, options);
+        }
+export function useFindTasksByStaffIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<FindTasksByStaffIdQuery, FindTasksByStaffIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<FindTasksByStaffIdQuery, FindTasksByStaffIdQueryVariables>(FindTasksByStaffIdDocument, options);
+        }
+export type FindTasksByStaffIdQueryHookResult = ReturnType<typeof useFindTasksByStaffIdQuery>;
+export type FindTasksByStaffIdLazyQueryHookResult = ReturnType<typeof useFindTasksByStaffIdLazyQuery>;
+export type FindTasksByStaffIdSuspenseQueryHookResult = ReturnType<typeof useFindTasksByStaffIdSuspenseQuery>;
+export type FindTasksByStaffIdQueryResult = Apollo.QueryResult<FindTasksByStaffIdQuery, FindTasksByStaffIdQueryVariables>;
 export const GetUsersDocument = gql`
     query GetUsers {
   users {

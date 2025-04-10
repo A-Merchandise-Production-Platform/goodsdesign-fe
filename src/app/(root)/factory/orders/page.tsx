@@ -91,7 +91,7 @@ export default function FactoryOrdersPage() {
     : [];
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="">
       <Card>
         <CardHeader>
           <CardTitle>Factory Orders</CardTitle>
