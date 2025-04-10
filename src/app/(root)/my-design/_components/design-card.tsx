@@ -28,6 +28,7 @@ export function DesignCard({
     'Phone Case': 'bg-purple-100 text-purple-800',
   };
 
+  
   return (
     <Card
       className="h-full cursor-pointer overflow-hidden pt-0 transition-all hover:shadow-md"
@@ -63,9 +64,9 @@ export function DesignCard({
         <div className="flex flex-grow flex-col p-4">
           <div className="mb-2 flex items-start justify-between">
             <h3 className="font-semibold">{name}</h3>
-            {/* {price && (
+            {price && (
               <p className="text-primary font-medium">{formatPrice(price)}</p>
-            )} */}
+            )}
           </div>
           <p className="text-muted-foreground text-sm">{description}</p>
         </div>
