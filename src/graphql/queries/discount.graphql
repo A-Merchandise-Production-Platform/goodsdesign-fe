@@ -1,0 +1,9 @@
+query GetAllDiscountByProductId($productId: String!) {
+  getAllDiscountByProductId(productId: $productId) {
+    id
+    discountPercent
+    minQuantity
+    isDeleted
+    isActive
+  }
+}

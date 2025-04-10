@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
   useCreateProductDesignMutation,
+  useGetAllDiscountByProductIdQuery,
   // useGetAllDiscountByProductIdQuery,
   useGetProductInformationByIdQuery,
 } from '@/graphql/generated/graphql';
@@ -48,12 +49,12 @@ export default function TShirtPage() {
       },
     });
 
-  // const { data: discountData, loading: discountLoading } =
-  //   useGetAllDiscountByProductIdQuery({
-  //     variables: {
-  //       productId: 'prod001',
-  //     },
-  //   });
+  const { data: discountData, loading: discountLoading } =
+    useGetAllDiscountByProductIdQuery({
+      variables: {
+        productId: 'prod001',
+      },
+    });
 
   // Set initial size and color from first variant when data loads
   useEffect(() => {
@@ -230,10 +231,10 @@ export default function TShirtPage() {
             /> */}
           </div>
 
-          {/* <VolumeDiscount
+          <VolumeDiscount
             discounts={discountData?.getAllDiscountByProductId || []}
             loading={discountLoading}
-          /> */}
+          />
 
           <Button
             onClick={onSubmit}
