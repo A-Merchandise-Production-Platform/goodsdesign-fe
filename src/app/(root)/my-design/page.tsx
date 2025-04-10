@@ -43,16 +43,14 @@ export default function MyDesignPage() {
           {data?.productDesignsByUser?.length ? (
             data.productDesignsByUser.map(design => {
               // Calculate base price from positions with designs
-              const positionPrices = design.designPositions?.reduce(
-                (total: number, position) => {
+              const positionPrices =
+                design.designPositions?.reduce((total: number, position) => {
                   if (position.designJSON && position.designJSON.length > 0) {
                     return total + (position.positionType?.basePrice ?? 0);
                   }
                   return total;
-                },
-                0
-              ) ?? 0;
-              
+                }, 0) ?? 0;
+
               // Use only the position prices since systemConfigVariant doesn't have a price field
               const basePrice = positionPrices;
 

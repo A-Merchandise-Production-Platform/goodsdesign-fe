@@ -28,7 +28,6 @@ export function DesignCard({
     'Phone Case': 'bg-purple-100 text-purple-800',
   };
 
-  
   return (
     <Card
       className="h-full cursor-pointer overflow-hidden pt-0 transition-all hover:shadow-md"
