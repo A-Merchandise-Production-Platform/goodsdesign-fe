@@ -5,12 +5,24 @@ import Link from 'next/link';
 
 import { Sidebar } from '@/components/shared/sidebar';
 import { Button } from '@/components/ui/button';
-import { useProductDesignsByUserQuery } from '@/graphql/generated/graphql';
+import {
+  Roles,
+  useProductDesignsByUserQuery,
+} from '@/graphql/generated/graphql';
 
 import { DesignCard } from './_components/design-card';
+import { useAuthStore } from '@/stores/auth.store';
+import ErrorPage from '@/components/shared/error-page';
 
 export default function MyDesignPage() {
   const { data, loading } = useProductDesignsByUserQuery();
+  const { user } = useAuthStore();
+
+  if (user?.role !== Roles.Customer) {
+    return (
+      <ErrorPage message="You not allowed to access this page" code={403} />
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 gap-4 px-4 pt-4 pb-2 md:grid-cols-[200px_1fr]">

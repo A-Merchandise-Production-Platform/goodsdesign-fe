@@ -2040,22 +2040,6 @@ export type UpdateDesignPositionMutation = {
   };
 };
 
-export type GetAllDiscountByProductIdQueryVariables = Exact<{
-  productId: Scalars['String']['input'];
-}>;
-
-export type GetAllDiscountByProductIdQuery = {
-  __typename?: 'Query';
-  getAllDiscountByProductId: Array<{
-    __typename?: 'SystemConfigDiscountEntity';
-    id: string;
-    discountPercent: number;
-    minQuantity: number;
-    isDeleted: boolean;
-    isActive: boolean;
-  }>;
-};
-
 export type GetMyFactoryQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetMyFactoryQuery = {
@@ -3704,6 +3688,37 @@ export type ProductDesignTemplatesQuery = {
         basePrice: number;
       } | null;
     }> | null;
+  }>;
+};
+
+export type DuplicateProductDesignMutationVariables = Exact<{
+  duplicateProductDesignId: Scalars['ID']['input'];
+}>;
+
+export type DuplicateProductDesignMutation = {
+  __typename?: 'Mutation';
+  duplicateProductDesign: {
+    __typename?: 'ProductDesignEntity';
+    id: string;
+    isFinalized: boolean;
+    isPublic: boolean;
+    isTemplate: boolean;
+  };
+};
+
+export type GetAllDiscountByProductIdQueryVariables = Exact<{
+  productId: Scalars['String']['input'];
+}>;
+
+export type GetAllDiscountByProductIdQuery = {
+  __typename?: 'Query';
+  getAllDiscountByProductId: Array<{
+    __typename?: 'SystemConfigDiscountEntity';
+    id: string;
+    discountPercent: number;
+    minQuantity: number;
+    isDeleted: boolean;
+    isActive: boolean;
   }>;
 };
 
@@ -5567,92 +5582,6 @@ export type UpdateDesignPositionMutationResult =
 export type UpdateDesignPositionMutationOptions = Apollo.BaseMutationOptions<
   UpdateDesignPositionMutation,
   UpdateDesignPositionMutationVariables
->;
-export const GetAllDiscountByProductIdDocument = gql`
-  query GetAllDiscountByProductId($productId: String!) {
-    getAllDiscountByProductId(productId: $productId) {
-      id
-      discountPercent
-      minQuantity
-      isDeleted
-      isActive
-    }
-  }
-`;
-
-/**
- * __useGetAllDiscountByProductIdQuery__
- *
- * To run a query within a React component, call `useGetAllDiscountByProductIdQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetAllDiscountByProductIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetAllDiscountByProductIdQuery({
- *   variables: {
- *      productId: // value for 'productId'
- *   },
- * });
- */
-export function useGetAllDiscountByProductIdQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GetAllDiscountByProductIdQuery,
-    GetAllDiscountByProductIdQueryVariables
-  > &
-    (
-      | { variables: GetAllDiscountByProductIdQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    ),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GetAllDiscountByProductIdQuery,
-    GetAllDiscountByProductIdQueryVariables
-  >(GetAllDiscountByProductIdDocument, options);
-}
-export function useGetAllDiscountByProductIdLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GetAllDiscountByProductIdQuery,
-    GetAllDiscountByProductIdQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GetAllDiscountByProductIdQuery,
-    GetAllDiscountByProductIdQueryVariables
-  >(GetAllDiscountByProductIdDocument, options);
-}
-export function useGetAllDiscountByProductIdSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GetAllDiscountByProductIdQuery,
-        GetAllDiscountByProductIdQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GetAllDiscountByProductIdQuery,
-    GetAllDiscountByProductIdQueryVariables
-  >(GetAllDiscountByProductIdDocument, options);
-}
-export type GetAllDiscountByProductIdQueryHookResult = ReturnType<
-  typeof useGetAllDiscountByProductIdQuery
->;
-export type GetAllDiscountByProductIdLazyQueryHookResult = ReturnType<
-  typeof useGetAllDiscountByProductIdLazyQuery
->;
-export type GetAllDiscountByProductIdSuspenseQueryHookResult = ReturnType<
-  typeof useGetAllDiscountByProductIdSuspenseQuery
->;
-export type GetAllDiscountByProductIdQueryResult = Apollo.QueryResult<
-  GetAllDiscountByProductIdQuery,
-  GetAllDiscountByProductIdQueryVariables
 >;
 export const GetMyFactoryDocument = gql`
   query GetMyFactory {
@@ -8715,6 +8644,145 @@ export type ProductDesignTemplatesSuspenseQueryHookResult = ReturnType<
 export type ProductDesignTemplatesQueryResult = Apollo.QueryResult<
   ProductDesignTemplatesQuery,
   ProductDesignTemplatesQueryVariables
+>;
+export const DuplicateProductDesignDocument = gql`
+  mutation DuplicateProductDesign($duplicateProductDesignId: ID!) {
+    duplicateProductDesign(id: $duplicateProductDesignId) {
+      id
+      isFinalized
+      isPublic
+      isTemplate
+    }
+  }
+`;
+export type DuplicateProductDesignMutationFn = Apollo.MutationFunction<
+  DuplicateProductDesignMutation,
+  DuplicateProductDesignMutationVariables
+>;
+
+/**
+ * __useDuplicateProductDesignMutation__
+ *
+ * To run a mutation, you first call `useDuplicateProductDesignMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDuplicateProductDesignMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [duplicateProductDesignMutation, { data, loading, error }] = useDuplicateProductDesignMutation({
+ *   variables: {
+ *      duplicateProductDesignId: // value for 'duplicateProductDesignId'
+ *   },
+ * });
+ */
+export function useDuplicateProductDesignMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DuplicateProductDesignMutation,
+    DuplicateProductDesignMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DuplicateProductDesignMutation,
+    DuplicateProductDesignMutationVariables
+  >(DuplicateProductDesignDocument, options);
+}
+export type DuplicateProductDesignMutationHookResult = ReturnType<
+  typeof useDuplicateProductDesignMutation
+>;
+export type DuplicateProductDesignMutationResult =
+  Apollo.MutationResult<DuplicateProductDesignMutation>;
+export type DuplicateProductDesignMutationOptions = Apollo.BaseMutationOptions<
+  DuplicateProductDesignMutation,
+  DuplicateProductDesignMutationVariables
+>;
+export const GetAllDiscountByProductIdDocument = gql`
+  query GetAllDiscountByProductId($productId: String!) {
+    getAllDiscountByProductId(productId: $productId) {
+      id
+      discountPercent
+      minQuantity
+      isDeleted
+      isActive
+    }
+  }
+`;
+
+/**
+ * __useGetAllDiscountByProductIdQuery__
+ *
+ * To run a query within a React component, call `useGetAllDiscountByProductIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllDiscountByProductIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllDiscountByProductIdQuery({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *   },
+ * });
+ */
+export function useGetAllDiscountByProductIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetAllDiscountByProductIdQuery,
+    GetAllDiscountByProductIdQueryVariables
+  > &
+    (
+      | { variables: GetAllDiscountByProductIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetAllDiscountByProductIdQuery,
+    GetAllDiscountByProductIdQueryVariables
+  >(GetAllDiscountByProductIdDocument, options);
+}
+export function useGetAllDiscountByProductIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAllDiscountByProductIdQuery,
+    GetAllDiscountByProductIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetAllDiscountByProductIdQuery,
+    GetAllDiscountByProductIdQueryVariables
+  >(GetAllDiscountByProductIdDocument, options);
+}
+export function useGetAllDiscountByProductIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetAllDiscountByProductIdQuery,
+        GetAllDiscountByProductIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetAllDiscountByProductIdQuery,
+    GetAllDiscountByProductIdQueryVariables
+  >(GetAllDiscountByProductIdDocument, options);
+}
+export type GetAllDiscountByProductIdQueryHookResult = ReturnType<
+  typeof useGetAllDiscountByProductIdQuery
+>;
+export type GetAllDiscountByProductIdLazyQueryHookResult = ReturnType<
+  typeof useGetAllDiscountByProductIdLazyQuery
+>;
+export type GetAllDiscountByProductIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetAllDiscountByProductIdSuspenseQuery
+>;
+export type GetAllDiscountByProductIdQueryResult = Apollo.QueryResult<
+  GetAllDiscountByProductIdQuery,
+  GetAllDiscountByProductIdQueryVariables
 >;
 export const GetAllProductsDocument = gql`
   query GetAllProducts {

@@ -44,6 +44,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGetOrderQuery } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
+import Link from 'next/link';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -525,20 +526,22 @@ export default function FactoryOrderDetailsPage() {
                 {order.orderDetails?.map(item => (
                   <div key={item.id} className="rounded-lg border p-4">
                     <div className="grid gap-4 md:grid-cols-[1fr_2fr]">
-                      <div className="bg-muted relative aspect-square overflow-hidden rounded-md">
-                        <Image
-                          src={
-                            item.design?.thumbnailUrl ||
-                            '/placeholder.svg?height=200&width=200'
-                          }
-                          alt={
-                            item.design?.systemConfigVariant?.product?.name ||
-                            'Product'
-                          }
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
+                      <Link href={`/view/tshirt/${item.design?.id}`}>
+                        <div className="bg-muted group relative aspect-square overflow-hidden rounded-md transition-all hover:opacity-90">
+                          <Image
+                            src={
+                              item.design?.thumbnailUrl ||
+                              '/placeholder.svg?height=200&width=200'
+                            }
+                            alt={
+                              item.design?.systemConfigVariant?.product?.name ||
+                              'Product'
+                            }
+                            fill
+                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        </div>
+                      </Link>
                       <div className="grid gap-2">
                         <div className="flex items-start justify-between">
                           <div>
