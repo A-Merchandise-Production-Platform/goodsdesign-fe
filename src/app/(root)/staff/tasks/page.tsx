@@ -17,7 +17,6 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -50,32 +49,7 @@ import {
   useGetMyStaffOrdersQuery,
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
-
-// Helper function to get status badge
-const getStatusBadge = (status: string) => {
-  const statusMap: Record<
-    string,
-    {
-      label: string;
-      variant: 'default' | 'secondary' | 'destructive' | 'outline';
-    }
-  > = {
-    PENDING: { label: 'Pending', variant: 'outline' },
-    PROCESSING: { label: 'Processing', variant: 'secondary' },
-    COMPLETED: { label: 'Completed', variant: 'default' },
-    CANCELLED: { label: 'Cancelled', variant: 'destructive' },
-    WAITING_FOR_CHECKING_QUALITY: {
-      label: 'Quality Check',
-      variant: 'outline',
-    },
-    REWORK_REQUIRED: { label: 'Rework Required', variant: 'destructive' },
-    REWORK_IN_PROGRESS: { label: 'Rework in Progress', variant: 'secondary' },
-  };
-
-  const config = statusMap[status] || { label: status, variant: 'outline' };
-
-  return <Badge variant={config.variant}>{config.label}</Badge>;
-};
+import { getStatusBadge } from '../../_components/order-status';
 
 export default function MyStaffTasksPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -274,7 +248,7 @@ export default function MyStaffTasksPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredOrders.map(order => (
+                      {filteredOrders.map((order: any) => (
                         <TableRow key={order.id}>
                           <TableCell className="font-medium">
                             #{order.id.substring(0, 8)}
@@ -348,7 +322,7 @@ export default function MyStaffTasksPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-6">
-                    {filteredOrders.map(order => (
+                    {filteredOrders.map((order: any) => (
                       <Card key={order.id} className="overflow-hidden">
                         <CardHeader className="bg-muted/50">
                           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
@@ -378,7 +352,7 @@ export default function MyStaffTasksPage() {
                         </CardHeader>
                         <CardContent className="pt-6">
                           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {order.orderDetails?.map(item => (
+                            {order.orderDetails?.map((item: any) => (
                               <div
                                 key={item.id}
                                 className="flex gap-4 rounded-lg border p-4"

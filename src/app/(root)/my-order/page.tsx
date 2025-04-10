@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/table';
 import { useGetMyOrdersQuery } from '@/graphql/generated/graphql';
 import { formatDate, formatPrice } from '@/lib/utils';
+import { getStatusBadge } from '../_components/order-status';
 
 export default function MyOrderPage() {
   const { data, loading } = useGetMyOrdersQuery();
@@ -41,40 +42,6 @@ export default function MyOrderPage() {
     setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
   };
 
-  // Get status badge color based on status
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'PENDING':
-        return (
-          <Badge
-            variant="outline"
-            className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-          >
-            Pending
-          </Badge>
-        );
-      case 'IN_PRODUCTION':
-        return (
-          <Badge
-            variant="outline"
-            className="bg-blue-100 text-blue-800 hover:bg-blue-100"
-          >
-            In Production
-          </Badge>
-        );
-      case 'COMPLETED':
-        return (
-          <Badge
-            variant="outline"
-            className="bg-green-100 text-green-800 hover:bg-green-100"
-          >
-            Completed
-          </Badge>
-        );
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  };
 
   return (
     <div className="container mx-auto px-4 py-10">

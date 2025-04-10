@@ -20,14 +20,6 @@ export type Scalars = {
   Upload: { input: any; output: any; }
 };
 
-/** The type of dashboard activity */
-export enum ActivityType {
-  Factory = 'FACTORY',
-  Order = 'ORDER',
-  Staff = 'STAFF',
-  System = 'SYSTEM'
-}
-
 export type AddressEntity = {
   __typename?: 'AddressEntity';
   districtID: Scalars['Float']['output'];
@@ -291,7 +283,6 @@ export type EnhancedManagerDashboardResponse = {
   __typename?: 'EnhancedManagerDashboardResponse';
   factoryPerformance: Array<EnhancedFactoryPerformance>;
   orderStatus: Array<OrderStatusDetail>;
-  recentActivities: Array<RecentActivity>;
   stats: DashboardStats;
 };
 
@@ -480,12 +471,25 @@ export type ManagerDashboardResponse = {
   totalRevenue: Scalars['Int']['output'];
 };
 
+export type ManagerOrderDashboardEntity = {
+  __typename?: 'ManagerOrderDashboardEntity';
+  completedOrders: Scalars['Int']['output'];
+  inProductionOrders: Scalars['Int']['output'];
+  lastMonthCompletedOrders: Scalars['Int']['output'];
+  lastMonthInProductionOrders: Scalars['Int']['output'];
+  lastMonthOrders: Scalars['Int']['output'];
+  lastMonthPendingOrders: Scalars['Int']['output'];
+  pendingOrders: Scalars['Int']['output'];
+  totalOrders: Scalars['Int']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   acceptOrderForFactory: OrderEntity;
   assignStaffToFactory: FactoryEntity;
   calculateShippingFee: ShippingFee;
   changeFactoryStatus: FactoryEntity;
+  changeOrderToShipping: OrderEntity;
   clearCart: Scalars['Boolean']['output'];
   createAddress: AddressEntity;
   createCartItem: CartItemEntity;
@@ -569,6 +573,11 @@ export type MutationCalculateShippingFeeArgs = {
 
 export type MutationChangeFactoryStatusArgs = {
   data: UpdateFactoryStatusDto;
+};
+
+
+export type MutationChangeOrderToShippingArgs = {
+  orderId: Scalars['String']['input'];
 };
 
 
@@ -936,6 +945,7 @@ export enum OrderDetailStatus {
   ReworkInProgress = 'REWORK_IN_PROGRESS',
   ReworkRequired = 'REWORK_REQUIRED',
   Shipped = 'SHIPPED',
+  Shipping = 'SHIPPING',
   WaitingForCheckingQuality = 'WAITING_FOR_CHECKING_QUALITY'
 }
 
@@ -1003,6 +1013,7 @@ export enum OrderStatus {
   ReworkInProgress = 'REWORK_IN_PROGRESS',
   ReworkRequired = 'REWORK_REQUIRED',
   Shipped = 'SHIPPED',
+  Shipping = 'SHIPPING',
   WaitingFillInformation = 'WAITING_FILL_INFORMATION',
   WaitingForCheckingQuality = 'WAITING_FOR_CHECKING_QUALITY',
   WaitingPayment = 'WAITING_PAYMENT'
@@ -1146,6 +1157,7 @@ export type Query = {
   getFactoryById: FactoryEntity;
   getFactoryDashboard: FactoryDashboardResponse;
   getManagerDashboard: ManagerDashboardResponse;
+  getManagerOrderDashboard: ManagerOrderDashboardEntity;
   getMe: UserEntity;
   getMyFactory: FactoryEntity;
   myNotifications: Array<NotificationEntity>;
@@ -1155,6 +1167,7 @@ export type Query = {
   notificationsByUserId: Array<NotificationEntity>;
   order: OrderEntity;
   orders: Array<OrderEntity>;
+  ordersByFactoryId: Array<OrderEntity>;
   paymentTransaction?: Maybe<PaymentTransactionEntity>;
   paymentTransactions: Array<PaymentTransactionEntity>;
   paymentTransactionsByCustomer: Array<PaymentTransactionEntity>;
@@ -1255,6 +1268,11 @@ export type QueryOrderArgs = {
 };
 
 
+export type QueryOrdersByFactoryIdArgs = {
+  factoryId: Scalars['String']['input'];
+};
+
+
 export type QueryPaymentTransactionArgs = {
   id: Scalars['ID']['input'];
 };
@@ -1322,16 +1340,6 @@ export type QueryWardArgs = {
 
 export type QueryWardsArgs = {
   districtId: Scalars['Int']['input'];
-};
-
-export type RecentActivity = {
-  __typename?: 'RecentActivity';
-  description: Scalars['String']['output'];
-  id: Scalars['String']['output'];
-  relatedId?: Maybe<Scalars['String']['output']>;
-  time: Scalars['String']['output'];
-  title: Scalars['String']['output'];
-  type: ActivityType;
 };
 
 /** Refresh token input */
@@ -1763,7 +1771,7 @@ export type DeleteCategoryMutation = { __typename?: 'Mutation', deleteCategory: 
 export type GetEnhancedManagerDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetEnhancedManagerDashboardQuery = { __typename?: 'Query', getEnhancedManagerDashboard: { __typename?: 'EnhancedManagerDashboardResponse', stats: { __typename?: 'DashboardStats', factories: { __typename?: 'EnhancedFactoryStats', total: number, change: string, changeType: ChangeType }, orders: { __typename?: 'EnhancedOrderStats', active: number, change: string, changeType: ChangeType }, staff: { __typename?: 'EnhancedStaffStats', total: number, change: string, changeType: ChangeType }, revenue: { __typename?: 'EnhancedRevenueStats', monthly: string, change: string, changeType: ChangeType } }, factoryPerformance: Array<{ __typename?: 'EnhancedFactoryPerformance', factoryId: string, factoryName: string, orderCount: number, totalRevenue: number }>, orderStatus: Array<{ __typename?: 'OrderStatusDetail', status: string, count: number }>, recentActivities: Array<{ __typename?: 'RecentActivity', id: string, type: ActivityType, title: string, description: string, time: string, relatedId?: string | null }> } };
+export type GetEnhancedManagerDashboardQuery = { __typename?: 'Query', getEnhancedManagerDashboard: { __typename?: 'EnhancedManagerDashboardResponse', stats: { __typename?: 'DashboardStats', factories: { __typename?: 'EnhancedFactoryStats', total: number, change: string, changeType: ChangeType }, orders: { __typename?: 'EnhancedOrderStats', active: number, change: string, changeType: ChangeType }, staff: { __typename?: 'EnhancedStaffStats', total: number, change: string, changeType: ChangeType }, revenue: { __typename?: 'EnhancedRevenueStats', monthly: string, change: string, changeType: ChangeType } }, factoryPerformance: Array<{ __typename?: 'EnhancedFactoryPerformance', factoryId: string, factoryName: string, orderCount: number, totalRevenue: number }>, orderStatus: Array<{ __typename?: 'OrderStatusDetail', status: string, count: number }> } };
 
 export type UpdateDesignPositionMutationVariables = Exact<{
   input: UpdateDesignPositionDto;
@@ -1906,6 +1914,13 @@ export type ShippedOrderMutationVariables = Exact<{
 
 
 export type ShippedOrderMutation = { __typename?: 'Mutation', shippedOrder: { __typename?: 'OrderEntity', id: string } };
+
+export type ChangeOrderToShippingMutationVariables = Exact<{
+  orderId: Scalars['String']['input'];
+}>;
+
+
+export type ChangeOrderToShippingMutation = { __typename?: 'Mutation', changeOrderToShipping: { __typename?: 'OrderEntity', id: string } };
 
 export type FeedbackOrderMutationVariables = Exact<{
   input: FeedbackOrderInput;
@@ -2925,14 +2940,6 @@ export const GetEnhancedManagerDashboardDocument = gql`
     orderStatus {
       status
       count
-    }
-    recentActivities {
-      id
-      type
-      title
-      description
-      time
-      relatedId
     }
   }
 }
@@ -4873,6 +4880,39 @@ export function useShippedOrderMutation(baseOptions?: Apollo.MutationHookOptions
 export type ShippedOrderMutationHookResult = ReturnType<typeof useShippedOrderMutation>;
 export type ShippedOrderMutationResult = Apollo.MutationResult<ShippedOrderMutation>;
 export type ShippedOrderMutationOptions = Apollo.BaseMutationOptions<ShippedOrderMutation, ShippedOrderMutationVariables>;
+export const ChangeOrderToShippingDocument = gql`
+    mutation ChangeOrderToShipping($orderId: String!) {
+  changeOrderToShipping(orderId: $orderId) {
+    id
+  }
+}
+    `;
+export type ChangeOrderToShippingMutationFn = Apollo.MutationFunction<ChangeOrderToShippingMutation, ChangeOrderToShippingMutationVariables>;
+
+/**
+ * __useChangeOrderToShippingMutation__
+ *
+ * To run a mutation, you first call `useChangeOrderToShippingMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeOrderToShippingMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeOrderToShippingMutation, { data, loading, error }] = useChangeOrderToShippingMutation({
+ *   variables: {
+ *      orderId: // value for 'orderId'
+ *   },
+ * });
+ */
+export function useChangeOrderToShippingMutation(baseOptions?: Apollo.MutationHookOptions<ChangeOrderToShippingMutation, ChangeOrderToShippingMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeOrderToShippingMutation, ChangeOrderToShippingMutationVariables>(ChangeOrderToShippingDocument, options);
+      }
+export type ChangeOrderToShippingMutationHookResult = ReturnType<typeof useChangeOrderToShippingMutation>;
+export type ChangeOrderToShippingMutationResult = Apollo.MutationResult<ChangeOrderToShippingMutation>;
+export type ChangeOrderToShippingMutationOptions = Apollo.BaseMutationOptions<ChangeOrderToShippingMutation, ChangeOrderToShippingMutationVariables>;
 export const FeedbackOrderDocument = gql`
     mutation FeedbackOrder($input: FeedbackOrderInput!, $orderId: String!) {
   feedbackOrder(input: $input, orderId: $orderId) {

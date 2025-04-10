@@ -32,13 +32,6 @@ query GetEnhancedManagerDashboard {
       status
       count
     }
-    recentActivities {
-      id
-      type
-      title
-      description
-      time
-      relatedId
-    }
+    
   }
 }

@@ -67,14 +67,14 @@ interface ManagerDashboardData {
     status: string;
     count: number;
   }>;
-  recentActivities: Array<{
-    id: string;
-    type: ActivityType;
-    title: string;
-    description: string;
-    time: string;
-    relatedId?: string;
-  }>;
+  // recentActivities: Array<{
+  //   id: string;
+  //   type: ActivityType;
+  //   title: string;
+  //   description: string;
+  //   time: string;
+  //   relatedId?: string;
+  // }>;
 }
 
 // Sample dashboard data
@@ -139,39 +139,39 @@ const dashboardData: ManagerDashboardData = {
     { status: 'Pending', count: 30 },
     { status: 'Cancelled', count: 15 },
   ],
-  recentActivities: [
-    {
-      id: 'act1001',
-      type: 'order',
-      title: 'New Order Received',
-      description: 'Order #12458 from Client XYZ for 200 units',
-      time: '10 minutes ago',
-      relatedId: 'ORD12458',
-    },
-    {
-      id: 'act1002',
-      type: 'factory',
-      title: 'Factory Maintenance Complete',
-      description: 'Factory #F1002 is back online after scheduled maintenance',
-      time: '1 hour ago',
-      relatedId: 'F1002',
-    },
-    {
-      id: 'act1003',
-      type: 'staff',
-      title: 'Staff Shift Change',
-      description: 'Night shift started with 12 workers at Factory #F1001',
-      time: '3 hours ago',
-      relatedId: 'F1001',
-    },
-    {
-      id: 'act1004',
-      type: 'system',
-      title: 'System Update',
-      description: 'Production planning module updated to v2.4',
-      time: 'Yesterday, 11:30 PM',
-    },
-  ],
+  // recentActivities: [
+    // {
+    //   id: 'act1001',
+    //   type: 'order',
+    //   title: 'New Order Received',
+    //   description: 'Order #12458 from Client XYZ for 200 units',
+    //   time: '10 minutes ago',
+    //   relatedId: 'ORD12458',
+    // },
+    // {
+    //   id: 'act1002',
+    //   type: 'factory',
+    //   title: 'Factory Maintenance Complete',
+    //   description: 'Factory #F1002 is back online after scheduled maintenance',
+    //   time: '1 hour ago',
+    //   relatedId: 'F1002',
+    // },
+    // {
+    //   id: 'act1003',
+    //   type: 'staff',
+    //   title: 'Staff Shift Change',
+    //   description: 'Night shift started with 12 workers at Factory #F1001',
+    //   time: '3 hours ago',
+    //   relatedId: 'F1001',
+    // },
+    // {
+    //   id: 'act1004',
+    //   type: 'system',
+    //   title: 'System Update',
+    //   description: 'Production planning module updated to v2.4',
+    //   time: 'Yesterday, 11:30 PM',
+    // },
+  // ],
 };
 
 export default function Page() {
@@ -287,7 +287,7 @@ export default function Page() {
             </Button>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-4">
+            {/* <ul className="space-y-4">
               {data?.getEnhancedManagerDashboard.recentActivities.map(
                 activity => (
                   <li
@@ -306,8 +306,8 @@ export default function Page() {
                     </div>
                   </li>
                 ),
-              )}
-            </ul>
+              )} */}
+            {/* </ul> */}
           </CardContent>
         </Card>
       </div>
