@@ -63,9 +63,9 @@ export function DesignCard({
         <div className="flex flex-grow flex-col p-4">
           <div className="mb-2 flex items-start justify-between">
             <h3 className="font-semibold">{name}</h3>
-            {price && (
+            {/* {price && (
               <p className="text-primary font-medium">{formatPrice(price)}</p>
-            )}
+            )} */}
           </div>
           <p className="text-muted-foreground text-sm">{description}</p>
         </div>

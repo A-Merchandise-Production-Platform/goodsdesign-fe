@@ -61,6 +61,12 @@ mutation UpdateCartItem(
   }
 }
 
+mutation DeleteCartItem($deleteCartItemId: String!) {
+  deleteCartItem(id: $deleteCartItemId) {
+    id
+  }
+}
+
 mutation CalculateShippingFee($input: CalculateShippingFeeDto!) {
   calculateShippingFee(input: $input) {
     total
