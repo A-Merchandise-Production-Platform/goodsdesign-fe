@@ -364,7 +364,9 @@ export default function CartPage() {
                                           Discount:
                                         </span>
                                         <span className="text-muted-foreground text-sm line-through">
-                                          {formatPrice(variant?.price || 0)}
+                                          {formatPrice(
+                                            unitPrice / (1 - discountPercent),
+                                          )}
                                         </span>
                                       </div>
 
