@@ -124,3 +124,12 @@ query ProductDesignTemplates {
     }
   }
 }
+
+mutation DuplicateProductDesign($duplicateProductDesignId: ID!) {
+  duplicateProductDesign(id: $duplicateProductDesignId) {
+    id
+    isFinalized
+    isPublic
+    isTemplate
+  }
+}
