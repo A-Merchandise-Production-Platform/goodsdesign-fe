@@ -11,13 +11,17 @@ import {
   CreditCardIcon as PaymentIcon,
   ShoppingBag,
   Truck,
-  XCircle
+  XCircle,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import { getPaymentStatusBadge, getStatusBadge, orderStatusSteps } from '@/app/(root)/_components/order-status';
+import {
+  getPaymentStatusBadge,
+  getStatusBadge,
+  orderStatusSteps,
+} from '@/app/(root)/_components/order-status';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -38,9 +42,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  useGetOrderQuery
-} from '@/graphql/generated/graphql';
+import { useGetOrderQuery } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
 
 // Helper function to format time
@@ -58,7 +60,6 @@ const formatCurrency = (amount: number) => {
     currency: 'VND',
   }).format(amount);
 };
-
 
 export default function FactoryOrderDetailsPage() {
   const router = useRouter();

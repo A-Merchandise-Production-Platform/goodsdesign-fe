@@ -62,7 +62,11 @@ import {
   useGetOrderQuery,
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
-import { orderStatusSteps, getStatusBadge, getPaymentStatusBadge } from '../../_components/order-status';
+import {
+  orderStatusSteps,
+  getStatusBadge,
+  getPaymentStatusBadge,
+} from '../../_components/order-status';
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -89,13 +93,14 @@ export default function OrderDetailsPage() {
   const [expandedPayments, setExpandedPayments] = useState<
     Record<string, boolean>
   >({});
-  const [selectedPaymentGateway, setSelectedPaymentGateway] =
-    useState<"VNPAY" | "PAYOS">('VNPAY');
+  const [selectedPaymentGateway, setSelectedPaymentGateway] = useState<
+    'VNPAY' | 'PAYOS'
+  >('VNPAY');
   const [isWithdrawDialogOpen, setIsWithdrawDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
-  const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false)
-  const [rating, setRating] = useState(5)
-  const [ratingComment, setRatingComment] = useState("")
+  const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [ratingComment, setRatingComment] = useState('');
 
   const [createPaymentGatewayUrl, { loading: createPaymentGatewayUrlLoading }] =
     useCreatePaymentGatewayUrlMutation({
@@ -112,8 +117,8 @@ export default function OrderDetailsPage() {
       },
     });
 
-    // useFeedbackOrderMutation
-    const [feedbackOrder, { loading: feedbackOrderLoading }] =
+  // useFeedbackOrderMutation
+  const [feedbackOrder, { loading: feedbackOrderLoading }] =
     useFeedbackOrderMutation({
       onCompleted: data => {
         refetch();
@@ -123,19 +128,19 @@ export default function OrderDetailsPage() {
       },
     });
 
-    const handleFeedbackSubmit = () => {
-      feedbackOrder({
-        variables: {
-          orderId: id,
-          input: {
-            rating: rating,
-            ratingComment: ratingComment,
-          },
+  const handleFeedbackSubmit = () => {
+    feedbackOrder({
+      variables: {
+        orderId: id,
+        input: {
+          rating: rating,
+          ratingComment: ratingComment,
         },
-      })
-      setIsFeedbackDialogOpen(false)
-      toast.success("Thank you for your feedback!")
-    }
+      },
+    });
+    setIsFeedbackDialogOpen(false);
+    toast.success('Thank you for your feedback!');
+  };
   // Use the query hook
   const { data, loading, error, refetch } = useGetOrderQuery({
     variables: {
@@ -146,13 +151,13 @@ export default function OrderDetailsPage() {
   const order = data?.order;
 
   useEffect(() => {
-    if (order?.status === "SHIPPED" && !order?.rating) {
-      setIsFeedbackDialogOpen(true)
+    if (order?.status === 'SHIPPED' && !order?.rating) {
+      setIsFeedbackDialogOpen(true);
     }
-  }, [order])
+  }, [order]);
 
   // Handle payment balance
-  const handlePayBalance = (paymentId: string, gateway: "VNPAY" | "PAYOS") => {
+  const handlePayBalance = (paymentId: string, gateway: 'VNPAY' | 'PAYOS') => {
     if (!order) return;
 
     setSelectedPaymentGateway(gateway);
@@ -866,7 +871,11 @@ export default function OrderDetailsPage() {
                           <div className="mb-4">
                             <Select
                               value={selectedPaymentGateway}
-                              onValueChange={(value) => setSelectedPaymentGateway(value as "VNPAY" | "PAYOS")}
+                              onValueChange={value =>
+                                setSelectedPaymentGateway(
+                                  value as 'VNPAY' | 'PAYOS',
+                                )
+                              }
                             >
                               <SelectTrigger>
                                 <SelectValue placeholder="Select payment method" />
@@ -880,7 +889,10 @@ export default function OrderDetailsPage() {
                           <Button
                             onClick={() => {
                               // Handle payment logic here
-                              handlePayBalance(payment.id, selectedPaymentGateway);
+                              handlePayBalance(
+                                payment.id,
+                                selectedPaymentGateway,
+                              );
                             }}
                             className="flex-1"
                           >
@@ -936,7 +948,9 @@ export default function OrderDetailsPage() {
           <div className="grid gap-4 py-4">
             <Select
               value={selectedPaymentGateway}
-              onValueChange={(value) => setSelectedPaymentGateway(value as "VNPAY" | "PAYOS")}
+              onValueChange={value =>
+                setSelectedPaymentGateway(value as 'VNPAY' | 'PAYOS')
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select payment method" />
@@ -973,28 +987,32 @@ export default function OrderDetailsPage() {
         </DialogContent>
       </Dialog>
       {/* Feedback Dialog */}
-      <Dialog open={isFeedbackDialogOpen} onOpenChange={setIsFeedbackDialogOpen}>
+      <Dialog
+        open={isFeedbackDialogOpen}
+        onOpenChange={setIsFeedbackDialogOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Rate Your Order</DialogTitle>
             <DialogDescription>
-              Please share your feedback about your order. Your opinion helps us improve our service.
+              Please share your feedback about your order. Your opinion helps us
+              improve our service.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="rating">Rating</Label>
               <div className="flex items-center gap-2">
-                {[1, 2, 3, 4, 5].map((star) => (
+                {[1, 2, 3, 4, 5].map(star => (
                   <Button
                     key={star}
                     type="button"
-                    variant={rating >= star ? "default" : "outline"}
+                    variant={rating >= star ? 'default' : 'outline'}
                     size="icon"
                     className="h-10 w-10"
                     onClick={() => setRating(star)}
                   >
-                    <Star className={rating >= star ? "fill-primary" : ""} />
+                    <Star className={rating >= star ? 'fill-primary' : ''} />
                     <span className="sr-only">{star} Star</span>
                   </Button>
                 ))}
@@ -1006,15 +1024,21 @@ export default function OrderDetailsPage() {
                 id="comment"
                 placeholder="Share your experience with this order..."
                 value={ratingComment}
-                onChange={(e) => setRatingComment(e.target.value)}
+                onChange={e => setRatingComment(e.target.value)}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsFeedbackDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsFeedbackDialogOpen(false)}
+            >
               Skip
             </Button>
-            <Button onClick={handleFeedbackSubmit} disabled={feedbackOrderLoading}>
+            <Button
+              onClick={handleFeedbackSubmit}
+              disabled={feedbackOrderLoading}
+            >
               Submit Feedback
             </Button>
           </DialogFooter>

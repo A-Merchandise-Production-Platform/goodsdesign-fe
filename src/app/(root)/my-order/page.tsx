@@ -42,7 +42,6 @@ export default function MyOrderPage() {
     setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
   };
 
-
   return (
     <div className="container mx-auto px-4 py-10">
       <Card>

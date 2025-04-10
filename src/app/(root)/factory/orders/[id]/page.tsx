@@ -68,7 +68,11 @@ import {
   useStartReworkMutation,
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
-import { getPaymentStatusBadge, getStatusBadge, orderStatusSteps } from '@/app/(root)/_components/order-status';
+import {
+  getPaymentStatusBadge,
+  getStatusBadge,
+  orderStatusSteps,
+} from '@/app/(root)/_components/order-status';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -189,7 +193,6 @@ export default function FactoryOrderDetailsPage() {
         toast.error(error.message || 'Failed to complete shipping');
       },
     });
-
 
   const order = data?.order;
 
@@ -612,8 +615,6 @@ export default function FactoryOrderDetailsPage() {
         </Card>
       )}
 
-      
-
       {order.status === OrderStatus.ReadyForShipping && (
         <Card className="mb-6 border-amber-200 bg-amber-50">
           <CardContent className="pt-6">
@@ -647,9 +648,9 @@ export default function FactoryOrderDetailsPage() {
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Shipping</AlertTitle>
                 <AlertDescription>
-                  This order is auto update by this system cron job. 
-                  Please wait for the shipping to be completed.
-                  This button is only for testing purpose.
+                  This order is auto update by this system cron job. Please wait
+                  for the shipping to be completed. This button is only for
+                  testing purpose.
                 </AlertDescription>
               </Alert>
               <Button

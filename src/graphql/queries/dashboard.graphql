@@ -32,6 +32,5 @@ query GetEnhancedManagerDashboard {
       status
       count
     }
-    
   }
 }
