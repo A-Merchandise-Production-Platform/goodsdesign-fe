@@ -547,6 +547,7 @@ export type Mutation = {
   updateProduct: ProductEntity;
   updateProductDesign: ProductDesignEntity;
   updateProductPositionType: ProductPositionTypeEntity;
+  updateProfile: UserEntity;
   updateSystemConfigBank: SystemConfigBankEntity;
   updateSystemConfigVariant: SystemConfigVariantEntity;
   updateUser: UserEntity;
@@ -873,6 +874,11 @@ export type MutationUpdateProductDesignArgs = {
 
 export type MutationUpdateProductPositionTypeArgs = {
   input: UpdateProductPositionTypeDto;
+};
+
+
+export type MutationUpdateProfileArgs = {
+  updateProfileInput: UpdateProfileDto;
 };
 
 
@@ -1581,6 +1587,13 @@ export type UpdateProductPositionTypeDto = {
   productId?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateProfileDto = {
+  dateOfBirth: Scalars['DateTime']['input'];
+  gender: Scalars['Boolean']['input'];
+  name: Scalars['String']['input'];
+  phoneNumber: Scalars['String']['input'];
+};
+
 export type UpdateSystemConfigBankDto = {
   bin?: InputMaybe<Scalars['String']['input']>;
   code?: InputMaybe<Scalars['String']['input']>;
@@ -2128,6 +2141,13 @@ export type GetAvailableStaffForFactoryQueryVariables = Exact<{ [key: string]: n
 
 
 export type GetAvailableStaffForFactoryQuery = { __typename?: 'Query', availableStaffForFactory: Array<{ __typename?: 'UserEntity', email?: string | null, id: string, gender: boolean, imageUrl?: string | null, name?: string | null, role: Roles }> };
+
+export type UpdateProfileMutationVariables = Exact<{
+  updateProfileInput: UpdateProfileDto;
+}>;
+
+
+export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null } };
 
 
 export const AddressesDocument = gql`
@@ -6395,3 +6415,46 @@ export type GetAvailableStaffForFactoryQueryHookResult = ReturnType<typeof useGe
 export type GetAvailableStaffForFactoryLazyQueryHookResult = ReturnType<typeof useGetAvailableStaffForFactoryLazyQuery>;
 export type GetAvailableStaffForFactorySuspenseQueryHookResult = ReturnType<typeof useGetAvailableStaffForFactorySuspenseQuery>;
 export type GetAvailableStaffForFactoryQueryResult = Apollo.QueryResult<GetAvailableStaffForFactoryQuery, GetAvailableStaffForFactoryQueryVariables>;
+export const UpdateProfileDocument = gql`
+    mutation UpdateProfile($updateProfileInput: UpdateProfileDto!) {
+  updateProfile(updateProfileInput: $updateProfileInput) {
+    id
+    imageUrl
+    gender
+    email
+    dateOfBirth
+    createdAt
+    isActive
+    name
+    phoneNumber
+    role
+    updatedAt
+  }
+}
+    `;
+export type UpdateProfileMutationFn = Apollo.MutationFunction<UpdateProfileMutation, UpdateProfileMutationVariables>;
+
+/**
+ * __useUpdateProfileMutation__
+ *
+ * To run a mutation, you first call `useUpdateProfileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateProfileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateProfileMutation, { data, loading, error }] = useUpdateProfileMutation({
+ *   variables: {
+ *      updateProfileInput: // value for 'updateProfileInput'
+ *   },
+ * });
+ */
+export function useUpdateProfileMutation(baseOptions?: Apollo.MutationHookOptions<UpdateProfileMutation, UpdateProfileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateProfileMutation, UpdateProfileMutationVariables>(UpdateProfileDocument, options);
+      }
+export type UpdateProfileMutationHookResult = ReturnType<typeof useUpdateProfileMutation>;
+export type UpdateProfileMutationResult = Apollo.MutationResult<UpdateProfileMutation>;
+export type UpdateProfileMutationOptions = Apollo.BaseMutationOptions<UpdateProfileMutation, UpdateProfileMutationVariables>;

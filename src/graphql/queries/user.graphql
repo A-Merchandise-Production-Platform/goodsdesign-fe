@@ -88,3 +88,19 @@ query GetAvailableStaffForFactory {
     role
   }
 }
+
+mutation UpdateProfile($updateProfileInput: UpdateProfileDto!) {
+  updateProfile(updateProfileInput: $updateProfileInput) {
+    id
+    imageUrl
+    gender
+    email
+    dateOfBirth
+    createdAt
+    isActive
+    name
+    phoneNumber
+    role
+    updatedAt
+  }
+}
