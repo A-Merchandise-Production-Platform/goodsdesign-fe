@@ -42,7 +42,10 @@ export default function MyDesignPage() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {data?.productDesignsByUser?.length ? (
             data.productDesignsByUser.map(design => {
-              // Calculate base price from positions with designs
+              // Get base product price from systemConfigVariant
+              const variantPrice = design.systemConfigVariant?.price ?? 0;
+
+              // Calculate total for positions that have designs
               const positionPrices =
                 design.designPositions?.reduce((total: number, position) => {
                   if (position.designJSON && position.designJSON.length > 0) {
@@ -51,8 +54,8 @@ export default function MyDesignPage() {
                   return total;
                 }, 0) ?? 0;
 
-              // Use only the position prices since systemConfigVariant doesn't have a price field
-              const basePrice = positionPrices;
+              // Calculate total base price
+              const basePrice = variantPrice + positionPrices;
 
               return (
                 <DesignCard

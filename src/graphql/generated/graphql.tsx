@@ -3561,6 +3561,7 @@ export type ProductDesignsByUserQuery = {
     thumbnailUrl?: string | null;
     systemConfigVariant?: {
       __typename?: 'SystemConfigVariantEntity';
+      price?: number | null;
       product: {
         __typename?: 'ProductEntity';
         name: string;
@@ -8194,6 +8195,7 @@ export const ProductDesignsByUserDocument = gql`
       id
       thumbnailUrl
       systemConfigVariant {
+        price
         product {
           name
           category {

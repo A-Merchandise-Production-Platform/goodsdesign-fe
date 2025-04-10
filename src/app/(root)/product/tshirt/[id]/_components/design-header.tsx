@@ -6,14 +6,9 @@ import { Button } from '@/components/ui/button';
 interface HeaderProps {
   onSave: () => Promise<void>;
   onExport?: () => void;
-  onThumbnail?: () => void;
 }
 
-const DesignHeader: React.FC<HeaderProps> = ({
-  onSave,
-  onExport,
-  onThumbnail,
-}) => {
+const DesignHeader: React.FC<HeaderProps> = ({ onSave, onExport }) => {
   return (
     <header className="z-40 flex h-14 items-center justify-between px-6">
       <div className="flex items-center gap-4">
@@ -31,7 +26,6 @@ const DesignHeader: React.FC<HeaderProps> = ({
           size="icon"
           onClick={() => {
             onSave();
-            onThumbnail?.(); // Call thumbnail update if provided
           }}
           title="Save current design"
         >
