@@ -14,10 +14,11 @@ import {
   ShoppingBag,
   Truck,
   XCircle,
+  Star,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -57,10 +58,18 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useCreatePaymentGatewayUrlMutation,
+  useFeedbackOrderMutation,
   useGetOrderQuery,
 } from '@/graphql/generated/graphql';
-import { useToast } from '@/hooks/use-toast';
 import { formatDate } from '@/lib/utils';
+import {
+  orderStatusSteps,
+  getStatusBadge,
+  getPaymentStatusBadge,
+} from '../../_components/order-status';
+import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -78,120 +87,20 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-// Helper function to get status badge
-const getStatusBadge = (status: string) => {
-  const statusMap: Record<
-    string,
-    {
-      label: string;
-      variant: 'default' | 'secondary' | 'destructive' | 'outline';
-    }
-  > = {
-    PENDING: { label: 'Pending', variant: 'outline' },
-    PROCESSING: { label: 'Processing', variant: 'secondary' },
-    COMPLETED: { label: 'Completed', variant: 'default' },
-    CANCELLED: { label: 'Cancelled', variant: 'destructive' },
-    SHIPPED: { label: 'Shipped', variant: 'default' },
-    PAID: { label: 'Paid', variant: 'default' },
-    UNPAID: { label: 'Unpaid', variant: 'outline' },
-    PAYMENT_RECEIVED: { label: 'Payment Received', variant: 'default' },
-    WAITING_FILL_INFORMATION: {
-      label: 'Waiting for Information',
-      variant: 'outline',
-    },
-    NEED_MANAGER_HANDLE: { label: 'Needs Manager', variant: 'outline' },
-    PENDING_ACCEPTANCE: { label: 'Pending Acceptance', variant: 'outline' },
-    REJECTED: { label: 'Rejected', variant: 'destructive' },
-    IN_PRODUCTION: { label: 'In Production', variant: 'secondary' },
-    WAITING_FOR_CHECKING_QUALITY: {
-      label: 'Quality Check',
-      variant: 'outline',
-    },
-    REWORK_REQUIRED: { label: 'Rework Required', variant: 'destructive' },
-    REWORK_IN_PROGRESS: { label: 'Rework in Progress', variant: 'secondary' },
-    WAITING_PAYMENT: { label: 'Waiting Payment', variant: 'outline' },
-    READY_FOR_SHIPPING: { label: 'Ready for Shipping', variant: 'secondary' },
-  };
-
-  const config = statusMap[status] || { label: status, variant: 'outline' };
-
-  return <Badge variant={config.variant}>{config.label}</Badge>;
-};
-
-// Helper function to get payment status badge
-const getPaymentStatusBadge = (status: string) => {
-  const statusMap: Record<
-    string,
-    {
-      label: string;
-      variant: 'default' | 'secondary' | 'destructive' | 'outline';
-    }
-  > = {
-    PENDING: { label: 'Pending', variant: 'outline' },
-    COMPLETED: { label: 'Completed', variant: 'default' },
-    FAILED: { label: 'Failed', variant: 'destructive' },
-  };
-
-  const config = statusMap[status] || { label: status, variant: 'outline' };
-
-  return <Badge variant={config.variant}>{config.label}</Badge>;
-};
-
-// Order status timeline steps
-const orderStatusSteps = [
-  {
-    group: 'initial',
-    statuses: ['PENDING', 'PAYMENT_RECEIVED', 'WAITING_FILL_INFORMATION'],
-    label: 'Initial Processing',
-    icon: FileText,
-  },
-  {
-    group: 'assignment',
-    statuses: ['NEED_MANAGER_HANDLE', 'PENDING_ACCEPTANCE', 'REJECTED'],
-    label: 'Assignment',
-    icon: ClipboardList,
-  },
-  {
-    group: 'production',
-    statuses: ['IN_PRODUCTION'],
-    label: 'Production',
-    icon: Package,
-  },
-  {
-    group: 'quality',
-    statuses: [
-      'WAITING_FOR_CHECKING_QUALITY',
-      'REWORK_REQUIRED',
-      'REWORK_IN_PROGRESS',
-    ],
-    label: 'Quality Check',
-    icon: CheckCircle2,
-  },
-  {
-    group: 'delivery',
-    statuses: ['WAITING_PAYMENT', 'READY_FOR_SHIPPING', 'SHIPPED'],
-    label: 'Payment & Shipping',
-    icon: Truck,
-  },
-  {
-    group: 'completion',
-    statuses: ['COMPLETED', 'CANCELED'],
-    label: 'Completion',
-    icon: CheckCircle2,
-  },
-];
-
 export default function OrderDetailsPage() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
-  const { toast } = useToast();
   const [expandedPayments, setExpandedPayments] = useState<
     Record<string, boolean>
   >({});
-  const [selectedPaymentGateway, setSelectedPaymentGateway] =
-    useState<string>('VNPAY');
+  const [selectedPaymentGateway, setSelectedPaymentGateway] = useState<
+    'VNPAY' | 'PAYOS'
+  >('VNPAY');
   const [isWithdrawDialogOpen, setIsWithdrawDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [ratingComment, setRatingComment] = useState('');
 
   const [createPaymentGatewayUrl, { loading: createPaymentGatewayUrlLoading }] =
     useCreatePaymentGatewayUrlMutation({
@@ -200,23 +109,38 @@ export default function OrderDetailsPage() {
           // Redirect to payment gateway URL
           window.location.href = data.createPayment;
         } else {
-          toast({
-            title: 'Payment Error',
-            description: 'Failed to create payment link. Please try again.',
-            variant: 'destructive',
-          });
+          toast.error('Failed to create payment link. Please try again.');
         }
       },
       onError: error => {
-        toast({
-          title: 'Payment Error',
-          description:
-            error.message || 'Something went wrong. Please try again.',
-          variant: 'destructive',
-        });
+        toast.error(error.message || 'Failed to create payment link');
       },
     });
 
+  // useFeedbackOrderMutation
+  const [feedbackOrder, { loading: feedbackOrderLoading }] =
+    useFeedbackOrderMutation({
+      onCompleted: data => {
+        refetch();
+      },
+      onError: error => {
+        toast.error(error.message || 'Failed to feedback order');
+      },
+    });
+
+  const handleFeedbackSubmit = () => {
+    feedbackOrder({
+      variables: {
+        orderId: id,
+        input: {
+          rating: rating,
+          ratingComment: ratingComment,
+        },
+      },
+    });
+    setIsFeedbackDialogOpen(false);
+    toast.success('Thank you for your feedback!');
+  };
   // Use the query hook
   const { data, loading, error, refetch } = useGetOrderQuery({
     variables: {
@@ -226,8 +150,14 @@ export default function OrderDetailsPage() {
 
   const order = data?.order;
 
+  useEffect(() => {
+    if (order?.status === 'SHIPPED' && !order?.rating) {
+      setIsFeedbackDialogOpen(true);
+    }
+  }, [order]);
+
   // Handle payment balance
-  const handlePayBalance = (paymentId: string, gateway: string) => {
+  const handlePayBalance = (paymentId: string, gateway: 'VNPAY' | 'PAYOS') => {
     if (!order) return;
 
     setSelectedPaymentGateway(gateway);
@@ -937,13 +867,34 @@ export default function OrderDetailsPage() {
                       )}
 
                       {payment.status === 'PENDING' && (
-                        <div className="mt-4">
+                        <div className="mt-4 flex justify-between gap-2">
+                          <div className="mb-4">
+                            <Select
+                              value={selectedPaymentGateway}
+                              onValueChange={value =>
+                                setSelectedPaymentGateway(
+                                  value as 'VNPAY' | 'PAYOS',
+                                )
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select payment method" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="VNPAY">VNPAY</SelectItem>
+                                <SelectItem value="PAYOS">PayOS</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                           <Button
-                            onClick={() =>
-                              handlePayBalance(payment.id, 'VNPAY')
-                            }
-                            disabled={createPaymentGatewayUrlLoading}
-                            className="w-full"
+                            onClick={() => {
+                              // Handle payment logic here
+                              handlePayBalance(
+                                payment.id,
+                                selectedPaymentGateway,
+                              );
+                            }}
+                            className="flex-1"
                           >
                             <DollarSign className="mr-2 h-4 w-4" />
                             Pay Now
@@ -997,15 +948,16 @@ export default function OrderDetailsPage() {
           <div className="grid gap-4 py-4">
             <Select
               value={selectedPaymentGateway}
-              onValueChange={setSelectedPaymentGateway}
+              onValueChange={value =>
+                setSelectedPaymentGateway(value as 'VNPAY' | 'PAYOS')
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select payment method" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="VNPAY">VNPAY</SelectItem>
-                <SelectItem value="MOMO">MoMo</SelectItem>
-                <SelectItem value="BANK_TRANSFER">Bank Transfer</SelectItem>
+                <SelectItem value="PAYOS">PayOS</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -1030,6 +982,64 @@ export default function OrderDetailsPage() {
               disabled={createPaymentGatewayUrlLoading}
             >
               Proceed to Payment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Feedback Dialog */}
+      <Dialog
+        open={isFeedbackDialogOpen}
+        onOpenChange={setIsFeedbackDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rate Your Order</DialogTitle>
+            <DialogDescription>
+              Please share your feedback about your order. Your opinion helps us
+              improve our service.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="rating">Rating</Label>
+              <div className="flex items-center gap-2">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <Button
+                    key={star}
+                    type="button"
+                    variant={rating >= star ? 'default' : 'outline'}
+                    size="icon"
+                    className="h-10 w-10"
+                    onClick={() => setRating(star)}
+                  >
+                    <Star className={rating >= star ? 'fill-primary' : ''} />
+                    <span className="sr-only">{star} Star</span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="comment">Comments</Label>
+              <Textarea
+                id="comment"
+                placeholder="Share your experience with this order..."
+                value={ratingComment}
+                onChange={e => setRatingComment(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsFeedbackDialogOpen(false)}
+            >
+              Skip
+            </Button>
+            <Button
+              onClick={handleFeedbackSubmit}
+              disabled={feedbackOrderLoading}
+            >
+              Submit Feedback
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -57,14 +57,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import {
   OrderDetailStatus,
+  OrderStatus,
   useAcceptOrderForFactoryMutation,
+  useChangeOrderToShippingMutation,
   useDoneProductionOrderDetailsMutation,
   useDoneReworkForOrderDetailsMutation,
   useGetOrderQuery,
   useRejectOrderMutation,
+  useShippedOrderMutation,
   useStartReworkMutation,
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
+import {
+  getPaymentStatusBadge,
+  getStatusBadge,
+  orderStatusSteps,
+} from '@/app/(root)/_components/order-status';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -81,109 +89,6 @@ const formatCurrency = (amount: number) => {
     currency: 'VND',
   }).format(amount);
 };
-
-// Helper function to get status badge
-const getStatusBadge = (status: string) => {
-  const statusMap: Record<
-    string,
-    {
-      label: string;
-      variant: 'default' | 'secondary' | 'destructive' | 'outline';
-    }
-  > = {
-    PENDING: { label: 'Pending', variant: 'outline' },
-    PROCESSING: { label: 'Processing', variant: 'secondary' },
-    COMPLETED: { label: 'Completed', variant: 'default' },
-    CANCELLED: { label: 'Cancelled', variant: 'destructive' },
-    SHIPPED: { label: 'Shipped', variant: 'default' },
-    PAID: { label: 'Paid', variant: 'default' },
-    UNPAID: { label: 'Unpaid', variant: 'outline' },
-    PAYMENT_RECEIVED: { label: 'Payment Received', variant: 'default' },
-    WAITING_FILL_INFORMATION: {
-      label: 'Waiting for Information',
-      variant: 'outline',
-    },
-    NEED_MANAGER_HANDLE: { label: 'Needs Manager', variant: 'outline' },
-    PENDING_ACCEPTANCE: { label: 'Pending Acceptance', variant: 'outline' },
-    REJECTED: { label: 'Rejected', variant: 'destructive' },
-    IN_PRODUCTION: { label: 'In Production', variant: 'secondary' },
-    WAITING_FOR_CHECKING_QUALITY: {
-      label: 'Quality Check',
-      variant: 'outline',
-    },
-    REWORK_REQUIRED: { label: 'Rework Required', variant: 'destructive' },
-    REWORK_IN_PROGRESS: { label: 'Rework in Progress', variant: 'secondary' },
-    WAITING_PAYMENT: { label: 'Waiting Payment', variant: 'outline' },
-    READY_FOR_SHIPPING: { label: 'Ready for Shipping', variant: 'secondary' },
-  };
-
-  const config = statusMap[status] || { label: status, variant: 'outline' };
-
-  return <Badge variant={config.variant}>{config.label}</Badge>;
-};
-
-// Helper function to get payment status badge
-const getPaymentStatusBadge = (status: string) => {
-  const statusMap: Record<
-    string,
-    {
-      label: string;
-      variant: 'default' | 'secondary' | 'destructive' | 'outline';
-    }
-  > = {
-    PENDING: { label: 'Pending', variant: 'outline' },
-    COMPLETED: { label: 'Completed', variant: 'default' },
-    FAILED: { label: 'Failed', variant: 'destructive' },
-  };
-
-  const config = statusMap[status] || { label: status, variant: 'outline' };
-
-  return <Badge variant={config.variant}>{config.label}</Badge>;
-};
-
-// Order status timeline steps
-const orderStatusSteps = [
-  {
-    group: 'initial',
-    statuses: ['PENDING', 'PAYMENT_RECEIVED', 'WAITING_FILL_INFORMATION'],
-    label: 'Initial Processing',
-    icon: FileText,
-  },
-  {
-    group: 'assignment',
-    statuses: ['NEED_MANAGER_HANDLE', 'PENDING_ACCEPTANCE', 'REJECTED'],
-    label: 'Assignment',
-    icon: ClipboardList,
-  },
-  {
-    group: 'production',
-    statuses: ['IN_PRODUCTION'],
-    label: 'Production',
-    icon: Package,
-  },
-  {
-    group: 'quality',
-    statuses: [
-      'WAITING_FOR_CHECKING_QUALITY',
-      'REWORK_REQUIRED',
-      'REWORK_IN_PROGRESS',
-    ],
-    label: 'Quality Check',
-    icon: CheckCircle2,
-  },
-  {
-    group: 'delivery',
-    statuses: ['WAITING_PAYMENT', 'READY_FOR_SHIPPING', 'SHIPPED'],
-    label: 'Payment & Shipping',
-    icon: Truck,
-  },
-  {
-    group: 'completion',
-    statuses: ['COMPLETED', 'CANCELED'],
-    label: 'Completion',
-    icon: CheckCircle2,
-  },
-];
 
 export default function FactoryOrderDetailsPage() {
   const router = useRouter();
@@ -264,6 +169,28 @@ export default function FactoryOrderDetailsPage() {
       },
       onError: error => {
         toast.error(error.message || 'Failed to complete rework');
+      },
+    });
+
+  const [startShipping, { loading: startShippingLoading }] =
+    useChangeOrderToShippingMutation({
+      onCompleted: data => {
+        refetch();
+        toast.success('Shipping started successfully');
+      },
+      onError: error => {
+        toast.error(error.message || 'Failed to start shipping');
+      },
+    });
+
+  const [doneShipping, { loading: doneShippingLoading }] =
+    useShippedOrderMutation({
+      onCompleted: data => {
+        refetch();
+        toast.success('[MOCK] Shipping completed successfully');
+      },
+      onError: error => {
+        toast.error(error.message || 'Failed to complete shipping');
       },
     });
 
@@ -353,13 +280,33 @@ export default function FactoryOrderDetailsPage() {
     }
   };
 
+  // Handle start shipping
+  const handleStartShipping = () => {
+    // TODO: Implement start shipping
+    startShipping({
+      variables: {
+        orderId: id,
+      },
+    });
+  };
+
+  // Handle done shipping
+  const handleDoneShipping = () => {
+    doneShipping({
+      variables: {
+        orderId: id,
+      },
+    });
+  };
   // Get loading state for any status update
   const updateStatusLoading =
     acceptOrderLoading ||
     rejectOrderLoading ||
     startReworkLoading ||
     doneProductionLoading ||
-    doneReworkLoading;
+    doneReworkLoading ||
+    startShippingLoading ||
+    doneShippingLoading;
 
   // Show confirmation dialog
   const showConfirmDialog = (action: string) => {
@@ -404,6 +351,22 @@ export default function FactoryOrderDetailsPage() {
             'Are you sure rework is complete? This will move the order to quality check.',
           action: handleDoneRework,
           actionText: 'Complete Rework',
+        };
+        break;
+      case 'startShipping':
+        dialogConfig = {
+          title: 'Start Shipping',
+          description: 'Are you sure you want to start shipping on this order?',
+          action: handleStartShipping,
+          actionText: 'Start Shipping',
+        };
+        break;
+      case 'doneShipping':
+        dialogConfig = {
+          title: 'Done Shipping',
+          description: 'Are you sure you want to done shipping on this order?',
+          action: handleDoneShipping,
+          actionText: 'Done Shipping',
         };
         break;
     }
@@ -646,6 +609,56 @@ export default function FactoryOrderDetailsPage() {
               >
                 <Play className="mr-2 h-4 w-4" />
                 Start Rework
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {order.status === OrderStatus.ReadyForShipping && (
+        <Card className="mb-6 border-amber-200 bg-amber-50">
+          <CardContent className="pt-6">
+            <div className="flex flex-col space-y-4">
+              <Alert>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Ready for Shipping</AlertTitle>
+                <AlertDescription>
+                  This order is ready for shipping. Please review the shipping
+                  details and send the order to the shipper.
+                </AlertDescription>
+              </Alert>
+              <Button
+                onClick={() => showConfirmDialog('startShipping')}
+                disabled={updateStatusLoading}
+              >
+                <Play className="mr-2 h-4 w-4" />
+                Start Shipping
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {order.status === OrderStatus.Shipping && (
+        <Card className="mb-6 border-amber-200 bg-amber-50">
+          <CardContent className="pt-6">
+            {/* mock done shipping */}
+            <div className="flex flex-col space-y-4">
+              <Alert>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Shipping</AlertTitle>
+                <AlertDescription>
+                  This order is auto update by this system cron job. Please wait
+                  for the shipping to be completed. This button is only for
+                  testing purpose.
+                </AlertDescription>
+              </Alert>
+              <Button
+                onClick={() => showConfirmDialog('doneShipping')}
+                disabled={updateStatusLoading}
+              >
+                <Play className="mr-2 h-4 w-4" />
+                Done Shipping
               </Button>
             </div>
           </CardContent>

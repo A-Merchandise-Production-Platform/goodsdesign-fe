@@ -17,7 +17,7 @@ export const useSocketStore = create<SocketState>(set => ({
     const socket = io(envConfig().ioUrl || 'http://localhost:5000', {
       path: '/socket.io',
       auth: { token },
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'],
       autoConnect: true,
     });
 

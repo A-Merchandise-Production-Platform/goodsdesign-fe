@@ -59,6 +59,7 @@ import {
   useGetOrderQuery,
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
+import { getStatusBadge } from '@/app/(root)/_components/order-status';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -74,32 +75,6 @@ const formatCurrency = (amount: number) => {
     style: 'currency',
     currency: 'VND',
   }).format(amount);
-};
-
-// Helper function to get status badge
-const getStatusBadge = (status: string) => {
-  const statusMap: Record<
-    string,
-    {
-      label: string;
-      variant: 'default' | 'secondary' | 'destructive' | 'outline';
-    }
-  > = {
-    PENDING: { label: 'Pending', variant: 'outline' },
-    PROCESSING: { label: 'Processing', variant: 'secondary' },
-    COMPLETED: { label: 'Completed', variant: 'default' },
-    CANCELLED: { label: 'Cancelled', variant: 'destructive' },
-    WAITING_FOR_CHECKING_QUALITY: {
-      label: 'Quality Check',
-      variant: 'outline',
-    },
-    REWORK_REQUIRED: { label: 'Rework Required', variant: 'destructive' },
-    REWORK_IN_PROGRESS: { label: 'Rework in Progress', variant: 'secondary' },
-  };
-
-  const config = statusMap[status] || { label: status, variant: 'outline' };
-
-  return <Badge variant={config.variant}>{config.label}</Badge>;
 };
 
 export default function StaffCheckQualityDetailsPage() {

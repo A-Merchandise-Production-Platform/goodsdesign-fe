@@ -1,31 +1,27 @@
 'use client';
 import {
-  AlertTriangle,
   ArrowLeft,
   Calendar,
-  CheckCheck,
   CheckCircle2,
-  ClipboardList,
   Clock,
   CreditCard,
-  CreditCardIcon as PaymentIcon,
   FileText,
   History,
   Package,
-  Play,
+  CreditCardIcon as PaymentIcon,
   ShoppingBag,
-  ThumbsDown,
-  ThumbsUp,
   Truck,
   XCircle,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
+import {
+  getPaymentStatusBadge,
+  getStatusBadge,
+  orderStatusSteps,
+} from '@/app/(root)/_components/order-status';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -35,14 +31,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -54,16 +42,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  OrderDetailStatus,
-  useAcceptOrderForFactoryMutation,
-  useDoneProductionOrderDetailsMutation,
-  useDoneReworkForOrderDetailsMutation,
-  useGetOrderQuery,
-  useRejectOrderMutation,
-  useStartReworkMutation,
-} from '@/graphql/generated/graphql';
+import { useGetOrderQuery } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
 
 // Helper function to format time
@@ -82,109 +61,6 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-// Helper function to get status badge
-const getStatusBadge = (status: string) => {
-  const statusMap: Record<
-    string,
-    {
-      label: string;
-      variant: 'default' | 'secondary' | 'destructive' | 'outline';
-    }
-  > = {
-    PENDING: { label: 'Pending', variant: 'outline' },
-    PROCESSING: { label: 'Processing', variant: 'secondary' },
-    COMPLETED: { label: 'Completed', variant: 'default' },
-    CANCELLED: { label: 'Cancelled', variant: 'destructive' },
-    SHIPPED: { label: 'Shipped', variant: 'default' },
-    PAID: { label: 'Paid', variant: 'default' },
-    UNPAID: { label: 'Unpaid', variant: 'outline' },
-    PAYMENT_RECEIVED: { label: 'Payment Received', variant: 'default' },
-    WAITING_FILL_INFORMATION: {
-      label: 'Waiting for Information',
-      variant: 'outline',
-    },
-    NEED_MANAGER_HANDLE: { label: 'Needs Manager', variant: 'outline' },
-    PENDING_ACCEPTANCE: { label: 'Pending Acceptance', variant: 'outline' },
-    REJECTED: { label: 'Rejected', variant: 'destructive' },
-    IN_PRODUCTION: { label: 'In Production', variant: 'secondary' },
-    WAITING_FOR_CHECKING_QUALITY: {
-      label: 'Quality Check',
-      variant: 'outline',
-    },
-    REWORK_REQUIRED: { label: 'Rework Required', variant: 'destructive' },
-    REWORK_IN_PROGRESS: { label: 'Rework in Progress', variant: 'secondary' },
-    WAITING_PAYMENT: { label: 'Waiting Payment', variant: 'outline' },
-    READY_FOR_SHIPPING: { label: 'Ready for Shipping', variant: 'secondary' },
-  };
-
-  const config = statusMap[status] || { label: status, variant: 'outline' };
-
-  return <Badge variant={config.variant}>{config.label}</Badge>;
-};
-
-// Helper function to get payment status badge
-const getPaymentStatusBadge = (status: string) => {
-  const statusMap: Record<
-    string,
-    {
-      label: string;
-      variant: 'default' | 'secondary' | 'destructive' | 'outline';
-    }
-  > = {
-    PENDING: { label: 'Pending', variant: 'outline' },
-    COMPLETED: { label: 'Completed', variant: 'default' },
-    FAILED: { label: 'Failed', variant: 'destructive' },
-  };
-
-  const config = statusMap[status] || { label: status, variant: 'outline' };
-
-  return <Badge variant={config.variant}>{config.label}</Badge>;
-};
-
-// Order status timeline steps
-const orderStatusSteps = [
-  {
-    group: 'initial',
-    statuses: ['PENDING', 'PAYMENT_RECEIVED', 'WAITING_FILL_INFORMATION'],
-    label: 'Initial Processing',
-    icon: FileText,
-  },
-  {
-    group: 'assignment',
-    statuses: ['NEED_MANAGER_HANDLE', 'PENDING_ACCEPTANCE', 'REJECTED'],
-    label: 'Assignment',
-    icon: ClipboardList,
-  },
-  {
-    group: 'production',
-    statuses: ['IN_PRODUCTION'],
-    label: 'Production',
-    icon: Package,
-  },
-  {
-    group: 'quality',
-    statuses: [
-      'WAITING_FOR_CHECKING_QUALITY',
-      'REWORK_REQUIRED',
-      'REWORK_IN_PROGRESS',
-    ],
-    label: 'Quality Check',
-    icon: CheckCircle2,
-  },
-  {
-    group: 'delivery',
-    statuses: ['WAITING_PAYMENT', 'READY_FOR_SHIPPING', 'SHIPPED'],
-    label: 'Payment & Shipping',
-    icon: Truck,
-  },
-  {
-    group: 'completion',
-    statuses: ['COMPLETED', 'CANCELED'],
-    label: 'Completion',
-    icon: CheckCircle2,
-  },
-];
-
 export default function FactoryOrderDetailsPage() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
@@ -192,15 +68,6 @@ export default function FactoryOrderDetailsPage() {
     Record<string, boolean>
   >({});
   const [activeTab, setActiveTab] = useState('overview');
-  const [rejectionReason, setRejectionReason] = useState('');
-  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
-  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  const [confirmAction, setConfirmAction] = useState<{
-    title: string;
-    description: string;
-    action: () => void;
-    actionText: string;
-  } | null>(null);
 
   // Use the query hook
   const { data, loading, error, refetch } = useGetOrderQuery({
