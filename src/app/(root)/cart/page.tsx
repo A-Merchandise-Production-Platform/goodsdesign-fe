@@ -357,10 +357,32 @@ export default function CartPage() {
                                   </div>
                                 ))}
                                 <div className="border-t pt-2">
-                                  <div className="flex items-center justify-between font-medium">
-                                    <span className="text-sm">Per Item:</span>
-                                    <span>{formatPrice(unitPrice)}</span>
-                                  </div>
+                                  {discountApplied ? (
+                                    <div>
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-sm">
+                                          Discount:
+                                        </span>
+                                        <span className="text-muted-foreground text-sm line-through">
+                                          {formatPrice(variant?.price || 0)}
+                                        </span>
+                                      </div>
+
+                                      <div className="flex items-center justify-between font-medium">
+                                        <span className="text-sm">
+                                          Per Item:
+                                        </span>
+                                        <span className="text-green-600">
+                                          {formatPrice(unitPrice)}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center justify-between font-medium">
+                                      <span className="text-sm">Per Item:</span>
+                                      <span>{formatPrice(unitPrice)}</span>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </PopoverContent>

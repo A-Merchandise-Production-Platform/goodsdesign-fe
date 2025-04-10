@@ -41,19 +41,30 @@ export default function MyDesignPage() {
         </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {data?.productDesignsByUser?.length ? (
-            data.productDesignsByUser.map(design => (
-              <DesignCard
-                key={design.id}
-                id={design.id}
-                image={design.thumbnailUrl || undefined}
-                name={design.systemConfigVariant?.product.name}
-                price={
-                  design.designPositions?.[0]?.positionType?.basePrice ||
-                  undefined
-                }
-                category={design.systemConfigVariant?.product?.category?.name}
-              />
-            ))
+            data.productDesignsByUser.map(design => {
+              // Calculate base price from positions with designs
+              const positionPrices =
+                design.designPositions?.reduce((total: number, position) => {
+                  if (position.designJSON && position.designJSON.length > 0) {
+                    return total + (position.positionType?.basePrice ?? 0);
+                  }
+                  return total;
+                }, 0) ?? 0;
+
+              // Use only the position prices since systemConfigVariant doesn't have a price field
+              const basePrice = positionPrices;
+
+              return (
+                <DesignCard
+                  key={design.id}
+                  id={design.id}
+                  image={design.thumbnailUrl || undefined}
+                  name={design.systemConfigVariant?.product.name}
+                  price={basePrice}
+                  category={design.systemConfigVariant?.product?.category?.name}
+                />
+              );
+            })
           ) : (
             <div className="container mx-auto py-6">
               <div className="flex h-[400px] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
