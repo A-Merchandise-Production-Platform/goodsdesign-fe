@@ -27,7 +27,7 @@ export function StatCard({
           </div>
           <div className="bg-primary/10 rounded-full p-2">{icon}</div>
         </div>
-        <div className="mt-4">
+        <div className="mt-4 flex items-end">
           <span
             className={cn(
               'inline-flex items-center text-xs font-medium',

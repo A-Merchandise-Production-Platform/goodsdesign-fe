@@ -20,14 +20,6 @@ export type Scalars = {
   Upload: { input: any; output: any; }
 };
 
-/** The type of dashboard activity */
-export enum ActivityType {
-  Factory = 'FACTORY',
-  Order = 'ORDER',
-  Staff = 'STAFF',
-  System = 'SYSTEM'
-}
-
 export type AddressEntity = {
   __typename?: 'AddressEntity';
   districtID: Scalars['Float']['output'];
@@ -291,7 +283,6 @@ export type EnhancedManagerDashboardResponse = {
   __typename?: 'EnhancedManagerDashboardResponse';
   factoryPerformance: Array<EnhancedFactoryPerformance>;
   orderStatus: Array<OrderStatusDetail>;
-  recentActivities: Array<RecentActivity>;
   stats: DashboardStats;
 };
 
@@ -478,6 +469,18 @@ export type ManagerDashboardResponse = {
   recentFactoryOrders: Array<FactoryOrderWithCustomer>;
   totalOrders: Scalars['Int']['output'];
   totalRevenue: Scalars['Int']['output'];
+};
+
+export type ManagerOrderDashboardEntity = {
+  __typename?: 'ManagerOrderDashboardEntity';
+  completedOrders: Scalars['Int']['output'];
+  inProductionOrders: Scalars['Int']['output'];
+  lastMonthCompletedOrders: Scalars['Int']['output'];
+  lastMonthInProductionOrders: Scalars['Int']['output'];
+  lastMonthOrders: Scalars['Int']['output'];
+  lastMonthPendingOrders: Scalars['Int']['output'];
+  pendingOrders: Scalars['Int']['output'];
+  totalOrders: Scalars['Int']['output'];
 };
 
 export type Mutation = {
@@ -1146,6 +1149,7 @@ export type Query = {
   getFactoryById: FactoryEntity;
   getFactoryDashboard: FactoryDashboardResponse;
   getManagerDashboard: ManagerDashboardResponse;
+  getManagerOrderDashboard: ManagerOrderDashboardEntity;
   getMe: UserEntity;
   getMyFactory: FactoryEntity;
   myNotifications: Array<NotificationEntity>;
@@ -1155,6 +1159,7 @@ export type Query = {
   notificationsByUserId: Array<NotificationEntity>;
   order: OrderEntity;
   orders: Array<OrderEntity>;
+  ordersByFactoryId: Array<OrderEntity>;
   paymentTransaction?: Maybe<PaymentTransactionEntity>;
   paymentTransactions: Array<PaymentTransactionEntity>;
   paymentTransactionsByCustomer: Array<PaymentTransactionEntity>;
@@ -1255,6 +1260,11 @@ export type QueryOrderArgs = {
 };
 
 
+export type QueryOrdersByFactoryIdArgs = {
+  factoryId: Scalars['String']['input'];
+};
+
+
 export type QueryPaymentTransactionArgs = {
   id: Scalars['ID']['input'];
 };
@@ -1322,16 +1332,6 @@ export type QueryWardArgs = {
 
 export type QueryWardsArgs = {
   districtId: Scalars['Int']['input'];
-};
-
-export type RecentActivity = {
-  __typename?: 'RecentActivity';
-  description: Scalars['String']['output'];
-  id: Scalars['String']['output'];
-  relatedId?: Maybe<Scalars['String']['output']>;
-  time: Scalars['String']['output'];
-  title: Scalars['String']['output'];
-  type: ActivityType;
 };
 
 /** Refresh token input */
@@ -1763,7 +1763,12 @@ export type DeleteCategoryMutation = { __typename?: 'Mutation', deleteCategory: 
 export type GetEnhancedManagerDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetEnhancedManagerDashboardQuery = { __typename?: 'Query', getEnhancedManagerDashboard: { __typename?: 'EnhancedManagerDashboardResponse', stats: { __typename?: 'DashboardStats', factories: { __typename?: 'EnhancedFactoryStats', total: number, change: string, changeType: ChangeType }, orders: { __typename?: 'EnhancedOrderStats', active: number, change: string, changeType: ChangeType }, staff: { __typename?: 'EnhancedStaffStats', total: number, change: string, changeType: ChangeType }, revenue: { __typename?: 'EnhancedRevenueStats', monthly: string, change: string, changeType: ChangeType } }, factoryPerformance: Array<{ __typename?: 'EnhancedFactoryPerformance', factoryId: string, factoryName: string, orderCount: number, totalRevenue: number }>, orderStatus: Array<{ __typename?: 'OrderStatusDetail', status: string, count: number }>, recentActivities: Array<{ __typename?: 'RecentActivity', id: string, type: ActivityType, title: string, description: string, time: string, relatedId?: string | null }> } };
+export type GetEnhancedManagerDashboardQuery = { __typename?: 'Query', getEnhancedManagerDashboard: { __typename?: 'EnhancedManagerDashboardResponse', stats: { __typename?: 'DashboardStats', factories: { __typename?: 'EnhancedFactoryStats', total: number, change: string, changeType: ChangeType }, orders: { __typename?: 'EnhancedOrderStats', active: number, change: string, changeType: ChangeType }, staff: { __typename?: 'EnhancedStaffStats', total: number, change: string, changeType: ChangeType }, revenue: { __typename?: 'EnhancedRevenueStats', monthly: string, change: string, changeType: ChangeType } }, factoryPerformance: Array<{ __typename?: 'EnhancedFactoryPerformance', factoryId: string, factoryName: string, orderCount: number, totalRevenue: number }>, orderStatus: Array<{ __typename?: 'OrderStatusDetail', status: string, count: number }> } };
+
+export type GetManagerOrderDashboardQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetManagerOrderDashboardQuery = { __typename?: 'Query', getManagerOrderDashboard: { __typename?: 'ManagerOrderDashboardEntity', completedOrders: number, inProductionOrders: number, lastMonthCompletedOrders: number, lastMonthInProductionOrders: number, lastMonthOrders: number, lastMonthPendingOrders: number, pendingOrders: number, totalOrders: number } };
 
 export type UpdateDesignPositionMutationVariables = Exact<{
   input: UpdateDesignPositionDto;
@@ -2926,14 +2931,6 @@ export const GetEnhancedManagerDashboardDocument = gql`
       status
       count
     }
-    recentActivities {
-      id
-      type
-      title
-      description
-      time
-      relatedId
-    }
   }
 }
     `;
@@ -2969,6 +2966,52 @@ export type GetEnhancedManagerDashboardQueryHookResult = ReturnType<typeof useGe
 export type GetEnhancedManagerDashboardLazyQueryHookResult = ReturnType<typeof useGetEnhancedManagerDashboardLazyQuery>;
 export type GetEnhancedManagerDashboardSuspenseQueryHookResult = ReturnType<typeof useGetEnhancedManagerDashboardSuspenseQuery>;
 export type GetEnhancedManagerDashboardQueryResult = Apollo.QueryResult<GetEnhancedManagerDashboardQuery, GetEnhancedManagerDashboardQueryVariables>;
+export const GetManagerOrderDashboardDocument = gql`
+    query GetManagerOrderDashboard {
+  getManagerOrderDashboard {
+    completedOrders
+    inProductionOrders
+    lastMonthCompletedOrders
+    lastMonthInProductionOrders
+    lastMonthOrders
+    lastMonthPendingOrders
+    pendingOrders
+    totalOrders
+  }
+}
+    `;
+
+/**
+ * __useGetManagerOrderDashboardQuery__
+ *
+ * To run a query within a React component, call `useGetManagerOrderDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetManagerOrderDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetManagerOrderDashboardQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetManagerOrderDashboardQuery(baseOptions?: Apollo.QueryHookOptions<GetManagerOrderDashboardQuery, GetManagerOrderDashboardQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetManagerOrderDashboardQuery, GetManagerOrderDashboardQueryVariables>(GetManagerOrderDashboardDocument, options);
+      }
+export function useGetManagerOrderDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetManagerOrderDashboardQuery, GetManagerOrderDashboardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetManagerOrderDashboardQuery, GetManagerOrderDashboardQueryVariables>(GetManagerOrderDashboardDocument, options);
+        }
+export function useGetManagerOrderDashboardSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetManagerOrderDashboardQuery, GetManagerOrderDashboardQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetManagerOrderDashboardQuery, GetManagerOrderDashboardQueryVariables>(GetManagerOrderDashboardDocument, options);
+        }
+export type GetManagerOrderDashboardQueryHookResult = ReturnType<typeof useGetManagerOrderDashboardQuery>;
+export type GetManagerOrderDashboardLazyQueryHookResult = ReturnType<typeof useGetManagerOrderDashboardLazyQuery>;
+export type GetManagerOrderDashboardSuspenseQueryHookResult = ReturnType<typeof useGetManagerOrderDashboardSuspenseQuery>;
+export type GetManagerOrderDashboardQueryResult = Apollo.QueryResult<GetManagerOrderDashboardQuery, GetManagerOrderDashboardQueryVariables>;
 export const UpdateDesignPositionDocument = gql`
     mutation UpdateDesignPosition($input: UpdateDesignPositionDto!) {
   updateDesignPosition(input: $input) {

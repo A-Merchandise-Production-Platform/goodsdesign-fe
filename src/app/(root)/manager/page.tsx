@@ -270,47 +270,6 @@ export default function Page() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Recent Activities and Quick Actions */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div>
-              <CardTitle>Recent Activities</CardTitle>
-              <CardDescription>
-                Latest updates across your operations
-              </CardDescription>
-            </div>
-            <Button variant="outline" size="sm">
-              View all
-              <ChevronRightIcon className="ml-1 h-4 w-4" />
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-4">
-              {data?.getEnhancedManagerDashboard.recentActivities.map(
-                activity => (
-                  <li
-                    key={activity.id}
-                    className="flex items-start gap-4 border-b pb-4 last:border-0"
-                  >
-                    <div className={cn('rounded-full p-2')}></div>
-                    <div className="flex-1 space-y-1">
-                      <p className="text-sm font-medium">{activity.title}</p>
-                      <p className="text-muted-foreground text-sm">
-                        {activity.description}
-                      </p>
-                      <p className="text-muted-foreground text-xs">
-                        {activity.time}
-                      </p>
-                    </div>
-                  </li>
-                ),
-              )}
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
     </DashboardShell>
   );
 }
