@@ -7,7 +7,7 @@ import * as THREE from 'three';
 
 import { useGetProductInformationByIdQuery } from '@/graphql/generated/graphql';
 // Types
-import type { DesignObject } from '@/types/design-object';
+import { DesignObject } from '@/types/design-object';
 
 import DesignCanvas from './design-canvas';
 import DesignFooter from './design-footer';
@@ -96,6 +96,7 @@ export default function ProductDesigner({
 
   // Handle export of 3D model
   const handleExport = () => {
+    console.log('Exporting 3D model...');
     const handleModelCapture = async (dataUrl: string) => {
       try {
         // Download 3D view
@@ -107,55 +108,22 @@ export default function ProductDesigner({
         document.body.removeChild(link3d);
 
         // Download 2D canvas if available
-        console.log(fabricCanvasRef.current);
         if (fabricCanvasRef.current) {
           try {
-            // Force rendering before export
-            fabricCanvasRef.current.renderAll();
+            const canvas2dDataUrl = fabricCanvasRef.current.toDataURL({
+              format: 'png',
+              quality: 1,
+            });
 
-            // Use setTimeout to ensure the canvas is fully rendered
-            setTimeout(() => {
-              try {
-                const canvas2dDataUrl = fabricCanvasRef.current.toDataURL({
-                  format: 'png',
-                  quality: 1,
-                  multiplier: 1, // Ensure we're using a 1:1 scale
-                });
-
-                // Create a blob from the data URL
-                const byteString = atob(canvas2dDataUrl.split(',')[1]);
-                const mimeString = canvas2dDataUrl
-                  .split(',')[0]
-                  .split(':')[1]
-                  .split(';')[0];
-                const ab = new ArrayBuffer(byteString.length);
-                const ia = new Uint8Array(ab);
-
-                for (let i = 0; i < byteString.length; i++) {
-                  ia[i] = byteString.charCodeAt(i);
-                }
-
-                const blob = new Blob([ab], { type: mimeString });
-                const blobUrl = URL.createObjectURL(blob);
-
-                const link2d = document.createElement('a');
-                link2d.href = blobUrl;
-                link2d.download = `tshirt-2d-${view}.png`;
-                document.body.appendChild(link2d);
-                link2d.click();
-                document.body.removeChild(link2d);
-
-                // Clean up the blob URL
-                setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
-              } catch (e) {
-                console.error('Canvas export error:', e);
-                alert(
-                  'Unable to export 2D view. Please try again or contact support.',
-                );
-              }
-            }, 100);
+            const link2d = document.createElement('a');
+            link2d.href = canvas2dDataUrl;
+            link2d.download = `tshirt-2d-${view}.png`;
+            document.body.appendChild(link2d);
+            link2d.click();
+            document.body.removeChild(link2d);
           } catch (e) {
             console.error('Canvas export error:', e);
+            // Show user-friendly error message
             alert(
               'Unable to export 2D view. Please try again or contact support.',
             );
