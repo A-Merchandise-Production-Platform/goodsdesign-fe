@@ -34,3 +34,16 @@ query GetEnhancedManagerDashboard {
     }
   }
 }
+
+query GetManagerOrderDashboard {
+  getManagerOrderDashboard {
+    completedOrders
+    inProductionOrders
+    lastMonthCompletedOrders
+    lastMonthInProductionOrders
+    lastMonthOrders
+    lastMonthPendingOrders
+    pendingOrders
+    totalOrders
+  }
+}

@@ -8,6 +8,7 @@ import {
   PackageIcon,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState, useCallback } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,19 +28,36 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useGetAllOrdersQuery } from '@/graphql/generated/graphql';
+import {
+  useGetAllOrdersQuery,
+  useGetManagerOrderDashboardQuery,
+} from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
 import { StatCard } from '@/components/stat-card';
 import { calculateChange } from '@/lib/calculate-change';
 import { DashboardShell } from '@/components/dashboard-shell';
+import { OrderSearch } from './_components/OrderSearch';
+import { OrderFilter } from './_components/OrderFilter';
 
 export default function ManagerOrdersPage() {
   const { data, loading } = useGetAllOrdersQuery();
+  const { data: dashboardData, loading: dashboardLoading } =
+    useGetManagerOrderDashboardQuery();
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 
   const viewOrderDetails = (orderId: string) => {
     router.push(`/manager/orders/${orderId}`);
   };
+
+  const handleSearch = useCallback((value: string) => {
+    setSearchQuery(value);
+  }, []);
+
+  const handleFilterChange = useCallback((statuses: string[]) => {
+    setSelectedStatuses(statuses);
+  }, []);
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<
@@ -80,11 +98,11 @@ export default function ManagerOrdersPage() {
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  if (loading) {
+  if (loading || dashboardLoading) {
     return <OrdersLoadingSkeleton />;
   }
 
-  const orders = data?.orders
+  const allOrders = data?.orders
     ? [...data?.orders].sort((a, b) => {
         return (
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
@@ -92,55 +110,36 @@ export default function ManagerOrdersPage() {
       })
     : [];
 
-  // Calculate current statistics
-  const totalOrders = orders.length;
-  const pendingOrders = orders.filter(
-    order => order.status === 'PENDING',
-  ).length;
-  const inProgressOrders = orders.filter(order =>
-    ['PROCESSING', 'IN_PRODUCTION', 'REWORK_IN_PROGRESS'].includes(
-      order.status,
-    ),
-  ).length;
-  const completedOrders = orders.filter(order =>
-    ['COMPLETED', 'SHIPPED', 'PAID', 'PAYMENT_RECEIVED'].includes(order.status),
-  ).length;
+  // Apply filters: first by ID, then by status
+  const filteredOrders = allOrders.filter(order => {
+    const matchesSearch = order.id
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesStatus =
+      selectedStatuses.length === 0 || selectedStatuses.includes(order.status);
+    return matchesSearch && matchesStatus;
+  });
 
-  // Calculate changes from last month
-  const lastMonth = new Date();
-  lastMonth.setMonth(lastMonth.getMonth() - 1);
-
-  const lastMonthOrders = orders.filter(
-    order => new Date(order.orderDate) < lastMonth,
-  ).length;
-
-  const lastMonthPending = orders.filter(
-    order =>
-      order.status === 'PENDING' && new Date(order.orderDate) < lastMonth,
-  ).length;
-
-  const lastMonthInProgress = orders.filter(
-    order =>
-      ['PROCESSING', 'IN_PRODUCTION', 'REWORK_IN_PROGRESS'].includes(
-        order.status,
-      ) && new Date(order.orderDate) < lastMonth,
-  ).length;
-
-  const lastMonthCompleted = orders.filter(
-    order =>
-      ['COMPLETED', 'SHIPPED', 'PAID', 'PAYMENT_RECEIVED'].includes(
-        order.status,
-      ) && new Date(order.orderDate) < lastMonth,
-  ).length;
+  // Use filtered orders for display
+  const orders = filteredOrders;
 
   // Calculate changes using the utility function
-  const totalChange = calculateChange(totalOrders, lastMonthOrders);
-  const pendingChange = calculateChange(pendingOrders, lastMonthPending);
-  const inProgressChange = calculateChange(
-    inProgressOrders,
-    lastMonthInProgress,
+  const totalChange = calculateChange(
+    dashboardData?.getManagerOrderDashboard?.totalOrders || 0,
+    dashboardData?.getManagerOrderDashboard?.lastMonthOrders || 0,
   );
-  const completedChange = calculateChange(completedOrders, lastMonthCompleted);
+  const pendingChange = calculateChange(
+    dashboardData?.getManagerOrderDashboard?.pendingOrders || 0,
+    dashboardData?.getManagerOrderDashboard?.lastMonthPendingOrders || 0,
+  );
+  const inProgressChange = calculateChange(
+    dashboardData?.getManagerOrderDashboard?.inProductionOrders || 0,
+    dashboardData?.getManagerOrderDashboard?.lastMonthInProductionOrders || 0,
+  );
+  const completedChange = calculateChange(
+    dashboardData?.getManagerOrderDashboard?.completedOrders || 0,
+    dashboardData?.getManagerOrderDashboard?.lastMonthCompletedOrders || 0,
+  );
 
   return (
     <DashboardShell
@@ -151,28 +150,40 @@ export default function ManagerOrdersPage() {
       <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Orders"
-          value={totalOrders.toString()}
+          value={
+            dashboardData?.getManagerOrderDashboard?.totalOrders?.toString() ||
+            '0'
+          }
           change={totalChange.change}
           changeType={totalChange.type}
           icon={<ClipboardIcon className="h-5 w-5" />}
         />
         <StatCard
           title="Pending Orders"
-          value={pendingOrders.toString()}
+          value={
+            dashboardData?.getManagerOrderDashboard?.pendingOrders?.toString() ||
+            '0'
+          }
           change={pendingChange.change}
           changeType={pendingChange.type}
           icon={<ClockIcon className="h-5 w-5" />}
         />
         <StatCard
           title="In Progress"
-          value={inProgressOrders.toString()}
+          value={
+            dashboardData?.getManagerOrderDashboard?.inProductionOrders?.toString() ||
+            '0'
+          }
           change={inProgressChange.change}
           changeType={inProgressChange.type}
           icon={<PackageIcon className="h-5 w-5" />}
         />
         <StatCard
           title="Completed"
-          value={completedOrders.toString()}
+          value={
+            dashboardData?.getManagerOrderDashboard?.completedOrders?.toString() ||
+            '0'
+          }
           change={completedChange.change}
           changeType={completedChange.type}
           icon={<DollarSignIcon className="h-5 w-5" />}
@@ -180,16 +191,28 @@ export default function ManagerOrdersPage() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Factory Orders</CardTitle>
-          <CardDescription>
-            Manage and view all your factory orders
-          </CardDescription>
+        <CardHeader className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+          <div>
+            <CardTitle>Factory Orders</CardTitle>
+            <CardDescription>
+              Manage and view all your factory orders
+            </CardDescription>
+          </div>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <div className="w-full sm:w-72">
+              <OrderSearch onSearch={handleSearch} />
+            </div>
+            <OrderFilter onFilterChange={handleFilterChange} />
+          </div>
         </CardHeader>
         <CardContent>
           {orders.length === 0 ? (
             <div className="py-6 text-center">
-              <p className="text-muted-foreground">No factory orders found</p>
+              <p className="text-muted-foreground">
+                {searchQuery || selectedStatuses.length < 18
+                  ? 'No orders found matching your filters'
+                  : 'No factory orders found'}
+              </p>
             </div>
           ) : (
             <Table>
@@ -235,46 +258,51 @@ export default function ManagerOrdersPage() {
 
 function OrdersLoadingSkeleton() {
   return (
-    <div className="container mx-auto space-y-6">
-      {/* Stats Skeleton */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {Array(4)
-          .fill(0)
-          .map((_, i) => (
-            <Card key={i}>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="mt-2 h-8 w-16" />
+    <DashboardShell
+      title="Orders Management"
+      subtitle="View and manage all orders"
+    >
+      <div className="container mx-auto space-y-6">
+        {/* Stats Skeleton */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {Array(4)
+            .fill(0)
+            .map((_, i) => (
+              <Card key={i}>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="mt-2 h-8 w-16" />
+                    </div>
+                    <Skeleton className="h-10 w-10 rounded-full" />
                   </div>
-                  <Skeleton className="h-10 w-10 rounded-full" />
-                </div>
-                <div className="mt-4">
-                  <Skeleton className="h-4 w-20" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-      </div>
+                  <div className="mt-4">
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+        </div>
 
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="mt-2 h-4 w-full" />
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {Array(5)
-              .fill(0)
-              .map((_, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <Skeleton className="h-12 w-full" />
-                </div>
-              ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="mt-2 h-4 w-full" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {Array(5)
+                .fill(0)
+                .map((_, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <Skeleton className="h-12 w-full" />
+                  </div>
+                ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </DashboardShell>
   );
 }

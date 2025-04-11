@@ -1,0 +1,38 @@
+query FindTasksByStaffId($staffId: String!) {
+  findTasksByStaffId(staffId: $staffId) {
+    assignedDate
+    assignee {
+      id
+      imageUrl
+      email
+      name
+    }
+    completedDate
+    description
+    expiredTime
+    id
+    note
+    startDate
+    status
+    taskType
+    taskname
+  }
+  user(id: $staffId) {
+    createdAt
+    createdBy
+    dateOfBirth
+    email
+    gender
+    id
+    imageUrl
+    isActive
+    isDeleted
+    name
+    phoneNumber
+    role
+    staffedFactory {
+      name
+    }
+    updatedAt
+  }
+}

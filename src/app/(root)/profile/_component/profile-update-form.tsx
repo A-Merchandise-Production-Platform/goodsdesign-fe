@@ -41,6 +41,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth.store';
+import { useUpdateProfileMutation } from '@/graphql/generated/graphql';
+import { toast } from 'sonner';
 
 // Define the form schema with validation
 const profileFormSchema = z.object({
@@ -61,6 +63,15 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 export default function ProfilePage() {
   const { user } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [updateProfile, { loading: isUpdating }] = useUpdateProfileMutation({
+    onCompleted: () => {
+      toast.success('Profile updated successfully');
+    },
+    onError: () => {
+      toast.error('Failed to update profile');
+    },
+    refetchQueries: ['GetMe'],
+  });
   const [originalValues, setOriginalValues] =
     useState<ProfileFormValues | null>(null);
 
@@ -137,16 +148,16 @@ export default function ProfilePage() {
   async function onSubmit(data: ProfileFormValues) {
     if (!hasChanges) return;
 
-    const updateInput: Partial<ProfileFormValues> = {};
-
-    if ('name' in changedFields) updateInput.name = data.name;
-    if ('phoneNumber' in changedFields)
-      updateInput.phoneNumber = data.phoneNumber;
-    if ('dateOfBirth' in changedFields)
-      updateInput.dateOfBirth = data.dateOfBirth;
-    if ('gender' in changedFields) updateInput.gender = data.gender;
+    const updateInput = {
+      name: data.name,
+      phoneNumber: data.phoneNumber,
+      dateOfBirth: data.dateOfBirth,
+      gender: data.gender,
+    };
 
     console.log(updateInput);
+
+    updateProfile({ variables: { updateProfileInput: updateInput } });
   }
 
   form.watch();
@@ -229,6 +240,7 @@ export default function ProfilePage() {
                             {...field}
                             defaultCountry="VN"
                             placeholder="Enter your phone number"
+                            disabled={isUpdating}
                           />
                         </FormControl>
                         {form.formState.errors.phoneNumber ? (
@@ -254,6 +266,7 @@ export default function ProfilePage() {
                             <FormControl>
                               <Button
                                 variant={'outline'}
+                                disabled={isUpdating}
                                 className={cn(
                                   'w-full pl-3 text-left font-normal',
                                   !field.value && 'text-muted-foreground',
@@ -314,13 +327,19 @@ export default function ProfilePage() {
                         >
                           <FormItem className="flex items-center space-y-0 space-x-2">
                             <FormControl>
-                              <RadioGroupItem value="true" />
+                              <RadioGroupItem
+                                value="true"
+                                disabled={isUpdating}
+                              />
                             </FormControl>
                             <FormLabel className="font-normal">Male</FormLabel>
                           </FormItem>
                           <FormItem className="flex items-center space-y-0 space-x-2">
                             <FormControl>
-                              <RadioGroupItem value="false" />
+                              <RadioGroupItem
+                                value="false"
+                                disabled={isUpdating}
+                              />
                             </FormControl>
                             <FormLabel className="font-normal">
                               Female
@@ -353,7 +372,7 @@ export default function ProfilePage() {
               <CardFooter>
                 <Button
                   type="submit"
-                  disabled={isLoading || !hasChanges}
+                  disabled={isLoading || !hasChanges || isUpdating}
                   className="ml-auto"
                 >
                   {isLoading ? (

@@ -167,7 +167,10 @@ export default function Page() {
                   </div>
                 )}
             </CardContent>
-            <CardFooter>
+            <div className="text-muted-foreground mt-2 px-6 text-xs">
+              {factory.factoryOwnerId}
+            </div>
+            <CardFooter className="pt-0">
               <Link
                 href={`/manager/factory/${factory.factoryOwnerId}`}
                 className="w-full"
