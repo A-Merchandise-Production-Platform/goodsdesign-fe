@@ -106,62 +106,27 @@ export default function ProductDesigner({
         link3d.click();
         document.body.removeChild(link3d);
 
-        // Download 2D canvas with improved error handling
+        // Download 2D canvas if available
+        console.log(fabricCanvasRef.current);
         if (fabricCanvasRef.current) {
           try {
-            // Make sure canvas is rendered before exporting
-            fabricCanvasRef.current.renderAll();
+            const canvas2dDataUrl = fabricCanvasRef.current.toDataURL({
+              format: 'png',
+              quality: 1,
+            });
 
-            // Check if canvas has any tainted images
-            const objects = fabricCanvasRef.current.getObjects();
-            let hasCrossOriginImages = false;
-
-            for (const obj of objects) {
-              if (obj.type === 'image' && obj._element) {
-                if (!obj._element.hasAttribute('crossorigin')) {
-                  console.warn('Found image without crossorigin attribute');
-                  hasCrossOriginImages = true;
-                }
-              }
-            }
-
-            if (hasCrossOriginImages) {
-              console.warn('Canvas may be tainted with cross-origin images');
-            }
-
-            // Try getting canvas data with timeout to ensure it's fully rendered
-            setTimeout(() => {
-              try {
-                const canvas2dDataUrl = fabricCanvasRef.current.toDataURL({
-                  format: 'png',
-                  quality: 1,
-                });
-
-                const link2d = document.createElement('a');
-                link2d.href = canvas2dDataUrl;
-                link2d.download = `tshirt-2d-${view}.png`;
-                document.body.appendChild(link2d);
-                link2d.click();
-                document.body.removeChild(link2d);
-                console.log('2D canvas exported successfully');
-              } catch (e) {
-                console.error('Canvas export timeout error:', e);
-                toast.error('Unable to export 2D view: Canvas export failed.');
-              }
-            }, 200);
+            const link2d = document.createElement('a');
+            link2d.href = canvas2dDataUrl;
+            link2d.download = `tshirt-2d-${view}.png`;
+            document.body.appendChild(link2d);
+            link2d.click();
+            document.body.removeChild(link2d);
           } catch (e) {
-            console.error('Canvas export error details:', e);
-
-            // More informative error handling
-            if (e instanceof DOMException && e.name === 'SecurityError') {
-              toast.error(
-                'Unable to export 2D view: Canvas is tainted with cross-origin content.',
-              );
-            } else {
-              toast.error(
-                'Unable to export 2D view. Please try again or contact support.',
-              );
-            }
+            console.error('Canvas export error:', e);
+            // Show user-friendly error message
+            alert(
+              'Unable to export 2D view. Please try again or contact support.',
+            );
           }
         }
       } catch (error) {
