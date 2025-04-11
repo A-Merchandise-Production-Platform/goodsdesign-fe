@@ -108,8 +108,8 @@ mutation UpdateThumbnailProductDesign(
   deleteFile(fileUrl: $fileUrl)
 }
 
-query ProductDesignTemplates {
-  productDesigns {
+query GetTemplateProductDesigns {
+  getTemplateProductDesigns {
     id
     isPublic
     isTemplate
