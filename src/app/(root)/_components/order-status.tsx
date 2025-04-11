@@ -78,7 +78,7 @@ export const orderStatusSteps = [
   },
   {
     group: 'production',
-    statuses: ['IN_PRODUCTION'],
+    statuses: ['IN_PRODUCTION', 'REWORK_IN_PROGRESS'],
     label: 'Production',
     icon: Package,
   },
@@ -87,7 +87,7 @@ export const orderStatusSteps = [
     statuses: [
       'WAITING_FOR_CHECKING_QUALITY',
       'REWORK_REQUIRED',
-      'REWORK_IN_PROGRESS',
+      ,
     ],
     label: 'Quality Check',
     icon: CheckCircle2,

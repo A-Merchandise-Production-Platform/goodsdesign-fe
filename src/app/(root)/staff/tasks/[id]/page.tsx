@@ -107,7 +107,6 @@ export default function StaffCheckQualityDetailsPage() {
       onCompleted: data => {
         refetch();
         toast.success('Quality check completed successfully');
-        router.push('/staff/tasks');
       },
       onError: error => {
         toast.error(error.message || 'Failed to complete quality check');
