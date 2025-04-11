@@ -96,6 +96,8 @@ export default function ProductDesigner({
 
   // Handle export of 3D model
   const handleExport = () => {
+    console.log(fabricCanvasRef.current);
+
     const handleModelCapture = async (dataUrl: string) => {
       try {
         // Download 3D view
@@ -107,7 +109,6 @@ export default function ProductDesigner({
         document.body.removeChild(link3d);
 
         // Download 2D canvas if available
-        console.log(fabricCanvasRef.current);
         if (fabricCanvasRef.current) {
           try {
             const canvas2dDataUrl = fabricCanvasRef.current.toDataURL({
