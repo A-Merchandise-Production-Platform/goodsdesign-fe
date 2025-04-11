@@ -52,6 +52,7 @@ interface DesignSidebarProps {
     };
   }) => void;
   designId?: string;
+  uploadLoading?: boolean;
 }
 
 const DesignSidebar: React.FC<DesignSidebarProps> = ({
@@ -70,6 +71,7 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
   getVariant,
   onUpdateVariant,
   designId,
+  uploadLoading,
 }) => {
   const [tempColor, setTempColor] = useState<
     { path: string; color: string } | undefined
@@ -82,15 +84,16 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
   return (
     <div className="z-40 w-[200px] p-4">
       <div className="bg-background space-y-1 rounded-xl">
-        <button
+        <Button
           onClick={() => setShowColorDialog(true)}
-          className="text-muted-foreground hover:bg-primary/5 dark:hover:bg-muted block w-full cursor-pointer rounded-md px-3 py-2 text-sm"
+          className="text-muted-foreground hover:bg-primary/5 dark:hover:bg-muted bg-background block w-full cursor-pointer rounded-md px-3 py-2 text-sm"
+          disabled={uploadLoading}
         >
           <div className="flex w-full items-center gap-2">
             <TShirt className="size-4" />
             <div>Product</div>
           </div>
-        </button>
+        </Button>
 
         <Dialog open={showColorDialog} onOpenChange={setShowColorDialog}>
           <DialogContent>
@@ -205,15 +208,16 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
         </Dialog>
 
         <div className="relative w-full">
-          <button
+          <Button
             onClick={handleUploadClick}
-            className="text-muted-foreground hover:bg-primary/5 dark:hover:bg-muted block w-full cursor-pointer rounded-md px-3 py-2 text-sm"
+            className="text-muted-foreground hover:bg-primary/5 dark:hover:bg-muted bg-background block w-full cursor-pointer rounded-md px-3 py-2 text-sm"
+            disabled={uploadLoading}
           >
             <div className="flex w-full items-center gap-2">
               <Upload className="size-4" />
               <div>Uploads</div>
             </div>
-          </button>
+          </Button>
           <input
             id="image-upload"
             type="file"
@@ -223,17 +227,22 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
           />
         </div>
 
-        <button
+        <Button
           onClick={onAddText}
-          className="text-muted-foreground hover:bg-primary/5 dark:hover:bg-muted block w-full cursor-pointer rounded-md px-3 py-2 text-sm"
+          className="text-muted-foreground hover:bg-primary/5 dark:hover:bg-muted bg-background block w-full cursor-pointer rounded-md px-3 py-2 text-sm"
+          disabled={uploadLoading}
         >
           <div className="flex w-full items-center gap-2">
             <Type className="size-4" />
             <div>Text</div>
           </div>
-        </button>
+        </Button>
 
-        <LayersPanel designs={designs} onReorder={onReorderLayers} />
+        <LayersPanel
+          disabled={uploadLoading}
+          designs={designs}
+          onReorder={onReorderLayers}
+        />
       </div>
     </div>
   );

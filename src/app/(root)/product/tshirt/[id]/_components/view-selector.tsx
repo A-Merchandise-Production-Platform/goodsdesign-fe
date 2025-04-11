@@ -14,6 +14,7 @@ interface ViewSelectorProps {
     } | null;
   }> | null;
   designs: Record<string, DesignObject[]>;
+  uploadLoading?: boolean;
 }
 
 const ViewSelector: React.FC<ViewSelectorProps> = ({
@@ -21,6 +22,7 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({
   onViewChange,
   designPositions,
   designs,
+  uploadLoading,
 }) => {
   const renderPrice = (positionName: string) => {
     const hasDesigns = designs[positionName.toLowerCase()]?.length > 0;
@@ -47,19 +49,35 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({
       className="w-[64rem] border-b"
     >
       <TabsList className="z-40 w-full justify-start rounded-none">
-        <TabsTrigger className="text-base" value="front">
+        <TabsTrigger
+          disabled={uploadLoading}
+          className="text-base"
+          value="front"
+        >
           Front
           {renderPrice('front')}
         </TabsTrigger>
-        <TabsTrigger className="text-base" value="back">
+        <TabsTrigger
+          disabled={uploadLoading}
+          className="text-base"
+          value="back"
+        >
           Back
           {renderPrice('back')}
         </TabsTrigger>
-        <TabsTrigger className="text-base" value="left sleeve">
+        <TabsTrigger
+          disabled={uploadLoading}
+          className="text-base"
+          value="left sleeve"
+        >
           Left sleeve
           {renderPrice('left sleeve')}
         </TabsTrigger>
-        <TabsTrigger className="text-base" value="right sleeve">
+        <TabsTrigger
+          disabled={uploadLoading}
+          className="text-base"
+          value="right sleeve"
+        >
           Right sleeve
           {renderPrice('right sleeve')}
         </TabsTrigger>

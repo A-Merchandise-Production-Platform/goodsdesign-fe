@@ -23,13 +23,19 @@ import {
 import { DesignObject } from '@/types/design-object';
 
 import { LayerItem } from './layer-item';
+import { Button } from '@/components/ui/button';
 
 interface LayersPanelProps {
   designs: DesignObject[];
   onReorder: (startIndex: number, endIndex: number) => void;
+  disabled?: boolean;
 }
 
-export function LayersPanel({ designs, onReorder }: LayersPanelProps) {
+export function LayersPanel({
+  designs,
+  onReorder,
+  disabled,
+}: LayersPanelProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -50,12 +56,15 @@ export function LayersPanel({ designs, onReorder }: LayersPanelProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className="text-muted-foreground hover:bg-primary/5 dark:hover:bg-muted block w-full cursor-pointer rounded-md px-3 py-2 text-sm">
+        <Button
+          disabled={disabled}
+          className="bg-background text-muted-foreground hover:bg-primary/5 dark:hover:bg-muted block w-full cursor-pointer rounded-md px-3 py-2 text-sm"
+        >
           <div className="flex w-full items-center gap-2">
             <Layers className="size-4" />
             <div>Layers</div>
           </div>
-        </button>
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="start">
         <div className="space-y-1 p-2">

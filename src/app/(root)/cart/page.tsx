@@ -34,6 +34,7 @@ import { toast } from 'sonner';
 
 // Interface for price calculation return values
 interface ItemPriceCalculation {
+  originalPrice: number;
   unitPrice: number;
   totalPrice: number;
   discountApplied: boolean;
@@ -83,6 +84,7 @@ export default function CartPage() {
   const calculateItemPrice = (item: CartItemEntity): ItemPriceCalculation => {
     if (!item.design?.systemConfigVariant || !item.design.designPositions) {
       return {
+        originalPrice: 0,
         unitPrice: 0,
         totalPrice: 0,
         discountApplied: false,
@@ -122,6 +124,7 @@ export default function CartPage() {
     const discountedPrice = basePrice * (1 - discountPercent);
 
     return {
+      originalPrice: basePrice,
       unitPrice: discountedPrice,
       totalPrice: discountedPrice * item.quantity,
       discountApplied: discountPercent > 0,
@@ -258,8 +261,13 @@ export default function CartPage() {
           </div>
 
           {cartItems.map(item => {
-            const { unitPrice, totalPrice, discountApplied, discountPercent } =
-              calculateItemPrice(item);
+            const {
+              originalPrice,
+              unitPrice,
+              totalPrice,
+              discountApplied,
+              discountPercent,
+            } = calculateItemPrice(item);
             const product = item?.design?.systemConfigVariant?.product;
             const variant = item?.design?.systemConfigVariant;
 
@@ -270,8 +278,6 @@ export default function CartPage() {
                 name: pos.positionType?.positionName || '',
                 price: pos.positionType?.basePrice || 0,
               }));
-
-            const positionNames = activePositions?.map(p => p.name).join(', ');
 
             return (
               <Card key={item.id} className="mb-4 overflow-hidden">
@@ -365,7 +371,8 @@ export default function CartPage() {
                                         </span>
                                         <span className="text-muted-foreground text-sm line-through">
                                           {formatPrice(
-                                            unitPrice / (1 - discountPercent),
+                                            originalPrice *
+                                              (discountPercent / 100),
                                           )}
                                         </span>
                                       </div>
