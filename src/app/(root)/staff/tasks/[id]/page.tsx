@@ -61,6 +61,7 @@ import {
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
 import { getStatusBadge } from '@/app/(root)/_components/order-status';
+import Link from 'next/link';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -463,20 +464,22 @@ export default function StaffCheckQualityDetailsPage() {
             {selectedOrderDetail && (
               <div className="bg-muted/30 rounded-lg border p-4">
                 <div className="grid gap-4 md:grid-cols-[1fr_3fr]">
-                  <div className="bg-muted relative aspect-square overflow-hidden rounded-md">
-                    <Image
-                      src={
-                        selectedOrderDetail.design?.thumbnailUrl ||
-                        '/placeholder.svg?height=200&width=200'
-                      }
-                      alt={
-                        selectedOrderDetail.design?.systemConfigVariant?.product
-                          ?.name || 'Product'
-                      }
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
+                  <Link href={`/view/tshirt/${selectedOrderDetail.design?.id}`}>
+                    <div className="bg-muted group relative aspect-square overflow-hidden rounded-md transition-all hover:opacity-90">
+                      <Image
+                        src={
+                          selectedOrderDetail.design?.thumbnailUrl ||
+                          '/placeholder.svg?height=200&width=200'
+                        }
+                        alt={
+                          selectedOrderDetail.design?.systemConfigVariant
+                            ?.product?.name || 'Product'
+                        }
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                  </Link>
                   <div>
                     <h3 className="mb-1 text-lg font-semibold">
                       {
