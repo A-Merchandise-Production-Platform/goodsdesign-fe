@@ -98,20 +98,29 @@ export default function ProductDesigner({
   const handleExport = () => {
     const handleModelCapture = async (dataUrl: string) => {
       try {
-        // Convert dataUrl to File
-        const response = await fetch(dataUrl);
-        const blob = await response.blob();
-        const file = new File([blob], `tshirt-3d-${view}.png`, {
-          type: 'image/png',
-        });
+        // Download 3D view
+        const link3d = document.createElement('a');
+        link3d.href = dataUrl;
+        link3d.download = `tshirt-3d-${view}.png`;
+        document.body.appendChild(link3d);
+        link3d.click();
+        document.body.removeChild(link3d);
 
-        // Still provide download functionality
-        const link = document.createElement('a');
-        link.href = dataUrl;
-        link.download = `tshirt-3d-${view}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Download 2D canvas if available
+        if (fabricCanvasRef.current) {
+          const canvas2dDataUrl = fabricCanvasRef.current.toDataURL({
+            format: 'png',
+            quality: 1
+          });
+          
+          const link2d = document.createElement('a');
+          link2d.href = canvas2dDataUrl;
+          link2d.download = `tshirt-2d-${view}.png`;
+          document.body.appendChild(link2d);
+          link2d.click();
+          document.body.removeChild(link2d);
+        }
+
       } catch (error) {
         console.error('Error handling export:', error);
       } finally {
