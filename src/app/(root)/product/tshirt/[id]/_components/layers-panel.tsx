@@ -47,8 +47,8 @@ export function LayersPanel({
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = Number(active.id);
-      const newIndex = Number(over.id);
+      const oldIndex = designs.length - 1 - Number(active.id);
+      const newIndex = designs.length - 1 - Number(over.id);
       onReorder(oldIndex, newIndex);
     }
   };
@@ -76,11 +76,15 @@ export function LayersPanel({
               onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={designs.map((_, index) => index)}
+                items={designs.map((_, index) => index).reverse()}
                 strategy={verticalListSortingStrategy}
               >
-                {designs.map((design, index) => (
-                  <LayerItem key={index} id={index} designObject={design} />
+                {[...designs].reverse().map((design, index) => (
+                  <LayerItem
+                    key={designs.length - 1 - index}
+                    id={designs.length - 1 - index}
+                    designObject={design}
+                  />
                 ))}
               </SortableContext>
             </DndContext>

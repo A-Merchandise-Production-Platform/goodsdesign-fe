@@ -238,13 +238,13 @@ export default function ProductDesigner({
     const scaleFactor = CANVAS_SIZE / 1280;
 
     const zones = {
-      front: {
+      "front": {
         minX: 160 * scaleFactor,
         maxX: 410 * scaleFactor,
         minY: 900 * scaleFactor,
         maxY: 1180 * scaleFactor,
       },
-      back: {
+      "back": {
         minX: 610 * scaleFactor,
         maxX: 880 * scaleFactor,
         minY: 870 * scaleFactor,
@@ -1120,6 +1120,25 @@ export default function ProductDesigner({
 
             canvas.renderAll();
             debounceTextureUpdate();
+
+            // Find the position type ID matching the current view
+            const positionType = initialDesigns?.find(
+              pos =>
+                pos.positionType?.positionName.toLowerCase() === view.toLowerCase()
+            );
+
+            // Update position after reordering
+            if (onUpdatePosition && designId && positionType?.positionType?.id) {
+              onUpdatePosition({
+                variables: {
+                  input: {
+                    designId: designId,
+                    productPositionTypeId: positionType.positionType.id,
+                    designJSON: currentDesigns,
+                  },
+                },
+              });
+            }
           }}
         />
 
