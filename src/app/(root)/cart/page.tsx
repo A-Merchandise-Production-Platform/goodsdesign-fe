@@ -261,8 +261,13 @@ export default function CartPage() {
           </div>
 
           {cartItems.map(item => {
-            const {originalPrice, unitPrice, totalPrice, discountApplied, discountPercent } =
-              calculateItemPrice(item);
+            const {
+              originalPrice,
+              unitPrice,
+              totalPrice,
+              discountApplied,
+              discountPercent,
+            } = calculateItemPrice(item);
             const product = item?.design?.systemConfigVariant?.product;
             const variant = item?.design?.systemConfigVariant;
 

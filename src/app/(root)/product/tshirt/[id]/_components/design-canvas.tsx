@@ -24,7 +24,7 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
       <div className="bg-muted relative z-10 flex h-[32rem] w-[32rem] flex-col items-center justify-center gap-4">
         {uploadLoading && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+            <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
           </div>
         )}
         <div
