@@ -1120,6 +1120,30 @@ export default function ProductDesigner({
 
             canvas.renderAll();
             debounceTextureUpdate();
+
+            // Find the position type ID matching the current view
+            const positionType = initialDesigns?.find(
+              pos =>
+                pos.positionType?.positionName.toLowerCase() ===
+                view.toLowerCase(),
+            );
+
+            // Update position after reordering
+            if (
+              onUpdatePosition &&
+              designId &&
+              positionType?.positionType?.id
+            ) {
+              onUpdatePosition({
+                variables: {
+                  input: {
+                    designId: designId,
+                    productPositionTypeId: positionType.positionType.id,
+                    designJSON: currentDesigns,
+                  },
+                },
+              });
+            }
           }}
         />
 

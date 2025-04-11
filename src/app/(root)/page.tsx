@@ -13,8 +13,10 @@ import { ProductSection } from './_components/product-section';
 import { PromotionalBanner } from './_components/promotional-banner';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
   const { user } = useAuthStore();
   const { data: proData, loading: proLoading } = useGetAllProductsQuery();
   const sortedProducts = proData?.products
@@ -30,6 +32,7 @@ export default function Home() {
     useDuplicateProductDesignMutation({
       onCompleted: data => {
         toast.success('Created product design successfully');
+        router.push(`/product/tshirt/${data.duplicateProductDesign.id}`);
       },
       onError: () => {
         toast.error('Failed to create product design');
@@ -62,6 +65,7 @@ export default function Home() {
         <DesignSection
           designs={filteredTemplates}
           onDuplicate={duplicateProductDesign}
+          isLoading={duplicateLoading}
         />
       </div>
     </div>

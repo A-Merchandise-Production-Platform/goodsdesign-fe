@@ -30,9 +30,14 @@ interface DesignSectionProps {
       duplicateProductDesignId: string;
     };
   }) => void;
+  isLoading?: boolean;
 }
 
-export function DesignSection({ designs, onDuplicate }: DesignSectionProps) {
+export function DesignSection({
+  designs,
+  onDuplicate,
+  isLoading,
+}: DesignSectionProps) {
   return (
     <div className="mt-12">
       <h2 className="mb-6 text-2xl font-bold">Available Designs</h2>
@@ -54,6 +59,7 @@ export function DesignSection({ designs, onDuplicate }: DesignSectionProps) {
                 design.systemConfigVariant?.product?.category?.name ?? ''
               }
               onDuplicate={onDuplicate}
+              isLoading={isLoading}
             />
           );
         })}
