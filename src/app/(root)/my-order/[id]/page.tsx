@@ -56,6 +56,7 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
+  CreatePaymentGatewayUrlMutation,
   useCreatePaymentGatewayUrlMutation,
   useFeedbackOrderMutation,
   useGetOrderQuery,
@@ -104,7 +105,7 @@ export default function OrderDetailsPage() {
 
   const [createPaymentGatewayUrl, { loading: createPaymentGatewayUrlLoading }] =
     useCreatePaymentGatewayUrlMutation({
-      onCompleted: data => {
+      onCompleted: (data: CreatePaymentGatewayUrlMutation) => {
         if (data?.createPayment) {
           // Redirect to payment gateway URL
           window.location.href = data.createPayment;
@@ -112,7 +113,7 @@ export default function OrderDetailsPage() {
           toast.error('Failed to create payment link. Please try again.');
         }
       },
-      onError: error => {
+      onError: (error: Error) => {
         toast.error(error.message || 'Failed to create payment link');
       },
     });
@@ -120,10 +121,10 @@ export default function OrderDetailsPage() {
   // useFeedbackOrderMutation
   const [feedbackOrder, { loading: feedbackOrderLoading }] =
     useFeedbackOrderMutation({
-      onCompleted: data => {
+      onCompleted: () => {
         refetch();
       },
-      onError: error => {
+      onError: (error: Error) => {
         toast.error(error.message || 'Failed to feedback order');
       },
     });

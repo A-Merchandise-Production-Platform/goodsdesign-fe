@@ -5,7 +5,7 @@ import {
   ClipboardIcon,
   DollarSignIcon,
   LaptopIcon,
-  UsersIcon
+  UsersIcon,
 } from 'lucide-react';
 
 import { DashboardShell } from '@/components/dashboard-shell';
