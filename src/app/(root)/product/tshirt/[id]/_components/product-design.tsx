@@ -107,27 +107,18 @@ export default function ProductDesigner({
         document.body.removeChild(link3d);
 
         // Download 2D canvas if available
-        if (fabricCanvasRef.current) {
-          try {
-            const canvas2dDataUrl = fabricCanvasRef.current.toDataURL({
-              format: 'png',
-              quality: 1,
-            });
+        const canvas2dDataUrl = fabricCanvasRef.current.toDataURL({
+          format: 'png',
+          quality: 1,
+        });
 
-            const link2d = document.createElement('a');
-            link2d.href = canvas2dDataUrl;
-            link2d.download = `tshirt-2d-${view}.png`;
-            document.body.appendChild(link2d);
-            link2d.click();
-            document.body.removeChild(link2d);
-          } catch (e) {
-            console.error('Canvas export error:', e);
-            // Show user-friendly error message
-            alert(
-              'Unable to export 2D view. Please try again or contact support.',
-            );
-          }
-        }
+        const link2d = document.createElement('a');
+        link2d.href = canvas2dDataUrl;
+        link2d.download = `tshirt-2d-${view}.png`;
+        document.body.appendChild(link2d);
+        link2d.click();
+        document.body.removeChild(link2d);
+        
       } catch (error) {
         console.error('Error handling export:', error);
       } finally {
