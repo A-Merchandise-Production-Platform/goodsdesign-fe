@@ -3703,13 +3703,13 @@ export type UpdateThumbnailProductDesignMutation = {
   };
 };
 
-export type ProductDesignTemplatesQueryVariables = Exact<{
+export type GetTemplateProductDesignsQueryVariables = Exact<{
   [key: string]: never;
 }>;
 
-export type ProductDesignTemplatesQuery = {
+export type GetTemplateProductDesignsQuery = {
   __typename?: 'Query';
-  productDesigns: Array<{
+  getTemplateProductDesigns: Array<{
     __typename?: 'ProductDesignEntity';
     id: string;
     isPublic: boolean;
@@ -8746,9 +8746,9 @@ export type UpdateThumbnailProductDesignMutationOptions =
     UpdateThumbnailProductDesignMutation,
     UpdateThumbnailProductDesignMutationVariables
   >;
-export const ProductDesignTemplatesDocument = gql`
-  query ProductDesignTemplates {
-    productDesigns {
+export const GetTemplateProductDesignsDocument = gql`
+  query GetTemplateProductDesigns {
+    getTemplateProductDesigns {
       id
       isPublic
       isTemplate
@@ -8767,50 +8767,50 @@ export const ProductDesignTemplatesDocument = gql`
 `;
 
 /**
- * __useProductDesignTemplatesQuery__
+ * __useGetTemplateProductDesignsQuery__
  *
- * To run a query within a React component, call `useProductDesignTemplatesQuery` and pass it any options that fit your needs.
- * When your component renders, `useProductDesignTemplatesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetTemplateProductDesignsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTemplateProductDesignsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useProductDesignTemplatesQuery({
+ * const { data, loading, error } = useGetTemplateProductDesignsQuery({
  *   variables: {
  *   },
  * });
  */
-export function useProductDesignTemplatesQuery(
+export function useGetTemplateProductDesignsQuery(
   baseOptions?: Apollo.QueryHookOptions<
-    ProductDesignTemplatesQuery,
-    ProductDesignTemplatesQueryVariables
+    GetTemplateProductDesignsQuery,
+    GetTemplateProductDesignsQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
-    ProductDesignTemplatesQuery,
-    ProductDesignTemplatesQueryVariables
-  >(ProductDesignTemplatesDocument, options);
+    GetTemplateProductDesignsQuery,
+    GetTemplateProductDesignsQueryVariables
+  >(GetTemplateProductDesignsDocument, options);
 }
-export function useProductDesignTemplatesLazyQuery(
+export function useGetTemplateProductDesignsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    ProductDesignTemplatesQuery,
-    ProductDesignTemplatesQueryVariables
+    GetTemplateProductDesignsQuery,
+    GetTemplateProductDesignsQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    ProductDesignTemplatesQuery,
-    ProductDesignTemplatesQueryVariables
-  >(ProductDesignTemplatesDocument, options);
+    GetTemplateProductDesignsQuery,
+    GetTemplateProductDesignsQueryVariables
+  >(GetTemplateProductDesignsDocument, options);
 }
-export function useProductDesignTemplatesSuspenseQuery(
+export function useGetTemplateProductDesignsSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        ProductDesignTemplatesQuery,
-        ProductDesignTemplatesQueryVariables
+        GetTemplateProductDesignsQuery,
+        GetTemplateProductDesignsQueryVariables
       >,
 ) {
   const options =
@@ -8818,22 +8818,22 @@ export function useProductDesignTemplatesSuspenseQuery(
       ? baseOptions
       : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
-    ProductDesignTemplatesQuery,
-    ProductDesignTemplatesQueryVariables
-  >(ProductDesignTemplatesDocument, options);
+    GetTemplateProductDesignsQuery,
+    GetTemplateProductDesignsQueryVariables
+  >(GetTemplateProductDesignsDocument, options);
 }
-export type ProductDesignTemplatesQueryHookResult = ReturnType<
-  typeof useProductDesignTemplatesQuery
+export type GetTemplateProductDesignsQueryHookResult = ReturnType<
+  typeof useGetTemplateProductDesignsQuery
 >;
-export type ProductDesignTemplatesLazyQueryHookResult = ReturnType<
-  typeof useProductDesignTemplatesLazyQuery
+export type GetTemplateProductDesignsLazyQueryHookResult = ReturnType<
+  typeof useGetTemplateProductDesignsLazyQuery
 >;
-export type ProductDesignTemplatesSuspenseQueryHookResult = ReturnType<
-  typeof useProductDesignTemplatesSuspenseQuery
+export type GetTemplateProductDesignsSuspenseQueryHookResult = ReturnType<
+  typeof useGetTemplateProductDesignsSuspenseQuery
 >;
-export type ProductDesignTemplatesQueryResult = Apollo.QueryResult<
-  ProductDesignTemplatesQuery,
-  ProductDesignTemplatesQueryVariables
+export type GetTemplateProductDesignsQueryResult = Apollo.QueryResult<
+  GetTemplateProductDesignsQuery,
+  GetTemplateProductDesignsQueryVariables
 >;
 export const DuplicateProductDesignDocument = gql`
   mutation DuplicateProductDesign($duplicateProductDesignId: ID!) {

@@ -5,7 +5,7 @@ import {
   Roles,
   useDuplicateProductDesignMutation,
   useGetAllProductsQuery,
-  useProductDesignTemplatesQuery,
+  useGetTemplateProductDesignsQuery,
 } from '@/graphql/generated/graphql';
 
 import { DesignSection } from './_components/design-section';
@@ -23,11 +23,7 @@ export default function Home() {
     ?.slice()
     .sort((a, b) => (a.id ?? '').localeCompare(b.id ?? ''));
   const { data: proDesData, loading: proDesLoading } =
-    useProductDesignTemplatesQuery();
-  const filteredTemplates =
-    proDesData?.productDesigns?.filter(
-      design => design.isPublic && design.isTemplate,
-    ) ?? [];
+    useGetTemplateProductDesignsQuery();
   const [duplicateProductDesign, { loading: duplicateLoading }] =
     useDuplicateProductDesignMutation({
       onCompleted: data => {
@@ -63,7 +59,7 @@ export default function Home() {
         <ProductSection products={sortedProducts} />
 
         <DesignSection
-          designs={filteredTemplates}
+          designs={proDesData?.getTemplateProductDesigns || []}
           onDuplicate={duplicateProductDesign}
           isLoading={duplicateLoading}
         />
