@@ -1,5 +1,10 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
+import {
+  ArrowRightIcon,
+  ArrowUpDown,
+  EyeIcon,
+  MoreHorizontal,
+} from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -27,8 +32,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   GetUsersQuery,
+  Roles,
   useDeleteUserMutation,
 } from '@/graphql/generated/graphql';
+import Link from 'next/link';
 
 export type User = GetUsersQuery['users'][number];
 
@@ -240,10 +247,37 @@ export const columns: ColumnDef<User>[] = [
       return <span>{formatted}</span>;
     },
   },
+  // {
+  //   id: 'actions',
+  //   cell: ({ row }) => {
+  //     return <UserActions user={row.original} />;
+  //   },
+  // },
   {
-    id: 'actions',
+    id: 'view-details',
     cell: ({ row }) => {
-      return <UserActions user={row.original} />;
+      const user = row.original;
+      return (
+        <Link
+          href={getUserLinkHrefByRole(user.role, user.id)}
+          className="text-blue-500 hover:underline"
+        >
+          View details
+        </Link>
+      );
     },
   },
 ];
+
+const getUserLinkHrefByRole = (role: Roles, id: string) => {
+  switch (role) {
+    case Roles.Factoryowner:
+      return `/manager/factory/${id}`;
+    case Roles.Staff:
+      return `/manager/users/staff/${id}`;
+    case Roles.Customer:
+      return `/manager/users/customer/${id}`;
+    default:
+      return '';
+  }
+};

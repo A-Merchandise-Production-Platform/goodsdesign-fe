@@ -11,7 +11,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
-import { ChevronDown, RefreshCwIcon } from 'lucide-react';
+import { ChevronDown, EyeIcon, RefreshCwIcon } from 'lucide-react';
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -32,11 +32,13 @@ import {
 } from '@/components/ui/table';
 import {
   type GetUsersQuery,
+  Roles,
   useGetUsersQuery,
 } from '@/graphql/generated/graphql';
 
 import AddUserForm from './add-user-form';
 import { columns } from './columns';
+import Link from 'next/link';
 
 export type User = GetUsersQuery['users'][number];
 

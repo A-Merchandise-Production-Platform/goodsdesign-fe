@@ -2041,6 +2041,25 @@ export type GetEnhancedManagerDashboardQuery = {
   };
 };
 
+export type GetManagerOrderDashboardQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetManagerOrderDashboardQuery = {
+  __typename?: 'Query';
+  getManagerOrderDashboard: {
+    __typename?: 'ManagerOrderDashboardEntity';
+    completedOrders: number;
+    inProductionOrders: number;
+    lastMonthCompletedOrders: number;
+    lastMonthInProductionOrders: number;
+    lastMonthOrders: number;
+    lastMonthPendingOrders: number;
+    pendingOrders: number;
+    totalOrders: number;
+  };
+};
+
 export type UpdateDesignPositionMutationVariables = Exact<{
   input: UpdateDesignPositionDto;
 }>;
@@ -4041,6 +4060,51 @@ export type GetSystemConfigVariantsByProductQuery = {
   }>;
 };
 
+export type FindTasksByStaffIdQueryVariables = Exact<{
+  staffId: Scalars['String']['input'];
+}>;
+
+export type FindTasksByStaffIdQuery = {
+  __typename?: 'Query';
+  findTasksByStaffId: Array<{
+    __typename?: 'TaskEntity';
+    assignedDate: any;
+    completedDate?: any | null;
+    description: string;
+    expiredTime: any;
+    id: string;
+    note?: string | null;
+    startDate: any;
+    status: string;
+    taskType: string;
+    taskname: string;
+    assignee?: {
+      __typename?: 'UserEntity';
+      id: string;
+      imageUrl?: string | null;
+      email?: string | null;
+      name?: string | null;
+    } | null;
+  }>;
+  user: {
+    __typename?: 'UserEntity';
+    createdAt: any;
+    createdBy?: string | null;
+    dateOfBirth?: any | null;
+    email?: string | null;
+    gender: boolean;
+    id: string;
+    imageUrl?: string | null;
+    isActive: boolean;
+    isDeleted: boolean;
+    name?: string | null;
+    phoneNumber?: string | null;
+    role: Roles;
+    updatedAt?: any | null;
+    staffedFactory?: { __typename?: 'FactoryEntity'; name: string } | null;
+  };
+};
+
 export type GetUsersQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetUsersQuery = {
@@ -4165,6 +4229,28 @@ export type GetAvailableStaffForFactoryQuery = {
     name?: string | null;
     role: Roles;
   }>;
+};
+
+export type UpdateProfileMutationVariables = Exact<{
+  updateProfileInput: UpdateProfileDto;
+}>;
+
+export type UpdateProfileMutation = {
+  __typename?: 'Mutation';
+  updateProfile: {
+    __typename?: 'UserEntity';
+    id: string;
+    imageUrl?: string | null;
+    gender: boolean;
+    email?: string | null;
+    dateOfBirth?: any | null;
+    createdAt: any;
+    isActive: boolean;
+    name?: string | null;
+    phoneNumber?: string | null;
+    role: Roles;
+    updatedAt?: any | null;
+  };
 };
 
 export const AddressesDocument = gql`
@@ -5547,6 +5633,90 @@ export type GetEnhancedManagerDashboardSuspenseQueryHookResult = ReturnType<
 export type GetEnhancedManagerDashboardQueryResult = Apollo.QueryResult<
   GetEnhancedManagerDashboardQuery,
   GetEnhancedManagerDashboardQueryVariables
+>;
+export const GetManagerOrderDashboardDocument = gql`
+  query GetManagerOrderDashboard {
+    getManagerOrderDashboard {
+      completedOrders
+      inProductionOrders
+      lastMonthCompletedOrders
+      lastMonthInProductionOrders
+      lastMonthOrders
+      lastMonthPendingOrders
+      pendingOrders
+      totalOrders
+    }
+  }
+`;
+
+/**
+ * __useGetManagerOrderDashboardQuery__
+ *
+ * To run a query within a React component, call `useGetManagerOrderDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetManagerOrderDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetManagerOrderDashboardQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetManagerOrderDashboardQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetManagerOrderDashboardQuery,
+    GetManagerOrderDashboardQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetManagerOrderDashboardQuery,
+    GetManagerOrderDashboardQueryVariables
+  >(GetManagerOrderDashboardDocument, options);
+}
+export function useGetManagerOrderDashboardLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetManagerOrderDashboardQuery,
+    GetManagerOrderDashboardQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetManagerOrderDashboardQuery,
+    GetManagerOrderDashboardQueryVariables
+  >(GetManagerOrderDashboardDocument, options);
+}
+export function useGetManagerOrderDashboardSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetManagerOrderDashboardQuery,
+        GetManagerOrderDashboardQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetManagerOrderDashboardQuery,
+    GetManagerOrderDashboardQueryVariables
+  >(GetManagerOrderDashboardDocument, options);
+}
+export type GetManagerOrderDashboardQueryHookResult = ReturnType<
+  typeof useGetManagerOrderDashboardQuery
+>;
+export type GetManagerOrderDashboardLazyQueryHookResult = ReturnType<
+  typeof useGetManagerOrderDashboardLazyQuery
+>;
+export type GetManagerOrderDashboardSuspenseQueryHookResult = ReturnType<
+  typeof useGetManagerOrderDashboardSuspenseQuery
+>;
+export type GetManagerOrderDashboardQueryResult = Apollo.QueryResult<
+  GetManagerOrderDashboardQuery,
+  GetManagerOrderDashboardQueryVariables
 >;
 export const UpdateDesignPositionDocument = gql`
   mutation UpdateDesignPosition($input: UpdateDesignPositionDto!) {
@@ -10154,6 +10324,121 @@ export type GetSystemConfigVariantsByProductQueryResult = Apollo.QueryResult<
   GetSystemConfigVariantsByProductQuery,
   GetSystemConfigVariantsByProductQueryVariables
 >;
+export const FindTasksByStaffIdDocument = gql`
+  query FindTasksByStaffId($staffId: String!) {
+    findTasksByStaffId(staffId: $staffId) {
+      assignedDate
+      assignee {
+        id
+        imageUrl
+        email
+        name
+      }
+      completedDate
+      description
+      expiredTime
+      id
+      note
+      startDate
+      status
+      taskType
+      taskname
+    }
+    user(id: $staffId) {
+      createdAt
+      createdBy
+      dateOfBirth
+      email
+      gender
+      id
+      imageUrl
+      isActive
+      isDeleted
+      name
+      phoneNumber
+      role
+      staffedFactory {
+        name
+      }
+      updatedAt
+    }
+  }
+`;
+
+/**
+ * __useFindTasksByStaffIdQuery__
+ *
+ * To run a query within a React component, call `useFindTasksByStaffIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFindTasksByStaffIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFindTasksByStaffIdQuery({
+ *   variables: {
+ *      staffId: // value for 'staffId'
+ *   },
+ * });
+ */
+export function useFindTasksByStaffIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    FindTasksByStaffIdQuery,
+    FindTasksByStaffIdQueryVariables
+  > &
+    (
+      | { variables: FindTasksByStaffIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    FindTasksByStaffIdQuery,
+    FindTasksByStaffIdQueryVariables
+  >(FindTasksByStaffIdDocument, options);
+}
+export function useFindTasksByStaffIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    FindTasksByStaffIdQuery,
+    FindTasksByStaffIdQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    FindTasksByStaffIdQuery,
+    FindTasksByStaffIdQueryVariables
+  >(FindTasksByStaffIdDocument, options);
+}
+export function useFindTasksByStaffIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        FindTasksByStaffIdQuery,
+        FindTasksByStaffIdQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    FindTasksByStaffIdQuery,
+    FindTasksByStaffIdQueryVariables
+  >(FindTasksByStaffIdDocument, options);
+}
+export type FindTasksByStaffIdQueryHookResult = ReturnType<
+  typeof useFindTasksByStaffIdQuery
+>;
+export type FindTasksByStaffIdLazyQueryHookResult = ReturnType<
+  typeof useFindTasksByStaffIdLazyQuery
+>;
+export type FindTasksByStaffIdSuspenseQueryHookResult = ReturnType<
+  typeof useFindTasksByStaffIdSuspenseQuery
+>;
+export type FindTasksByStaffIdQueryResult = Apollo.QueryResult<
+  FindTasksByStaffIdQuery,
+  FindTasksByStaffIdQueryVariables
+>;
 export const GetUsersDocument = gql`
   query GetUsers {
     users {
@@ -10577,4 +10862,64 @@ export type GetAvailableStaffForFactorySuspenseQueryHookResult = ReturnType<
 export type GetAvailableStaffForFactoryQueryResult = Apollo.QueryResult<
   GetAvailableStaffForFactoryQuery,
   GetAvailableStaffForFactoryQueryVariables
+>;
+export const UpdateProfileDocument = gql`
+  mutation UpdateProfile($updateProfileInput: UpdateProfileDto!) {
+    updateProfile(updateProfileInput: $updateProfileInput) {
+      id
+      imageUrl
+      gender
+      email
+      dateOfBirth
+      createdAt
+      isActive
+      name
+      phoneNumber
+      role
+      updatedAt
+    }
+  }
+`;
+export type UpdateProfileMutationFn = Apollo.MutationFunction<
+  UpdateProfileMutation,
+  UpdateProfileMutationVariables
+>;
+
+/**
+ * __useUpdateProfileMutation__
+ *
+ * To run a mutation, you first call `useUpdateProfileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateProfileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateProfileMutation, { data, loading, error }] = useUpdateProfileMutation({
+ *   variables: {
+ *      updateProfileInput: // value for 'updateProfileInput'
+ *   },
+ * });
+ */
+export function useUpdateProfileMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateProfileMutation,
+    UpdateProfileMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateProfileMutation,
+    UpdateProfileMutationVariables
+  >(UpdateProfileDocument, options);
+}
+export type UpdateProfileMutationHookResult = ReturnType<
+  typeof useUpdateProfileMutation
+>;
+export type UpdateProfileMutationResult =
+  Apollo.MutationResult<UpdateProfileMutation>;
+export type UpdateProfileMutationOptions = Apollo.BaseMutationOptions<
+  UpdateProfileMutation,
+  UpdateProfileMutationVariables
 >;
