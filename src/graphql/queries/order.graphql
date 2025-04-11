@@ -951,6 +951,12 @@ mutation ShippedOrder($orderId: String!) {
   }
 }
 
+mutation ChangeOrderToShipping($orderId: String!) {
+  changeOrderToShipping(orderId: $orderId) {
+    id
+  }
+}
+
 mutation FeedbackOrder($input: FeedbackOrderInput!, $orderId: String!) {
   feedbackOrder(input: $input, orderId: $orderId) {
     id

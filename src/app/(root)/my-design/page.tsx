@@ -5,12 +5,24 @@ import Link from 'next/link';
 
 import { Sidebar } from '@/components/shared/sidebar';
 import { Button } from '@/components/ui/button';
-import { useProductDesignsByUserQuery } from '@/graphql/generated/graphql';
+import {
+  Roles,
+  useProductDesignsByUserQuery,
+} from '@/graphql/generated/graphql';
 
 import { DesignCard } from './_components/design-card';
+import { useAuthStore } from '@/stores/auth.store';
+import ErrorPage from '@/components/shared/error-page';
 
 export default function MyDesignPage() {
   const { data, loading } = useProductDesignsByUserQuery();
+  const { user } = useAuthStore();
+
+  if (user?.role !== Roles.Customer) {
+    return (
+      <ErrorPage message="You not allowed to access this page" code={403} />
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 gap-4 px-4 pt-4 pb-2 md:grid-cols-[200px_1fr]">
@@ -29,19 +41,33 @@ export default function MyDesignPage() {
         </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {data?.productDesignsByUser?.length ? (
-            data.productDesignsByUser.map(design => (
-              <DesignCard
-                key={design.id}
-                id={design.id}
-                image={design.thumbnailUrl || undefined}
-                name={design.systemConfigVariant?.product.name}
-                price={
-                  design.designPositions?.[0]?.positionType?.basePrice ||
-                  undefined
-                }
-                category={design.systemConfigVariant?.product?.category?.name}
-              />
-            ))
+            data.productDesignsByUser.map(design => {
+              // Get base product price from systemConfigVariant
+              const variantPrice = design.systemConfigVariant?.price ?? 0;
+
+              // Calculate total for positions that have designs
+              const positionPrices =
+                design.designPositions?.reduce((total: number, position) => {
+                  if (position.designJSON && position.designJSON.length > 0) {
+                    return total + (position.positionType?.basePrice ?? 0);
+                  }
+                  return total;
+                }, 0) ?? 0;
+
+              // Calculate total base price
+              const basePrice = variantPrice + positionPrices;
+
+              return (
+                <DesignCard
+                  key={design.id}
+                  id={design.id}
+                  image={design.thumbnailUrl || undefined}
+                  name={design.systemConfigVariant?.product.name}
+                  price={basePrice}
+                  category={design.systemConfigVariant?.product?.category?.name}
+                />
+              );
+            })
           ) : (
             <div className="container mx-auto py-6">
               <div className="flex h-[400px] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">

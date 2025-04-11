@@ -49,7 +49,7 @@ export function ProductSection({ products = [] }: ProductSectionProps) {
                 : product.id
           }`}
           name={product.name}
-          price={getMinPrice(product.variants) / 1000}
+          price={getMinPrice(product.variants)}
           image={product.imageUrl || ''}
           description={product.description || ''}
         />

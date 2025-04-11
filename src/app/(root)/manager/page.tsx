@@ -1,20 +1,17 @@
 'use client';
 
 import {
-  ArrowUpIcon,
-  ArrowDownIcon,
-  BarChart3Icon,
   Building2Icon,
-  ChevronRightIcon,
-  PlusCircleIcon,
   ClipboardIcon,
   DollarSignIcon,
   LaptopIcon,
-  Settings2Icon,
-  UserPlusIcon,
-  UsersIcon,
+  UsersIcon
 } from 'lucide-react';
 
+import { DashboardShell } from '@/components/dashboard-shell';
+import { FactoryPerformanceChart } from '@/components/factory-performance-chart';
+import { OrderStatusChart } from '@/components/order-status-chart';
+import { StatCard } from '@/components/stat-card';
 import {
   Card,
   CardContent,
@@ -22,16 +19,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { FactoryPerformanceChart } from '@/components/factory-performance-chart';
-import { OrderStatusChart } from '@/components/order-status-chart';
-import { cn } from '@/lib/utils';
 import {
   ChangeType,
   useGetEnhancedManagerDashboardQuery,
 } from '@/graphql/generated/graphql';
-import { StatCard } from '@/components/stat-card';
-import { DashboardShell } from '@/components/dashboard-shell';
 
 // Dashboard data interface
 interface ManagerDashboardData {
@@ -67,14 +58,14 @@ interface ManagerDashboardData {
     status: string;
     count: number;
   }>;
-  recentActivities: Array<{
-    id: string;
-    type: ActivityType;
-    title: string;
-    description: string;
-    time: string;
-    relatedId?: string;
-  }>;
+  // recentActivities: Array<{
+  //   id: string;
+  //   type: ActivityType;
+  //   title: string;
+  //   description: string;
+  //   time: string;
+  //   relatedId?: string;
+  // }>;
 }
 
 // Sample dashboard data
@@ -139,39 +130,39 @@ const dashboardData: ManagerDashboardData = {
     { status: 'Pending', count: 30 },
     { status: 'Cancelled', count: 15 },
   ],
-  recentActivities: [
-    {
-      id: 'act1001',
-      type: 'order',
-      title: 'New Order Received',
-      description: 'Order #12458 from Client XYZ for 200 units',
-      time: '10 minutes ago',
-      relatedId: 'ORD12458',
-    },
-    {
-      id: 'act1002',
-      type: 'factory',
-      title: 'Factory Maintenance Complete',
-      description: 'Factory #F1002 is back online after scheduled maintenance',
-      time: '1 hour ago',
-      relatedId: 'F1002',
-    },
-    {
-      id: 'act1003',
-      type: 'staff',
-      title: 'Staff Shift Change',
-      description: 'Night shift started with 12 workers at Factory #F1001',
-      time: '3 hours ago',
-      relatedId: 'F1001',
-    },
-    {
-      id: 'act1004',
-      type: 'system',
-      title: 'System Update',
-      description: 'Production planning module updated to v2.4',
-      time: 'Yesterday, 11:30 PM',
-    },
-  ],
+  // recentActivities: [
+  // {
+  //   id: 'act1001',
+  //   type: 'order',
+  //   title: 'New Order Received',
+  //   description: 'Order #12458 from Client XYZ for 200 units',
+  //   time: '10 minutes ago',
+  //   relatedId: 'ORD12458',
+  // },
+  // {
+  //   id: 'act1002',
+  //   type: 'factory',
+  //   title: 'Factory Maintenance Complete',
+  //   description: 'Factory #F1002 is back online after scheduled maintenance',
+  //   time: '1 hour ago',
+  //   relatedId: 'F1002',
+  // },
+  // {
+  //   id: 'act1003',
+  //   type: 'staff',
+  //   title: 'Staff Shift Change',
+  //   description: 'Night shift started with 12 workers at Factory #F1001',
+  //   time: '3 hours ago',
+  //   relatedId: 'F1001',
+  // },
+  // {
+  //   id: 'act1004',
+  //   type: 'system',
+  //   title: 'System Update',
+  //   description: 'Production planning module updated to v2.4',
+  //   time: 'Yesterday, 11:30 PM',
+  // },
+  // ],
 };
 
 export default function Page() {

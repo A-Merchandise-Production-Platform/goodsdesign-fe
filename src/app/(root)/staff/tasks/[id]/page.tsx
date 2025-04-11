@@ -55,10 +55,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import {
+  OrderStatus,
   useDoneCheckQualityMutation,
   useGetOrderQuery,
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
+import { getStatusBadge } from '@/app/(root)/_components/order-status';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -74,32 +76,6 @@ const formatCurrency = (amount: number) => {
     style: 'currency',
     currency: 'VND',
   }).format(amount);
-};
-
-// Helper function to get status badge
-const getStatusBadge = (status: string) => {
-  const statusMap: Record<
-    string,
-    {
-      label: string;
-      variant: 'default' | 'secondary' | 'destructive' | 'outline';
-    }
-  > = {
-    PENDING: { label: 'Pending', variant: 'outline' },
-    PROCESSING: { label: 'Processing', variant: 'secondary' },
-    COMPLETED: { label: 'Completed', variant: 'default' },
-    CANCELLED: { label: 'Cancelled', variant: 'destructive' },
-    WAITING_FOR_CHECKING_QUALITY: {
-      label: 'Quality Check',
-      variant: 'outline',
-    },
-    REWORK_REQUIRED: { label: 'Rework Required', variant: 'destructive' },
-    REWORK_IN_PROGRESS: { label: 'Rework in Progress', variant: 'secondary' },
-  };
-
-  const config = statusMap[status] || { label: status, variant: 'outline' };
-
-  return <Badge variant={config.variant}>{config.label}</Badge>;
 };
 
 export default function StaffCheckQualityDetailsPage() {
@@ -821,222 +797,240 @@ export default function StaffCheckQualityDetailsPage() {
 
           {/* Quality Check Form Tab */}
           <TabsContent value="quality-check">
-            <Card>
-              <CardHeader>
-                <CardTitle>Quality Check Form</CardTitle>
-                <CardDescription>
-                  Complete the quality check for this product
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-6">
-                  <Alert>
-                    <CheckCircle2 className="h-4 w-4" />
-                    <AlertTitle>Quality Check Instructions</AlertTitle>
-                    <AlertDescription>
-                      <p className="mt-2">
-                        Please inspect the product carefully and record the
-                        number of items that pass and fail quality standards.
-                        Take clear photos of any defects found and provide
-                        detailed notes about the issues.
-                      </p>
-                    </AlertDescription>
-                  </Alert>
+            {order.status !== OrderStatus.WaitingForCheckingQuality ? (
+              // you cannot check quality if order status is not waiting for checking quality
+              <Card className="text-center">
+                <CardContent className="flex flex-col items-center justify-center py-16">
+                  <AlertTriangle className="mb-4 h-12 w-12 text-red-500" />
+                  <h2 className="mb-2 text-xl font-semibold">
+                    Quality Check Not Allowed
+                  </h2>
+                  <p className="text-muted-foreground mx-auto mb-6 max-w-md">
+                    You cannot perform a quality check on this order because its
+                    status is not valid for quality checking.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quality Check Form</CardTitle>
+                  <CardDescription>
+                    Complete the quality check for this product
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-6">
+                    <Alert>
+                      <CheckCircle2 className="h-4 w-4" />
+                      <AlertTitle>Quality Check Instructions</AlertTitle>
+                      <AlertDescription>
+                        <p className="mt-2">
+                          Please inspect the product carefully and record the
+                          number of items that pass and fail quality standards.
+                          Take clear photos of any defects found and provide
+                          detailed notes about the issues.
+                        </p>
+                      </AlertDescription>
+                    </Alert>
 
-                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div>
+                        <label
+                          htmlFor="passedQuantity"
+                          className="mb-1 block text-sm font-medium"
+                        >
+                          Passed Quantity
+                        </label>
+                        <Input
+                          id="passedQuantity"
+                          type="number"
+                          min="0"
+                          max={selectedOrderDetail.quantity}
+                          value={passedQuantity}
+                          onChange={e =>
+                            setPassedQuantity(
+                              Number.parseInt(e.target.value) || 0,
+                            )
+                          }
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="failedQuantity"
+                          className="mb-1 block text-sm font-medium"
+                        >
+                          Failed Quantity
+                        </label>
+                        <Input
+                          id="failedQuantity"
+                          type="number"
+                          min="0"
+                          max={selectedOrderDetail.quantity}
+                          value={failedQuantity}
+                          onChange={e =>
+                            setFailedQuantity(
+                              Number.parseInt(e.target.value) || 0,
+                            )
+                          }
+                        />
+                      </div>
+                    </div>
+
                     <div>
-                      <label
-                        htmlFor="passedQuantity"
-                        className="mb-1 block text-sm font-medium"
-                      >
-                        Passed Quantity
-                      </label>
-                      <Input
-                        id="passedQuantity"
-                        type="number"
-                        min="0"
-                        max={selectedOrderDetail.quantity}
-                        value={passedQuantity}
-                        onChange={e =>
-                          setPassedQuantity(
-                            Number.parseInt(e.target.value) || 0,
-                          )
-                        }
+                      <div className="mb-1 flex items-center justify-between">
+                        <label
+                          htmlFor="note"
+                          className="block text-sm font-medium"
+                        >
+                          Quality Check Notes
+                        </label>
+                        <span className="text-muted-foreground text-xs">
+                          {note.length} / 500 characters
+                        </span>
+                      </div>
+                      <Textarea
+                        id="note"
+                        placeholder="Enter detailed notes about the quality check results, including any defects found..."
+                        value={note}
+                        onChange={e => setNote(e.target.value)}
+                        className="min-h-[120px]"
+                        maxLength={500}
                       />
                     </div>
+
                     <div>
-                      <label
-                        htmlFor="failedQuantity"
-                        className="mb-1 block text-sm font-medium"
-                      >
-                        Failed Quantity
+                      <label className="mb-2 block text-sm font-medium">
+                        Upload Images
                       </label>
-                      <Input
-                        id="failedQuantity"
-                        type="number"
-                        min="0"
-                        max={selectedOrderDetail.quantity}
-                        value={failedQuantity}
-                        onChange={e =>
-                          setFailedQuantity(
-                            Number.parseInt(e.target.value) || 0,
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
 
-                  <div>
-                    <div className="mb-1 flex items-center justify-between">
-                      <label
-                        htmlFor="note"
-                        className="block text-sm font-medium"
-                      >
-                        Quality Check Notes
-                      </label>
-                      <span className="text-muted-foreground text-xs">
-                        {note.length} / 500 characters
-                      </span>
-                    </div>
-                    <Textarea
-                      id="note"
-                      placeholder="Enter detailed notes about the quality check results, including any defects found..."
-                      value={note}
-                      onChange={e => setNote(e.target.value)}
-                      className="min-h-[120px]"
-                      maxLength={500}
-                    />
-                  </div>
+                      <div className="mb-4 flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={imageUploading || doneCheckQualityLoading}
+                        >
+                          <Upload className="mr-2 h-4 w-4" />
+                          Select Images
+                        </Button>
+                        <Input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          className="hidden"
+                          onChange={handleFileChange}
+                          disabled={imageUploading || doneCheckQualityLoading}
+                        />
 
-                  <div>
-                    <label className="mb-2 block text-sm font-medium">
-                      Upload Images
-                    </label>
+                        <span className="text-muted-foreground text-sm">
+                          {images.length}{' '}
+                          {images.length === 1 ? 'image' : 'images'} selected
+                        </span>
+                      </div>
 
-                    <div className="mb-4 flex items-center gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={imageUploading || doneCheckQualityLoading}
-                      >
-                        <Upload className="mr-2 h-4 w-4" />
-                        Select Images
-                      </Button>
-                      <Input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        className="hidden"
-                        onChange={handleFileChange}
-                        disabled={imageUploading || doneCheckQualityLoading}
-                      />
+                      {/* Image Preview */}
+                      {previewImages.length > 0 ? (
+                        <div className="rounded-md border p-4">
+                          <div className="mb-2 flex items-center justify-between">
+                            <h4 className="font-medium">Image Previews</h4>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                previewImages.forEach(url =>
+                                  URL.revokeObjectURL(url),
+                                );
+                                setPreviewImages([]);
+                                setImages([]);
+                              }}
+                              disabled={
+                                imageUploading || doneCheckQualityLoading
+                              }
+                            >
+                              <Trash2 className="mr-1 h-4 w-4" />
+                              Clear All
+                            </Button>
+                          </div>
 
-                      <span className="text-muted-foreground text-sm">
-                        {images.length}{' '}
-                        {images.length === 1 ? 'image' : 'images'} selected
-                      </span>
-                    </div>
-
-                    {/* Image Preview */}
-                    {previewImages.length > 0 ? (
-                      <div className="rounded-md border p-4">
-                        <div className="mb-2 flex items-center justify-between">
-                          <h4 className="font-medium">Image Previews</h4>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              previewImages.forEach(url =>
-                                URL.revokeObjectURL(url),
-                              );
-                              setPreviewImages([]);
-                              setImages([]);
-                            }}
-                            disabled={imageUploading || doneCheckQualityLoading}
-                          >
-                            <Trash2 className="mr-1 h-4 w-4" />
-                            Clear All
-                          </Button>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                          {previewImages.map((url, index) => (
-                            <div key={index} className="group relative">
-                              <div
-                                className="bg-muted relative aspect-square cursor-pointer overflow-hidden rounded-md border"
-                                onClick={() => openImagePreview(index)}
-                              >
-                                <Image
-                                  src={url || '/placeholder.svg'}
-                                  alt={`Preview ${index + 1}`}
-                                  fill
-                                  className="object-cover"
-                                />
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-colors group-hover:bg-black/10 group-hover:opacity-100">
-                                  <ImageIcon className="h-6 w-6 text-white" />
+                          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                            {previewImages.map((url, index) => (
+                              <div key={index} className="group relative">
+                                <div
+                                  className="bg-muted relative aspect-square cursor-pointer overflow-hidden rounded-md border"
+                                  onClick={() => openImagePreview(index)}
+                                >
+                                  <Image
+                                    src={url || '/placeholder.svg'}
+                                    alt={`Preview ${index + 1}`}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                  <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-colors group-hover:bg-black/10 group-hover:opacity-100">
+                                    <ImageIcon className="h-6 w-6 text-white" />
+                                  </div>
                                 </div>
+                                <Button
+                                  variant="destructive"
+                                  size="icon"
+                                  className="absolute top-1 right-1 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    removeImage(index);
+                                  }}
+                                  disabled={
+                                    imageUploading || doneCheckQualityLoading
+                                  }
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
                               </div>
-                              <Button
-                                variant="destructive"
-                                size="icon"
-                                className="absolute top-1 right-1 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  removeImage(index);
-                                }}
-                                disabled={
-                                  imageUploading || doneCheckQualityLoading
-                                }
-                              >
-                                <X className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center rounded-md border border-dashed p-8 text-center">
-                        <FileImage className="text-muted-foreground mb-2 h-10 w-10" />
-                        <p className="text-muted-foreground mb-1 text-sm">
-                          No images selected
-                        </p>
-                        <p className="text-muted-foreground text-xs">
-                          Upload images to document the quality check results
-                        </p>
-                      </div>
-                    )}
+                      ) : (
+                        <div className="flex flex-col items-center justify-center rounded-md border border-dashed p-8 text-center">
+                          <FileImage className="text-muted-foreground mb-2 h-10 w-10" />
+                          <p className="text-muted-foreground mb-1 text-sm">
+                            No images selected
+                          </p>
+                          <p className="text-muted-foreground text-xs">
+                            Upload images to document the quality check results
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-              <CardFooter className="flex flex-col gap-3 border-t pt-6 sm:flex-row">
-                <Button
-                  variant="outline"
-                  onClick={() => setActiveTab('details')}
-                  disabled={imageUploading || doneCheckQualityLoading}
-                  className="w-full sm:w-auto"
-                >
-                  Back to Details
-                </Button>
-                <Button
-                  onClick={handleSubmitQualityCheck}
-                  disabled={
-                    imageUploading ||
-                    doneCheckQualityLoading ||
-                    passedQuantity + failedQuantity <= 0 ||
-                    passedQuantity + failedQuantity >
-                      selectedOrderDetail.quantity
-                  }
-                  className="w-full sm:w-auto"
-                >
-                  {(imageUploading || doneCheckQualityLoading) && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Complete Quality Check
-                </Button>
-              </CardFooter>
-            </Card>
+                </CardContent>
+                <CardFooter className="flex flex-col gap-3 border-t pt-6 sm:flex-row">
+                  <Button
+                    variant="outline"
+                    onClick={() => setActiveTab('details')}
+                    disabled={imageUploading || doneCheckQualityLoading}
+                    className="w-full sm:w-auto"
+                  >
+                    Back to Details
+                  </Button>
+                  <Button
+                    onClick={handleSubmitQualityCheck}
+                    disabled={
+                      imageUploading ||
+                      doneCheckQualityLoading ||
+                      passedQuantity + failedQuantity <= 0 ||
+                      passedQuantity + failedQuantity >
+                        selectedOrderDetail.quantity
+                    }
+                    className="w-full sm:w-auto"
+                  >
+                    {(imageUploading || doneCheckQualityLoading) && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Complete Quality Check
+                  </Button>
+                </CardFooter>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       )}

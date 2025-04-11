@@ -1,5 +1,3 @@
-import MyStaffTasksPage from './tasks/page';
-
 export default function StaffPage() {
-  return <h1>Hientai</h1>;
+  return <h1></h1>;
 }

@@ -26,6 +26,7 @@ query ProductDesignsByUser {
     id
     thumbnailUrl
     systemConfigVariant {
+      price
       product {
         name
         category {
@@ -122,5 +123,14 @@ query ProductDesignTemplates {
       }
       designJSON
     }
+  }
+}
+
+mutation DuplicateProductDesign($duplicateProductDesignId: ID!) {
+  duplicateProductDesign(id: $duplicateProductDesignId) {
+    id
+    isFinalized
+    isPublic
+    isTemplate
   }
 }

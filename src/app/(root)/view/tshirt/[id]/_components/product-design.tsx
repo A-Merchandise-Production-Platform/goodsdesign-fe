@@ -2,7 +2,6 @@
 import * as fabric from 'fabric';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
 import * as THREE from 'three';
 
 import { useGetProductInformationByIdQuery } from '@/graphql/generated/graphql';
@@ -12,7 +11,6 @@ import { DesignObject } from '@/types/design-object';
 import DesignCanvas from './design-canvas';
 import DesignFooter from './design-footer';
 import DesignHeader from './design-header';
-import DesignSidebar from './design-sidebar';
 import { SHIRT_COLORS } from './shirt-colors';
 import ViewSelector from './view-selector';
 
@@ -43,51 +41,12 @@ interface ProductVariant {
 interface ProductDesignerComponentProps {
   initialDesigns?: DesignPosition[] | null;
   productVariant?: ProductVariant | null;
-  onUpload?: (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => Promise<string | null | undefined>;
-  onThumbnail?: (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => Promise<string | null | undefined>;
-  onUpdateVariant?: (options: {
-    variables: {
-      updateProductDesignId: string;
-      input: { systemConfigVariantId: string };
-    };
-  }) => void;
-  onUpdatePosition?: (options: {
-    variables: {
-      input: {
-        designId: string;
-        productPositionTypeId: string;
-        designJSON: any;
-      };
-    };
-  }) => void;
-  onCreateCartItem?: (options: {
-    variables: {
-      createCartItemInput: {
-        designId: string;
-        quantity: number;
-      };
-    };
-  }) => void;
-  cartLoading?: boolean;
   designId?: string;
-  uploadLoading?: boolean;
 }
 
 export default function ProductDesigner({
   initialDesigns = [],
   productVariant,
-  onUpload,
-  onThumbnail,
-  onUpdateVariant,
-  onUpdatePosition,
-  onCreateCartItem,
-  cartLoading,
-  designId,
-  uploadLoading,
 }: ProductDesignerComponentProps) {
   // State for 3D model export
   const [modelExportCallback, setModelExportCallback] = useState<
@@ -125,9 +84,6 @@ export default function ProductDesigner({
       productId: 'prod001',
     },
   });
-
-  const [selectedSize, setSelectedSize] = useState<string>('');
-  const [selectedColor, setSelectedColor] = useState<string>('');
   const [view, setView] = useState('front');
   const [currentTexture, setCurrentTexture] = useState<string>(() => {
     if (productVariant?.color) {
@@ -149,43 +105,16 @@ export default function ProductDesigner({
       );
       if (matchingColor?.path) {
         setCurrentTexture(matchingColor.path);
-        setSelectedColor(productVariant.color);
       }
     }
   }, [productVariant]);
 
-  useEffect(() => {
-    if (infoData?.product.variants && infoData.product.variants.length > 0) {
-      const firstVariant = infoData.product.variants[0];
-      if (firstVariant.size) setSelectedSize(firstVariant.size);
-      if (firstVariant.color) setSelectedColor(firstVariant.color);
-    }
-  }, [infoData]);
-
-  const getVariant = (size: string, color: string) => {
-    const variant = infoData?.product.variants?.find(
-      v => v.size === size && v.color === color,
-    );
-
-    if (!variant) return undefined;
-
-    return {
-      id: variant.id,
-      price: variant.price ?? 0, // Provide default value for nullable price
-      color: variant.color ?? '', // Provide default value for nullable color
-      size: variant.size ?? '', // Provide default value for nullable size
-      model: variant.model ?? '', // Provide default value for nullable model
-    };
-  };
-
   const [texture, setTexture] = useState<THREE.CanvasTexture | null>(null);
-  const [showColorDialog, setShowColorDialog] = useState(false);
   const [designsInitialized, setDesignsInitialized] = useState(false);
-  const [cartQuantity, setCartQuantity] = useState(1);
   const [designs, setDesigns] = useState<SerializedDesign>(() => {
     if (!initialDesigns) return {};
 
-    // Add timeout to initialize designs after 2 seconds
+    // Add timeout to initialize designs after 1 second
     setTimeout(() => {
       setDesignsInitialized(true);
     }, 1000);
@@ -445,6 +374,8 @@ export default function ProductDesigner({
   };
 
   const updateTextureOnModel = () => {
+    const allViews = ['front', 'back', 'left sleeve', 'right sleeve'];
+
     if (!fabricCanvasRef.current || !tempCanvasRef.current) return;
 
     const tempCanvas = tempCanvasRef.current;
@@ -475,9 +406,6 @@ export default function ProductDesigner({
         );
       }
     }
-
-    // Get all views
-    const allViews = ['front', 'back', 'left sleeve', 'right sleeve'];
 
     // Prepare all images first to avoid async issues
     const imagePromises: Promise<void>[] = [];
@@ -641,10 +569,6 @@ export default function ProductDesigner({
       return base;
     });
 
-    const previousDesigns = designs[view] || [];
-    const hasChanges =
-      JSON.stringify(previousDesigns) !== JSON.stringify(currentDesigns);
-
     // Update state directly with the new designs
     setDesigns(prev => {
       return {
@@ -652,31 +576,6 @@ export default function ProductDesigner({
         [view]: currentDesigns,
       };
     });
-
-    // Then, if there are changes, call onUpdatePosition in a separate effect
-    if (hasChanges && onUpdatePosition && designId) {
-      // Find the current position type for this view
-      const currentPosition = initialDesigns?.find(
-        position => position?.positionType?.positionName.toLowerCase() === view,
-      );
-
-      if (currentPosition?.positionType?.id) {
-        const positionTypeId = currentPosition.positionType.id;
-
-        // Use setTimeout to push this to the next tick, avoiding the setState in render error
-        setTimeout(() => {
-          onUpdatePosition({
-            variables: {
-              input: {
-                designId: designId,
-                productPositionTypeId: positionTypeId,
-                designJSON: currentDesigns,
-              },
-            },
-          });
-        }, 0);
-      }
-    }
   };
 
   // Load saved design
@@ -726,6 +625,14 @@ export default function ProductDesigner({
             scaleY: objData.scaleY,
             angle: objData.angle,
             layer: objData.layer || 1,
+            lockMovementX: true,
+            lockMovementY: true,
+            lockRotation: true,
+            lockScalingX: true,
+            lockScalingY: true,
+            selectable: false,
+            hasControls: false,
+            hoverCursor: 'default',
           });
           // Store the view with the object
           fabricImage.set('data', { view: objData.view || view });
@@ -781,6 +688,20 @@ export default function ProductDesigner({
       // Store the current view with the object
       obj.set('data', { ...obj.get('data'), view: view });
 
+      // Set specific properties for images to prevent modification
+      if (obj.type === 'image') {
+        obj.set({
+          lockMovementX: true,
+          lockMovementY: true,
+          lockRotation: true,
+          lockScalingX: true,
+          lockScalingY: true,
+          selectable: false,
+          hasControls: false,
+          hoverCursor: 'default',
+        });
+      }
+
       // If object is fully outside, remove it
       if (isObjectFullyOutside(obj, view)) {
         fabricCanvasRef.current?.remove(obj);
@@ -794,6 +715,11 @@ export default function ProductDesigner({
 
       const obj = e.target;
 
+      // Prevent interaction with images
+      if (obj.type === 'image') {
+        return;
+      }
+
       // If object is fully outside, remove it
       if (isObjectFullyOutside(obj, view)) {
         fabricCanvasRef.current?.remove(obj);
@@ -805,6 +731,15 @@ export default function ProductDesigner({
     // Handle scaling boundary check
     fabricCanvasRef.current.on('object:scaling', (e: any) => {
       const obj = e.target;
+
+      // Prevent scaling of images
+      if (obj.type === 'image') {
+        obj.set({
+          scaleX: obj.originalState?.scaleX || obj.scaleX,
+          scaleY: obj.originalState?.scaleY || obj.scaleY,
+        });
+        return;
+      }
 
       // If object is fully outside after scaling, remove it
       if (isObjectFullyOutside(obj, view)) {
@@ -867,30 +802,8 @@ export default function ProductDesigner({
     )
       return;
 
-    let imageUrl: string;
-
-    if (onUpload) {
-      // Use the provided upload handler
-      const uploadedUrl = await onUpload(e);
-      if (!uploadedUrl) {
-        e.target.value = '';
-        return;
-      }
-      imageUrl = uploadedUrl;
-    } else {
-      // Fallback to local handling
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      imageUrl = await new Promise(resolve => {
-        reader.onload = event =>
-          resolve(event.target?.result?.toString() || '');
-        reader.readAsDataURL(file);
-      });
-    }
-
     const imageElement = new Image();
     imageElement.crossOrigin = 'anonymous';
-    imageElement.src = imageUrl;
 
     imageElement.onload = () => {
       const fabricImage = new (fabric as any).Image(imageElement);
@@ -987,11 +900,6 @@ export default function ProductDesigner({
     debounceTextureUpdate();
   };
 
-  const handleColorChange = (texturePath: string) => {
-    setCurrentTexture(texturePath);
-    setShowColorDialog(false);
-  };
-
   const handleViewChange = (newView: string) => {
     // Just update the view, useEffect will handle loading the saved design
     setView(newView);
@@ -999,172 +907,23 @@ export default function ProductDesigner({
 
   return (
     <div className="flex h-screen flex-col">
-      <DesignHeader
-        onSave={async () => {
-          saveCurrentDesign();
+      <DesignHeader onExport={handleExport} />
 
-          // Then capture and update thumbnail
-          const captureCallback = async (dataUrl: string) => {
-            try {
-              // Convert dataUrl to File
-              const response = await fetch(dataUrl);
-              const blob = await response.blob();
-              const file = new File([blob], `tshirt-3d-${view}.png`, {
-                type: 'image/png',
-              });
-
-              // Create a mock event with the file
-              const mockEvent = {
-                target: {
-                  files: [file],
-                },
-              } as unknown as React.ChangeEvent<HTMLInputElement>;
-
-              // Upload thumbnail using the provided callback
-              if (onThumbnail) {
-                await onThumbnail(mockEvent);
-              }
-            } catch (error) {
-              console.error('Error capturing thumbnail:', error);
-            } finally {
-              setModelExportCallback(undefined);
-            }
-          };
-
-          // Set the callback to capture the model view
-          setModelExportCallback(() => captureCallback);
-        }}
-        onExport={handleExport} // Keep the download button functionality
-      />
-
-      <div className="flex flex-1">
-        <DesignSidebar
-          showColorDialog={showColorDialog}
-          setShowColorDialog={setShowColorDialog}
-          currentTexture={currentTexture}
-          onColorChange={handleColorChange}
-          onImageUpload={handleImageUpload}
-          onAddText={addText}
-          designs={designs[view] || []}
-          productInfo={infoData?.product}
-          selectedSize={selectedSize}
-          selectedColor={selectedColor}
-          onSizeChange={setSelectedSize}
-          getVariant={getVariant}
-          onUpdateVariant={onUpdateVariant}
-          designId={designId}
-          uploadLoading={uploadLoading}
-          onReorderLayers={(startIndex: number, endIndex: number) => {
-            if (!fabricCanvasRef.current) return;
-
-            // Get current view's designs
-            const currentDesigns = [...(designs[view] || [])];
-
-            // Move the layer
-            const [removed] = currentDesigns.splice(startIndex, 1);
-            currentDesigns.splice(endIndex, 0, removed);
-
-            // Update state
-            setDesigns(prev => ({
-              ...prev,
-              [view]: currentDesigns,
-            }));
-
-            // Re-render canvas with new order
-            const canvas = fabricCanvasRef.current;
-            const objects = canvas
-              .getObjects()
-              .filter((obj: any) => obj.get('data')?.type !== 'designZone');
-
-            // Clear canvas except design zone
-            objects.forEach((obj: any) => canvas.remove(obj));
-
-            // Add objects in new order
-            currentDesigns.forEach(design => {
-              if (design.type === 'textbox' && design.text) {
-                const text = new (fabric as any).IText(design.text, {
-                  left: design.left,
-                  top: design.top,
-                  fontSize: design.fontSize,
-                  fill: design.fill,
-                  fontFamily: design.fontFamily,
-                  scaleX: design.scaleX,
-                  scaleY: design.scaleY,
-                  angle: design.angle,
-                  layer: design.layer || 1,
-                });
-                text.set('data', { view: design.view });
-                applyClipPathToObject(text, view);
-                canvas.add(text);
-              } else if (design.type === 'image' && design.src) {
-                const imgElement = new Image();
-                imgElement.crossOrigin = 'anonymous';
-                imgElement.onload = () => {
-                  const fabricImage = new (fabric as any).Image(imgElement);
-                  fabricImage.set({
-                    left: design.left,
-                    top: design.top,
-                    scaleX: design.scaleX,
-                    scaleY: design.scaleY,
-                    angle: design.angle,
-                    layer: design.layer || 1,
-                  });
-                  fabricImage.set('data', { view: design.view });
-                  applyClipPathToObject(fabricImage, view);
-                  canvas.add(fabricImage);
-                  canvas.renderAll();
-                };
-                imgElement.src = design.src;
-              }
-            });
-
-            canvas.renderAll();
-            debounceTextureUpdate();
-
-            // Find the position type ID matching the current view
-            const positionType = initialDesigns?.find(
-              pos =>
-                pos.positionType?.positionName.toLowerCase() ===
-                view.toLowerCase(),
-            );
-
-            // Update position after reordering
-            if (
-              onUpdatePosition &&
-              designId &&
-              positionType?.positionType?.id
-            ) {
-              onUpdatePosition({
-                variables: {
-                  input: {
-                    designId: designId,
-                    productPositionTypeId: positionType.positionType.id,
-                    designJSON: currentDesigns,
-                  },
-                },
-              });
-            }
-          }}
-        />
-
+      <div className="mx-auto flex flex-1">
         <div className="flex flex-1 flex-col">
-          <div className="">
-            <ViewSelector
-              view={view}
-              onViewChange={handleViewChange}
-              designPositions={initialDesigns}
-              designs={designs}
-              uploadLoading={uploadLoading}
-            />
+          <ViewSelector
+            view={view}
+            onViewChange={handleViewChange}
+            designPositions={initialDesigns}
+            designs={designs}
+          />
 
-            <DesignCanvas
-              canvasRef={canvasRef as any}
-              view={view}
-              texture={texture}
-              onExport={modelExportCallback}
-              uploadLoading={uploadLoading}
-            />
-          </div>
+          <DesignCanvas
+            canvasRef={canvasRef as any}
+            view={view}
+            texture={texture}
+            onExport={modelExportCallback}
+          />
         </div>
       </div>
 
@@ -1184,27 +943,6 @@ export default function ProductDesigner({
             };
           },
         )}
-        quantity={cartQuantity}
-        onIncrement={() => setCartQuantity(prev => Math.min(prev + 1, 99))}
-        onDecrement={() => setCartQuantity(prev => Math.max(prev - 1, 1))}
-        onCreateCartItem={() => {
-          try {
-            if (onCreateCartItem && designId) {
-              onCreateCartItem({
-                variables: {
-                  createCartItemInput: {
-                    designId,
-                    quantity: cartQuantity,
-                  },
-                },
-              });
-            }
-            toast.success(`Product has been added to cart`);
-          } catch (error) {
-            toast.error(`Failed to add product to cart`);
-          }
-        }}
-        loading={cartLoading}
       />
     </div>
   );

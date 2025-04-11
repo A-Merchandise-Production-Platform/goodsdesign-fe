@@ -8,6 +8,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -24,14 +25,16 @@ import {
   CartItemEntity,
   DesignPositionEntity,
   useCreateOrderMutation,
+  useDeleteCartItemMutation,
   useGetUserCartItemsQuery,
   useUpdateCartItemMutation,
 } from '@/graphql/generated/graphql';
-import { useToast } from '@/hooks/use-toast';
 import { formatPrice } from '@/lib/utils';
+import { toast } from 'sonner';
 
 // Interface for price calculation return values
 interface ItemPriceCalculation {
+  originalPrice: number;
   unitPrice: number;
   totalPrice: number;
   discountApplied: boolean;
@@ -39,8 +42,8 @@ interface ItemPriceCalculation {
 }
 
 export default function CartPage() {
+  const router = useRouter();
   const { data, loading, refetch } = useGetUserCartItemsQuery();
-  const { toast } = useToast();
   const [isCheckingOut, setIsCheckingOut] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>(
     {},
@@ -53,30 +56,23 @@ export default function CartPage() {
         refetch();
       },
       onError: error => {
-        toast({
-          title: 'Update failed',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast.error(error.message);
       },
     });
+  const [deleteCartItem, { loading: deleteCartItemLoading }] =
+    useDeleteCartItemMutation();
 
   const [createOrder, { loading: createOrderLoading }] = useCreateOrderMutation(
     {
       onCompleted: data => {
-        toast({
-          title: 'Order created',
-          description: 'Your order has been placed successfully!',
-        });
+        const orderId = data.createOrder.id;
+        toast.success('Your order has been placed successfully!');
         setIsCheckingOut(false);
         refetch();
+        router.push(`/my-order/${orderId}`);
       },
       onError: error => {
-        toast({
-          title: 'Checkout failed',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast.error(error.message);
         setIsCheckingOut(false);
       },
     },
@@ -88,6 +84,7 @@ export default function CartPage() {
   const calculateItemPrice = (item: CartItemEntity): ItemPriceCalculation => {
     if (!item.design?.systemConfigVariant || !item.design.designPositions) {
       return {
+        originalPrice: 0,
         unitPrice: 0,
         totalPrice: 0,
         discountApplied: false,
@@ -127,6 +124,7 @@ export default function CartPage() {
     const discountedPrice = basePrice * (1 - discountPercent);
 
     return {
+      originalPrice: basePrice,
       unitPrice: discountedPrice,
       totalPrice: discountedPrice * item.quantity,
       discountApplied: discountPercent > 0,
@@ -159,15 +157,18 @@ export default function CartPage() {
 
   // Handle item removal
   const handleRemoveItem = (id: string): void => {
-    // In a real app, this would call a mutation to remove the item
-    console.log(`Removing item ${id} from cart`);
-    toast({
-      title: 'Item removed',
-      description: 'Item has been removed from your cart',
-      variant: 'destructive',
+    deleteCartItem({
+      variables: {
+        deleteCartItemId: id,
+      },
+      onCompleted: () => {
+        toast.success('Item has been removed from your cart');
+        refetch();
+      },
+      onError: error => {
+        toast.error(error.message);
+      },
     });
-    // Refetch cart data after removal
-    // refetch();
   };
 
   // Handle item selection
@@ -194,11 +195,7 @@ export default function CartPage() {
   // Handle checkout
   const handleCheckout = (): void => {
     if (selectedCartItems.length === 0) {
-      toast({
-        title: 'No items selected',
-        description: 'Please select items to checkout',
-        variant: 'destructive',
-      });
+      toast.error('Please select items to checkout');
       return;
     }
 
@@ -264,8 +261,13 @@ export default function CartPage() {
           </div>
 
           {cartItems.map(item => {
-            const { unitPrice, totalPrice, discountApplied, discountPercent } =
-              calculateItemPrice(item);
+            const {
+              originalPrice,
+              unitPrice,
+              totalPrice,
+              discountApplied,
+              discountPercent,
+            } = calculateItemPrice(item);
             const product = item?.design?.systemConfigVariant?.product;
             const variant = item?.design?.systemConfigVariant;
 
@@ -276,8 +278,6 @@ export default function CartPage() {
                 name: pos.positionType?.positionName || '',
                 price: pos.positionType?.basePrice || 0,
               }));
-
-            const positionNames = activePositions?.map(p => p.name).join(', ');
 
             return (
               <Card key={item.id} className="mb-4 overflow-hidden">
@@ -363,10 +363,35 @@ export default function CartPage() {
                                   </div>
                                 ))}
                                 <div className="border-t pt-2">
-                                  <div className="flex items-center justify-between font-medium">
-                                    <span className="text-sm">Per Item:</span>
-                                    <span>{formatPrice(unitPrice)}</span>
-                                  </div>
+                                  {discountApplied ? (
+                                    <div>
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-sm">
+                                          Discount:
+                                        </span>
+                                        <span className="text-muted-foreground text-sm line-through">
+                                          {formatPrice(
+                                            originalPrice *
+                                              (discountPercent / 100),
+                                          )}
+                                        </span>
+                                      </div>
+
+                                      <div className="flex items-center justify-between font-medium">
+                                        <span className="text-sm">
+                                          Per Item:
+                                        </span>
+                                        <span className="text-green-600">
+                                          {formatPrice(unitPrice)}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center justify-between font-medium">
+                                      <span className="text-sm">Per Item:</span>
+                                      <span>{formatPrice(unitPrice)}</span>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </PopoverContent>
@@ -428,7 +453,7 @@ export default function CartPage() {
           })}
         </div>
 
-        <div className="lg:col-span-1">
+        <div className="md:mt-10 lg:col-span-1">
           <Card className="sticky top-4 p-6">
             <h2 className="mb-4 text-xl font-semibold">Order Summary</h2>
 
