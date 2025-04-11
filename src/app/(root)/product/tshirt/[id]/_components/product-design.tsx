@@ -74,6 +74,7 @@ interface ProductDesignerComponentProps {
   }) => void;
   cartLoading?: boolean;
   designId?: string;
+  uploadLoading?: boolean;
 }
 
 export default function ProductDesigner({
@@ -86,6 +87,7 @@ export default function ProductDesigner({
   onCreateCartItem,
   cartLoading,
   designId,
+  uploadLoading,
 }: ProductDesignerComponentProps) {
   // State for 3D model export
   const [modelExportCallback, setModelExportCallback] = useState<
@@ -1051,6 +1053,7 @@ export default function ProductDesigner({
           getVariant={getVariant}
           onUpdateVariant={onUpdateVariant}
           designId={designId}
+          uploadLoading={uploadLoading}
           onReorderLayers={(startIndex: number, endIndex: number) => {
             if (!fabricCanvasRef.current) return;
 
@@ -1127,6 +1130,7 @@ export default function ProductDesigner({
               onViewChange={handleViewChange}
               designPositions={initialDesigns}
               designs={designs}
+              uploadLoading={uploadLoading}
             />
 
             <DesignCanvas
@@ -1134,6 +1138,7 @@ export default function ProductDesigner({
               view={view}
               texture={texture}
               onExport={modelExportCallback}
+              uploadLoading={uploadLoading}
             />
           </div>
         </div>

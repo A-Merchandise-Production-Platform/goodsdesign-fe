@@ -140,6 +140,7 @@ export default function Page() {
         onCreateCartItem={createCartItem}
         cartLoading={cartLoading}
         designId={id}
+        uploadLoading={uploadFileloading}
       />
     </div>
   );

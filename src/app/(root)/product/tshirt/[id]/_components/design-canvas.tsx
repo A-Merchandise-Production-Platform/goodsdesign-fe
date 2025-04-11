@@ -8,6 +8,7 @@ interface DesignCanvasProps {
   view: string;
   texture: THREE.CanvasTexture | null;
   onExport?: (dataUrl: string) => void;
+  uploadLoading?: boolean;
 }
 
 const DesignCanvas: React.FC<DesignCanvasProps> = ({
@@ -15,11 +16,17 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
   view,
   texture,
   onExport,
+  uploadLoading,
 }) => {
   return (
     <div className="relative flex h-[32rem] w-[64rem] flex-1 gap-4 pt-4">
       {/* Canvas Area */}
       <div className="bg-muted relative z-10 flex h-[32rem] w-[32rem] flex-col items-center justify-center gap-4">
+        {uploadLoading && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          </div>
+        )}
         <div
           className={`absolute -z-10 flex flex-col items-center gap-4 ${
             view === 'front'
