@@ -3,26 +3,8 @@ query GetUserCartItems {
     id
     quantity
     design {
+      id
       thumbnailUrl
-      systemConfigVariant {
-        id
-        price
-        color
-        size
-        model
-        isActive
-        isDeleted
-        product {
-          id
-          name
-          imageUrl
-          discounts {
-            minQuantity
-            name
-            discountPercent
-          }
-        }
-      }
       designPositions {
         positionType {
           id
@@ -32,8 +14,28 @@ query GetUserCartItems {
         designJSON
       }
     }
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+      isActive
+      isDeleted
+      product {
+        id
+        name
+        imageUrl
+        discounts {
+          minQuantity
+          name
+          discountPercent
+        }
+      }
+    }
   }
 }
+
 
 query GetCartItemCount {
   getCartItemCount
