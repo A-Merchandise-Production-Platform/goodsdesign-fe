@@ -77,6 +77,7 @@ interface ProductDesignerComponentProps {
   designId?: string;
   uploadLoading?: boolean;
   thumbnailUrl?: string | null;
+  isInCart?: boolean;
 }
 
 export default function ProductDesigner({
@@ -91,6 +92,7 @@ export default function ProductDesigner({
   designId,
   uploadLoading,
   thumbnailUrl,
+  isInCart,
 }: ProductDesignerComponentProps) {
   // State for 3D model export
   const [modelExportCallback, setModelExportCallback] = useState<
@@ -1241,6 +1243,7 @@ export default function ProductDesigner({
         quantity={cartQuantity}
         onIncrement={() => setCartQuantity(prev => Math.min(prev + 1, 99))}
         onDecrement={() => setCartQuantity(prev => Math.max(prev - 1, 1))}
+        isInCart={isInCart}
         onCreateCartItem={() => {
           try {
             if (onCreateCartItem && designId) {
