@@ -141,6 +141,7 @@ export default function Page() {
         cartLoading={cartLoading}
         designId={id}
         uploadLoading={uploadFileloading}
+        thumbnailUrl={proDesData?.productDesign?.thumbnailUrl}
       />
     </div>
   );

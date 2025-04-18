@@ -69,12 +69,14 @@ interface ProductDesignerComponentProps {
       createCartItemInput: {
         designId: string;
         quantity: number;
+        systemConfigVariantId: string;
       };
     };
   }) => void;
   cartLoading?: boolean;
   designId?: string;
   uploadLoading?: boolean;
+  thumbnailUrl?: string | null;
 }
 
 export default function ProductDesigner({
@@ -88,6 +90,7 @@ export default function ProductDesigner({
   cartLoading,
   designId,
   uploadLoading,
+  thumbnailUrl,
 }: ProductDesignerComponentProps) {
   // State for 3D model export
   const [modelExportCallback, setModelExportCallback] = useState<
@@ -143,8 +146,12 @@ export default function ProductDesigner({
     },
   });
 
-  const [selectedSize, setSelectedSize] = useState<string>('');
-  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedSize, setSelectedSize] = useState<string>(
+    productVariant?.size || '',
+  );
+  const [selectedColor, setSelectedColor] = useState<string>(
+    productVariant?.color || '',
+  );
   const [view, setView] = useState('front');
   const [currentTexture, setCurrentTexture] = useState<string>(() => {
     if (productVariant?.color) {
@@ -166,18 +173,9 @@ export default function ProductDesigner({
       );
       if (matchingColor?.path) {
         setCurrentTexture(matchingColor.path);
-        setSelectedColor(productVariant.color);
       }
     }
   }, [productVariant]);
-
-  useEffect(() => {
-    if (infoData?.product.variants && infoData.product.variants.length > 0) {
-      const firstVariant = infoData.product.variants[0];
-      if (firstVariant.size) setSelectedSize(firstVariant.size);
-      if (firstVariant.color) setSelectedColor(firstVariant.color);
-    }
-  }, [infoData]);
 
   const getVariant = (size: string, color: string) => {
     const variant = infoData?.product.variants?.find(
@@ -868,6 +866,40 @@ export default function ProductDesigner({
     loadSavedDesign();
   }, [view, designsInitialized, currentTexture]);
 
+  // Generate initial thumbnail if none exists
+  useEffect(() => {
+    const generateInitialThumbnail = async () => {
+      if (!onThumbnail || thumbnailUrl !== null || !fabricCanvasRef.current) return;
+
+      const captureCallback = async (dataUrl: string) => {
+        try {
+          const response = await fetch(dataUrl);
+          const blob = await response.blob();
+          const file = new File([blob], `tshirt-3d-${view}.png`, {
+            type: 'image/png',
+          });
+
+          const mockEvent = {
+            target: {
+              files: [file],
+            },
+          } as unknown as React.ChangeEvent<HTMLInputElement>;
+
+          await onThumbnail(mockEvent);
+        } catch (error) {
+          console.error('Error generating initial thumbnail:', error);
+        } finally {
+          setModelExportCallback(undefined);
+        }
+      };
+
+      // Trigger the model capture
+      setModelExportCallback(() => captureCallback);
+    };
+
+    generateInitialThumbnail();
+  }, [thumbnailUrl, onThumbnail, view]);
+
   // Update 3D model when designs change
   useEffect(() => {
     if (Object.keys(designs).length > 0) {
@@ -1006,6 +1038,11 @@ export default function ProductDesigner({
 
   const handleColorChange = (texturePath: string) => {
     setCurrentTexture(texturePath);
+    // Find matching color from SHIRT_COLORS and update selectedColor
+    const matchingColor = SHIRT_COLORS.find(color => color.path === texturePath);
+    if (matchingColor) {
+      setSelectedColor(matchingColor.color);
+    }
     setShowColorDialog(false);
   };
 
@@ -1186,7 +1223,7 @@ export default function ProductDesigner({
       </div>
 
       <DesignFooter
-        variantPrice={productVariant?.price ?? 0}
+        variantPrice={getVariant(selectedSize, selectedColor)?.price ?? 0}
         designPositions={['front', 'back', 'left sleeve', 'right sleeve'].map(
           pos => {
             const position = initialDesigns?.find(
@@ -1212,11 +1249,13 @@ export default function ProductDesigner({
                   createCartItemInput: {
                     designId,
                     quantity: cartQuantity,
+                    systemConfigVariantId:
+                      getVariant(selectedSize, selectedColor)?.id || '',
                   },
                 },
               });
+              toast.success(`Product has been added to cart`);
             }
-            toast.success(`Product has been added to cart`);
           } catch (error) {
             toast.error(`Failed to add product to cart`);
           }

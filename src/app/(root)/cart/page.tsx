@@ -82,7 +82,11 @@ export default function CartPage() {
 
   // Function to calculate price for a single cart item
   const calculateItemPrice = (item: CartItemEntity): ItemPriceCalculation => {
-    if (!item.design?.systemConfigVariant || !item.design.designPositions) {
+    if (
+      !item.design ||
+      !item.systemConfigVariant ||
+      !item.design.designPositions
+    ) {
       return {
         originalPrice: 0,
         unitPrice: 0,
@@ -91,7 +95,7 @@ export default function CartPage() {
         discountPercent: 0,
       };
     }
-    const blankPrice = item.design.systemConfigVariant.price || 0;
+    const blankPrice = item.systemConfigVariant.price || 0;
     // Calculate total for positions that have designs
     const positionPrices = item.design.designPositions.reduce(
       (total: number, position: DesignPositionEntity) => {
@@ -108,7 +112,7 @@ export default function CartPage() {
     const basePrice = blankPrice + positionPrices;
 
     // Check for applicable discounts
-    const discounts = item.design.systemConfigVariant.product.discounts || [];
+    const discounts = item.systemConfigVariant.product.discounts || [];
     let discountPercent = 0;
 
     for (const discount of discounts) {
@@ -268,8 +272,8 @@ export default function CartPage() {
               discountApplied,
               discountPercent,
             } = calculateItemPrice(item);
-            const product = item?.design?.systemConfigVariant?.product;
-            const variant = item?.design?.systemConfigVariant;
+            const product = item?.systemConfigVariant?.product;
+            const variant = item?.systemConfigVariant;
 
             // Filter positions that have designs and get their names and prices
             const activePositions = item?.design?.designPositions
