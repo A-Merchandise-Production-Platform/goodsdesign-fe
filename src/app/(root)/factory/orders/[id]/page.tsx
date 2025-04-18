@@ -24,6 +24,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { gql, useMutation } from '@apollo/client';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -60,6 +61,7 @@ import {
   OrderDetailStatus,
   OrderStatus,
   useAcceptOrderForFactoryMutation,
+  useAddOrderProgressReportMutation,
   useChangeOrderToShippingMutation,
   useDoneProductionOrderDetailsMutation,
   useDoneReworkForOrderDetailsMutation,
@@ -74,6 +76,7 @@ import {
   getStatusBadge,
   orderStatusSteps,
 } from '@/app/(root)/_components/order-status';
+import { filesToBase64 } from '@/utils/handle-upload';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -107,6 +110,32 @@ export default function FactoryOrderDetailsPage() {
     action: () => void;
     actionText: string;
   } | null>(null);
+  
+  // Image upload states
+  const [images, setImages] = useState<File[]>([]);
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [progressNote, setProgressNote] = useState('');
+  const [isAddProgressDialogOpen, setIsAddProgressDialogOpen] = useState(false);
+  
+  // Add progress report mutation
+  const [addProgressReport, { loading: addProgressReportLoading }] = useAddOrderProgressReportMutation(
+    {
+      onCompleted: () => {
+        refetch();
+        toast.success('Progress report added successfully');
+        setIsAddProgressDialogOpen(false);
+        setProgressNote('');
+        setImages([]);
+        setPreviewImages([]);
+      },
+      onError: (error: Error) => {
+        toast.error(error.message || 'Failed to add progress report');
+      },
+    }
+  );
 
   // Use the query hook
   const { data, loading, error, refetch } = useGetOrderQuery({
@@ -374,6 +403,83 @@ export default function FactoryOrderDetailsPage() {
 
     setConfirmAction(dialogConfig);
     setIsConfirmDialogOpen(true);
+  };
+
+  // Handle file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    // Convert FileList to Array
+    const newFiles = Array.from(files);
+    
+    // Create preview URLs
+    const newPreviewUrls = newFiles.map(file => URL.createObjectURL(file));
+    
+    // Update state
+    setImages(prev => [...prev, ...newFiles]);
+    setPreviewImages(prev => [...prev, ...newPreviewUrls]);
+  };
+
+  // Remove image
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+    
+    // Revoke the URL to prevent memory leaks
+    URL.revokeObjectURL(previewImages[index]);
+    setPreviewImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Convert images to base64
+  const convertImagesToBase64 = async (): Promise<string[]> => {
+    if (images.length === 0) return [];
+
+    setImageUploading(true);
+
+    try {
+      // Convert images to base64 strings
+      const base64Strings = await filesToBase64(images);
+      return base64Strings;
+    } catch (error) {
+      console.error('Error converting images to base64:', error);
+      toast.error('Failed to process images');
+      return [];
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
+  // Handle add progress report
+  const handleAddProgressReport = async () => {
+    if (!progressNote.trim()) {
+      toast.error('Please enter a progress note');
+      return;
+    }
+
+    try {
+      // Convert images to base64
+      const base64Images = await convertImagesToBase64();
+      
+      // Add progress report with base64 images
+      addProgressReport({
+        variables: {
+          input: {
+            orderId: id,
+            note: progressNote,
+            imageUrls: base64Images,
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Error adding progress report:', error);
+      toast.error('Failed to add progress report');
+    }
+  };
+
+  // Open image preview
+  const openImagePreview = (index: number) => {
+    setSelectedImageIndex(index);
+    setIsImagePreviewOpen(true);
   };
 
   // Error or empty order state
@@ -1138,6 +1244,17 @@ export default function FactoryOrderDetailsPage() {
                     No progress updates available yet.
                   </div>
                 )}
+                
+                {/* Add Progress Report Button */}
+                <div className="mt-6">
+                  <Button 
+                    onClick={() => setIsAddProgressDialogOpen(true)}
+                    className="w-full"
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    Add Progress Report
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -1311,6 +1428,207 @@ export default function FactoryOrderDetailsPage() {
               disabled={updateStatusLoading}
             >
               {confirmAction?.actionText}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Progress Report Dialog */}
+      <Dialog 
+        open={isAddProgressDialogOpen} 
+        onOpenChange={setIsAddProgressDialogOpen}
+      >
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Add Progress Report</DialogTitle>
+            <DialogDescription>
+              Add a new progress report with images to document the order status.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <label htmlFor="progress-note" className="text-sm font-medium">
+                Progress Note
+              </label>
+              <Textarea
+                id="progress-note"
+                placeholder="Enter progress details..."
+                value={progressNote}
+                onChange={(e) => setProgressNote(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Images</label>
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => document.getElementById('image-upload')?.click()}
+                    disabled={imageUploading || addProgressReportLoading}
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    Select Images
+                  </Button>
+                  <input
+                    id="image-upload"
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={handleFileChange}
+                    accept="image/*"
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    {images.length}{' '}
+                    {images.length === 1 ? 'image' : 'images'} selected
+                  </span>
+                </div>
+                
+                {/* Image Preview */}
+                {previewImages.length > 0 ? (
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Image Previews</h4>
+                    <div className="grid grid-cols-4 gap-2">
+                      {previewImages.map((url, index) => (
+                        <div
+                          key={index}
+                          className="group relative aspect-square overflow-hidden rounded-md border"
+                          onClick={() => openImagePreview(index)}
+                        >
+                          <Image
+                            src={url}
+                            alt={`Preview ${index + 1}`}
+                            fill
+                            className="object-cover"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                            <FileText className="h-6 w-6 text-white" />
+                          </div>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className="absolute right-1 top-1 h-6 w-6 rounded-full"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeImage(index);
+                            }}
+                            disabled={imageUploading || addProgressReportLoading}
+                          >
+                            <XCircle className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center rounded-md border border-dashed p-6 text-center">
+                    <FileText className="text-muted-foreground mb-2 h-10 w-10" />
+                    <p className="text-sm text-muted-foreground">
+                      No images selected
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Upload images to document the progress
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsAddProgressDialogOpen(false);
+                setProgressNote('');
+                // Clean up image previews
+                previewImages.forEach(url => URL.revokeObjectURL(url));
+                setPreviewImages([]);
+                setImages([]);
+              }}
+              disabled={imageUploading || addProgressReportLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAddProgressReport}
+              disabled={
+                imageUploading ||
+                addProgressReportLoading ||
+                !progressNote.trim()
+              }
+            >
+              {(imageUploading || addProgressReportLoading) && (
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              )}
+              Add Progress Report
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Image Preview Dialog */}
+      <Dialog open={isImagePreviewOpen} onOpenChange={setIsImagePreviewOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Image Preview</DialogTitle>
+            <DialogDescription>
+              Image {selectedImageIndex + 1} of {previewImages.length}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="relative aspect-square overflow-hidden rounded-md">
+            {previewImages[selectedImageIndex] && (
+              <Image
+                src={previewImages[selectedImageIndex] || '/placeholder.svg'}
+                alt={`Preview ${selectedImageIndex + 1}`}
+                fill
+                className="object-contain"
+              />
+            )}
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSelectedImageIndex(prev =>
+                  prev > 0 ? prev - 1 : previewImages.length - 1,
+                );
+              }}
+              disabled={previewImages.length <= 1}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSelectedImageIndex(prev =>
+                  prev < previewImages.length - 1 ? prev + 1 : 0,
+                );
+              }}
+              disabled={previewImages.length <= 1}
+            >
+              Next
+            </Button>
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                removeImage(selectedImageIndex);
+                if (previewImages.length <= 1) {
+                  setIsImagePreviewOpen(false);
+                } else if (selectedImageIndex >= previewImages.length - 1) {
+                  setSelectedImageIndex(previewImages.length - 2);
+                }
+              }}
+              disabled={imageUploading || addProgressReportLoading}
+            >
+              Remove Image
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1807,7 +1807,7 @@ export type GetMeQuery = { __typename?: 'Query', getMe: { __typename?: 'UserEnti
 export type GetUserCartItemsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUserCartItemsQuery = { __typename?: 'Query', userCartItems: Array<{ __typename?: 'CartItemEntity', id: string, quantity: number, design?: { __typename?: 'ProductDesignEntity', id: string, thumbnailUrl?: string | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null } | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null, isActive: boolean, isDeleted: boolean, product: { __typename?: 'ProductEntity', id: string, name: string, imageUrl?: string | null, discounts?: Array<{ __typename?: 'SystemConfigDiscountEntity', minQuantity: number, name: string, discountPercent: number }> | null } } | null }> };
+export type GetUserCartItemsQuery = { __typename?: 'Query', userCartItems: Array<{ __typename?: 'CartItemEntity', id: string, quantity: number, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null, isActive: boolean, isDeleted: boolean, product: { __typename?: 'ProductEntity', id: string, name: string, imageUrl?: string | null, discounts?: Array<{ __typename?: 'SystemConfigDiscountEntity', minQuantity: number, name: string, discountPercent: number }> | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null } | null }> };
 
 export type GetCartItemCountQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2028,6 +2028,13 @@ export type FeedbackOrderMutationVariables = Exact<{
 
 
 export type FeedbackOrderMutation = { __typename?: 'Mutation', feedbackOrder: { __typename?: 'OrderEntity', id: string } };
+
+export type AddOrderProgressReportMutationVariables = Exact<{
+  input: AddOrderProgressReportInput;
+}>;
+
+
+export type AddOrderProgressReportMutation = { __typename?: 'Mutation', addOrderProgressReport: { __typename?: 'OrderProgressReportEntity', id: string } };
 
 export type ProductDesignsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2702,8 +2709,26 @@ export const GetUserCartItemsDocument = gql`
     id
     quantity
     design {
-      id
       thumbnailUrl
+      systemConfigVariant {
+        id
+        price
+        color
+        size
+        model
+        isActive
+        isDeleted
+        product {
+          id
+          name
+          imageUrl
+          discounts {
+            minQuantity
+            name
+            discountPercent
+          }
+        }
+      }
       designPositions {
         positionType {
           id
@@ -2711,25 +2736,6 @@ export const GetUserCartItemsDocument = gql`
           basePrice
         }
         designJSON
-      }
-    }
-    systemConfigVariant {
-      id
-      price
-      color
-      size
-      model
-      isActive
-      isDeleted
-      product {
-        id
-        name
-        imageUrl
-        discounts {
-          minQuantity
-          name
-          discountPercent
-        }
       }
     }
   }
@@ -5154,6 +5160,39 @@ export function useFeedbackOrderMutation(baseOptions?: Apollo.MutationHookOption
 export type FeedbackOrderMutationHookResult = ReturnType<typeof useFeedbackOrderMutation>;
 export type FeedbackOrderMutationResult = Apollo.MutationResult<FeedbackOrderMutation>;
 export type FeedbackOrderMutationOptions = Apollo.BaseMutationOptions<FeedbackOrderMutation, FeedbackOrderMutationVariables>;
+export const AddOrderProgressReportDocument = gql`
+    mutation AddOrderProgressReport($input: AddOrderProgressReportInput!) {
+  addOrderProgressReport(input: $input) {
+    id
+  }
+}
+    `;
+export type AddOrderProgressReportMutationFn = Apollo.MutationFunction<AddOrderProgressReportMutation, AddOrderProgressReportMutationVariables>;
+
+/**
+ * __useAddOrderProgressReportMutation__
+ *
+ * To run a mutation, you first call `useAddOrderProgressReportMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddOrderProgressReportMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addOrderProgressReportMutation, { data, loading, error }] = useAddOrderProgressReportMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAddOrderProgressReportMutation(baseOptions?: Apollo.MutationHookOptions<AddOrderProgressReportMutation, AddOrderProgressReportMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddOrderProgressReportMutation, AddOrderProgressReportMutationVariables>(AddOrderProgressReportDocument, options);
+      }
+export type AddOrderProgressReportMutationHookResult = ReturnType<typeof useAddOrderProgressReportMutation>;
+export type AddOrderProgressReportMutationResult = Apollo.MutationResult<AddOrderProgressReportMutation>;
+export type AddOrderProgressReportMutationOptions = Apollo.BaseMutationOptions<AddOrderProgressReportMutation, AddOrderProgressReportMutationVariables>;
 export const ProductDesignsDocument = gql`
     query ProductDesigns {
   productDesigns {
