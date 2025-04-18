@@ -62,6 +62,7 @@ import {
 import { formatDate } from '@/lib/utils';
 import { getStatusBadge } from '@/app/(root)/_components/order-status';
 import Link from 'next/link';
+import { filesToBase64 } from '@/utils/handle-upload';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -165,23 +166,14 @@ export default function StaffCheckQualityDetailsPage() {
     setImageUploading(true);
 
     try {
-      // This is a mock implementation
-      // In a real application, you would upload the images to your server or cloud storage
-      // and get back the URLs
-
-      // Simulate upload delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Mock URLs - in a real app, these would come from your server
-      const uploadedUrls = images.map(
-        (_, index) =>
-          `https://example.com/uploads/image-${Date.now()}-${index}.jpg`,
-      );
-
-      return uploadedUrls;
+      // Convert images to base64 strings
+      const base64Strings = await filesToBase64(images);
+      
+      // Return the base64 strings to be stored in the database
+      return base64Strings;
     } catch (error) {
-      console.error('Error uploading images:', error);
-      toast.error('Failed to upload images');
+      console.error('Error converting images to base64:', error);
+      toast.error('Failed to process images');
       return [];
     } finally {
       setImageUploading(false);

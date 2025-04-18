@@ -962,3 +962,9 @@ mutation FeedbackOrder($input: FeedbackOrderInput!, $orderId: String!) {
     id
   }
 }
+
+mutation AddOrderProgressReport($input: AddOrderProgressReportInput!) {
+  addOrderProgressReport(input: $input) {
+    id
+  }
+}
