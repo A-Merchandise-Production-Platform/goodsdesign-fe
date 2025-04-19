@@ -46,7 +46,7 @@ mutation DeleteProduct($deleteProductId: String!) {
   }
 }
 
-query GetProductInformationById($productId: String!) {
+query GetProductVariantById($productId: String!) {
   product(id: $productId) {
     imageUrl
     name

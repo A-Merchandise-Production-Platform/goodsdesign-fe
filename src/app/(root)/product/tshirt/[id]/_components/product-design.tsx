@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import * as THREE from 'three';
 
-import { useGetProductInformationByIdQuery } from '@/graphql/generated/graphql';
+import { useGetProductVariantByIdQuery } from '@/graphql/generated/graphql';
 // Types
 import { DesignObject } from '@/types/design-object';
 
@@ -142,7 +142,7 @@ export default function ProductDesigner({
     };
     setModelExportCallback(() => handleModelCapture);
   };
-  const { data: infoData } = useGetProductInformationByIdQuery({
+  const { data: infoData } = useGetProductVariantByIdQuery({
     variables: {
       productId: 'prod001',
     },
@@ -871,7 +871,8 @@ export default function ProductDesigner({
   // Generate initial thumbnail if none exists
   useEffect(() => {
     const generateInitialThumbnail = async () => {
-      if (!onThumbnail || thumbnailUrl !== null || !fabricCanvasRef.current) return;
+      if (!onThumbnail || thumbnailUrl !== null || !fabricCanvasRef.current)
+        return;
 
       const captureCallback = async (dataUrl: string) => {
         try {
@@ -1041,7 +1042,9 @@ export default function ProductDesigner({
   const handleColorChange = (texturePath: string) => {
     setCurrentTexture(texturePath);
     // Find matching color from SHIRT_COLORS and update selectedColor
-    const matchingColor = SHIRT_COLORS.find(color => color.path === texturePath);
+    const matchingColor = SHIRT_COLORS.find(
+      color => color.path === texturePath,
+    );
     if (matchingColor) {
       setSelectedColor(matchingColor.color);
     }
