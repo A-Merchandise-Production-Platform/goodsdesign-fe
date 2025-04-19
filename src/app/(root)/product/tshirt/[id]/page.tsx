@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   useCreateCartItemMutation,
+  useGetUserCartItemsQuery,
   useProductDesignByIdQuery,
   useUpdateDesignPositionMutation,
   useUpdateProductDesignMutation,
@@ -33,6 +34,10 @@ export default function Page() {
   const [updateVariant] = useUpdateProductDesignMutation();
   const [updateThumbnailProductDesign] =
     useUpdateThumbnailProductDesignMutation();
+  const { data: cartData, refetch: cartRefetch } = useGetUserCartItemsQuery();
+  const isInCart = cartData?.userCartItems?.some(
+    item => item.design?.id === id
+  );
 
   // Keep track of current thumbnail URL to handle deletion
   const [currentThumbnailUrl, setCurrentThumbnailUrl] = useState<string>('');
@@ -137,11 +142,15 @@ export default function Page() {
         onThumbnail={handleThumbnail}
         onUpdateVariant={updateVariant}
         onUpdatePosition={updateDesignPosition}
-        onCreateCartItem={createCartItem}
+        onCreateCartItem={async options => {
+          await createCartItem(options);
+          cartRefetch();
+        }}
         cartLoading={cartLoading}
         designId={id}
         uploadLoading={uploadFileloading}
         thumbnailUrl={proDesData?.productDesign?.thumbnailUrl}
+        isInCart={isInCart}
       />
     </div>
   );

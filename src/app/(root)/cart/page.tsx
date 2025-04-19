@@ -1,36 +1,26 @@
 'use client';
 
-import {
-  Info,
-  MinusCircle,
-  PlusCircle,
-  ShoppingCart,
-  Trash2,
-} from 'lucide-react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Separator } from '@/components/ui/separator';
 import {
   CartItemEntity,
   DesignPositionEntity,
+  SystemConfigVariantEntity,
+  useCreateCartItemMutation,
   useCreateOrderMutation,
   useDeleteCartItemMutation,
+  useGetProductVariantByIdLazyQuery,
   useGetUserCartItemsQuery,
   useUpdateCartItemMutation,
 } from '@/graphql/generated/graphql';
-import { formatPrice } from '@/lib/utils';
-import { toast } from 'sonner';
+
+import { CartHeader } from './_components/cart-header';
+import { CartItem } from './_components/cart-item';
+import { EmptyCart } from './_components/empty-cart';
+import { LoadingCart } from './_components/loading-cart';
+import { OrderSummary } from './_components/order-summary';
 
 // Interface for price calculation return values
 interface ItemPriceCalculation {
@@ -48,37 +38,137 @@ export default function CartPage() {
   const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>(
     {},
   );
+  const [productVariants, setProductVariants] = useState<
+    Record<string, SystemConfigVariantEntity[]>
+  >({});
+
+  const [getProductVariants] = useGetProductVariantByIdLazyQuery();
 
   const [updateCartItem, { loading: updateCartItemLoading }] =
     useUpdateCartItemMutation({
-      onCompleted: data => {
-        console.log(data);
+      onCompleted: () => {
         refetch();
       },
       onError: error => {
         toast.error(error.message);
       },
     });
-  const [deleteCartItem, { loading: deleteCartItemLoading }] =
-    useDeleteCartItemMutation();
 
-  const [createOrder, { loading: createOrderLoading }] = useCreateOrderMutation(
-    {
-      onCompleted: data => {
-        const orderId = data.createOrder.id;
-        toast.success('Your order has been placed successfully!');
-        setIsCheckingOut(false);
-        refetch();
-        router.push(`/my-order/${orderId}`);
-      },
-      onError: error => {
-        toast.error(error.message);
-        setIsCheckingOut(false);
-      },
+  const [createCartItem] = useCreateCartItemMutation({
+    onCompleted: () => {
+      refetch();
+      toast.success('Size added to cart');
     },
-  );
+    onError: error => {
+      toast.error(error.message);
+    },
+  });
+
+  const [deleteCartItem] = useDeleteCartItemMutation();
+
+  const [createOrder] = useCreateOrderMutation({
+    onCompleted: data => {
+      const orderId = data.createOrder.id;
+      toast.success('Your order has been placed successfully!');
+      setIsCheckingOut(false);
+      refetch();
+      router.push(`/my-order/${orderId}`);
+    },
+    onError: error => {
+      toast.error(error.message);
+      setIsCheckingOut(false);
+    },
+  });
 
   const cartItems = (data?.userCartItems || []) as CartItemEntity[];
+
+  // Group cart items by design ID
+  const groupedCartItems = useMemo(() => {
+    const groups: Record<string, CartItemEntity[]> = {};
+    cartItems.forEach(item => {
+      if (item.design?.id) {
+        if (!groups[item.design.id]) {
+          groups[item.design.id] = [];
+        }
+        groups[item.design.id].push(item);
+      }
+    });
+    return groups;
+  }, [cartItems]);
+
+  // Handle removing a design (all its variants)
+  const handleRemoveDesign = async (items: CartItemEntity[]) => {
+    try {
+      const deletePromises = items.map(item =>
+        deleteCartItem({
+          variables: {
+            deleteCartItemId: item.id,
+          },
+        }).then(result => {
+          if (result.errors) {
+            throw result.errors[0];
+          }
+          return result.data;
+        }),
+      );
+
+      await Promise.all(deletePromises);
+      toast.success('Items removed from cart');
+      refetch();
+    } catch (error) {
+      toast.error('Failed to remove some items');
+    }
+  };
+
+  // Handle removing a single variant
+  const handleRemoveVariant = async (itemId: string) => {
+    try {
+      await deleteCartItem({
+        variables: {
+          deleteCartItemId: itemId,
+        },
+      });
+      toast.success('Item removed from cart');
+      refetch();
+    } catch (error) {
+      toast.error('Failed to remove item');
+    }
+  };
+
+  // Get unique product IDs and fetch their variants
+  useEffect(() => {
+    const fetchVariants = async () => {
+      const uniqueProductIds = new Set<string>();
+      cartItems.forEach(item => {
+        const productId = item.systemConfigVariant?.product?.id;
+        if (productId) {
+          uniqueProductIds.add(productId);
+        }
+      });
+
+      if (uniqueProductIds.size === 0) return;
+
+      try {
+        const variants: Record<string, SystemConfigVariantEntity[]> = {};
+        await Promise.all(
+          Array.from(uniqueProductIds).map(async productId => {
+            const result = await getProductVariants({
+              variables: { productId },
+            });
+            if (result.data?.product?.variants) {
+              variants[productId] = result.data.product
+                .variants as SystemConfigVariantEntity[];
+            }
+          }),
+        );
+        setProductVariants(variants);
+      } catch (error) {
+        console.error('Error fetching variants:', error);
+      }
+    };
+
+    fetchVariants();
+  }, [cartItems, getProductVariants]);
 
   // Function to calculate price for a single cart item
   const calculateItemPrice = (item: CartItemEntity): ItemPriceCalculation => {
@@ -136,6 +226,15 @@ export default function CartPage() {
     };
   };
 
+  // Calculate price info for all items
+  const priceInfos = useMemo(() => {
+    const infos: Record<string, ItemPriceCalculation> = {};
+    cartItems.forEach(item => {
+      infos[item.id] = calculateItemPrice(item);
+    });
+    return infos;
+  }, [cartItems]);
+
   // Get only selected cart items
   const selectedCartItems = cartItems.filter(item => selectedItems[item.id]);
 
@@ -155,22 +254,6 @@ export default function CartPage() {
         updateCartItemInput: {
           quantity: newQuantity,
         },
-      },
-    });
-  };
-
-  // Handle item removal
-  const handleRemoveItem = (id: string): void => {
-    deleteCartItem({
-      variables: {
-        deleteCartItemId: id,
-      },
-      onCompleted: () => {
-        toast.success('Item has been removed from your cart');
-        refetch();
-      },
-      onError: error => {
-        toast.error(error.message);
       },
     });
   };
@@ -196,6 +279,23 @@ export default function CartPage() {
   const areAllItemsSelected =
     cartItems.length > 0 && cartItems.every(item => selectedItems[item.id]);
 
+  // Handle adding new size
+  const handleAddSize = (
+    designId: string,
+    variantId: string,
+    quantity: number,
+  ): void => {
+    createCartItem({
+      variables: {
+        createCartItemInput: {
+          designId,
+          quantity,
+          systemConfigVariantId: variantId,
+        },
+      },
+    });
+  };
+
   // Handle checkout
   const handleCheckout = (): void => {
     if (selectedCartItems.length === 0) {
@@ -204,306 +304,63 @@ export default function CartPage() {
     }
 
     setIsCheckingOut(true);
-
     createOrder({
       variables: {
         createOrderInput: {
-          orderDetails: selectedCartItems.map(item => {
-            return {
-              cartItemId: item.id,
-            };
-          }),
+          orderDetails: selectedCartItems.map(item => ({
+            cartItemId: item.id,
+          })),
         },
       },
     });
   };
 
   if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-10">
-        <h1 className="mb-6 text-2xl font-bold">Shopping Cart</h1>
-        <div className="flex h-64 items-center justify-center">
-          <div className="border-primary h-12 w-12 animate-spin rounded-full border-b-2"></div>
-        </div>
-      </div>
-    );
+    return <LoadingCart />;
   }
 
   if (cartItems.length === 0) {
-    return (
-      <div className="container mx-auto py-8">
-        <h1 className="mb-6 text-2xl font-bold">Shopping Cart</h1>
-        <Card className="p-8 text-center">
-          <ShoppingCart className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-          <h2 className="mb-2 text-xl font-semibold">Your cart is empty</h2>
-          <p className="text-muted-foreground mb-6">
-            Looks like you haven&apos;t added any items to your cart yet.
-          </p>
-          <Button>Continue Shopping</Button>
-        </Card>
-      </div>
-    );
+    return <EmptyCart />;
   }
 
   return (
     <div className="container mx-auto px-4 py-10">
-      <h1 className="mb-6 text-2xl font-bold">
-        Shopping Cart ({cartItems.length} items)
-      </h1>
+      <CartHeader
+        itemCount={cartItems.length}
+        areAllItemsSelected={areAllItemsSelected}
+        onToggleAll={handleToggleAll}
+      />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <div className="mb-4 flex items-center">
-            <Checkbox
-              id="select-all"
-              checked={areAllItemsSelected}
-              onCheckedChange={handleToggleAll}
-            />
-            <label htmlFor="select-all" className="ml-2 cursor-pointer">
-              Select All Items
-            </label>
-          </div>
-
-          {cartItems.map(item => {
-            const {
-              originalPrice,
-              unitPrice,
-              totalPrice,
-              discountApplied,
-              discountPercent,
-            } = calculateItemPrice(item);
-            const product = item?.systemConfigVariant?.product;
-            const variant = item?.systemConfigVariant;
-
-            // Filter positions that have designs and get their names and prices
-            const activePositions = item?.design?.designPositions
-              ?.filter(pos => pos.designJSON && pos.designJSON.length > 0)
-              ?.map((pos: DesignPositionEntity) => ({
-                name: pos.positionType?.positionName || '',
-                price: pos.positionType?.basePrice || 0,
-              }));
-
+          {Object.entries(groupedCartItems).map(([designId, items]) => {
+            const productId = items[0].systemConfigVariant?.product?.id;
             return (
-              <Card key={item.id} className="mb-4 overflow-hidden">
-                <div className="flex flex-col gap-4 p-4 sm:flex-row sm:p-6">
-                  <div className="flex items-center">
-                    <Checkbox
-                      id={`item-${item.id}`}
-                      checked={selectedItems[item.id] || false}
-                      onCheckedChange={checked =>
-                        handleItemSelect(item.id, !!checked)
-                      }
-                    />
-                  </div>
-
-                  <div className="bg-muted relative mx-auto h-32 w-32 flex-shrink-0 rounded-md sm:mx-0">
-                    <Image
-                      src={
-                        item.design?.thumbnailUrl ||
-                        '/placeholder.svg?height=128&width=128'
-                      }
-                      alt={product?.name || 'Product image'}
-                      fill
-                      className="rounded-xl object-cover"
-                    />
-                  </div>
-
-                  <div className="flex-1">
-                    <div className="flex flex-col sm:flex-row sm:justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold">
-                          {product?.name}
-                        </h3>
-                        <div className="mt-1 flex items-center gap-2">
-                          <p className="text-muted-foreground text-sm">Size:</p>
-                          <p>{variant?.size}</p>
-                        </div>
-                        <p className="text-muted-foreground mt-1 flex items-center gap-2 text-sm">
-                          Color:
-                          <span
-                            className="mt-[2px] inline-block h-4 w-4 rounded-full border"
-                            style={{
-                              backgroundColor: variant?.color || '#ffffff',
-                            }}
-                          ></span>
-                        </p>
-                        {item?.design?.isTemplate && (
-                          <Badge variant="outline" className="mt-1">
-                            Template Design
-                          </Badge>
-                        )}
-                      </div>
-
-                      <div className="mt-2 text-right sm:mt-0">
-                        <div className="flex items-center justify-end gap-2">
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button className="hover:text-primary">
-                                <Info className="h-4 w-4" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-[200px] space-y-2"
-                              align="end"
-                            >
-                              <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                  <span className="text-sm">Base Price:</span>
-                                  <span className="text-muted-foreground">
-                                    {formatPrice(variant?.price || 0)}
-                                  </span>
-                                </div>
-                                {activePositions?.map(pos => (
-                                  <div
-                                    key={pos.name}
-                                    className="flex items-center justify-between"
-                                  >
-                                    <span className="text-sm capitalize">
-                                      {pos.name}:
-                                    </span>
-                                    <span className="text-muted-foreground">
-                                      +{formatPrice(pos.price)}
-                                    </span>
-                                  </div>
-                                ))}
-                                <div className="border-t pt-2">
-                                  {discountApplied ? (
-                                    <div>
-                                      <div className="flex items-center justify-between">
-                                        <span className="text-sm">
-                                          Discount:
-                                        </span>
-                                        <span className="text-muted-foreground text-sm line-through">
-                                          {formatPrice(
-                                            originalPrice *
-                                              (discountPercent / 100),
-                                          )}
-                                        </span>
-                                      </div>
-
-                                      <div className="flex items-center justify-between font-medium">
-                                        <span className="text-sm">
-                                          Per Item:
-                                        </span>
-                                        <span className="text-green-600">
-                                          {formatPrice(unitPrice)}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div className="flex items-center justify-between font-medium">
-                                      <span className="text-sm">Per Item:</span>
-                                      <span>{formatPrice(unitPrice)}</span>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                          <span className="font-semibold">
-                            {formatPrice(totalPrice)}
-                          </span>
-                        </div>
-                        {discountApplied && (
-                          <Badge variant="secondary" className="mt-1">
-                            {discountPercent}% discount applied
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="mt-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() =>
-                            handleQuantityChange(
-                              item.id,
-                              Math.max(1, item.quantity - 1),
-                            )
-                          }
-                          disabled={item.quantity <= 1 || updateCartItemLoading}
-                        >
-                          <MinusCircle className="h-4 w-4" />
-                        </Button>
-                        <span className="w-8 text-center">{item.quantity}</span>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() =>
-                            handleQuantityChange(item.id, item.quantity + 1)
-                          }
-                          disabled={updateCartItemLoading}
-                        >
-                          <PlusCircle className="h-4 w-4" />
-                        </Button>
-                      </div>
-
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:text-destructive/90"
-                        onClick={() => handleRemoveItem(item.id)}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Remove
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+              <CartItem
+                key={designId}
+                items={items}
+                priceInfos={priceInfos}
+                selectedItems={selectedItems}
+                onSelect={handleItemSelect}
+                onQuantityChange={handleQuantityChange}
+                onRemove={handleRemoveDesign}
+                onRemoveVariant={handleRemoveVariant}
+                isUpdating={updateCartItemLoading}
+                onAddSize={handleAddSize}
+                availableVariants={
+                  productId ? productVariants[productId] : undefined
+                }
+              />
             );
           })}
         </div>
 
-        <div className="md:mt-10 lg:col-span-1">
-          <Card className="sticky top-4 p-6">
-            <h2 className="mb-4 text-xl font-semibold">Order Summary</h2>
-
-            <Separator className="my-4" />
-
-            <div className="mb-4 space-y-2">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  Subtotal ({selectedCartItems.length} items)
-                </span>
-                <span>{formatPrice(cartTotal)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Shipping Cost</span>
-                <span>Calculated when finished production</span>
-              </div>
-            </div>
-
-            <Separator className="my-4" />
-
-            <div className="mb-6 flex justify-between text-lg font-semibold">
-              <span>Total</span>
-              <span>{formatPrice(cartTotal)}</span>
-            </div>
-
-            <Button
-              className="w-full"
-              size="lg"
-              onClick={handleCheckout}
-              disabled={createOrderLoading || selectedCartItems.length === 0}
-            >
-              {createOrderLoading ? (
-                <>
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
-                  Processing...
-                </>
-              ) : (
-                'Proceed to Checkout'
-              )}
-            </Button>
-
-            <p className="text-muted-foreground mt-4 text-center text-xs">
-              Taxes and discounts calculated at checkout
-            </p>
-          </Card>
-        </div>
+        <OrderSummary
+          selectedItemCount={selectedCartItems.length}
+          cartTotal={cartTotal}
+          onCheckout={handleCheckout}
+          isProcessing={isCheckingOut}
+        />
       </div>
     </div>
   );

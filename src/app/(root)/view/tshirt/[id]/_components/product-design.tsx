@@ -4,7 +4,7 @@ import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
-import { useGetProductInformationByIdQuery } from '@/graphql/generated/graphql';
+import { useGetProductVariantByIdQuery } from '@/graphql/generated/graphql';
 // Types
 import { DesignObject } from '@/types/design-object';
 
@@ -87,7 +87,7 @@ export default function ProductDesigner({
     };
     setModelExportCallback(() => handleModelCapture);
   };
-  const { data: infoData } = useGetProductInformationByIdQuery({
+  const { data: infoData } = useGetProductVariantByIdQuery({
     variables: {
       productId: 'prod001',
     },

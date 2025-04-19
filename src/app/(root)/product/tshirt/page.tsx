@@ -12,7 +12,7 @@ import {
   useCreateProductDesignMutation,
   useGetAllDiscountByProductIdQuery,
   // useGetAllDiscountByProductIdQuery,
-  useGetProductInformationByIdQuery,
+  useGetProductVariantByIdQuery,
 } from '@/graphql/generated/graphql';
 import { formatPrice } from '@/lib/utils';
 
@@ -46,7 +46,7 @@ export default function TShirtPage() {
   const [createProductDesign, { data: proData, loading: proLoading }] =
     useCreateProductDesignMutation();
   const { data: infoData, loading: infoLoading } =
-    useGetProductInformationByIdQuery({
+    useGetProductVariantByIdQuery({
       variables: {
         productId: 'prod001',
       },

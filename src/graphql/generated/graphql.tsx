@@ -2115,12 +2115,12 @@ export type DeleteProductMutationVariables = Exact<{
 
 export type DeleteProductMutation = { __typename?: 'Mutation', deleteProduct: { __typename?: 'ProductEntity', id: string, imageUrl?: string | null, isActive: boolean, name: string, updatedAt?: any | null, createdAt: any, description?: string | null, category?: { __typename?: 'CategoryEntity', name: string } | null } };
 
-export type GetProductInformationByIdQueryVariables = Exact<{
+export type GetProductVariantByIdQueryVariables = Exact<{
   productId: Scalars['String']['input'];
 }>;
 
 
-export type GetProductInformationByIdQuery = { __typename?: 'Query', product: { __typename?: 'ProductEntity', imageUrl?: string | null, name: string, variants?: Array<{ __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null }> | null } };
+export type GetProductVariantByIdQuery = { __typename?: 'Query', product: { __typename?: 'ProductEntity', imageUrl?: string | null, name: string, variants?: Array<{ __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null }> | null } };
 
 export type GetAllProvincesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -5746,8 +5746,8 @@ export function useDeleteProductMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteProductMutationHookResult = ReturnType<typeof useDeleteProductMutation>;
 export type DeleteProductMutationResult = Apollo.MutationResult<DeleteProductMutation>;
 export type DeleteProductMutationOptions = Apollo.BaseMutationOptions<DeleteProductMutation, DeleteProductMutationVariables>;
-export const GetProductInformationByIdDocument = gql`
-    query GetProductInformationById($productId: String!) {
+export const GetProductVariantByIdDocument = gql`
+    query GetProductVariantById($productId: String!) {
   product(id: $productId) {
     imageUrl
     name
@@ -5763,37 +5763,37 @@ export const GetProductInformationByIdDocument = gql`
     `;
 
 /**
- * __useGetProductInformationByIdQuery__
+ * __useGetProductVariantByIdQuery__
  *
- * To run a query within a React component, call `useGetProductInformationByIdQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetProductInformationByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetProductVariantByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProductVariantByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetProductInformationByIdQuery({
+ * const { data, loading, error } = useGetProductVariantByIdQuery({
  *   variables: {
  *      productId: // value for 'productId'
  *   },
  * });
  */
-export function useGetProductInformationByIdQuery(baseOptions: Apollo.QueryHookOptions<GetProductInformationByIdQuery, GetProductInformationByIdQueryVariables> & ({ variables: GetProductInformationByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetProductVariantByIdQuery(baseOptions: Apollo.QueryHookOptions<GetProductVariantByIdQuery, GetProductVariantByIdQueryVariables> & ({ variables: GetProductVariantByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetProductInformationByIdQuery, GetProductInformationByIdQueryVariables>(GetProductInformationByIdDocument, options);
+        return Apollo.useQuery<GetProductVariantByIdQuery, GetProductVariantByIdQueryVariables>(GetProductVariantByIdDocument, options);
       }
-export function useGetProductInformationByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProductInformationByIdQuery, GetProductInformationByIdQueryVariables>) {
+export function useGetProductVariantByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProductVariantByIdQuery, GetProductVariantByIdQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetProductInformationByIdQuery, GetProductInformationByIdQueryVariables>(GetProductInformationByIdDocument, options);
+          return Apollo.useLazyQuery<GetProductVariantByIdQuery, GetProductVariantByIdQueryVariables>(GetProductVariantByIdDocument, options);
         }
-export function useGetProductInformationByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetProductInformationByIdQuery, GetProductInformationByIdQueryVariables>) {
+export function useGetProductVariantByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetProductVariantByIdQuery, GetProductVariantByIdQueryVariables>) {
           const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetProductInformationByIdQuery, GetProductInformationByIdQueryVariables>(GetProductInformationByIdDocument, options);
+          return Apollo.useSuspenseQuery<GetProductVariantByIdQuery, GetProductVariantByIdQueryVariables>(GetProductVariantByIdDocument, options);
         }
-export type GetProductInformationByIdQueryHookResult = ReturnType<typeof useGetProductInformationByIdQuery>;
-export type GetProductInformationByIdLazyQueryHookResult = ReturnType<typeof useGetProductInformationByIdLazyQuery>;
-export type GetProductInformationByIdSuspenseQueryHookResult = ReturnType<typeof useGetProductInformationByIdSuspenseQuery>;
-export type GetProductInformationByIdQueryResult = Apollo.QueryResult<GetProductInformationByIdQuery, GetProductInformationByIdQueryVariables>;
+export type GetProductVariantByIdQueryHookResult = ReturnType<typeof useGetProductVariantByIdQuery>;
+export type GetProductVariantByIdLazyQueryHookResult = ReturnType<typeof useGetProductVariantByIdLazyQuery>;
+export type GetProductVariantByIdSuspenseQueryHookResult = ReturnType<typeof useGetProductVariantByIdSuspenseQuery>;
+export type GetProductVariantByIdQueryResult = Apollo.QueryResult<GetProductVariantByIdQuery, GetProductVariantByIdQueryVariables>;
 export const GetAllProvincesDocument = gql`
     query GetAllProvinces {
   provinces {
