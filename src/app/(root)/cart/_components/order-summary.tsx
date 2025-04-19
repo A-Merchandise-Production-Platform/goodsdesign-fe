@@ -17,7 +17,7 @@ export function OrderSummary({
   isProcessing,
 }: OrderSummaryProps) {
   return (
-    <div className="md:mt-10 lg:col-span-1">
+    <div className="lg:col-span-1">
       <Card className="sticky top-4 p-6">
         <h2 className="mb-4 text-xl font-semibold">Order Summary</h2>
 

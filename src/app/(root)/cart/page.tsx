@@ -35,9 +35,12 @@ export default function CartPage() {
   const router = useRouter();
   const { data, loading, refetch } = useGetUserCartItemsQuery();
   const [isCheckingOut, setIsCheckingOut] = useState<boolean>(false);
-  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>({});
-  const [productVariants, setProductVariants] = useState<Record<string, SystemConfigVariantEntity[]>>({});
-  const [isLoadingVariants, setIsLoadingVariants] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>(
+    {},
+  );
+  const [productVariants, setProductVariants] = useState<
+    Record<string, SystemConfigVariantEntity[]>
+  >({});
 
   const [getProductVariants] = useGetProductVariantByIdLazyQuery();
 
@@ -62,6 +65,7 @@ export default function CartPage() {
   });
 
   const [deleteCartItem] = useDeleteCartItemMutation();
+
   const [createOrder] = useCreateOrderMutation({
     onCompleted: data => {
       const orderId = data.createOrder.id;
@@ -92,6 +96,45 @@ export default function CartPage() {
     return groups;
   }, [cartItems]);
 
+  // Handle removing a design (all its variants)
+  const handleRemoveDesign = async (items: CartItemEntity[]) => {
+    try {
+      const deletePromises = items.map(item =>
+        deleteCartItem({
+          variables: {
+            deleteCartItemId: item.id,
+          },
+        }).then(result => {
+          if (result.errors) {
+            throw result.errors[0];
+          }
+          return result.data;
+        }),
+      );
+
+      await Promise.all(deletePromises);
+      toast.success('Items removed from cart');
+      refetch();
+    } catch (error) {
+      toast.error('Failed to remove some items');
+    }
+  };
+
+  // Handle removing a single variant
+  const handleRemoveVariant = async (itemId: string) => {
+    try {
+      await deleteCartItem({
+        variables: {
+          deleteCartItemId: itemId,
+        },
+      });
+      toast.success('Item removed from cart');
+      refetch();
+    } catch (error) {
+      toast.error('Failed to remove item');
+    }
+  };
+
   // Get unique product IDs and fetch their variants
   useEffect(() => {
     const fetchVariants = async () => {
@@ -105,24 +148,22 @@ export default function CartPage() {
 
       if (uniqueProductIds.size === 0) return;
 
-      setIsLoadingVariants(true);
       try {
         const variants: Record<string, SystemConfigVariantEntity[]> = {};
         await Promise.all(
-          Array.from(uniqueProductIds).map(async (productId) => {
+          Array.from(uniqueProductIds).map(async productId => {
             const result = await getProductVariants({
               variables: { productId },
             });
             if (result.data?.product?.variants) {
-              variants[productId] = result.data.product.variants as SystemConfigVariantEntity[];
+              variants[productId] = result.data.product
+                .variants as SystemConfigVariantEntity[];
             }
-          })
+          }),
         );
         setProductVariants(variants);
       } catch (error) {
         console.error('Error fetching variants:', error);
-      } finally {
-        setIsLoadingVariants(false);
       }
     };
 
@@ -198,9 +239,12 @@ export default function CartPage() {
   const selectedCartItems = cartItems.filter(item => selectedItems[item.id]);
 
   // Calculate cart totals for selected items only
-  const cartTotal = selectedCartItems.reduce((total: number, item: CartItemEntity) => {
-    return total + calculateItemPrice(item).totalPrice;
-  }, 0);
+  const cartTotal = selectedCartItems.reduce(
+    (total: number, item: CartItemEntity) => {
+      return total + calculateItemPrice(item).totalPrice;
+    },
+    0,
+  );
 
   // Handle quantity changes
   const handleQuantityChange = (id: string, newQuantity: number): void => {
@@ -210,22 +254,6 @@ export default function CartPage() {
         updateCartItemInput: {
           quantity: newQuantity,
         },
-      },
-    });
-  };
-
-  // Handle item removal
-  const handleRemoveItem = (id: string): void => {
-    deleteCartItem({
-      variables: {
-        deleteCartItemId: id,
-      },
-      onCompleted: () => {
-        toast.success('Item has been removed from your cart');
-        refetch();
-      },
-      onError: error => {
-        toast.error(error.message);
       },
     });
   };
@@ -252,7 +280,11 @@ export default function CartPage() {
     cartItems.length > 0 && cartItems.every(item => selectedItems[item.id]);
 
   // Handle adding new size
-  const handleAddSize = (designId: string, variantId: string, quantity: number): void => {
+  const handleAddSize = (
+    designId: string,
+    variantId: string,
+    quantity: number,
+  ): void => {
     createCartItem({
       variables: {
         createCartItemInput: {
@@ -283,6 +315,10 @@ export default function CartPage() {
     });
   };
 
+  if (loading) {
+    return <LoadingCart />;
+  }
+
   if (cartItems.length === 0) {
     return <EmptyCart />;
   }
@@ -307,10 +343,13 @@ export default function CartPage() {
                 selectedItems={selectedItems}
                 onSelect={handleItemSelect}
                 onQuantityChange={handleQuantityChange}
-                onRemove={handleRemoveItem}
+                onRemove={handleRemoveDesign}
+                onRemoveVariant={handleRemoveVariant}
                 isUpdating={updateCartItemLoading}
                 onAddSize={handleAddSize}
-                availableVariants={productId ? productVariants[productId] : undefined}
+                availableVariants={
+                  productId ? productVariants[productId] : undefined
+                }
               />
             );
           })}
