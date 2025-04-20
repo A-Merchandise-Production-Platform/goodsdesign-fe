@@ -333,6 +333,21 @@ export type FactoryDashboardResponse = {
   totalRevenue: Scalars['Int']['output'];
 };
 
+export type FactoryDetailDashboardResponse = {
+  __typename?: 'FactoryDetailDashboardResponse';
+  inProductionOrders: Scalars['Int']['output'];
+  lastMonthInProductionOrders: Scalars['Int']['output'];
+  lastMonthPendingOrders: Scalars['Int']['output'];
+  lastMonthTotalOrders: Scalars['Int']['output'];
+  lastMonthTotalRevenue: Scalars['Int']['output'];
+  pendingOrders: Scalars['Int']['output'];
+  productionProgress: Array<FactoryOrderWithProgress>;
+  qualityIssues: Array<QualityIssueWithFactory>;
+  recentOrders: Array<FactoryOrderWithCustomer>;
+  totalOrders: Scalars['Int']['output'];
+  totalRevenue: Scalars['Int']['output'];
+};
+
 export type FactoryEntity = {
   __typename?: 'FactoryEntity';
   address?: Maybe<AddressEntity>;
@@ -504,6 +519,7 @@ export type Mutation = {
   addOrderProgressReport: OrderProgressReportEntity;
   assignStaffToFactory: FactoryEntity;
   calculateShippingFee: ShippingFee;
+  changeFactoryStaff: FactoryEntity;
   changeFactoryStatus: FactoryEntity;
   changeOrderToShipping: OrderEntity;
   clearCart: Scalars['Boolean']['output'];
@@ -593,6 +609,12 @@ export type MutationAssignStaffToFactoryArgs = {
 
 export type MutationCalculateShippingFeeArgs = {
   input: CalculateShippingFeeDto;
+};
+
+
+export type MutationChangeFactoryStaffArgs = {
+  factoryId: Scalars['String']['input'];
+  newStaffId: Scalars['String']['input'];
 };
 
 
@@ -1205,6 +1227,7 @@ export type Query = {
   getEnhancedManagerDashboard: EnhancedManagerDashboardResponse;
   getFactoryById: FactoryEntity;
   getFactoryDashboard: FactoryDashboardResponse;
+  getFactoryDetailDashboard: FactoryDetailDashboardResponse;
   getManagerDashboard: ManagerDashboardResponse;
   getManagerOrderDashboard: ManagerOrderDashboardEntity;
   getMe: UserEntity;
@@ -1317,6 +1340,11 @@ export type QueryGetCartItemArgs = {
 
 
 export type QueryGetFactoryByIdArgs = {
+  factoryId: Scalars['String']['input'];
+};
+
+
+export type QueryGetFactoryDetailDashboardArgs = {
   factoryId: Scalars['String']['input'];
 };
 
@@ -1872,6 +1900,13 @@ export type GetManagerOrderDashboardQueryVariables = Exact<{ [key: string]: neve
 
 export type GetManagerOrderDashboardQuery = { __typename?: 'Query', getManagerOrderDashboard: { __typename?: 'ManagerOrderDashboardEntity', completedOrders: number, inProductionOrders: number, lastMonthCompletedOrders: number, lastMonthInProductionOrders: number, lastMonthOrders: number, lastMonthPendingOrders: number, pendingOrders: number, totalOrders: number } };
 
+export type GetFactoryDetailDashboardQueryVariables = Exact<{
+  factoryId: Scalars['String']['input'];
+}>;
+
+
+export type GetFactoryDetailDashboardQuery = { __typename?: 'Query', getFactoryDetailDashboard: { __typename?: 'FactoryDetailDashboardResponse', inProductionOrders: number, lastMonthInProductionOrders: number, lastMonthPendingOrders: number, lastMonthTotalOrders: number, lastMonthTotalRevenue: number, pendingOrders: number, totalOrders: number, totalRevenue: number, productionProgress: Array<{ __typename?: 'FactoryOrderWithProgress', id: string, status: string, createdAt: any, totalProductionCost: number }>, qualityIssues: Array<{ __typename?: 'QualityIssueWithFactory', id: string, reportedAt: any, issueType: string, status: string, description: string, factoryOrder: { __typename?: 'FactoryOrderInfo', id: string, status: string } }>, recentOrders: Array<{ __typename?: 'FactoryOrderWithCustomer', id: string, status: string, totalProductionCost: number, createdAt: any, customerOrder: { __typename?: 'CustomerOrderInfo', id: string, status: string, totalPrice: number } }> } };
+
 export type UpdateDesignPositionMutationVariables = Exact<{
   input: UpdateDesignPositionDto;
 }>;
@@ -1910,6 +1945,14 @@ export type ChangeFactoryStatusMutationVariables = Exact<{
 
 export type ChangeFactoryStatusMutation = { __typename?: 'Mutation', changeFactoryStatus: { __typename?: 'FactoryEntity', factoryStatus?: FactoryStatus | null } };
 
+export type ChangeFactoryStaffMutationVariables = Exact<{
+  factoryId: Scalars['String']['input'];
+  newStaffId: Scalars['String']['input'];
+}>;
+
+
+export type ChangeFactoryStaffMutation = { __typename?: 'Mutation', changeFactoryStaff: { __typename?: 'FactoryEntity', staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, name?: string | null, role: Roles, email?: string | null } | null } };
+
 export type MyNotificationsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1946,6 +1989,13 @@ export type GetMyFactoryOrdersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetMyFactoryOrdersQuery = { __typename?: 'Query', factoryOrders: Array<{ __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null }> };
+
+export type GetOrdersByFactoryIdQueryVariables = Exact<{
+  factoryId: Scalars['String']['input'];
+}>;
+
+
+export type GetOrdersByFactoryIdQuery = { __typename?: 'Query', ordersByFactoryId: Array<{ __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null }> };
 
 export type GetOrderQueryVariables = Exact<{
   orderId: Scalars['String']['input'];
@@ -3190,6 +3240,81 @@ export type GetManagerOrderDashboardQueryHookResult = ReturnType<typeof useGetMa
 export type GetManagerOrderDashboardLazyQueryHookResult = ReturnType<typeof useGetManagerOrderDashboardLazyQuery>;
 export type GetManagerOrderDashboardSuspenseQueryHookResult = ReturnType<typeof useGetManagerOrderDashboardSuspenseQuery>;
 export type GetManagerOrderDashboardQueryResult = Apollo.QueryResult<GetManagerOrderDashboardQuery, GetManagerOrderDashboardQueryVariables>;
+export const GetFactoryDetailDashboardDocument = gql`
+    query GetFactoryDetailDashboard($factoryId: String!) {
+  getFactoryDetailDashboard(factoryId: $factoryId) {
+    inProductionOrders
+    lastMonthInProductionOrders
+    lastMonthPendingOrders
+    lastMonthTotalOrders
+    lastMonthTotalRevenue
+    pendingOrders
+    productionProgress {
+      id
+      status
+      createdAt
+      totalProductionCost
+    }
+    qualityIssues {
+      id
+      reportedAt
+      issueType
+      status
+      description
+      factoryOrder {
+        id
+        status
+      }
+    }
+    recentOrders {
+      id
+      status
+      totalProductionCost
+      createdAt
+      customerOrder {
+        id
+        status
+        totalPrice
+      }
+    }
+    totalOrders
+    totalRevenue
+  }
+}
+    `;
+
+/**
+ * __useGetFactoryDetailDashboardQuery__
+ *
+ * To run a query within a React component, call `useGetFactoryDetailDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFactoryDetailDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFactoryDetailDashboardQuery({
+ *   variables: {
+ *      factoryId: // value for 'factoryId'
+ *   },
+ * });
+ */
+export function useGetFactoryDetailDashboardQuery(baseOptions: Apollo.QueryHookOptions<GetFactoryDetailDashboardQuery, GetFactoryDetailDashboardQueryVariables> & ({ variables: GetFactoryDetailDashboardQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetFactoryDetailDashboardQuery, GetFactoryDetailDashboardQueryVariables>(GetFactoryDetailDashboardDocument, options);
+      }
+export function useGetFactoryDetailDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFactoryDetailDashboardQuery, GetFactoryDetailDashboardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetFactoryDetailDashboardQuery, GetFactoryDetailDashboardQueryVariables>(GetFactoryDetailDashboardDocument, options);
+        }
+export function useGetFactoryDetailDashboardSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetFactoryDetailDashboardQuery, GetFactoryDetailDashboardQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetFactoryDetailDashboardQuery, GetFactoryDetailDashboardQueryVariables>(GetFactoryDetailDashboardDocument, options);
+        }
+export type GetFactoryDetailDashboardQueryHookResult = ReturnType<typeof useGetFactoryDetailDashboardQuery>;
+export type GetFactoryDetailDashboardLazyQueryHookResult = ReturnType<typeof useGetFactoryDetailDashboardLazyQuery>;
+export type GetFactoryDetailDashboardSuspenseQueryHookResult = ReturnType<typeof useGetFactoryDetailDashboardSuspenseQuery>;
+export type GetFactoryDetailDashboardQueryResult = Apollo.QueryResult<GetFactoryDetailDashboardQuery, GetFactoryDetailDashboardQueryVariables>;
 export const UpdateDesignPositionDocument = gql`
     mutation UpdateDesignPosition($input: UpdateDesignPositionDto!) {
   updateDesignPosition(input: $input) {
@@ -3641,6 +3766,46 @@ export function useChangeFactoryStatusMutation(baseOptions?: Apollo.MutationHook
 export type ChangeFactoryStatusMutationHookResult = ReturnType<typeof useChangeFactoryStatusMutation>;
 export type ChangeFactoryStatusMutationResult = Apollo.MutationResult<ChangeFactoryStatusMutation>;
 export type ChangeFactoryStatusMutationOptions = Apollo.BaseMutationOptions<ChangeFactoryStatusMutation, ChangeFactoryStatusMutationVariables>;
+export const ChangeFactoryStaffDocument = gql`
+    mutation ChangeFactoryStaff($factoryId: String!, $newStaffId: String!) {
+  changeFactoryStaff(factoryId: $factoryId, newStaffId: $newStaffId) {
+    staff {
+      id
+      imageUrl
+      name
+      role
+      email
+    }
+  }
+}
+    `;
+export type ChangeFactoryStaffMutationFn = Apollo.MutationFunction<ChangeFactoryStaffMutation, ChangeFactoryStaffMutationVariables>;
+
+/**
+ * __useChangeFactoryStaffMutation__
+ *
+ * To run a mutation, you first call `useChangeFactoryStaffMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeFactoryStaffMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeFactoryStaffMutation, { data, loading, error }] = useChangeFactoryStaffMutation({
+ *   variables: {
+ *      factoryId: // value for 'factoryId'
+ *      newStaffId: // value for 'newStaffId'
+ *   },
+ * });
+ */
+export function useChangeFactoryStaffMutation(baseOptions?: Apollo.MutationHookOptions<ChangeFactoryStaffMutation, ChangeFactoryStaffMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeFactoryStaffMutation, ChangeFactoryStaffMutationVariables>(ChangeFactoryStaffDocument, options);
+      }
+export type ChangeFactoryStaffMutationHookResult = ReturnType<typeof useChangeFactoryStaffMutation>;
+export type ChangeFactoryStaffMutationResult = Apollo.MutationResult<ChangeFactoryStaffMutation>;
+export type ChangeFactoryStaffMutationOptions = Apollo.BaseMutationOptions<ChangeFactoryStaffMutation, ChangeFactoryStaffMutationVariables>;
 export const MyNotificationsDocument = gql`
     query MyNotifications {
   myNotifications {
@@ -4218,6 +4383,221 @@ export type GetMyFactoryOrdersQueryHookResult = ReturnType<typeof useGetMyFactor
 export type GetMyFactoryOrdersLazyQueryHookResult = ReturnType<typeof useGetMyFactoryOrdersLazyQuery>;
 export type GetMyFactoryOrdersSuspenseQueryHookResult = ReturnType<typeof useGetMyFactoryOrdersSuspenseQuery>;
 export type GetMyFactoryOrdersQueryResult = Apollo.QueryResult<GetMyFactoryOrdersQuery, GetMyFactoryOrdersQueryVariables>;
+export const GetOrdersByFactoryIdDocument = gql`
+    query GetOrdersByFactoryId($factoryId: String!) {
+  ordersByFactoryId(factoryId: $factoryId) {
+    acceptanceDeadline
+    acceptedAt
+    address {
+      districtID
+      factoryId
+      id
+      provinceID
+      street
+      wardCode
+    }
+    addressId
+    assignedAt
+    completedAt
+    currentProgress
+    customer {
+      imageUrl
+      name
+      email
+    }
+    customerId
+    delayReason
+    doneCheckQualityAt
+    doneProductionAt
+    estimatedCheckQualityAt
+    estimatedCompletionAt
+    estimatedDoneProductionAt
+    estimatedShippingAt
+    factory {
+      name
+      owner {
+        name
+        imageUrl
+        email
+      }
+    }
+    id
+    isDelayed
+    orderDate
+    orderDetails {
+      checkQualities {
+        totalChecked
+        status
+        passedQuantity
+        orderDetailId
+        task {
+          taskname
+          taskType
+          status
+          startDate
+          note
+          id
+          expiredTime
+          description
+          completedDate
+          assignee {
+            email
+            name
+            imageUrl
+            id
+          }
+          assignedDate
+        }
+      }
+      completedQty
+      createdAt
+      design {
+        thumbnailUrl
+        systemConfigVariantId
+        isTemplate
+        isPublic
+        isFinalized
+        id
+        systemConfigVariant {
+          color
+          id
+          isActive
+          isDeleted
+          model
+          price
+          product {
+            name
+            imageUrl
+          }
+          productId
+          size
+        }
+        designPositions {
+          positionType {
+            positionName
+            basePrice
+          }
+          designJSON
+        }
+      }
+      id
+      isRework
+      price
+      productionCost
+      quantity
+      rejectedQty
+      reworkTime
+      status
+      updatedAt
+    }
+    orderProgressReports {
+      reportDate
+      note
+      imageUrls
+      id
+    }
+    payments {
+      id
+      type
+      paymentLog
+      amount
+      transactions {
+        transactionLog
+        status
+        paymentMethod
+        createdAt
+        amount
+        id
+        type
+      }
+      status
+    }
+    ratedAt
+    ratedBy
+    rating
+    ratingComment
+    rejectedHistory {
+      rejectedAt
+      reassignedTo
+      reassignedAt
+      reason
+      id
+      factory {
+        name
+        contractUrl
+        address {
+          wardCode
+          street
+          districtID
+          provinceID
+        }
+        owner {
+          name
+          email
+          imageUrl
+        }
+      }
+    }
+    shippedAt
+    shippingPrice
+    status
+    tasks {
+      taskname
+      taskType
+      id
+      status
+      startDate
+      note
+      description
+      expiredTime
+      completedDate
+      assignee {
+        name
+        imageUrl
+        email
+      }
+      assignedDate
+    }
+    totalItems
+    totalPrice
+    totalProductionCost
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGetOrdersByFactoryIdQuery__
+ *
+ * To run a query within a React component, call `useGetOrdersByFactoryIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetOrdersByFactoryIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetOrdersByFactoryIdQuery({
+ *   variables: {
+ *      factoryId: // value for 'factoryId'
+ *   },
+ * });
+ */
+export function useGetOrdersByFactoryIdQuery(baseOptions: Apollo.QueryHookOptions<GetOrdersByFactoryIdQuery, GetOrdersByFactoryIdQueryVariables> & ({ variables: GetOrdersByFactoryIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetOrdersByFactoryIdQuery, GetOrdersByFactoryIdQueryVariables>(GetOrdersByFactoryIdDocument, options);
+      }
+export function useGetOrdersByFactoryIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetOrdersByFactoryIdQuery, GetOrdersByFactoryIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetOrdersByFactoryIdQuery, GetOrdersByFactoryIdQueryVariables>(GetOrdersByFactoryIdDocument, options);
+        }
+export function useGetOrdersByFactoryIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetOrdersByFactoryIdQuery, GetOrdersByFactoryIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetOrdersByFactoryIdQuery, GetOrdersByFactoryIdQueryVariables>(GetOrdersByFactoryIdDocument, options);
+        }
+export type GetOrdersByFactoryIdQueryHookResult = ReturnType<typeof useGetOrdersByFactoryIdQuery>;
+export type GetOrdersByFactoryIdLazyQueryHookResult = ReturnType<typeof useGetOrdersByFactoryIdLazyQuery>;
+export type GetOrdersByFactoryIdSuspenseQueryHookResult = ReturnType<typeof useGetOrdersByFactoryIdSuspenseQuery>;
+export type GetOrdersByFactoryIdQueryResult = Apollo.QueryResult<GetOrdersByFactoryIdQuery, GetOrdersByFactoryIdQueryVariables>;
 export const GetOrderDocument = gql`
     query GetOrder($orderId: String!) {
   order(id: $orderId) {

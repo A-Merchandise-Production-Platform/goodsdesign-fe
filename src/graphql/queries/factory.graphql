@@ -257,3 +257,15 @@ mutation ChangeFactoryStatus($data: UpdateFactoryStatusDto!) {
     factoryStatus
   }
 }
+
+mutation ChangeFactoryStaff($factoryId: String!, $newStaffId: String!) {
+  changeFactoryStaff(factoryId: $factoryId, newStaffId: $newStaffId) {
+    staff {
+      id
+      imageUrl
+      name
+      role
+      email
+    }
+  }
+}
