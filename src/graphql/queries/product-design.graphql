@@ -55,6 +55,9 @@ query ProductDesignsByUser {
 query ProductDesignById($productDesignId: ID!) {
   productDesign(id: $productDesignId) {
     thumbnailUrl
+    isFinalized
+    isPublic
+    isTemplate
     systemConfigVariant {
       id
       price

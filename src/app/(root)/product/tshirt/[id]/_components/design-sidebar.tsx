@@ -13,6 +13,8 @@ import { DesignObject } from '@/types/design-object';
 
 import { LayersPanel } from './layers-panel';
 import { SHIRT_COLORS } from './shirt-colors';
+import { useAuthStore } from '@/stores/auth.store';
+import { Roles } from '@/graphql/generated/graphql';
 
 interface DesignSidebarProps {
   showColorDialog: boolean;
@@ -48,7 +50,12 @@ interface DesignSidebarProps {
   onUpdateVariant?: (options: {
     variables: {
       updateProductDesignId: string;
-      input: { systemConfigVariantId: string };
+      input: {
+        systemConfigVariantId: string;
+        isFinalized: boolean;
+        isPublic: boolean;
+        isTemplate: boolean;
+      };
     };
   }) => void;
   designId?: string;
@@ -73,6 +80,8 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
   designId,
   uploadLoading,
 }) => {
+  const { user } = useAuthStore();
+
   const [tempColor, setTempColor] = useState<
     { path: string; color: string } | undefined
   >();
@@ -184,7 +193,13 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
                       onUpdateVariant({
                         variables: {
                           updateProductDesignId: designId,
-                          input: { systemConfigVariantId: variant.id },
+                          input: {
+                            systemConfigVariantId: variant.id,
+                            isFinalized: false,
+                            isPublic: user?.role === Roles.Admin ? true : false,
+                            isTemplate:
+                              user?.role === Roles.Admin ? true : false,
+                          },
                         },
                       });
                       onColorChange(tempColor.path);

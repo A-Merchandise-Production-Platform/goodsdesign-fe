@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import {
+  Roles,
   useCreateCartItemMutation,
   useGetUserCartItemsQuery,
   useProductDesignByIdQuery,
@@ -16,10 +17,12 @@ import {
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
 
 import ProductDesigner from './_components/product-design';
+import { useAuthStore } from '@/stores/auth.store';
 
 export default function Page() {
   const params = useParams();
   const id = params.id as string;
+  const { user } = useAuthStore();
 
   const { data: proDesData, loading: proDesLoading } =
     useProductDesignByIdQuery({
@@ -66,12 +69,17 @@ export default function Page() {
       if (!newThumbnailUrl) {
         return null;
       }
-      
+
       // Update the thumbnail
       await updateThumbnailProductDesign({
         variables: {
           updateProductDesignId: id,
-          input: { thumbnailUrl: newThumbnailUrl },
+          input: {
+            thumbnailUrl: newThumbnailUrl,
+            isFinalized: false,
+            isPublic: user?.role === Roles.Admin ? true : false,
+            isTemplate: user?.role === Roles.Admin ? true : false,
+          },
           fileUrl: currentThumbnailUrl,
         },
       });

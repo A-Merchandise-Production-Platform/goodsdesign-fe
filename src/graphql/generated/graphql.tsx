@@ -2224,7 +2224,7 @@ export type ProductDesignByIdQueryVariables = Exact<{
 }>;
 
 
-export type ProductDesignByIdQuery = { __typename?: 'Query', productDesign: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null } };
+export type ProductDesignByIdQuery = { __typename?: 'Query', productDesign: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, isFinalized: boolean, isPublic: boolean, isTemplate: boolean, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null } };
 
 export type CreateProductDesignMutationVariables = Exact<{
   input: CreateProductDesignDto;
@@ -6091,6 +6091,9 @@ export const ProductDesignByIdDocument = gql`
     query ProductDesignById($productDesignId: ID!) {
   productDesign(id: $productDesignId) {
     thumbnailUrl
+    isFinalized
+    isPublic
+    isTemplate
     systemConfigVariant {
       id
       price

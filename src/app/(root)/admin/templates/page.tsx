@@ -160,9 +160,10 @@ export default function Page() {
       },
       onCompleted: () => {
         toast.success(`Design is now ${!currentStatus ? 'public' : 'private'}`);
-        refetch();
+        refetch(); // Refresh data to ensure UI is in sync with server
       },
       onError: error => {
+        // Revert the optimistic update on error
         setDesigns(prevDesigns =>
           prevDesigns.map(design =>
             design.id === designId
@@ -208,13 +209,12 @@ export default function Page() {
   }
 
   function handleCreateNew(): void {
-    router.push('/product/tshirt/new');
+    router.push('/product/tshirt');
   }
 
   return (
     <div className="bg-background container mx-auto rounded-lg py-6">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Template Product Designs</h1>
         <Tabs
           defaultValue="all"
           value={filter}
@@ -227,6 +227,10 @@ export default function Page() {
             <TabsTrigger value="private">Private</TabsTrigger>
           </TabsList>
         </Tabs>
+        <Button onClick={handleCreateNew}>
+          <PlusCircle className="h-4 w-4" />
+          Create New Template
+        </Button>
       </div>
 
       {loading ? (

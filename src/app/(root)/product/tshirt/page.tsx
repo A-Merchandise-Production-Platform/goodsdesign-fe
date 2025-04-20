@@ -176,8 +176,8 @@ export default function TShirtPage() {
           input: {
             systemConfigVariantId,
             isFinalized: false,
-            isPublic: false,
-            isTemplate: false,
+            isPublic: user?.role === Roles.Admin ? true : false,
+            isTemplate: user?.role === Roles.Admin ? true : false,
             thumbnailUrl: null,
           },
         },
@@ -190,7 +190,7 @@ export default function TShirtPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <Link
-        href="/"
+        href={user?.role === Roles.Admin ? "/admin/templates" : "/"}
         className="text-muted-foreground hover:text-foreground mb-6 flex items-center transition-colors"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
@@ -248,9 +248,23 @@ export default function TShirtPage() {
               {proLoading ? (
                 <Loader2 className="animate-spin" />
               ) : (
-                <Paintbrush className="mr-2 h-5 w-5" />
+                <Paintbrush className="h-5 w-5" />
               )}
               Start Designing
+            </Button>
+          ) : user?.role === Roles.Admin ? (
+            <Button
+              onClick={onSubmit}
+              size="lg"
+              className="w-full"
+              disabled={proLoading}
+            >
+              {proLoading ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <Paintbrush className="h-5 w-5" />
+              )}
+              Create New Template
             </Button>
           ) : user ? (
             <Button size="lg" className="w-full" disabled>
