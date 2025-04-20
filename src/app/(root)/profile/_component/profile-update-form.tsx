@@ -6,6 +6,7 @@ import { CalendarIcon, Loader2, Save } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { isValidPhoneNumber } from 'react-phone-number-input';
+import { toast } from 'sonner';
 import * as z from 'zod';
 
 import AddressesUpdateForm from '@/app/(root)/profile/_component/addresses-update-form';
@@ -39,10 +40,9 @@ import {
 } from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
+import { useUpdateProfileMutation } from '@/graphql/generated/graphql';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth.store';
-import { useUpdateProfileMutation } from '@/graphql/generated/graphql';
-import { toast } from 'sonner';
 
 // Define the form schema with validation
 const profileFormSchema = z.object({

@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { DashboardShell } from '@/components/dashboard-shell';
+import { StatCard } from '@/components/stat-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -27,7 +28,6 @@ import {
   FactoryStatus,
   useGetFactoriesQuery,
 } from '@/graphql/generated/graphql';
-import { StatCard } from '@/components/stat-card';
 import { calculateChange } from '@/lib/calculate-change';
 
 export default function Page() {

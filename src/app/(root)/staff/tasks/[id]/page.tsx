@@ -14,11 +14,13 @@ import {
   XCircle,
 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
+import { getStatusBadge } from '@/app/(root)/_components/order-status';
 import {
   Accordion,
   AccordionContent,
@@ -60,8 +62,6 @@ import {
   useGetOrderQuery,
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
-import { getStatusBadge } from '@/app/(root)/_components/order-status';
-import Link from 'next/link';
 import { filesToBase64 } from '@/utils/handle-upload';
 
 // Helper function to format time
@@ -168,7 +168,7 @@ export default function StaffCheckQualityDetailsPage() {
     try {
       // Convert images to base64 strings
       const base64Strings = await filesToBase64(images);
-      
+
       // Return the base64 strings to be stored in the database
       return base64Strings;
     } catch (error) {

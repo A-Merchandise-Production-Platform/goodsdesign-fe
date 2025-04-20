@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/table';
 import { useGetMyFactoryOrdersQuery } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
+
 import { getStatusBadge } from '../../_components/order-status';
 
 export default function FactoryOrdersPage() {

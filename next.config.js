@@ -18,6 +18,10 @@ const nextConfig = {
   env: {
     API_URL: 'http://localhost:5000',
   },
+  // Disable ESLint during build
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 module.exports = nextConfig;

@@ -1,4 +1,5 @@
 'use client';
+import { gql, useMutation } from '@apollo/client';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -24,8 +25,12 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { gql, useMutation } from '@apollo/client';
 
+import {
+  getPaymentStatusBadge,
+  getStatusBadge,
+  orderStatusSteps,
+} from '@/app/(root)/_components/order-status';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -71,11 +76,6 @@ import {
   useStartReworkMutation,
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
-import {
-  getPaymentStatusBadge,
-  getStatusBadge,
-  orderStatusSteps,
-} from '@/app/(root)/_components/order-status';
 import { filesToBase64 } from '@/utils/handle-upload';
 
 // Helper function to format time
@@ -110,7 +110,7 @@ export default function FactoryOrderDetailsPage() {
     action: () => void;
     actionText: string;
   } | null>(null);
-  
+
   // Image upload states
   const [images, setImages] = useState<File[]>([]);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
@@ -119,10 +119,10 @@ export default function FactoryOrderDetailsPage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [progressNote, setProgressNote] = useState('');
   const [isAddProgressDialogOpen, setIsAddProgressDialogOpen] = useState(false);
-  
+
   // Add progress report mutation
-  const [addProgressReport, { loading: addProgressReportLoading }] = useAddOrderProgressReportMutation(
-    {
+  const [addProgressReport, { loading: addProgressReportLoading }] =
+    useAddOrderProgressReportMutation({
       onCompleted: () => {
         refetch();
         toast.success('Progress report added successfully');
@@ -134,8 +134,7 @@ export default function FactoryOrderDetailsPage() {
       onError: (error: Error) => {
         toast.error(error.message || 'Failed to add progress report');
       },
-    }
-  );
+    });
 
   // Use the query hook
   const { data, loading, error, refetch } = useGetOrderQuery({
@@ -412,10 +411,10 @@ export default function FactoryOrderDetailsPage() {
 
     // Convert FileList to Array
     const newFiles = Array.from(files);
-    
+
     // Create preview URLs
     const newPreviewUrls = newFiles.map(file => URL.createObjectURL(file));
-    
+
     // Update state
     setImages(prev => [...prev, ...newFiles]);
     setPreviewImages(prev => [...prev, ...newPreviewUrls]);
@@ -424,7 +423,7 @@ export default function FactoryOrderDetailsPage() {
   // Remove image
   const removeImage = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index));
-    
+
     // Revoke the URL to prevent memory leaks
     URL.revokeObjectURL(previewImages[index]);
     setPreviewImages(prev => prev.filter((_, i) => i !== index));
@@ -459,7 +458,7 @@ export default function FactoryOrderDetailsPage() {
     try {
       // Convert images to base64
       const base64Images = await convertImagesToBase64();
-      
+
       // Add progress report with base64 images
       addProgressReport({
         variables: {
@@ -1244,10 +1243,10 @@ export default function FactoryOrderDetailsPage() {
                     No progress updates available yet.
                   </div>
                 )}
-                
+
                 {/* Add Progress Report Button */}
                 <div className="mt-6">
-                  <Button 
+                  <Button
                     onClick={() => setIsAddProgressDialogOpen(true)}
                     className="w-full"
                   >
@@ -1434,18 +1433,19 @@ export default function FactoryOrderDetailsPage() {
       </Dialog>
 
       {/* Add Progress Report Dialog */}
-      <Dialog 
-        open={isAddProgressDialogOpen} 
+      <Dialog
+        open={isAddProgressDialogOpen}
         onOpenChange={setIsAddProgressDialogOpen}
       >
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>Add Progress Report</DialogTitle>
             <DialogDescription>
-              Add a new progress report with images to document the order status.
+              Add a new progress report with images to document the order
+              status.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
               <label htmlFor="progress-note" className="text-sm font-medium">
@@ -1455,18 +1455,20 @@ export default function FactoryOrderDetailsPage() {
                 id="progress-note"
                 placeholder="Enter progress details..."
                 value={progressNote}
-                onChange={(e) => setProgressNote(e.target.value)}
+                onChange={e => setProgressNote(e.target.value)}
                 className="min-h-[100px]"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label className="text-sm font-medium">Images</label>
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
-                    onClick={() => document.getElementById('image-upload')?.click()}
+                    onClick={() =>
+                      document.getElementById('image-upload')?.click()
+                    }
                     disabled={imageUploading || addProgressReportLoading}
                   >
                     <FileText className="mr-2 h-4 w-4" />
@@ -1480,12 +1482,12 @@ export default function FactoryOrderDetailsPage() {
                     onChange={handleFileChange}
                     accept="image/*"
                   />
-                  <span className="text-sm text-muted-foreground">
-                    {images.length}{' '}
-                    {images.length === 1 ? 'image' : 'images'} selected
+                  <span className="text-muted-foreground text-sm">
+                    {images.length} {images.length === 1 ? 'image' : 'images'}{' '}
+                    selected
                   </span>
                 </div>
-                
+
                 {/* Image Preview */}
                 {previewImages.length > 0 ? (
                   <div className="space-y-2">
@@ -1509,12 +1511,14 @@ export default function FactoryOrderDetailsPage() {
                           <Button
                             variant="destructive"
                             size="icon"
-                            className="absolute right-1 top-1 h-6 w-6 rounded-full"
-                            onClick={(e) => {
+                            className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                            onClick={e => {
                               e.stopPropagation();
                               removeImage(index);
                             }}
-                            disabled={imageUploading || addProgressReportLoading}
+                            disabled={
+                              imageUploading || addProgressReportLoading
+                            }
                           >
                             <XCircle className="h-4 w-4" />
                           </Button>
@@ -1525,10 +1529,10 @@ export default function FactoryOrderDetailsPage() {
                 ) : (
                   <div className="flex flex-col items-center justify-center rounded-md border border-dashed p-6 text-center">
                     <FileText className="text-muted-foreground mb-2 h-10 w-10" />
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       No images selected
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-muted-foreground mt-1 text-xs">
                       Upload images to document the progress
                     </p>
                   </div>
@@ -1536,7 +1540,7 @@ export default function FactoryOrderDetailsPage() {
               </div>
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button
               variant="outline"
@@ -1578,7 +1582,7 @@ export default function FactoryOrderDetailsPage() {
               Image {selectedImageIndex + 1} of {previewImages.length}
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="relative aspect-square overflow-hidden rounded-md">
             {previewImages[selectedImageIndex] && (
               <Image
@@ -1589,7 +1593,7 @@ export default function FactoryOrderDetailsPage() {
               />
             )}
           </div>
-          
+
           <div className="flex items-center justify-between">
             <Button
               variant="outline"
@@ -1614,7 +1618,7 @@ export default function FactoryOrderDetailsPage() {
               Next
             </Button>
           </div>
-          
+
           <DialogFooter>
             <Button
               variant="destructive"

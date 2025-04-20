@@ -1,4 +1,5 @@
-import { ArrowUpIcon, ArrowDownIcon } from 'lucide-react';
+import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 

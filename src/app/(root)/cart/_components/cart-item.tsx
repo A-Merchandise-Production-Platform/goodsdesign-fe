@@ -18,7 +18,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Separator } from '@/components/ui/separator';
 import {
   Select,
   SelectContent,
@@ -26,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import {
   CartItemEntity,
   DesignPositionEntity,
@@ -278,7 +278,7 @@ export const CartItem: FC<CartItemProps> = ({
                             <div className="flex items-center justify-between font-medium">
                               <span className="text-sm">Total:</span>
                               <span>{formatPrice(priceInfo.unitPrice)}</span>
-                              </div>
+                            </div>
                           </div>
                         </PopoverContent>
                       </Popover>

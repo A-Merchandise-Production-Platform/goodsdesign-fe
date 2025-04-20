@@ -1,5 +1,6 @@
-import { useFormatAddressLazyQuery } from '@/graphql/generated/graphql';
 import { useState } from 'react';
+
+import { useFormatAddressLazyQuery } from '@/graphql/generated/graphql';
 
 type AddressInput = {
   provinceID: string;

@@ -1,17 +1,17 @@
 'use client';
 
 import {
-  UsersIcon,
-  UserPlusIcon,
   UserCheckIcon,
+  UserPlusIcon,
+  UsersIcon,
   UserXIcon,
 } from 'lucide-react';
 
-import { Roles, useGetUsersQuery } from '@/graphql/generated/graphql';
 import UserTable from '@/app/(root)/manager/users/_components/staff-data-table';
-import { StatCard } from '@/components/stat-card';
-import { calculateChange } from '@/lib/calculate-change';
 import { DashboardShell } from '@/components/dashboard-shell';
+import { StatCard } from '@/components/stat-card';
+import { Roles, useGetUsersQuery } from '@/graphql/generated/graphql';
+import { calculateChange } from '@/lib/calculate-change';
 
 export default function Page() {
   const { data, loading, refetch } = useGetUsersQuery();
