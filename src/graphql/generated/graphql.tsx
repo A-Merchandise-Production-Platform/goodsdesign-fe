@@ -586,6 +586,7 @@ export type Mutation = {
   updateProfile: UserEntity;
   updateSystemConfigBank: SystemConfigBankEntity;
   updateSystemConfigDiscount: SystemConfigDiscountEntity;
+  updateSystemConfigOrder: SystemConfigOrderEntity;
   updateSystemConfigVariant: SystemConfigVariantEntity;
   updateUser: UserEntity;
   uploadFile: FileUploadResponse;
@@ -962,6 +963,11 @@ export type MutationUpdateSystemConfigDiscountArgs = {
 };
 
 
+export type MutationUpdateSystemConfigOrderArgs = {
+  updateConfigInput: UpdateSystemConfigOrderDto;
+};
+
+
 export type MutationUpdateSystemConfigVariantArgs = {
   updateSystemConfigVariantInput: UpdateSystemConfigVariantInput;
 };
@@ -1272,6 +1278,7 @@ export type Query = {
   systemConfigBanks: Array<SystemConfigBankEntity>;
   systemConfigDiscount: SystemConfigDiscountEntity;
   systemConfigDiscounts: Array<SystemConfigDiscountEntity>;
+  systemConfigOrder: SystemConfigOrderEntity;
   systemConfigVariant: SystemConfigVariantEntity;
   systemConfigVariants: Array<SystemConfigVariantEntity>;
   systemConfigVariantsByProduct: Array<SystemConfigVariantEntity>;
@@ -1579,6 +1586,27 @@ export type SystemConfigDiscountEntity = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type SystemConfigOrderEntity = {
+  __typename?: 'SystemConfigOrderEntity';
+  acceptHoursForFactory: Scalars['Int']['output'];
+  capacityScoreWeight: Scalars['Float']['output'];
+  checkQualityTimesDays: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  leadTimeScoreWeight: Scalars['Float']['output'];
+  legitPointScoreWeight: Scalars['Float']['output'];
+  legitPointToSuspend: Scalars['Int']['output'];
+  limitFactoryRejectOrders: Scalars['Int']['output'];
+  limitReworkTimes: Scalars['Int']['output'];
+  maxLegitPoint: Scalars['Int']['output'];
+  maxProductionCapacity: Scalars['Int']['output'];
+  maxProductionTimeInMinutes: Scalars['Int']['output'];
+  productionCapacityScoreWeight: Scalars['Float']['output'];
+  reduceLegitPointIfReject: Scalars['Int']['output'];
+  shippingDays: Scalars['Int']['output'];
+  specializationScoreWeight: Scalars['Float']['output'];
+  type: Scalars['String']['output'];
+};
+
 export type SystemConfigVariantEntity = {
   __typename?: 'SystemConfigVariantEntity';
   color?: Maybe<Scalars['String']['output']>;
@@ -1744,6 +1772,24 @@ export type UpdateSystemConfigDiscountDto = {
   minQuantity?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   productId?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateSystemConfigOrderDto = {
+  acceptHoursForFactory?: InputMaybe<Scalars['Int']['input']>;
+  capacityScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  checkQualityTimesDays?: InputMaybe<Scalars['Int']['input']>;
+  leadTimeScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  legitPointScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  legitPointToSuspend?: InputMaybe<Scalars['Int']['input']>;
+  limitFactoryRejectOrders?: InputMaybe<Scalars['Int']['input']>;
+  limitReworkTimes?: InputMaybe<Scalars['Int']['input']>;
+  maxLegitPoint?: InputMaybe<Scalars['Int']['input']>;
+  maxProductionCapacity?: InputMaybe<Scalars['Int']['input']>;
+  maxProductionTimeInMinutes?: InputMaybe<Scalars['Int']['input']>;
+  productionCapacityScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  reduceLegitPointIfReject?: InputMaybe<Scalars['Int']['input']>;
+  shippingDays?: InputMaybe<Scalars['Int']['input']>;
+  specializationScoreWeight?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type UpdateSystemConfigVariantInput = {
@@ -2303,6 +2349,18 @@ export type RemoveSystemConfigBankMutationVariables = Exact<{
 
 
 export type RemoveSystemConfigBankMutation = { __typename?: 'Mutation', removeSystemConfigBank: { __typename?: 'SystemConfigBankEntity', bin: string, id: string, code: string, isActive: boolean, isDeleted: boolean, logo: string, name: string, shortName: string } };
+
+export type SystemConfigOrderQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SystemConfigOrderQuery = { __typename?: 'Query', systemConfigOrder: { __typename?: 'SystemConfigOrderEntity', acceptHoursForFactory: number, capacityScoreWeight: number, checkQualityTimesDays: number, leadTimeScoreWeight: number, legitPointScoreWeight: number, legitPointToSuspend: number, limitFactoryRejectOrders: number, limitReworkTimes: number, maxLegitPoint: number, maxProductionCapacity: number, maxProductionTimeInMinutes: number, productionCapacityScoreWeight: number, reduceLegitPointIfReject: number, shippingDays: number, specializationScoreWeight: number } };
+
+export type UpdateSystemConfigOrderMutationVariables = Exact<{
+  updateConfigInput: UpdateSystemConfigOrderDto;
+}>;
+
+
+export type UpdateSystemConfigOrderMutation = { __typename?: 'Mutation', updateSystemConfigOrder: { __typename?: 'SystemConfigOrderEntity', id: string } };
 
 export type GetSystemConfigVariantsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -6792,6 +6850,92 @@ export function useRemoveSystemConfigBankMutation(baseOptions?: Apollo.MutationH
 export type RemoveSystemConfigBankMutationHookResult = ReturnType<typeof useRemoveSystemConfigBankMutation>;
 export type RemoveSystemConfigBankMutationResult = Apollo.MutationResult<RemoveSystemConfigBankMutation>;
 export type RemoveSystemConfigBankMutationOptions = Apollo.BaseMutationOptions<RemoveSystemConfigBankMutation, RemoveSystemConfigBankMutationVariables>;
+export const SystemConfigOrderDocument = gql`
+    query SystemConfigOrder {
+  systemConfigOrder {
+    acceptHoursForFactory
+    capacityScoreWeight
+    checkQualityTimesDays
+    leadTimeScoreWeight
+    legitPointScoreWeight
+    legitPointToSuspend
+    limitFactoryRejectOrders
+    limitReworkTimes
+    maxLegitPoint
+    maxProductionCapacity
+    maxProductionTimeInMinutes
+    productionCapacityScoreWeight
+    reduceLegitPointIfReject
+    shippingDays
+    specializationScoreWeight
+  }
+}
+    `;
+
+/**
+ * __useSystemConfigOrderQuery__
+ *
+ * To run a query within a React component, call `useSystemConfigOrderQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSystemConfigOrderQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSystemConfigOrderQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useSystemConfigOrderQuery(baseOptions?: Apollo.QueryHookOptions<SystemConfigOrderQuery, SystemConfigOrderQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SystemConfigOrderQuery, SystemConfigOrderQueryVariables>(SystemConfigOrderDocument, options);
+      }
+export function useSystemConfigOrderLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SystemConfigOrderQuery, SystemConfigOrderQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SystemConfigOrderQuery, SystemConfigOrderQueryVariables>(SystemConfigOrderDocument, options);
+        }
+export function useSystemConfigOrderSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SystemConfigOrderQuery, SystemConfigOrderQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SystemConfigOrderQuery, SystemConfigOrderQueryVariables>(SystemConfigOrderDocument, options);
+        }
+export type SystemConfigOrderQueryHookResult = ReturnType<typeof useSystemConfigOrderQuery>;
+export type SystemConfigOrderLazyQueryHookResult = ReturnType<typeof useSystemConfigOrderLazyQuery>;
+export type SystemConfigOrderSuspenseQueryHookResult = ReturnType<typeof useSystemConfigOrderSuspenseQuery>;
+export type SystemConfigOrderQueryResult = Apollo.QueryResult<SystemConfigOrderQuery, SystemConfigOrderQueryVariables>;
+export const UpdateSystemConfigOrderDocument = gql`
+    mutation UpdateSystemConfigOrder($updateConfigInput: UpdateSystemConfigOrderDto!) {
+  updateSystemConfigOrder(updateConfigInput: $updateConfigInput) {
+    id
+  }
+}
+    `;
+export type UpdateSystemConfigOrderMutationFn = Apollo.MutationFunction<UpdateSystemConfigOrderMutation, UpdateSystemConfigOrderMutationVariables>;
+
+/**
+ * __useUpdateSystemConfigOrderMutation__
+ *
+ * To run a mutation, you first call `useUpdateSystemConfigOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSystemConfigOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSystemConfigOrderMutation, { data, loading, error }] = useUpdateSystemConfigOrderMutation({
+ *   variables: {
+ *      updateConfigInput: // value for 'updateConfigInput'
+ *   },
+ * });
+ */
+export function useUpdateSystemConfigOrderMutation(baseOptions?: Apollo.MutationHookOptions<UpdateSystemConfigOrderMutation, UpdateSystemConfigOrderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateSystemConfigOrderMutation, UpdateSystemConfigOrderMutationVariables>(UpdateSystemConfigOrderDocument, options);
+      }
+export type UpdateSystemConfigOrderMutationHookResult = ReturnType<typeof useUpdateSystemConfigOrderMutation>;
+export type UpdateSystemConfigOrderMutationResult = Apollo.MutationResult<UpdateSystemConfigOrderMutation>;
+export type UpdateSystemConfigOrderMutationOptions = Apollo.BaseMutationOptions<UpdateSystemConfigOrderMutation, UpdateSystemConfigOrderMutationVariables>;
 export const GetSystemConfigVariantsDocument = gql`
     query GetSystemConfigVariants {
   systemConfigVariants {
