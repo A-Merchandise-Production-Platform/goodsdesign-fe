@@ -32,7 +32,6 @@ import {
   orderStatusSteps,
 } from '@/app/(root)/_components/order-status';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -1023,7 +1022,7 @@ export default function FactoryOrderDetailsPage() {
                               '/placeholder.svg?height=200&width=200'
                             }
                             alt={
-                              item.design?.systemConfigVariant?.product?.name ||
+                              item.systemConfigVariant?.product?.name ||
                               'Product'
                             }
                             fill
@@ -1035,21 +1034,21 @@ export default function FactoryOrderDetailsPage() {
                         <div className="flex items-start justify-between">
                           <div>
                             <h3 className="font-semibold">
-                              {item.design?.systemConfigVariant?.product?.name}
+                              {item.systemConfigVariant?.product?.name}
                             </h3>
                             <p className="text-muted-foreground text-sm">
-                              Size: {item.design?.systemConfigVariant?.size} •
+                              Size: {item.systemConfigVariant?.size} •
                               Color:{' '}
                               <span className="inline-flex items-center">
                                 <span
                                   className="mr-1 inline-block h-3 w-3 rounded-full"
                                   style={{
                                     backgroundColor:
-                                      item.design?.systemConfigVariant?.color ||
+                                      item.systemConfigVariant?.color ||
                                       'transparent',
                                   }}
                                 ></span>
-                                {item.design?.systemConfigVariant?.color}
+                                {item.systemConfigVariant?.color}
                               </span>
                             </p>
                           </div>

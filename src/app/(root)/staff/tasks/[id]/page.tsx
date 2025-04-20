@@ -410,8 +410,8 @@ export default function StaffCheckQualityDetailsPage() {
                   <SelectContent>
                     {orderDetails.map((detail, index) => (
                       <SelectItem key={detail.id} value={index.toString()}>
-                        {detail.design?.systemConfigVariant?.product?.name} -{' '}
-                        {detail.design?.systemConfigVariant?.size} (
+                        {detail.systemConfigVariant?.product?.name} -{' '}
+                        {detail.systemConfigVariant?.size} (
                         {detail.quantity} items)
                       </SelectItem>
                     ))}
@@ -464,7 +464,7 @@ export default function StaffCheckQualityDetailsPage() {
                           '/placeholder.svg?height=200&width=200'
                         }
                         alt={
-                          selectedOrderDetail.design?.systemConfigVariant
+                          selectedOrderDetail.systemConfigVariant
                             ?.product?.name || 'Product'
                         }
                         fill
@@ -475,7 +475,7 @@ export default function StaffCheckQualityDetailsPage() {
                   <div>
                     <h3 className="mb-1 text-lg font-semibold">
                       {
-                        selectedOrderDetail.design?.systemConfigVariant?.product
+                        selectedOrderDetail.systemConfigVariant?.product
                           ?.name
                       }
                     </h3>
@@ -484,7 +484,7 @@ export default function StaffCheckQualityDetailsPage() {
                         <p className="text-muted-foreground text-sm">Size</p>
                         <p className="font-medium">
                           {
-                            selectedOrderDetail.design?.systemConfigVariant
+                            selectedOrderDetail.systemConfigVariant
                               ?.size
                           }
                         </p>
@@ -496,12 +496,12 @@ export default function StaffCheckQualityDetailsPage() {
                             className="mr-1 inline-block h-3 w-3 rounded-full"
                             style={{
                               backgroundColor:
-                                selectedOrderDetail.design?.systemConfigVariant
+                                selectedOrderDetail.systemConfigVariant
                                   ?.color || 'transparent',
                             }}
                           ></span>
                           {
-                            selectedOrderDetail.design?.systemConfigVariant
+                            selectedOrderDetail.systemConfigVariant
                               ?.color
                           }
                         </p>
@@ -566,7 +566,7 @@ export default function StaffCheckQualityDetailsPage() {
                           </span>
                           <span className="font-medium">
                             {
-                              selectedOrderDetail.design?.systemConfigVariant
+                              selectedOrderDetail.systemConfigVariant
                                 ?.product?.name
                             }
                           </span>
@@ -577,7 +577,7 @@ export default function StaffCheckQualityDetailsPage() {
                           </span>
                           <span className="font-medium">
                             {
-                              selectedOrderDetail.design?.systemConfigVariant
+                              selectedOrderDetail.systemConfigVariant
                                 ?.size
                             }
                           </span>
@@ -597,7 +597,7 @@ export default function StaffCheckQualityDetailsPage() {
                               }}
                             ></span>
                             {
-                              selectedOrderDetail.design?.systemConfigVariant
+                              selectedOrderDetail.systemConfigVariant
                                 ?.color
                             }
                           </span>
