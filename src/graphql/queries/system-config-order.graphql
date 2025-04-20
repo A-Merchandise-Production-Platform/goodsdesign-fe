@@ -23,3 +23,9 @@ mutation UpdateSystemConfigOrder($updateConfigInput: UpdateSystemConfigOrderDto!
     id
   }
 }
+
+mutation ReassignNewStaffForOrder($newStaffId: String!, $orderId: String!) {
+  reassignNewStaffForOrder(newStaffId: $newStaffId, orderId: $orderId) {
+    id  
+  }
+}

@@ -2394,6 +2394,14 @@ export type UpdateSystemConfigOrderMutationVariables = Exact<{
 
 export type UpdateSystemConfigOrderMutation = { __typename?: 'Mutation', updateSystemConfigOrder: { __typename?: 'SystemConfigOrderEntity', id: string } };
 
+export type ReassignNewStaffForOrderMutationVariables = Exact<{
+  newStaffId: Scalars['String']['input'];
+  orderId: Scalars['String']['input'];
+}>;
+
+
+export type ReassignNewStaffForOrderMutation = { __typename?: 'Mutation', reassignNewStaffForOrder: { __typename?: 'OrderEntity', id: string } };
+
 export type GetSystemConfigVariantsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -7241,6 +7249,40 @@ export function useUpdateSystemConfigOrderMutation(baseOptions?: Apollo.Mutation
 export type UpdateSystemConfigOrderMutationHookResult = ReturnType<typeof useUpdateSystemConfigOrderMutation>;
 export type UpdateSystemConfigOrderMutationResult = Apollo.MutationResult<UpdateSystemConfigOrderMutation>;
 export type UpdateSystemConfigOrderMutationOptions = Apollo.BaseMutationOptions<UpdateSystemConfigOrderMutation, UpdateSystemConfigOrderMutationVariables>;
+export const ReassignNewStaffForOrderDocument = gql`
+    mutation ReassignNewStaffForOrder($newStaffId: String!, $orderId: String!) {
+  reassignNewStaffForOrder(newStaffId: $newStaffId, orderId: $orderId) {
+    id
+  }
+}
+    `;
+export type ReassignNewStaffForOrderMutationFn = Apollo.MutationFunction<ReassignNewStaffForOrderMutation, ReassignNewStaffForOrderMutationVariables>;
+
+/**
+ * __useReassignNewStaffForOrderMutation__
+ *
+ * To run a mutation, you first call `useReassignNewStaffForOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReassignNewStaffForOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [reassignNewStaffForOrderMutation, { data, loading, error }] = useReassignNewStaffForOrderMutation({
+ *   variables: {
+ *      newStaffId: // value for 'newStaffId'
+ *      orderId: // value for 'orderId'
+ *   },
+ * });
+ */
+export function useReassignNewStaffForOrderMutation(baseOptions?: Apollo.MutationHookOptions<ReassignNewStaffForOrderMutation, ReassignNewStaffForOrderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ReassignNewStaffForOrderMutation, ReassignNewStaffForOrderMutationVariables>(ReassignNewStaffForOrderDocument, options);
+      }
+export type ReassignNewStaffForOrderMutationHookResult = ReturnType<typeof useReassignNewStaffForOrderMutation>;
+export type ReassignNewStaffForOrderMutationResult = Apollo.MutationResult<ReassignNewStaffForOrderMutation>;
+export type ReassignNewStaffForOrderMutationOptions = Apollo.BaseMutationOptions<ReassignNewStaffForOrderMutation, ReassignNewStaffForOrderMutationVariables>;
 export const GetSystemConfigVariantsDocument = gql`
     query GetSystemConfigVariants {
   systemConfigVariants {
