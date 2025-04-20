@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import * as THREE from 'three';
 
-import { useGetProductInformationByIdQuery } from '@/graphql/generated/graphql';
+import { useGetProductVariantByIdQuery } from '@/graphql/generated/graphql';
 // Types
 import { DesignObject } from '@/types/design-object';
 
@@ -77,6 +77,7 @@ interface ProductDesignerComponentProps {
   designId?: string;
   uploadLoading?: boolean;
   thumbnailUrl?: string | null;
+  isInCart?: boolean;
 }
 
 export default function ProductDesigner({
@@ -91,6 +92,7 @@ export default function ProductDesigner({
   designId,
   uploadLoading,
   thumbnailUrl,
+  isInCart,
 }: ProductDesignerComponentProps) {
   // State for 3D model export
   const [modelExportCallback, setModelExportCallback] = useState<
@@ -140,7 +142,7 @@ export default function ProductDesigner({
     };
     setModelExportCallback(() => handleModelCapture);
   };
-  const { data: infoData } = useGetProductInformationByIdQuery({
+  const { data: infoData } = useGetProductVariantByIdQuery({
     variables: {
       productId: 'prod001',
     },
@@ -869,7 +871,8 @@ export default function ProductDesigner({
   // Generate initial thumbnail if none exists
   useEffect(() => {
     const generateInitialThumbnail = async () => {
-      if (!onThumbnail || thumbnailUrl !== null || !fabricCanvasRef.current) return;
+      if (!onThumbnail || thumbnailUrl !== null || !fabricCanvasRef.current)
+        return;
 
       const captureCallback = async (dataUrl: string) => {
         try {
@@ -1039,7 +1042,9 @@ export default function ProductDesigner({
   const handleColorChange = (texturePath: string) => {
     setCurrentTexture(texturePath);
     // Find matching color from SHIRT_COLORS and update selectedColor
-    const matchingColor = SHIRT_COLORS.find(color => color.path === texturePath);
+    const matchingColor = SHIRT_COLORS.find(
+      color => color.path === texturePath,
+    );
     if (matchingColor) {
       setSelectedColor(matchingColor.color);
     }
@@ -1241,6 +1246,7 @@ export default function ProductDesigner({
         quantity={cartQuantity}
         onIncrement={() => setCartQuantity(prev => Math.min(prev + 1, 99))}
         onDecrement={() => setCartQuantity(prev => Math.max(prev - 1, 1))}
+        isInCart={isInCart}
         onCreateCartItem={() => {
           try {
             if (onCreateCartItem && designId) {

@@ -29,6 +29,7 @@ interface DesignFooterProps {
   onDecrement: () => void;
   onCreateCartItem: () => void;
   loading?: boolean;
+  isInCart?: boolean;
 }
 
 const DesignFooter: React.FC<DesignFooterProps> = ({
@@ -39,6 +40,7 @@ const DesignFooter: React.FC<DesignFooterProps> = ({
   onDecrement,
   loading,
   onCreateCartItem,
+  isInCart,
 }) => {
   const activePositions = designPositions.filter(pos => pos.hasDesigns);
   const designsPositionsPrice = activePositions.reduce(
@@ -99,18 +101,22 @@ const DesignFooter: React.FC<DesignFooterProps> = ({
       <div className="flex items-center gap-4">
         <span className="text-sm">
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" onClick={onDecrement}>
+            <Button variant="outline" size="icon" onClick={onDecrement} disabled={isInCart}>
               <MinusCircle className="h-4 w-4" />
             </Button>
             <span className="w-8 text-center">{quantity}</span>
-            <Button variant="outline" size="icon" onClick={onIncrement}>
+            <Button variant="outline" size="icon" onClick={onIncrement} disabled={isInCart}>
               <PlusCircle className="h-4 w-4" />
             </Button>
           </div>
         </span>
-        <Button disabled={loading} onClick={onCreateCartItem}>
+        <Button
+          disabled={loading || isInCart}
+          onClick={onCreateCartItem}
+          className={isInCart ? "bg-muted hover:bg-muted cursor-not-allowed" : ""}
+        >
           {loading && <Loader2 className="animate-spin" />}
-          Add to cart
+          {isInCart ? "Added to cart" : "Add to cart"}
         </Button>
       </div>
     </div>
