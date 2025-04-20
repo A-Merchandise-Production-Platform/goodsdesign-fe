@@ -1,6 +1,12 @@
 'use client';
 
-import { useGetTemplateProductDesignsQuery } from '@/graphql/generated/graphql';
+import type React from 'react';
+
+import {
+  useGetTemplateProductDesignsQuery,
+  useRemoveProductDesignMutation,
+  useUpdateProductDesignMutation,
+} from '@/graphql/generated/graphql';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,11 +23,21 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Info, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { Info, MoreVertical, Pencil, Trash2, PlusCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { formatPrice } from '@/lib/utils';
+import { toast } from 'sonner';
 
 // Define types for our data
 interface PositionType {
@@ -70,11 +86,15 @@ interface Design {
 type FilterType = 'all' | 'public' | 'private';
 
 export default function Page() {
-  const { data, loading } = useGetTemplateProductDesignsQuery();
+  const { data, loading, refetch } = useGetTemplateProductDesignsQuery();
+  const [removeProductDesign] = useRemoveProductDesignMutation();
+  const [updatePublicStatus] = useUpdateProductDesignMutation();
   const router = useRouter();
   const [designs, setDesigns] = useState<Design[]>([]);
   const [filter, setFilter] = useState<FilterType>('all');
   const [filteredDesigns, setFilteredDesigns] = useState<Design[]>([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [designToDelete, setDesignToDelete] = useState<string | null>(null);
 
   // Initialize designs when data is loaded
   useEffect(() => {
@@ -112,8 +132,14 @@ export default function Page() {
     router.push(`/product/tshirt/${id}`);
   }
 
-  function handleTogglePublic(e: React.MouseEvent, designId: string): void {
+  function handleTogglePublic(
+    e: React.MouseEvent,
+    designId: string,
+    currentStatus: boolean,
+  ): void {
     e.stopPropagation();
+
+    // Optimistically update the UI
     setDesigns(prevDesigns =>
       prevDesigns.map(design =>
         design.id === designId
@@ -121,6 +147,31 @@ export default function Page() {
           : design,
       ),
     );
+
+    // Call the mutation to update the public status
+    updatePublicStatus({
+      variables: {
+        updateProductDesignId: designId,
+        input: {
+          isPublic: !currentStatus,
+        },
+      },
+      onCompleted: () => {
+        toast.success(`Design is now ${!currentStatus ? 'public' : 'private'}`);
+        refetch(); // Refresh data to ensure UI is in sync with server
+      },
+      onError: error => {
+        // Revert the optimistic update on error
+        setDesigns(prevDesigns =>
+          prevDesigns.map(design =>
+            design.id === designId
+              ? { ...design, isPublic: currentStatus }
+              : design,
+          ),
+        );
+        toast.error(`Failed to update status: ${error.message}`);
+      },
+    });
   }
 
   function handleEdit(e: React.MouseEvent, designId: string): void {
@@ -129,13 +180,34 @@ export default function Page() {
     router.push(`/product/tshirt/${designId}`);
   }
 
-  function handleDelete(e: React.MouseEvent, designId: string): void {
+  function openDeleteDialog(e: React.MouseEvent, designId: string): void {
     e.stopPropagation();
-    if (confirm('Are you sure you want to delete this design?')) {
-      setDesigns(prevDesigns =>
-        prevDesigns.filter(design => design.id !== designId),
-      );
-    }
+    setDesignToDelete(designId);
+    setDeleteDialogOpen(true);
+  }
+
+  function confirmDelete(): void {
+    if (!designToDelete) return;
+
+    // Call the mutation to remove the design
+    removeProductDesign({
+      variables: {
+        removeProductDesignId: designToDelete,
+      },
+      onCompleted: () => {
+        refetch();
+        setDeleteDialogOpen(false);
+        setDesignToDelete(null);
+        toast.success('Design deleted successfully!');
+      },
+      onError: error => {
+        toast.error(`Error deleting design: ${error.message}`);
+      },
+    });
+  }
+
+  function handleCreateNew(): void {
+    router.push('/product/tshirt/new');
   }
 
   return (
@@ -169,6 +241,19 @@ export default function Page() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      ) : filteredDesigns.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="bg-muted mb-4 rounded-full p-3">
+            <PlusCircle className="text-muted-foreground h-10 w-10" />
+          </div>
+          <h3 className="mb-2 text-xl font-semibold">No designs found</h3>
+          <p className="text-muted-foreground mb-6 max-w-md">
+            {filter !== 'all'
+              ? `There are no ${filter} designs available. Try changing your filter or create a new design.`
+              : "You don't have any template product designs yet. Create your first design to get started."}
+          </p>
+          <Button onClick={handleCreateNew}>Create New Design</Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -234,13 +319,17 @@ export default function Page() {
                             const event = {
                               stopPropagation: () => {},
                             } as React.MouseEvent;
-                            handleTogglePublic(event, design.id);
+                            handleTogglePublic(
+                              event,
+                              design.id,
+                              design.isPublic,
+                            );
                           }}
                         />
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-destructive focus:text-destructive"
-                        onClick={e => handleDelete(e, design.id)}
+                        onClick={e => openDeleteDialog(e, design.id)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
@@ -249,27 +338,7 @@ export default function Page() {
                   </DropdownMenu>
                 </div>
               </div>
-              <CardContent className="">
-                <div className="mb-3 flex flex-wrap gap-2">
-                  {design.isPublic ? (
-                    <Badge
-                      variant="outline"
-                      className="border-green-200 bg-green-50 text-green-700"
-                    >
-                      Public
-                    </Badge>
-                  ) : (
-                    <Badge
-                      variant="outline"
-                      className="border-gray-200 bg-gray-50 text-gray-700"
-                    >
-                      Private
-                    </Badge>
-                  )}
-                  {design.isFinalized && (
-                    <Badge variant="outline">Finalized</Badge>
-                  )}
-                </div>
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div
@@ -280,6 +349,24 @@ export default function Page() {
                       }}
                       title={design.systemConfigVariant?.color}
                     />
+                    {design.isPublic ? (
+                      <Badge
+                        variant="outline"
+                        className="border-green-200 bg-green-50 text-green-700"
+                      >
+                        Public
+                      </Badge>
+                    ) : (
+                      <Badge
+                        variant="outline"
+                        className="border-gray-200 bg-gray-50 text-gray-700"
+                      >
+                        Private
+                      </Badge>
+                    )}
+                    {design.isFinalized && (
+                      <Badge variant="outline">Finalized</Badge>
+                    )}
                   </div>
 
                   {design.systemConfigVariant && (
@@ -331,7 +418,7 @@ export default function Page() {
                           </div>
                         </PopoverContent>
                       </Popover>
-                      <p className="mr-1 text-lg font-medium">
+                      <p className="text-lg font-medium">
                         {formatPrice(calculateTotalPrice(design))}
                       </p>
                     </div>
@@ -342,6 +429,30 @@ export default function Page() {
           ))}
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this design? This action cannot be
+              undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

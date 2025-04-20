@@ -2240,6 +2240,13 @@ export type UpdateProductDesignMutationVariables = Exact<{
 
 export type UpdateProductDesignMutation = { __typename?: 'Mutation', updateProductDesign: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null } };
 
+export type RemoveProductDesignMutationVariables = Exact<{
+  removeProductDesignId: Scalars['ID']['input'];
+}>;
+
+
+export type RemoveProductDesignMutation = { __typename?: 'Mutation', removeProductDesign: { __typename?: 'ProductDesignEntity', id: string, isFinalized: boolean, isPublic: boolean, isTemplate: boolean } };
+
 export type UpdateThumbnailProductDesignMutationVariables = Exact<{
   updateProductDesignId: Scalars['String']['input'];
   input: UpdateProductDesignDto;
@@ -6209,6 +6216,42 @@ export function useUpdateProductDesignMutation(baseOptions?: Apollo.MutationHook
 export type UpdateProductDesignMutationHookResult = ReturnType<typeof useUpdateProductDesignMutation>;
 export type UpdateProductDesignMutationResult = Apollo.MutationResult<UpdateProductDesignMutation>;
 export type UpdateProductDesignMutationOptions = Apollo.BaseMutationOptions<UpdateProductDesignMutation, UpdateProductDesignMutationVariables>;
+export const RemoveProductDesignDocument = gql`
+    mutation RemoveProductDesign($removeProductDesignId: ID!) {
+  removeProductDesign(id: $removeProductDesignId) {
+    id
+    isFinalized
+    isPublic
+    isTemplate
+  }
+}
+    `;
+export type RemoveProductDesignMutationFn = Apollo.MutationFunction<RemoveProductDesignMutation, RemoveProductDesignMutationVariables>;
+
+/**
+ * __useRemoveProductDesignMutation__
+ *
+ * To run a mutation, you first call `useRemoveProductDesignMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveProductDesignMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeProductDesignMutation, { data, loading, error }] = useRemoveProductDesignMutation({
+ *   variables: {
+ *      removeProductDesignId: // value for 'removeProductDesignId'
+ *   },
+ * });
+ */
+export function useRemoveProductDesignMutation(baseOptions?: Apollo.MutationHookOptions<RemoveProductDesignMutation, RemoveProductDesignMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveProductDesignMutation, RemoveProductDesignMutationVariables>(RemoveProductDesignDocument, options);
+      }
+export type RemoveProductDesignMutationHookResult = ReturnType<typeof useRemoveProductDesignMutation>;
+export type RemoveProductDesignMutationResult = Apollo.MutationResult<RemoveProductDesignMutation>;
+export type RemoveProductDesignMutationOptions = Apollo.BaseMutationOptions<RemoveProductDesignMutation, RemoveProductDesignMutationVariables>;
 export const UpdateThumbnailProductDesignDocument = gql`
     mutation UpdateThumbnailProductDesign($updateProductDesignId: String!, $input: UpdateProductDesignDto!, $fileUrl: String!) {
   updateProductDesign(id: $updateProductDesignId, input: $input) {
