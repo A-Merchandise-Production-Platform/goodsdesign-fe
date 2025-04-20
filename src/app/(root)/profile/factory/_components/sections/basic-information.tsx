@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import { CalendarIcon, HelpCircle } from 'lucide-react';
+import { useContext } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
@@ -38,7 +39,6 @@ import {
   RequiredFieldsContext,
   RequiredIndicator,
 } from '../update-factory-form';
-import { useContext } from 'react';
 
 interface BasicInformationProps {
   form: UseFormReturn<FactoryFormValues>;

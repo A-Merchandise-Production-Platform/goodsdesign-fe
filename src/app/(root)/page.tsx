@@ -1,5 +1,8 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+
 import { Sidebar } from '@/components/shared/sidebar';
 import {
   Roles,
@@ -7,13 +10,11 @@ import {
   useGetAllProductsQuery,
   useGetTemplateProductDesignsQuery,
 } from '@/graphql/generated/graphql';
+import { useAuthStore } from '@/stores/auth.store';
 
 import { DesignSection } from './_components/design-section';
 import { ProductSection } from './_components/product-section';
 import { PromotionalBanner } from './_components/promotional-banner';
-import { useAuthStore } from '@/stores/auth.store';
-import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const router = useRouter();

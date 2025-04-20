@@ -1,10 +1,11 @@
+import React from 'react';
+
 import { Separator } from '@/components/ui/separator';
 import {
   GetProductByIdQuery,
   GetProductByIdQueryResult,
 } from '@/graphql/generated/graphql';
 import { formatPrice } from '@/lib/utils';
-import React from 'react';
 
 export default function DetailsTab({
   product,

@@ -2,6 +2,7 @@
 
 import { type ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -14,7 +15,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import { type Product } from './product-table';
-import Link from 'next/link';
 
 export const columns: ColumnDef<Product>[] = [
   {

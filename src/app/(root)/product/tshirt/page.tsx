@@ -15,12 +15,12 @@ import {
   useGetProductVariantByIdQuery,
 } from '@/graphql/generated/graphql';
 import { formatPrice } from '@/lib/utils';
+import { useAuthStore } from '@/stores/auth.store';
 
 import { ColorSelector } from '../_components/color-selector';
 import { ModelSelector } from '../_components/model-selector';
 import { ProductImageGallery } from '../_components/product-image-gallery';
 import { VolumeDiscount } from '../_components/volume-discount';
-import { useAuthStore } from '@/stores/auth.store';
 
 interface TShirtProduct {
   name: string;

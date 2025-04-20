@@ -1,7 +1,14 @@
 'use client';
 
-import { useGetProductByIdQuery } from '@/graphql/generated/graphql';
+import { ArrowLeft, Edit, Package, Tag, Trash } from 'lucide-react';
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
+
+import DetailsTab from '@/app/(root)/admin/products/[id]/_components/details-tab';
+import DiscountTab from '@/app/(root)/admin/products/[id]/_components/discount-tab';
+import VarriantsTab from '@/app/(root)/admin/products/[id]/_components/varriants-tab';
+import { DashboardShell } from '@/components/dashboard-shell';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -10,16 +17,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Edit, Package, Tag, Trash } from 'lucide-react';
-import Image from 'next/image';
-import { formatPrice } from '@/lib/utils';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { DashboardShell } from '@/components/dashboard-shell';
-import DetailsTab from '@/app/(root)/admin/products/[id]/_components/details-tab';
-import VarriantsTab from '@/app/(root)/admin/products/[id]/_components/varriants-tab';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useGetProductByIdQuery } from '@/graphql/generated/graphql';
+import { formatPrice } from '@/lib/utils';
 
 export default function ProductDetailPage() {
   const router = useRouter();
@@ -112,6 +114,7 @@ export default function ProductDetailPage() {
               <TabsList className="mb-4">
                 <TabsTrigger value="details">Details</TabsTrigger>
                 <TabsTrigger value="variants">Variants</TabsTrigger>
+                <TabsTrigger value="discount">Discount</TabsTrigger>
               </TabsList>
 
               <TabsContent value="details" className="space-y-4">
@@ -120,6 +123,10 @@ export default function ProductDetailPage() {
 
               <TabsContent value="variants">
                 <VarriantsTab product={product} />
+              </TabsContent>
+
+              <TabsContent value="discount">
+                <DiscountTab />
               </TabsContent>
             </Tabs>
           </CardContent>

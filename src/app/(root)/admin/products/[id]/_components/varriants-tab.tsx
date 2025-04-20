@@ -1,8 +1,9 @@
-import { GetProductByIdQuery } from '@/graphql/generated/graphql';
-import { formatPrice } from '@/lib/utils';
 import { Package } from 'lucide-react';
 import React from 'react';
+
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { GetProductByIdQuery } from '@/graphql/generated/graphql';
+import { formatPrice } from '@/lib/utils';
 
 export default function VarriantsTab({
   product,

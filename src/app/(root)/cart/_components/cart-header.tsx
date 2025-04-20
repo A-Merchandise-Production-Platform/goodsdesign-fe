@@ -6,7 +6,11 @@ interface CartHeaderProps {
   onToggleAll: (checked: boolean) => void;
 }
 
-export function CartHeader({ itemCount, areAllItemsSelected, onToggleAll }: CartHeaderProps) {
+export function CartHeader({
+  itemCount,
+  areAllItemsSelected,
+  onToggleAll,
+}: CartHeaderProps) {
   return (
     <>
       <h1 className="mb-6 text-2xl font-bold">

@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/table';
 import { useGetMyOrdersQuery } from '@/graphql/generated/graphql';
 import { formatDate, formatPrice } from '@/lib/utils';
+
 import { getStatusBadge } from '../_components/order-status';
 
 export default function MyOrderPage() {

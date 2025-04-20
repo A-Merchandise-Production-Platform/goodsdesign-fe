@@ -1,6 +1,6 @@
 'use client';
 
-import { UsersIcon, UserPlusIcon, UserCheckIcon } from 'lucide-react';
+import { UserCheckIcon, UserPlusIcon, UsersIcon } from 'lucide-react';
 
 import UserTable from '@/app/(root)/admin/users/_components/user-table';
 import { StatCard } from '@/components/stat-card';

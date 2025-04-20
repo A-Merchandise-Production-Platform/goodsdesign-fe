@@ -1,6 +1,6 @@
 'use client';
 
-import { FolderIcon, FolderPlusIcon, FolderCheckIcon } from 'lucide-react';
+import { FolderCheckIcon, FolderIcon, FolderPlusIcon } from 'lucide-react';
 
 import CategoryTable from '@/app/(root)/admin/categories/_components/category-table';
 import { StatCard } from '@/components/stat-card';

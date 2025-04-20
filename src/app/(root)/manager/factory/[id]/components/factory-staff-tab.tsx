@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Mail, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import MyAvatar from '@/components/shared/my-avatar';
 import { Badge } from '@/components/ui/badge';

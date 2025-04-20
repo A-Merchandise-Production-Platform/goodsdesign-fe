@@ -8,8 +8,10 @@ import {
   PackageIcon,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
+import { DashboardShell } from '@/components/dashboard-shell';
+import { StatCard } from '@/components/stat-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,12 +34,11 @@ import {
   useGetAllOrdersQuery,
   useGetManagerOrderDashboardQuery,
 } from '@/graphql/generated/graphql';
-import { formatDate } from '@/lib/utils';
-import { StatCard } from '@/components/stat-card';
 import { calculateChange } from '@/lib/calculate-change';
-import { DashboardShell } from '@/components/dashboard-shell';
-import { OrderSearch } from './_components/OrderSearch';
+import { formatDate } from '@/lib/utils';
+
 import { OrderFilter } from './_components/OrderFilter';
+import { OrderSearch } from './_components/OrderSearch';
 
 export default function ManagerOrdersPage() {
   const { data, loading } = useGetAllOrdersQuery();

@@ -10,6 +10,7 @@ import {
   UsersIcon,
 } from 'lucide-react';
 
+import { DashboardShell } from '@/components/dashboard-shell';
 import { StatCard } from '@/components/stat-card';
 import {
   Card,
@@ -23,7 +24,6 @@ import {
   useGetAdminDashboardQuery,
 } from '@/graphql/generated/graphql';
 import { formatPrice } from '@/lib/utils';
-import { DashboardShell } from '@/components/dashboard-shell';
 
 // Define types for all data structures
 type StatCardType = {

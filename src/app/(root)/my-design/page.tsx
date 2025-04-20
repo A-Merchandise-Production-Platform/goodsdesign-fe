@@ -3,16 +3,16 @@
 import { Plus, Search } from 'lucide-react';
 import Link from 'next/link';
 
+import ErrorPage from '@/components/shared/error-page';
 import { Sidebar } from '@/components/shared/sidebar';
 import { Button } from '@/components/ui/button';
 import {
   Roles,
   useProductDesignsByUserQuery,
 } from '@/graphql/generated/graphql';
+import { useAuthStore } from '@/stores/auth.store';
 
 import { DesignCard } from './_components/design-card';
-import { useAuthStore } from '@/stores/auth.store';
-import ErrorPage from '@/components/shared/error-page';
 
 export default function MyDesignPage() {
   const { data, loading } = useProductDesignsByUserQuery();

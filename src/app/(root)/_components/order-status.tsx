@@ -1,7 +1,12 @@
+import {
+  CheckCircle2,
+  ClipboardList,
+  FileText,
+  Package,
+  Truck,
+} from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Truck } from 'lucide-react';
-import { ClipboardList, Package } from 'lucide-react';
-import { FileText } from 'lucide-react';
 
 export const getStatusBadge = (status: string) => {
   const statusMap: Record<
@@ -84,11 +89,7 @@ export const orderStatusSteps = [
   },
   {
     group: 'quality',
-    statuses: [
-      'WAITING_FOR_CHECKING_QUALITY',
-      'REWORK_REQUIRED',
-      ,
-    ],
+    statuses: ['WAITING_FOR_CHECKING_QUALITY', 'REWORK_REQUIRED', ,],
     label: 'Quality Check',
     icon: CheckCircle2,
   },
