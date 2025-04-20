@@ -626,7 +626,7 @@ export default function OrderDetailsPage() {
                               '/placeholder.svg?height=200&width=200'
                             }
                             alt={
-                              item.design?.systemConfigVariant?.product?.name ||
+                              item.systemConfigVariant?.product?.name ||
                               'Product'
                             }
                             fill
@@ -638,21 +638,21 @@ export default function OrderDetailsPage() {
                         <div className="flex items-start justify-between">
                           <div>
                             <h3 className="font-semibold">
-                              {item.design?.systemConfigVariant?.product?.name}
+                              {item.systemConfigVariant?.product?.name}
                             </h3>
                             <p className="text-muted-foreground text-sm">
-                              Size: {item.design?.systemConfigVariant?.size} •
+                              Size: {item.systemConfigVariant?.size} •
                               Color:{' '}
                               <span className="inline-flex items-center">
                                 <span
                                   className="mr-1 inline-block h-3 w-3 rounded-full"
                                   style={{
                                     backgroundColor:
-                                      item.design?.systemConfigVariant?.color ||
+                                      item.systemConfigVariant?.color ||
                                       'transparent',
                                   }}
                                 ></span>
-                                {item.design?.systemConfigVariant?.color}
+                                {item.systemConfigVariant?.color}
                               </span>
                             </p>
                           </div>
