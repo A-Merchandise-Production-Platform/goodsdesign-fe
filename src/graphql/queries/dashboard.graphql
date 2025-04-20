@@ -47,3 +47,44 @@ query GetManagerOrderDashboard {
     totalOrders
   }
 }
+
+query GetFactoryDetailDashboard($factoryId: String!) {
+  getFactoryDetailDashboard(factoryId: $factoryId) {
+    inProductionOrders
+    lastMonthInProductionOrders
+    lastMonthPendingOrders
+    lastMonthTotalOrders
+    lastMonthTotalRevenue
+    pendingOrders
+    productionProgress {
+      id
+      status
+      createdAt
+      totalProductionCost
+    }
+    qualityIssues {
+      id
+      reportedAt
+      issueType
+      status
+      description
+      factoryOrder {
+        id
+        status
+      }
+    }
+    recentOrders {
+      id
+      status
+      totalProductionCost
+      createdAt
+      customerOrder {
+        id
+        status
+        totalPrice
+      }
+    }
+    totalOrders
+    totalRevenue
+  }
+}

@@ -201,7 +201,7 @@ export default function FactoryOrderDetailsPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <CardTitle className="text-2xl font-bold">
-                Order #{order.id.substring(0, 8)}
+                Order #{order.id}
               </CardTitle>
               <CardDescription className="mt-2">
                 <div className="flex items-center">
