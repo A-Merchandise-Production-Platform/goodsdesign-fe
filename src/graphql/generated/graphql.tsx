@@ -586,6 +586,7 @@ export type Mutation = {
   updateProfile: UserEntity;
   updateSystemConfigBank: SystemConfigBankEntity;
   updateSystemConfigDiscount: SystemConfigDiscountEntity;
+  updateSystemConfigOrder: SystemConfigOrderEntity;
   updateSystemConfigVariant: SystemConfigVariantEntity;
   updateUser: UserEntity;
   uploadFile: FileUploadResponse;
@@ -962,6 +963,11 @@ export type MutationUpdateSystemConfigDiscountArgs = {
 };
 
 
+export type MutationUpdateSystemConfigOrderArgs = {
+  updateConfigInput: UpdateSystemConfigOrderDto;
+};
+
+
 export type MutationUpdateSystemConfigVariantArgs = {
   updateSystemConfigVariantInput: UpdateSystemConfigVariantInput;
 };
@@ -1272,6 +1278,7 @@ export type Query = {
   systemConfigBanks: Array<SystemConfigBankEntity>;
   systemConfigDiscount: SystemConfigDiscountEntity;
   systemConfigDiscounts: Array<SystemConfigDiscountEntity>;
+  systemConfigOrder: SystemConfigOrderEntity;
   systemConfigVariant: SystemConfigVariantEntity;
   systemConfigVariants: Array<SystemConfigVariantEntity>;
   systemConfigVariantsByProduct: Array<SystemConfigVariantEntity>;
@@ -1579,6 +1586,27 @@ export type SystemConfigDiscountEntity = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type SystemConfigOrderEntity = {
+  __typename?: 'SystemConfigOrderEntity';
+  acceptHoursForFactory: Scalars['Int']['output'];
+  capacityScoreWeight: Scalars['Float']['output'];
+  checkQualityTimesDays: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  leadTimeScoreWeight: Scalars['Float']['output'];
+  legitPointScoreWeight: Scalars['Float']['output'];
+  legitPointToSuspend: Scalars['Int']['output'];
+  limitFactoryRejectOrders: Scalars['Int']['output'];
+  limitReworkTimes: Scalars['Int']['output'];
+  maxLegitPoint: Scalars['Int']['output'];
+  maxProductionCapacity: Scalars['Int']['output'];
+  maxProductionTimeInMinutes: Scalars['Int']['output'];
+  productionCapacityScoreWeight: Scalars['Float']['output'];
+  reduceLegitPointIfReject: Scalars['Int']['output'];
+  shippingDays: Scalars['Int']['output'];
+  specializationScoreWeight: Scalars['Float']['output'];
+  type: Scalars['String']['output'];
+};
+
 export type SystemConfigVariantEntity = {
   __typename?: 'SystemConfigVariantEntity';
   color?: Maybe<Scalars['String']['output']>;
@@ -1744,6 +1772,24 @@ export type UpdateSystemConfigDiscountDto = {
   minQuantity?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   productId?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateSystemConfigOrderDto = {
+  acceptHoursForFactory?: InputMaybe<Scalars['Int']['input']>;
+  capacityScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  checkQualityTimesDays?: InputMaybe<Scalars['Int']['input']>;
+  leadTimeScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  legitPointScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  legitPointToSuspend?: InputMaybe<Scalars['Int']['input']>;
+  limitFactoryRejectOrders?: InputMaybe<Scalars['Int']['input']>;
+  limitReworkTimes?: InputMaybe<Scalars['Int']['input']>;
+  maxLegitPoint?: InputMaybe<Scalars['Int']['input']>;
+  maxProductionCapacity?: InputMaybe<Scalars['Int']['input']>;
+  maxProductionTimeInMinutes?: InputMaybe<Scalars['Int']['input']>;
+  productionCapacityScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  reduceLegitPointIfReject?: InputMaybe<Scalars['Int']['input']>;
+  shippingDays?: InputMaybe<Scalars['Int']['input']>;
+  specializationScoreWeight?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type UpdateSystemConfigVariantInput = {

@@ -277,7 +277,7 @@ export const CartItem: FC<CartItemProps> = ({
                             )}
                             <div className="flex items-center justify-between font-medium">
                               <span className="text-sm">Total:</span>
-                              <span>{formatPrice(priceInfo.totalPrice)}</span>
+                              <span>{formatPrice(priceInfo.unitPrice)}</span>
                               </div>
                           </div>
                         </PopoverContent>
