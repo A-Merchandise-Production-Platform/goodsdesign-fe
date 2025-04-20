@@ -1168,6 +1168,7 @@ export type ProductDesignEntity = {
   createdAt: Scalars['DateTime']['output'];
   designPositions?: Maybe<Array<DesignPositionEntity>>;
   id: Scalars['ID']['output'];
+  isDeleted?: Maybe<Scalars['Boolean']['output']>;
   isFinalized: Scalars['Boolean']['output'];
   isPublic: Scalars['Boolean']['output'];
   isTemplate: Scalars['Boolean']['output'];
@@ -2216,7 +2217,7 @@ export type ProductDesignsQuery = { __typename?: 'Query', productDesigns: Array<
 export type ProductDesignsByUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ProductDesignsByUserQuery = { __typename?: 'Query', productDesignsByUser: Array<{ __typename?: 'ProductDesignEntity', id: string, thumbnailUrl?: string | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', price?: number | null, product: { __typename?: 'ProductEntity', name: string, category?: { __typename?: 'CategoryEntity', name: string } | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null }> };
+export type ProductDesignsByUserQuery = { __typename?: 'Query', productDesignsByUser: Array<{ __typename?: 'ProductDesignEntity', id: string, isPublic: boolean, isTemplate: boolean, isFinalized: boolean, thumbnailUrl?: string | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, category?: { __typename?: 'CategoryEntity', name: string } | null } } | null }> };
 
 export type ProductDesignByIdQueryVariables = Exact<{
   productDesignId: Scalars['ID']['input'];
@@ -2245,7 +2246,7 @@ export type RemoveProductDesignMutationVariables = Exact<{
 }>;
 
 
-export type RemoveProductDesignMutation = { __typename?: 'Mutation', removeProductDesign: { __typename?: 'ProductDesignEntity', id: string, isFinalized: boolean, isPublic: boolean, isTemplate: boolean } };
+export type RemoveProductDesignMutation = { __typename?: 'Mutation', removeProductDesign: { __typename?: 'ProductDesignEntity', id: string, isDeleted?: boolean | null, isFinalized: boolean, isPublic: boolean, isTemplate: boolean } };
 
 export type UpdateThumbnailProductDesignMutationVariables = Exact<{
   updateProductDesignId: Scalars['String']['input'];
@@ -6026,16 +6027,10 @@ export const ProductDesignsByUserDocument = gql`
     query ProductDesignsByUser {
   productDesignsByUser {
     id
+    isPublic
+    isTemplate
+    isFinalized
     thumbnailUrl
-    systemConfigVariant {
-      price
-      product {
-        name
-        category {
-          name
-        }
-      }
-    }
     designPositions {
       positionType {
         id
@@ -6043,6 +6038,19 @@ export const ProductDesignsByUserDocument = gql`
         basePrice
       }
       designJSON
+    }
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+      product {
+        name
+        category {
+          name
+        }
+      }
     }
   }
 }
@@ -6220,6 +6228,7 @@ export const RemoveProductDesignDocument = gql`
     mutation RemoveProductDesign($removeProductDesignId: ID!) {
   removeProductDesign(id: $removeProductDesignId) {
     id
+    isDeleted
     isFinalized
     isPublic
     isTemplate

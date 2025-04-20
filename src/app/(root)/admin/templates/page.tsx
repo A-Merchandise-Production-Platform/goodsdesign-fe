@@ -154,14 +154,15 @@ export default function Page() {
         updateProductDesignId: designId,
         input: {
           isPublic: !currentStatus,
+          isTemplate: true,
+          isFinalized: false,
         },
       },
       onCompleted: () => {
         toast.success(`Design is now ${!currentStatus ? 'public' : 'private'}`);
-        refetch(); // Refresh data to ensure UI is in sync with server
+        refetch();
       },
       onError: error => {
-        // Revert the optimistic update on error
         setDesigns(prevDesigns =>
           prevDesigns.map(design =>
             design.id === designId
