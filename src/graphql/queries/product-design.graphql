@@ -24,16 +24,10 @@ query ProductDesigns {
 query ProductDesignsByUser {
   productDesignsByUser {
     id
+    isPublic
+    isTemplate
+    isFinalized
     thumbnailUrl
-    systemConfigVariant {
-      price
-      product {
-        name
-        category {
-          name
-        }
-      }
-    }
     designPositions {
       positionType {
         id
@@ -42,12 +36,28 @@ query ProductDesignsByUser {
       }
       designJSON
     }
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+      product {
+        name
+        category {
+          name
+        }
+      }
+    }
   }
 }
 
 query ProductDesignById($productDesignId: ID!) {
   productDesign(id: $productDesignId) {
     thumbnailUrl
+    isFinalized
+    isPublic
+    isTemplate
     systemConfigVariant {
       id
       price
@@ -96,6 +106,16 @@ mutation UpdateProductDesign(
   }
 }
 
+mutation RemoveProductDesign($removeProductDesignId: ID!) {
+  removeProductDesign(id: $removeProductDesignId) {
+    id
+    isDeleted
+    isFinalized
+    isPublic
+    isTemplate
+  }
+}
+
 mutation UpdateThumbnailProductDesign(
   $updateProductDesignId: String!
   $input: UpdateProductDesignDto!
@@ -122,6 +142,19 @@ query GetTemplateProductDesigns {
         basePrice
       }
       designJSON
+    }
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+      product {
+        name
+        category {
+          name
+        }
+      }
     }
   }
 }

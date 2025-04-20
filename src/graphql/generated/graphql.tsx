@@ -1168,6 +1168,7 @@ export type ProductDesignEntity = {
   createdAt: Scalars['DateTime']['output'];
   designPositions?: Maybe<Array<DesignPositionEntity>>;
   id: Scalars['ID']['output'];
+  isDeleted?: Maybe<Scalars['Boolean']['output']>;
   isFinalized: Scalars['Boolean']['output'];
   isPublic: Scalars['Boolean']['output'];
   isTemplate: Scalars['Boolean']['output'];
@@ -2216,14 +2217,14 @@ export type ProductDesignsQuery = { __typename?: 'Query', productDesigns: Array<
 export type ProductDesignsByUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ProductDesignsByUserQuery = { __typename?: 'Query', productDesignsByUser: Array<{ __typename?: 'ProductDesignEntity', id: string, thumbnailUrl?: string | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', price?: number | null, product: { __typename?: 'ProductEntity', name: string, category?: { __typename?: 'CategoryEntity', name: string } | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null }> };
+export type ProductDesignsByUserQuery = { __typename?: 'Query', productDesignsByUser: Array<{ __typename?: 'ProductDesignEntity', id: string, isPublic: boolean, isTemplate: boolean, isFinalized: boolean, thumbnailUrl?: string | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, category?: { __typename?: 'CategoryEntity', name: string } | null } } | null }> };
 
 export type ProductDesignByIdQueryVariables = Exact<{
   productDesignId: Scalars['ID']['input'];
 }>;
 
 
-export type ProductDesignByIdQuery = { __typename?: 'Query', productDesign: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null } };
+export type ProductDesignByIdQuery = { __typename?: 'Query', productDesign: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, isFinalized: boolean, isPublic: boolean, isTemplate: boolean, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null } };
 
 export type CreateProductDesignMutationVariables = Exact<{
   input: CreateProductDesignDto;
@@ -2240,6 +2241,13 @@ export type UpdateProductDesignMutationVariables = Exact<{
 
 export type UpdateProductDesignMutation = { __typename?: 'Mutation', updateProductDesign: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null } };
 
+export type RemoveProductDesignMutationVariables = Exact<{
+  removeProductDesignId: Scalars['ID']['input'];
+}>;
+
+
+export type RemoveProductDesignMutation = { __typename?: 'Mutation', removeProductDesign: { __typename?: 'ProductDesignEntity', id: string, isDeleted?: boolean | null, isFinalized: boolean, isPublic: boolean, isTemplate: boolean } };
+
 export type UpdateThumbnailProductDesignMutationVariables = Exact<{
   updateProductDesignId: Scalars['String']['input'];
   input: UpdateProductDesignDto;
@@ -2252,7 +2260,7 @@ export type UpdateThumbnailProductDesignMutation = { __typename?: 'Mutation', de
 export type GetTemplateProductDesignsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTemplateProductDesignsQuery = { __typename?: 'Query', getTemplateProductDesigns: Array<{ __typename?: 'ProductDesignEntity', id: string, isPublic: boolean, isTemplate: boolean, isFinalized: boolean, thumbnailUrl?: string | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null }> };
+export type GetTemplateProductDesignsQuery = { __typename?: 'Query', getTemplateProductDesigns: Array<{ __typename?: 'ProductDesignEntity', id: string, isPublic: boolean, isTemplate: boolean, isFinalized: boolean, thumbnailUrl?: string | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, category?: { __typename?: 'CategoryEntity', name: string } | null } } | null }> };
 
 export type DuplicateProductDesignMutationVariables = Exact<{
   duplicateProductDesignId: Scalars['ID']['input'];
@@ -6027,16 +6035,10 @@ export const ProductDesignsByUserDocument = gql`
     query ProductDesignsByUser {
   productDesignsByUser {
     id
+    isPublic
+    isTemplate
+    isFinalized
     thumbnailUrl
-    systemConfigVariant {
-      price
-      product {
-        name
-        category {
-          name
-        }
-      }
-    }
     designPositions {
       positionType {
         id
@@ -6044,6 +6046,19 @@ export const ProductDesignsByUserDocument = gql`
         basePrice
       }
       designJSON
+    }
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+      product {
+        name
+        category {
+          name
+        }
+      }
     }
   }
 }
@@ -6084,6 +6099,9 @@ export const ProductDesignByIdDocument = gql`
     query ProductDesignById($productDesignId: ID!) {
   productDesign(id: $productDesignId) {
     thumbnailUrl
+    isFinalized
+    isPublic
+    isTemplate
     systemConfigVariant {
       id
       price
@@ -6217,6 +6235,43 @@ export function useUpdateProductDesignMutation(baseOptions?: Apollo.MutationHook
 export type UpdateProductDesignMutationHookResult = ReturnType<typeof useUpdateProductDesignMutation>;
 export type UpdateProductDesignMutationResult = Apollo.MutationResult<UpdateProductDesignMutation>;
 export type UpdateProductDesignMutationOptions = Apollo.BaseMutationOptions<UpdateProductDesignMutation, UpdateProductDesignMutationVariables>;
+export const RemoveProductDesignDocument = gql`
+    mutation RemoveProductDesign($removeProductDesignId: ID!) {
+  removeProductDesign(id: $removeProductDesignId) {
+    id
+    isDeleted
+    isFinalized
+    isPublic
+    isTemplate
+  }
+}
+    `;
+export type RemoveProductDesignMutationFn = Apollo.MutationFunction<RemoveProductDesignMutation, RemoveProductDesignMutationVariables>;
+
+/**
+ * __useRemoveProductDesignMutation__
+ *
+ * To run a mutation, you first call `useRemoveProductDesignMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveProductDesignMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeProductDesignMutation, { data, loading, error }] = useRemoveProductDesignMutation({
+ *   variables: {
+ *      removeProductDesignId: // value for 'removeProductDesignId'
+ *   },
+ * });
+ */
+export function useRemoveProductDesignMutation(baseOptions?: Apollo.MutationHookOptions<RemoveProductDesignMutation, RemoveProductDesignMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveProductDesignMutation, RemoveProductDesignMutationVariables>(RemoveProductDesignDocument, options);
+      }
+export type RemoveProductDesignMutationHookResult = ReturnType<typeof useRemoveProductDesignMutation>;
+export type RemoveProductDesignMutationResult = Apollo.MutationResult<RemoveProductDesignMutation>;
+export type RemoveProductDesignMutationOptions = Apollo.BaseMutationOptions<RemoveProductDesignMutation, RemoveProductDesignMutationVariables>;
 export const UpdateThumbnailProductDesignDocument = gql`
     mutation UpdateThumbnailProductDesign($updateProductDesignId: String!, $input: UpdateProductDesignDto!, $fileUrl: String!) {
   updateProductDesign(id: $updateProductDesignId, input: $input) {
@@ -6268,6 +6323,19 @@ export const GetTemplateProductDesignsDocument = gql`
         basePrice
       }
       designJSON
+    }
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+      product {
+        name
+        category {
+          name
+        }
+      }
     }
   }
 }

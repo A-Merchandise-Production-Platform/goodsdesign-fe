@@ -1,9 +1,8 @@
 'use client';
 
-import { Check, FilterIcon } from 'lucide-react';
+import { FilterIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
