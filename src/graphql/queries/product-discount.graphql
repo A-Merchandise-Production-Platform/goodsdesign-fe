@@ -1,9 +1,12 @@
 query GetAllDiscountByProductId($productId: String!) {
   getAllDiscountByProductId(productId: $productId) {
-    id
+    createdAt
     discountPercent
-    minQuantity
-    isDeleted
+    id
     isActive
+    isDeleted
+    minQuantity
+    name
+    updatedAt
   }
 }

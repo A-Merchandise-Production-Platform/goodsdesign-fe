@@ -3,6 +3,7 @@
 import { ArrowLeft, Factory, Loader2, Truck, Users } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 import { DashboardShell } from '@/components/dashboard-shell';
 import { StatCard } from '@/components/stat-card';
@@ -15,16 +16,16 @@ import {
   useGetFactoryByIdQuery,
   useGetFactoryDetailDashboardQuery,
 } from '@/graphql/generated/graphql';
-import { toast } from 'sonner';
+import { formatPrice } from '@/lib/utils';
+
 import {
   FactoryContactsTab,
+  FactoryOrdersTab,
   FactoryOverviewTab,
   FactoryProductionTab,
   FactorySettingsTab,
   FactoryStaffTab,
-  FactoryOrdersTab,
 } from './components';
-import { formatPrice } from '@/lib/utils';
 
 export default function FactoryDetailPage() {
   const { id } = useParams<{ id: string }>();

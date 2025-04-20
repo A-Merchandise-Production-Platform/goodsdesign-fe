@@ -5,6 +5,7 @@ import {
   EyeIcon,
   MoreHorizontal,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -35,7 +36,6 @@ import {
   Roles,
   useDeleteUserMutation,
 } from '@/graphql/generated/graphql';
-import Link from 'next/link';
 
 export type User = GetUsersQuery['users'][number];
 

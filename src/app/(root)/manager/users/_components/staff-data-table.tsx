@@ -12,6 +12,7 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table';
 import { ChevronDown, EyeIcon, RefreshCwIcon } from 'lucide-react';
+import Link from 'next/link';
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -38,7 +39,6 @@ import {
 
 import AddUserForm from './add-user-form';
 import { columns } from './columns';
-import Link from 'next/link';
 
 export type User = GetUsersQuery['users'][number];
 

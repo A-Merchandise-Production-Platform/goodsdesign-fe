@@ -15,6 +15,7 @@ import {
 import { Layers } from 'lucide-react';
 import React from 'react';
 
+import { Button } from '@/components/ui/button';
 import {
   Popover,
   PopoverContent,
@@ -23,7 +24,6 @@ import {
 import { DesignObject } from '@/types/design-object';
 
 import { LayerItem } from './layer-item';
-import { Button } from '@/components/ui/button';
 
 interface LayersPanelProps {
   designs: DesignObject[];

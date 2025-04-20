@@ -12,13 +12,15 @@ import {
   History,
   Package,
   ShoppingBag,
+  Star,
   Truck,
   XCircle,
-  Star,
 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -37,6 +39,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import {
   Select,
@@ -55,6 +58,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import {
   CreatePaymentGatewayUrlMutation,
   useCreatePaymentGatewayUrlMutation,
@@ -62,15 +66,12 @@ import {
   useGetOrderQuery,
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
+
 import {
-  orderStatusSteps,
-  getStatusBadge,
   getPaymentStatusBadge,
+  getStatusBadge,
+  orderStatusSteps,
 } from '../../_components/order-status';
-import { toast } from 'sonner';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import Link from 'next/link';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {

@@ -36,7 +36,7 @@ export default function Page() {
     useUpdateThumbnailProductDesignMutation();
   const { data: cartData, refetch: cartRefetch } = useGetUserCartItemsQuery();
   const isInCart = cartData?.userCartItems?.some(
-    item => item.design?.id === id
+    item => item.design?.id === id,
   );
 
   // Keep track of current thumbnail URL to handle deletion

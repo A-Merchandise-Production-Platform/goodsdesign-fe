@@ -3,13 +3,13 @@
 import {
   BadgeCheckIcon,
   BuildingIcon,
+  CalendarDaysIcon,
   CalendarIcon,
   ClipboardIcon,
+  ClockIcon,
   MailIcon,
   PhoneIcon,
   UserIcon,
-  ClockIcon,
-  CalendarDaysIcon,
 } from 'lucide-react';
 import { useParams } from 'next/navigation';
 
@@ -24,6 +24,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -34,8 +36,6 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGetStaffDashboardQuery } from '@/graphql/generated/graphql';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Separator } from '@/components/ui/separator';
 
 export default function StaffDetailPage() {
   const params = useParams();

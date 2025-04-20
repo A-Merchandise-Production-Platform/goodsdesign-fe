@@ -149,3 +149,41 @@ query GetStaffDashboard($userId: String!) {
     dateOfBirth
   }
 }
+
+query GetAdminDashboard {
+  getAdminDashboard {
+    activeFactories
+    activeUsers
+    activeUsersChange
+    activeUsersChangeType
+    factoryPerformance {
+      factoryId
+      orderCount
+      totalRevenue
+    }
+    pendingOrders
+    pendingOrdersChange
+    pendingOrdersChangeType
+    recentOrders {
+      id
+      orderDate
+      status
+      totalPrice
+      factory {
+        id
+        name
+        factoryStatus
+      }
+    }
+    totalCustomers
+    totalFactories
+    totalOrders
+    totalProducts
+    totalProductsChange
+    totalProductsChangeType
+    totalRevenue
+    totalSales
+    totalSalesChange
+    totalSalesChangeType
+  }
+}

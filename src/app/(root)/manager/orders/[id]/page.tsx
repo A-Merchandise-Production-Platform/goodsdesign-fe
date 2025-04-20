@@ -5,15 +5,16 @@ import {
   CheckCircle2,
   Clock,
   CreditCard,
+  CreditCardIcon as PaymentIcon,
   FileText,
   History,
   Package,
-  CreditCardIcon as PaymentIcon,
   ShoppingBag,
   Truck,
   XCircle,
 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -44,7 +45,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGetOrderQuery } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
-import Link from 'next/link';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {

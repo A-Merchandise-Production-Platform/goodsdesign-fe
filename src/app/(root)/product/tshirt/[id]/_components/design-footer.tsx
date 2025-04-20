@@ -101,11 +101,21 @@ const DesignFooter: React.FC<DesignFooterProps> = ({
       <div className="flex items-center gap-4">
         <span className="text-sm">
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" onClick={onDecrement} disabled={isInCart}>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onDecrement}
+              disabled={isInCart}
+            >
               <MinusCircle className="h-4 w-4" />
             </Button>
             <span className="w-8 text-center">{quantity}</span>
-            <Button variant="outline" size="icon" onClick={onIncrement} disabled={isInCart}>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onIncrement}
+              disabled={isInCart}
+            >
               <PlusCircle className="h-4 w-4" />
             </Button>
           </div>
@@ -113,10 +123,12 @@ const DesignFooter: React.FC<DesignFooterProps> = ({
         <Button
           disabled={loading || isInCart}
           onClick={onCreateCartItem}
-          className={isInCart ? "bg-muted hover:bg-muted cursor-not-allowed" : ""}
+          className={
+            isInCart ? 'bg-muted hover:bg-muted cursor-not-allowed' : ''
+          }
         >
           {loading && <Loader2 className="animate-spin" />}
-          {isInCart ? "Added to cart" : "Add to cart"}
+          {isInCart ? 'Added to cart' : 'Add to cart'}
         </Button>
       </div>
     </div>

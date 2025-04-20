@@ -42,13 +42,24 @@ export type AddressEntity = {
 export type AdminDashboardResponse = {
   __typename?: 'AdminDashboardResponse';
   activeFactories: Scalars['Int']['output'];
+  activeUsers: Scalars['Int']['output'];
+  activeUsersChange: Scalars['Int']['output'];
+  activeUsersChangeType: ChangeType;
   factoryPerformance: Array<FactoryPerformance>;
   pendingOrders: Scalars['Int']['output'];
+  pendingOrdersChange: Scalars['Int']['output'];
+  pendingOrdersChangeType: ChangeType;
   recentOrders: Array<OrderWithFactory>;
   totalCustomers: Scalars['Int']['output'];
   totalFactories: Scalars['Int']['output'];
   totalOrders: Scalars['Int']['output'];
+  totalProducts: Scalars['Int']['output'];
+  totalProductsChange: Scalars['Int']['output'];
+  totalProductsChangeType: ChangeType;
   totalRevenue: Scalars['Int']['output'];
+  totalSales: Scalars['Int']['output'];
+  totalSalesChange: Scalars['Int']['output'];
+  totalSalesChangeType: ChangeType;
 };
 
 /** Authentication response */
@@ -2013,6 +2024,11 @@ export type GetStaffDashboardQueryVariables = Exact<{
 
 export type GetStaffDashboardQuery = { __typename?: 'Query', getStaffDashboard: { __typename?: 'StaffDashboardResponse', completedTasks: number, lastMonthActiveTasks: number, lastMonthCompletedTasks: number, totalActiveTasks: number, totalTaskHistory: number, activeTasks: Array<{ __typename?: 'TaskEntity', id: string, note?: string | null, startDate: any, orderId?: string | null, status: string, taskType: string, taskname: string, userId?: string | null, completedDate?: any | null, description: string, assignedDate: any }>, taskHistory: Array<{ __typename?: 'TaskEntity', id: string, note?: string | null, startDate: any, orderId?: string | null, status: string, taskType: string, taskname: string, userId?: string | null, completedDate?: any | null, description: string, assignedDate: any }> }, user: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, email?: string | null, deletedAt?: any | null, createdAt: any, updatedAt?: any | null, gender: boolean, dateOfBirth?: any | null, staffedFactory?: { __typename?: 'FactoryEntity', name: string, factoryOwnerId: string, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, provinceID: number, street: string, wardCode: string } | null } | null } };
 
+export type GetAdminDashboardQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAdminDashboardQuery = { __typename?: 'Query', getAdminDashboard: { __typename?: 'AdminDashboardResponse', activeFactories: number, activeUsers: number, activeUsersChange: number, activeUsersChangeType: ChangeType, pendingOrders: number, pendingOrdersChange: number, pendingOrdersChangeType: ChangeType, totalCustomers: number, totalFactories: number, totalOrders: number, totalProducts: number, totalProductsChange: number, totalProductsChangeType: ChangeType, totalRevenue: number, totalSales: number, totalSalesChange: number, totalSalesChangeType: ChangeType, factoryPerformance: Array<{ __typename?: 'FactoryPerformance', factoryId: string, orderCount: number, totalRevenue: number }>, recentOrders: Array<{ __typename?: 'OrderWithFactory', id: string, orderDate: any, status: string, totalPrice: number, factory?: { __typename?: 'FactoryInfo', id: string, name: string, factoryStatus: string } | null }> } };
+
 export type UpdateDesignPositionMutationVariables = Exact<{
   input: UpdateDesignPositionDto;
 }>;
@@ -2250,12 +2266,19 @@ export type GetAllDiscountByProductIdQueryVariables = Exact<{
 }>;
 
 
-export type GetAllDiscountByProductIdQuery = { __typename?: 'Query', getAllDiscountByProductId: Array<{ __typename?: 'SystemConfigDiscountEntity', id: string, discountPercent: number, minQuantity: number, isDeleted: boolean, isActive: boolean }> };
+export type GetAllDiscountByProductIdQuery = { __typename?: 'Query', getAllDiscountByProductId: Array<{ __typename?: 'SystemConfigDiscountEntity', createdAt: any, discountPercent: number, id: string, isActive: boolean, isDeleted: boolean, minQuantity: number, name: string, updatedAt: any }> };
 
 export type GetAllProductsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetAllProductsQuery = { __typename?: 'Query', products: Array<{ __typename?: 'ProductEntity', id: string, imageUrl?: string | null, isActive: boolean, name: string, updatedAt?: any | null, createdAt: any, description?: string | null, category?: { __typename?: 'CategoryEntity', name: string } | null, variants?: Array<{ __typename?: 'SystemConfigVariantEntity', price?: number | null }> | null }> };
+
+export type GetProductByIdQueryVariables = Exact<{
+  productId: Scalars['String']['input'];
+}>;
+
+
+export type GetProductByIdQuery = { __typename?: 'Query', product: { __typename?: 'ProductEntity', id: string, imageUrl?: string | null, isActive: boolean, name: string, updatedAt?: any | null, createdAt: any, description?: string | null, weight?: number | null, createdBy?: string | null, category?: { __typename?: 'CategoryEntity', name: string } | null, variants?: Array<{ __typename?: 'SystemConfigVariantEntity', price?: number | null, model?: string | null, isDeleted: boolean, isActive: boolean, id: string, color?: string | null, productId: string, size?: string | null }> | null } };
 
 export type CreateProductMutationVariables = Exact<{
   input: CreateProductDto;
@@ -2350,6 +2373,18 @@ export type RemoveSystemConfigBankMutationVariables = Exact<{
 
 
 export type RemoveSystemConfigBankMutation = { __typename?: 'Mutation', removeSystemConfigBank: { __typename?: 'SystemConfigBankEntity', bin: string, id: string, code: string, isActive: boolean, isDeleted: boolean, logo: string, name: string, shortName: string } };
+
+export type SystemConfigOrderQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SystemConfigOrderQuery = { __typename?: 'Query', systemConfigOrder: { __typename?: 'SystemConfigOrderEntity', acceptHoursForFactory: number, capacityScoreWeight: number, checkQualityTimesDays: number, leadTimeScoreWeight: number, legitPointScoreWeight: number, legitPointToSuspend: number, limitFactoryRejectOrders: number, limitReworkTimes: number, maxLegitPoint: number, maxProductionCapacity: number, maxProductionTimeInMinutes: number, productionCapacityScoreWeight: number, reduceLegitPointIfReject: number, shippingDays: number, specializationScoreWeight: number } };
+
+export type UpdateSystemConfigOrderMutationVariables = Exact<{
+  updateConfigInput: UpdateSystemConfigOrderDto;
+}>;
+
+
+export type UpdateSystemConfigOrderMutation = { __typename?: 'Mutation', updateSystemConfigOrder: { __typename?: 'SystemConfigOrderEntity', id: string } };
 
 export type GetSystemConfigVariantsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3516,6 +3551,77 @@ export type GetStaffDashboardQueryHookResult = ReturnType<typeof useGetStaffDash
 export type GetStaffDashboardLazyQueryHookResult = ReturnType<typeof useGetStaffDashboardLazyQuery>;
 export type GetStaffDashboardSuspenseQueryHookResult = ReturnType<typeof useGetStaffDashboardSuspenseQuery>;
 export type GetStaffDashboardQueryResult = Apollo.QueryResult<GetStaffDashboardQuery, GetStaffDashboardQueryVariables>;
+export const GetAdminDashboardDocument = gql`
+    query GetAdminDashboard {
+  getAdminDashboard {
+    activeFactories
+    activeUsers
+    activeUsersChange
+    activeUsersChangeType
+    factoryPerformance {
+      factoryId
+      orderCount
+      totalRevenue
+    }
+    pendingOrders
+    pendingOrdersChange
+    pendingOrdersChangeType
+    recentOrders {
+      id
+      orderDate
+      status
+      totalPrice
+      factory {
+        id
+        name
+        factoryStatus
+      }
+    }
+    totalCustomers
+    totalFactories
+    totalOrders
+    totalProducts
+    totalProductsChange
+    totalProductsChangeType
+    totalRevenue
+    totalSales
+    totalSalesChange
+    totalSalesChangeType
+  }
+}
+    `;
+
+/**
+ * __useGetAdminDashboardQuery__
+ *
+ * To run a query within a React component, call `useGetAdminDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAdminDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAdminDashboardQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetAdminDashboardQuery(baseOptions?: Apollo.QueryHookOptions<GetAdminDashboardQuery, GetAdminDashboardQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAdminDashboardQuery, GetAdminDashboardQueryVariables>(GetAdminDashboardDocument, options);
+      }
+export function useGetAdminDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAdminDashboardQuery, GetAdminDashboardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAdminDashboardQuery, GetAdminDashboardQueryVariables>(GetAdminDashboardDocument, options);
+        }
+export function useGetAdminDashboardSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAdminDashboardQuery, GetAdminDashboardQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAdminDashboardQuery, GetAdminDashboardQueryVariables>(GetAdminDashboardDocument, options);
+        }
+export type GetAdminDashboardQueryHookResult = ReturnType<typeof useGetAdminDashboardQuery>;
+export type GetAdminDashboardLazyQueryHookResult = ReturnType<typeof useGetAdminDashboardLazyQuery>;
+export type GetAdminDashboardSuspenseQueryHookResult = ReturnType<typeof useGetAdminDashboardSuspenseQuery>;
+export type GetAdminDashboardQueryResult = Apollo.QueryResult<GetAdminDashboardQuery, GetAdminDashboardQueryVariables>;
 export const UpdateDesignPositionDocument = gql`
     mutation UpdateDesignPosition($input: UpdateDesignPositionDto!) {
   updateDesignPosition(input: $input) {
@@ -6229,11 +6335,14 @@ export type DuplicateProductDesignMutationOptions = Apollo.BaseMutationOptions<D
 export const GetAllDiscountByProductIdDocument = gql`
     query GetAllDiscountByProductId($productId: String!) {
   getAllDiscountByProductId(productId: $productId) {
-    id
+    createdAt
     discountPercent
-    minQuantity
-    isDeleted
+    id
     isActive
+    isDeleted
+    minQuantity
+    name
+    updatedAt
   }
 }
     `;
@@ -6321,6 +6430,67 @@ export type GetAllProductsQueryHookResult = ReturnType<typeof useGetAllProductsQ
 export type GetAllProductsLazyQueryHookResult = ReturnType<typeof useGetAllProductsLazyQuery>;
 export type GetAllProductsSuspenseQueryHookResult = ReturnType<typeof useGetAllProductsSuspenseQuery>;
 export type GetAllProductsQueryResult = Apollo.QueryResult<GetAllProductsQuery, GetAllProductsQueryVariables>;
+export const GetProductByIdDocument = gql`
+    query GetProductById($productId: String!) {
+  product(id: $productId) {
+    category {
+      name
+    }
+    id
+    imageUrl
+    isActive
+    name
+    updatedAt
+    createdAt
+    description
+    variants {
+      price
+      model
+      isDeleted
+      isActive
+      id
+      color
+      productId
+      size
+    }
+    weight
+    createdBy
+  }
+}
+    `;
+
+/**
+ * __useGetProductByIdQuery__
+ *
+ * To run a query within a React component, call `useGetProductByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProductByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProductByIdQuery({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *   },
+ * });
+ */
+export function useGetProductByIdQuery(baseOptions: Apollo.QueryHookOptions<GetProductByIdQuery, GetProductByIdQueryVariables> & ({ variables: GetProductByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetProductByIdQuery, GetProductByIdQueryVariables>(GetProductByIdDocument, options);
+      }
+export function useGetProductByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProductByIdQuery, GetProductByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetProductByIdQuery, GetProductByIdQueryVariables>(GetProductByIdDocument, options);
+        }
+export function useGetProductByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetProductByIdQuery, GetProductByIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetProductByIdQuery, GetProductByIdQueryVariables>(GetProductByIdDocument, options);
+        }
+export type GetProductByIdQueryHookResult = ReturnType<typeof useGetProductByIdQuery>;
+export type GetProductByIdLazyQueryHookResult = ReturnType<typeof useGetProductByIdLazyQuery>;
+export type GetProductByIdSuspenseQueryHookResult = ReturnType<typeof useGetProductByIdSuspenseQuery>;
+export type GetProductByIdQueryResult = Apollo.QueryResult<GetProductByIdQuery, GetProductByIdQueryVariables>;
 export const CreateProductDocument = gql`
     mutation CreateProduct($input: CreateProductDto!) {
   createProduct(input: $input) {
@@ -6917,6 +7087,92 @@ export function useRemoveSystemConfigBankMutation(baseOptions?: Apollo.MutationH
 export type RemoveSystemConfigBankMutationHookResult = ReturnType<typeof useRemoveSystemConfigBankMutation>;
 export type RemoveSystemConfigBankMutationResult = Apollo.MutationResult<RemoveSystemConfigBankMutation>;
 export type RemoveSystemConfigBankMutationOptions = Apollo.BaseMutationOptions<RemoveSystemConfigBankMutation, RemoveSystemConfigBankMutationVariables>;
+export const SystemConfigOrderDocument = gql`
+    query SystemConfigOrder {
+  systemConfigOrder {
+    acceptHoursForFactory
+    capacityScoreWeight
+    checkQualityTimesDays
+    leadTimeScoreWeight
+    legitPointScoreWeight
+    legitPointToSuspend
+    limitFactoryRejectOrders
+    limitReworkTimes
+    maxLegitPoint
+    maxProductionCapacity
+    maxProductionTimeInMinutes
+    productionCapacityScoreWeight
+    reduceLegitPointIfReject
+    shippingDays
+    specializationScoreWeight
+  }
+}
+    `;
+
+/**
+ * __useSystemConfigOrderQuery__
+ *
+ * To run a query within a React component, call `useSystemConfigOrderQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSystemConfigOrderQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSystemConfigOrderQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useSystemConfigOrderQuery(baseOptions?: Apollo.QueryHookOptions<SystemConfigOrderQuery, SystemConfigOrderQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SystemConfigOrderQuery, SystemConfigOrderQueryVariables>(SystemConfigOrderDocument, options);
+      }
+export function useSystemConfigOrderLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SystemConfigOrderQuery, SystemConfigOrderQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SystemConfigOrderQuery, SystemConfigOrderQueryVariables>(SystemConfigOrderDocument, options);
+        }
+export function useSystemConfigOrderSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SystemConfigOrderQuery, SystemConfigOrderQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SystemConfigOrderQuery, SystemConfigOrderQueryVariables>(SystemConfigOrderDocument, options);
+        }
+export type SystemConfigOrderQueryHookResult = ReturnType<typeof useSystemConfigOrderQuery>;
+export type SystemConfigOrderLazyQueryHookResult = ReturnType<typeof useSystemConfigOrderLazyQuery>;
+export type SystemConfigOrderSuspenseQueryHookResult = ReturnType<typeof useSystemConfigOrderSuspenseQuery>;
+export type SystemConfigOrderQueryResult = Apollo.QueryResult<SystemConfigOrderQuery, SystemConfigOrderQueryVariables>;
+export const UpdateSystemConfigOrderDocument = gql`
+    mutation UpdateSystemConfigOrder($updateConfigInput: UpdateSystemConfigOrderDto!) {
+  updateSystemConfigOrder(updateConfigInput: $updateConfigInput) {
+    id
+  }
+}
+    `;
+export type UpdateSystemConfigOrderMutationFn = Apollo.MutationFunction<UpdateSystemConfigOrderMutation, UpdateSystemConfigOrderMutationVariables>;
+
+/**
+ * __useUpdateSystemConfigOrderMutation__
+ *
+ * To run a mutation, you first call `useUpdateSystemConfigOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSystemConfigOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSystemConfigOrderMutation, { data, loading, error }] = useUpdateSystemConfigOrderMutation({
+ *   variables: {
+ *      updateConfigInput: // value for 'updateConfigInput'
+ *   },
+ * });
+ */
+export function useUpdateSystemConfigOrderMutation(baseOptions?: Apollo.MutationHookOptions<UpdateSystemConfigOrderMutation, UpdateSystemConfigOrderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateSystemConfigOrderMutation, UpdateSystemConfigOrderMutationVariables>(UpdateSystemConfigOrderDocument, options);
+      }
+export type UpdateSystemConfigOrderMutationHookResult = ReturnType<typeof useUpdateSystemConfigOrderMutation>;
+export type UpdateSystemConfigOrderMutationResult = Apollo.MutationResult<UpdateSystemConfigOrderMutation>;
+export type UpdateSystemConfigOrderMutationOptions = Apollo.BaseMutationOptions<UpdateSystemConfigOrderMutation, UpdateSystemConfigOrderMutationVariables>;
 export const GetSystemConfigVariantsDocument = gql`
     query GetSystemConfigVariants {
   systemConfigVariants {
