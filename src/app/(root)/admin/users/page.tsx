@@ -1,54 +1,55 @@
 'use client';
 
-import { UsersIcon } from 'lucide-react';
+import { UsersIcon, UserPlusIcon, UserCheckIcon } from 'lucide-react';
 
 import UserTable from '@/app/(root)/admin/users/_components/user-table';
+import { StatCard } from '@/components/stat-card';
 import { Roles, useGetUsersQuery } from '@/graphql/generated/graphql';
 
 export default function Page() {
   const { data, loading, refetch } = useGetUsersQuery();
 
+  // Calculate fake stats data
+  const totalUsers = data?.users.length || 0;
+  const newUsers =
+    data?.users?.filter(user => {
+      const date = new Date(user.createdAt);
+      return (
+        date.getMonth() === new Date().getMonth() &&
+        date.getFullYear() === new Date().getFullYear()
+      );
+    }).length || 0;
+  const activeUsers = data?.users?.filter(user => user.isActive).length || 0;
+
+  // Calculate fake changes (simulating increases/decreases)
+  const totalChange = Math.round(Math.random() * 12) + '%';
+  const newChange = Math.round(Math.random() * 20) + '%';
+  const activeChange = Math.round(Math.random() * 5) + '%';
+
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-background col-span-1 row-span-1 flex h-40 flex-col gap-2 space-y-4 rounded-lg border p-4 shadow-sm">
-          <div className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
-            <UsersIcon className="h-4 w-4" />
-            Total Users
-          </div>
-          <div className="flex-1 text-5xl font-bold">
-            {data?.users.length}
-            <span className="text-muted-foreground ml-2 text-base font-medium">
-              users
-            </span>
-          </div>
-        </div>
-        <div className="bg-background col-span-1 row-span-1 flex h-40 flex-col gap-2 space-y-4 rounded-lg border p-4 shadow-sm">
-          <div className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
-            <UsersIcon className="h-4 w-4" />
-            New User this month
-          </div>
-          <div className="flex-1 text-5xl font-bold">
-            {
-              (
-                data?.users?.filter(user => {
-                  const date = new Date(user.createdAt);
-                  return (
-                    date.getMonth() === new Date().getMonth() &&
-                    date.getFullYear() === new Date().getFullYear()
-                  );
-                }) || []
-              ).length
-            }
-            <span className="text-muted-foreground text-base font-medium">
-              / {data?.users.length}
-              <span className="text-muted-foreground ml-2 text-base font-medium">
-                users
-              </span>
-            </span>
-          </div>
-        </div>
-        <div className="bg-background col-span-1 row-span-1 flex h-40 flex-col gap-2 space-y-4 rounded-lg border p-4 shadow-sm"></div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <StatCard
+          title="Total Users"
+          value={totalUsers.toString()}
+          change={totalChange}
+          changeType="positive"
+          icon={<UsersIcon className="h-5 w-5" />}
+        />
+        <StatCard
+          title="New Users This Month"
+          value={newUsers.toString()}
+          change={newChange}
+          changeType="positive"
+          icon={<UserPlusIcon className="h-5 w-5" />}
+        />
+        <StatCard
+          title="Active Users"
+          value={activeUsers.toString()}
+          change={activeChange}
+          changeType="positive"
+          icon={<UserCheckIcon className="h-5 w-5" />}
+        />
       </div>
       <div className="bg-background col-span-3 row-span-3 rounded-lg">
         <UserTable refetch={refetch} loading={loading} data={data?.users} />

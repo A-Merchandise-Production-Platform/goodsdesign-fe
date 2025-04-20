@@ -16,6 +16,33 @@ query GetAllProducts {
   }
 }
 
+query GetProductById($productId: String!) {
+  product(id: $productId) {
+    category {
+      name
+    }
+    id
+    imageUrl
+    isActive
+    name
+    updatedAt
+    createdAt
+    description
+    variants {
+      price
+      model
+      isDeleted
+      isActive
+      id
+      color
+      productId
+      size
+    }
+    weight
+    createdBy
+  }
+}
+
 mutation CreateProduct($input: CreateProductDto!) {
   createProduct(input: $input) {
     category {

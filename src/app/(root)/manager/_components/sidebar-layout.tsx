@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
-import { ManagerBreadcrumbNav } from '@/components/manager/breadcrumb-nav';
+import { ManagerBreadcrumbNav } from '@/app/(root)/manager/_components/breadcrumb-nav';
 import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 
 export default function ManagerSidebarLayout({
