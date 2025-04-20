@@ -278,7 +278,7 @@ export default function SystemConfigOrder() {
             label="Limit Factory Reject Orders"
             name="limitFactoryRejectOrders"
             value={configValues.limitFactoryRejectOrders}
-            description="Maximum number of orders a factory can reject"
+            description="Maximum number of a order can be rejected by factories - If exceed, the order will be need to be handled by manager"
             onChange={(value) => handleInputChange("limitFactoryRejectOrders", value)}
             onSave={() => handleUpdateConfig("limitFactoryRejectOrders")}
             isEdited={editedFields.has("limitFactoryRejectOrders")}

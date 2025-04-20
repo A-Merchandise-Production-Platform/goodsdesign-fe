@@ -49,6 +49,7 @@ export default function CartPage() {
       onError: error => {
         toast.error(error.message);
       },
+      refetchQueries: ["GetCartItemCount"]
     });
 
   const [createCartItem] = useCreateCartItemMutation({
@@ -59,9 +60,12 @@ export default function CartPage() {
     onError: error => {
       toast.error(error.message);
     },
+    refetchQueries: ["GetCartItemCount"]
   });
 
-  const [deleteCartItem] = useDeleteCartItemMutation();
+  const [deleteCartItem] = useDeleteCartItemMutation({
+    refetchQueries: ["GetCartItemCount"]
+  });
 
   const [createOrder] = useCreateOrderMutation({
     onCompleted: data => {
@@ -75,6 +79,7 @@ export default function CartPage() {
       toast.error(error.message);
       setIsCheckingOut(false);
     },
+    refetchQueries: ["GetCartItemCount"]
   });
 
   const cartItems = (data?.userCartItems || []) as CartItemEntity[];
