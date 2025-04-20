@@ -41,6 +41,7 @@ export default function ManagerSidebarLayout({
       href: '/manager/users',
       label: 'Users Management',
       icon: <User2Icon className="size-4" />,
+      isActive: pathname.includes('/manager/users'),
     },
   ];
 
