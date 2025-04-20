@@ -23,9 +23,10 @@ const formatLabel = (segment: string): string => {
   // Special case mappings
   const specialCases: Record<string, string> = {
     admin: 'Dashboard',
-    users: 'Users Management',
-    products: 'Products Management',
-    categories: 'Categories Management',
+    users: 'User Management',
+    products: 'Product Management',
+    categories: 'Category Management',
+    templates: 'Template Management',
     system: 'System Settings',
   };
 

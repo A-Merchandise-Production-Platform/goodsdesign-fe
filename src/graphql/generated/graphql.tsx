@@ -2252,7 +2252,7 @@ export type UpdateThumbnailProductDesignMutation = { __typename?: 'Mutation', de
 export type GetTemplateProductDesignsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTemplateProductDesignsQuery = { __typename?: 'Query', getTemplateProductDesigns: Array<{ __typename?: 'ProductDesignEntity', id: string, isPublic: boolean, isTemplate: boolean, isFinalized: boolean, thumbnailUrl?: string | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null }> };
+export type GetTemplateProductDesignsQuery = { __typename?: 'Query', getTemplateProductDesigns: Array<{ __typename?: 'ProductDesignEntity', id: string, isPublic: boolean, isTemplate: boolean, isFinalized: boolean, thumbnailUrl?: string | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, category?: { __typename?: 'CategoryEntity', name: string } | null } } | null }> };
 
 export type DuplicateProductDesignMutationVariables = Exact<{
   duplicateProductDesignId: Scalars['ID']['input'];
@@ -6260,6 +6260,19 @@ export const GetTemplateProductDesignsDocument = gql`
         basePrice
       }
       designJSON
+    }
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+      product {
+        name
+        category {
+          name
+        }
+      }
     }
   }
 }

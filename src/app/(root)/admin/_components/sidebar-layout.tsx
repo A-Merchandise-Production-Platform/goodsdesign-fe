@@ -3,18 +3,14 @@
 import {
   CogIcon,
   HomeIcon,
-  HouseIcon,
-  ListIcon,
-  PenSquareIcon,
-  ShoppingBag,
-  ShoppingCartIcon,
-  User2Icon,
+  LayoutGrid,
+  Shirt,
+  SquareBottomDashedScissors,
   UsersIcon,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 import { AdminBreadcrumbNav } from '@/app/(root)/admin/_components/breadcrumb-nav';
-import { ManagerBreadcrumbNav } from '@/app/(root)/manager/_components/breadcrumb-nav';
 import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 
 export default function AdminSidebarLayout({
@@ -38,14 +34,20 @@ export default function AdminSidebarLayout({
     {
       href: '/admin/categories',
       label: 'Categories',
-      icon: <ShoppingCartIcon className="size-4" />,
+      icon: <LayoutGrid className="size-4" />,
       isActive: pathname.includes('/admin/categories'),
     },
     {
       href: '/admin/products',
       label: 'Products',
-      icon: <ShoppingCartIcon className="size-4" />,
+      icon: <Shirt className="size-4" />,
       isActive: pathname.includes('/admin/products'),
+    },
+    {
+      href: '/admin/templates',
+      label: 'Templates',
+      icon: <SquareBottomDashedScissors className="size-4" />,
+      isActive: pathname.includes('/admin/templates'),
     },
     {
       href: '/admin/system',

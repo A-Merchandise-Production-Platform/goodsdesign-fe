@@ -1,29 +1,42 @@
 import { DesignCard } from './design-card';
 
 interface DesignSectionProps {
-  designs: Array<{
-    __typename?: 'ProductDesignEntity';
-    id: string;
-    thumbnailUrl?: string | null;
-    systemConfigVariant?: {
-      __typename?: 'SystemConfigVariantEntity';
-      product: {
-        __typename?: 'ProductEntity';
-        name: string;
-        category?: {
-          __typename?: 'CategoryEntity';
-          name: string;
+  designs:
+    | {
+        __typename?: 'ProductDesignEntity';
+        id: string;
+        isPublic: boolean;
+        isTemplate: boolean;
+        isFinalized: boolean;
+        thumbnailUrl?: string | null;
+        designPositions?: Array<{
+          __typename?: 'DesignPositionEntity';
+          designJSON?: any | null;
+          positionType?: {
+            __typename?: 'ProductPositionTypeEntity';
+            id: string;
+            positionName: string;
+            basePrice: number;
+          } | null;
+        }> | null;
+        systemConfigVariant?: {
+          __typename?: 'SystemConfigVariantEntity';
+          id: string;
+          price?: number | null;
+          color?: string | null;
+          size?: string | null;
+          model?: string | null;
+          product: {
+            __typename?: 'ProductEntity';
+            name: string;
+            category?: {
+              __typename?: 'CategoryEntity';
+              name: string;
+            } | null;
+          };
         } | null;
-      };
-    } | null;
-    designPositions?: Array<{
-      __typename?: 'DesignPositionEntity';
-      positionType?: {
-        __typename?: 'ProductPositionTypeEntity';
-        basePrice: number;
-      } | null;
-    }> | null;
-  }>;
+      }[]
+    | undefined;
 
   onDuplicate?: (options: {
     variables: {
@@ -42,7 +55,7 @@ export function DesignSection({
     <div className="mt-12">
       <h2 className="mb-6 text-2xl font-bold">Available Designs</h2>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {designs.map((design, index) => {
+        {designs?.map((design) => {
           const productName =
             design.systemConfigVariant?.product?.name ?? 'Custom Product';
           const categoryName =
