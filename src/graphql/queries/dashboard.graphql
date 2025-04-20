@@ -47,3 +47,105 @@ query GetManagerOrderDashboard {
     totalOrders
   }
 }
+
+query GetFactoryDetailDashboard($factoryId: String!) {
+  getFactoryDetailDashboard(factoryId: $factoryId) {
+    inProductionOrders
+    lastMonthInProductionOrders
+    lastMonthPendingOrders
+    lastMonthTotalOrders
+    lastMonthTotalRevenue
+    pendingOrders
+    productionProgress {
+      id
+      status
+      createdAt
+      totalProductionCost
+    }
+    qualityIssues {
+      id
+      reportedAt
+      issueType
+      status
+      description
+      factoryOrder {
+        id
+        status
+      }
+    }
+    recentOrders {
+      id
+      status
+      totalProductionCost
+      createdAt
+      customerOrder {
+        id
+        status
+        totalPrice
+      }
+    }
+    totalOrders
+    totalRevenue
+  }
+}
+
+query GetStaffDashboard($userId: String!) {
+  getStaffDashboard(userId: $userId) {
+    activeTasks {
+      id
+      note
+      startDate
+      orderId
+      status
+      taskType
+      taskname
+      userId
+      completedDate
+      description
+      assignedDate
+    }
+    completedTasks
+    lastMonthActiveTasks
+    lastMonthCompletedTasks
+    taskHistory {
+      id
+      note
+      startDate
+      orderId
+      status
+      taskType
+      taskname
+      userId
+      completedDate
+      description
+      assignedDate
+    }
+    totalActiveTasks
+    totalTaskHistory
+  }
+  user(id: $userId) {
+    id
+    imageUrl
+    isActive
+    name
+    phoneNumber
+    role
+    staffedFactory {
+      name
+      factoryOwnerId
+      address {
+        districtID
+        factoryId
+        provinceID
+        street
+        wardCode
+      }
+    }
+    email
+    deletedAt
+    createdAt
+    updatedAt
+    gender
+    dateOfBirth
+  }
+}

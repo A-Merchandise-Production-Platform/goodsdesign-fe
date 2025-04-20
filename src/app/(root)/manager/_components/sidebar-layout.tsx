@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
+import { ManagerBreadcrumbNav } from '@/components/manager/breadcrumb-nav';
 import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 
 export default function ManagerSidebarLayout({
@@ -40,8 +41,16 @@ export default function ManagerSidebarLayout({
       href: '/manager/users',
       label: 'Users Management',
       icon: <User2Icon className="size-4" />,
+      isActive: pathname.includes('/manager/users'),
     },
   ];
 
-  return <MySidebar navItems={navItems}>{children}</MySidebar>;
+  return (
+    <MySidebar navItems={navItems}>
+      <div className="space-y-4">
+        <ManagerBreadcrumbNav />
+        {children}
+      </div>
+    </MySidebar>
+  );
 }

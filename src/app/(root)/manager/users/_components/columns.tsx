@@ -257,6 +257,9 @@ export const columns: ColumnDef<User>[] = [
     id: 'view-details',
     cell: ({ row }) => {
       const user = row.original;
+
+      if (user.role == Roles.Customer) return null;
+
       return (
         <Link
           href={getUserLinkHrefByRole(user.role, user.id)}
