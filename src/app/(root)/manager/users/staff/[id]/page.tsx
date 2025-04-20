@@ -1,30 +1,29 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import {
-  BriefcaseIcon,
-  ClipboardIcon,
-  ClockIcon,
-  UserIcon,
-  BuildingIcon,
   BadgeCheckIcon,
+  BuildingIcon,
   CalendarIcon,
-  PhoneIcon,
+  ClipboardIcon,
   MailIcon,
-  ChevronRightIcon,
+  PhoneIcon,
+  UserIcon,
+  ClockIcon,
+  CalendarDaysIcon,
 } from 'lucide-react';
+import { useParams } from 'next/navigation';
 
 import { DashboardShell } from '@/components/dashboard-shell';
 import { StatCard } from '@/components/stat-card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -33,425 +32,314 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-
-// Fake staff data
-const staffMember = {
-  id: '123456',
-  name: 'Emma Johnson',
-  role: 'Senior Production Specialist',
-  email: 'emma.johnson@example.com',
-  phone: '+1 (555) 123-4567',
-  joinDate: '2021-05-12',
-  imageUrl: 'https://randomuser.me/api/portraits/women/23.jpg',
-  status: 'Active',
-  factory: {
-    id: 'F1001',
-    name: 'Shanghai Plant',
-    department: 'Production Line B',
-    manager: 'Liu Wei',
-  },
-  stats: {
-    completedTasks: 187,
-    activeTasks: 4,
-    efficiency: 94,
-    attendance: 98,
-  },
-  performance: {
-    lastMonth: 92,
-    lastWeek: 96,
-    currentWeek: 94,
-  },
-};
-
-// Fake task data
-const activeTasks = [
-  {
-    id: 'T1001',
-    title: 'Quality Inspection - Batch #45892',
-    priority: 'High',
-    status: 'In Progress',
-    deadline: '2023-06-15',
-    progress: 75,
-  },
-  {
-    id: 'T1002',
-    title: 'Machine Maintenance - Unit #12',
-    priority: 'Medium',
-    status: 'Pending',
-    deadline: '2023-06-18',
-    progress: 20,
-  },
-  {
-    id: 'T1003',
-    title: 'Material Inventory Check',
-    priority: 'Low',
-    status: 'In Progress',
-    deadline: '2023-06-20',
-    progress: 45,
-  },
-  {
-    id: 'T1004',
-    title: 'New Staff Training',
-    priority: 'Medium',
-    status: 'Not Started',
-    deadline: '2023-06-22',
-    progress: 0,
-  },
-];
-
-// Fake task history
-const taskHistory = [
-  {
-    id: 'T0987',
-    title: 'Product Assembly - Model X35',
-    completedDate: '2023-06-05',
-    rating: 'Excellent',
-    notes: 'Completed ahead of schedule with zero defects',
-  },
-  {
-    id: 'T0986',
-    title: 'Equipment Testing - Line 5',
-    completedDate: '2023-06-02',
-    rating: 'Good',
-    notes: 'Minor delays due to equipment calibration issues',
-  },
-  {
-    id: 'T0985',
-    title: 'Safety Protocol Audit',
-    completedDate: '2023-05-28',
-    rating: 'Excellent',
-    notes: 'Comprehensive audit with detailed documentation',
-  },
-  {
-    id: 'T0984',
-    title: 'Inventory Reconciliation',
-    completedDate: '2023-05-25',
-    rating: 'Satisfactory',
-    notes: 'Some discrepancies found and resolved',
-  },
-  {
-    id: 'T0983',
-    title: 'Production Planning Meeting',
-    completedDate: '2023-05-20',
-    rating: 'Good',
-    notes: 'Contributed valuable insights to Q3 planning',
-  },
-];
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useGetStaffDashboardQuery } from '@/graphql/generated/graphql';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Separator } from '@/components/ui/separator';
 
 export default function StaffDetailPage() {
   const params = useParams();
   const staffId = params.id as string;
 
-  // In a real app, you would fetch the staff data using the ID
-  // const { data, loading, error } = useGetStaffByIdQuery({ variables: { id: staffId } });
+  const { data, loading } = useGetStaffDashboardQuery({
+    variables: {
+      userId: staffId,
+    },
+  });
 
   // Function to format date
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
     });
   };
 
+  if (loading) {
+    return (
+      <DashboardShell title="Loading..." subtitle="Staff details and tasks">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+          <Skeleton className="h-[300px] w-full" />
+          <div className="space-y-6 md:col-span-3">
+            <div className="grid grid-cols-2 gap-4">
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+            </div>
+            <Skeleton className="h-[400px] w-full" />
+          </div>
+        </div>
+      </DashboardShell>
+    );
+  }
+
+  const staffMember = data?.user;
+  const dashboardData = data?.getStaffDashboard;
+
+  if (!staffMember || !dashboardData) {
+    return (
+      <DashboardShell title="Error" subtitle="Could not load staff data">
+        <Card>
+          <CardContent className="pt-6">
+            <p>Staff information unavailable. Please try again later.</p>
+          </CardContent>
+        </Card>
+      </DashboardShell>
+    );
+  }
+
+  // Get staff name or use fallback
+  const staffName = staffMember.name || 'Unknown Staff';
+
+  // Create initials for avatar fallback
+  const initials = staffName
+    .split(' ')
+    .map(n => n[0])
+    .join('');
+
+  // Format gender for display
+  const formatGender = (gender: string | null | undefined) => {
+    if (!gender) return 'Not specified';
+    return gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase();
+  };
+
+  console.log(staffMember.staffedFactory);
+
   return (
     <DashboardShell
-      title={`Staff Profile: ${staffMember.name}`}
-      subtitle="View staff details, tasks, and performance metrics"
+      title={`Staff: ${staffName}`}
+      subtitle="Staff details and tasks"
     >
       {/* Staff Overview Section */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+        {/* Staff Info Card */}
         <Card className="md:col-span-1">
-          <CardHeader className="pb-2">
-            <CardTitle>Staff Information</CardTitle>
-            <CardDescription>Personal and contact details</CardDescription>
+          <CardHeader>
+            <div className="flex items-center space-x-4">
+              <Avatar className="h-16 w-16">
+                <AvatarImage src={staffMember.imageUrl || ''} alt={staffName} />
+                <AvatarFallback>{initials}</AvatarFallback>
+              </Avatar>
+              <div>
+                <CardTitle className="text-lg">{staffName}</CardTitle>
+                <CardDescription>{staffMember.role}</CardDescription>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent className="flex flex-col items-center pb-2 text-center">
-            <Avatar className="mb-4 h-24 w-24">
-              <AvatarImage src={staffMember.imageUrl} alt={staffMember.name} />
-              <AvatarFallback className="text-lg">
-                {staffMember.name
-                  .split(' ')
-                  .map(n => n[0])
-                  .join('')}
-              </AvatarFallback>
-            </Avatar>
-            <h3 className="text-xl font-bold">{staffMember.name}</h3>
-            <p className="text-muted-foreground">{staffMember.role}</p>
-            <Badge
-              className="mt-2"
-              variant={
-                staffMember.status === 'Active' ? 'default' : 'secondary'
-              }
-            >
-              {staffMember.status}
+          <CardContent className="space-y-2">
+            <Badge variant={staffMember.isActive ? 'default' : 'secondary'}>
+              {staffMember.isActive ? 'Active' : 'Inactive'}
             </Badge>
 
-            <div className="mt-4 w-full space-y-2">
+            <div className="space-y-2 pt-2">
+              {/* Contact info is based on the fields in the actual data */}
               <div className="flex items-center gap-2 text-sm">
                 <MailIcon className="text-muted-foreground h-4 w-4" />
-                <span>{staffMember.email}</span>
+                <span>{staffMember.email || 'No email'}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <PhoneIcon className="text-muted-foreground h-4 w-4" />
-                <span>{staffMember.phone}</span>
+                <span>{staffMember.phoneNumber || 'No phone number'}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <CalendarIcon className="text-muted-foreground h-4 w-4" />
-                <span>Joined {formatDate(staffMember.joinDate)}</span>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-center">
-            <Button variant="outline" size="sm">
-              Edit Profile
-            </Button>
-          </CardFooter>
-        </Card>
-
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Performance Metrics</CardTitle>
-            <CardDescription>Staff performance overview</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              <StatCard
-                title="Completed Tasks"
-                value={staffMember.stats.completedTasks.toString()}
-                change="+12"
-                changeType="positive"
-                icon={<BadgeCheckIcon className="h-5 w-5" />}
-              />
-              <StatCard
-                title="Active Tasks"
-                value={staffMember.stats.activeTasks.toString()}
-                change="+1"
-                changeType="positive"
-                icon={<ClipboardIcon className="h-5 w-5" />}
-              />
-              <StatCard
-                title="Efficiency"
-                value={`${staffMember.stats.efficiency}%`}
-                change="+2%"
-                changeType="positive"
-                icon={<ClockIcon className="h-5 w-5" />}
-              />
-              <StatCard
-                title="Attendance"
-                value={`${staffMember.stats.attendance}%`}
-                change="-1%"
-                changeType="negative"
-                icon={<UserIcon className="h-5 w-5" />}
-              />
-            </div>
-
-            <div className="mt-6">
-              <h4 className="mb-3 text-sm font-semibold">Performance Trend</h4>
-              <div className="space-y-3">
-                <div>
-                  <div className="mb-1 flex justify-between text-sm">
-                    <span>Current Week</span>
-                    <span>{staffMember.performance.currentWeek}%</span>
-                  </div>
-                  <Progress value={staffMember.performance.currentWeek} />
+              {staffMember.gender && typeof staffMember.gender === 'string' && (
+                <div className="flex items-center gap-2 text-sm">
+                  <UserIcon className="text-muted-foreground h-4 w-4" />
+                  <span>{formatGender(staffMember.gender)}</span>
                 </div>
-                <div>
-                  <div className="mb-1 flex justify-between text-sm">
-                    <span>Last Week</span>
-                    <span>{staffMember.performance.lastWeek}%</span>
-                  </div>
-                  <Progress value={staffMember.performance.lastWeek} />
+              )}
+              {staffMember.dateOfBirth && (
+                <div className="flex items-center gap-2 text-sm">
+                  <CalendarDaysIcon className="text-muted-foreground h-4 w-4" />
+                  <span>Born: {formatDate(staffMember.dateOfBirth)}</span>
                 </div>
-                <div>
-                  <div className="mb-1 flex justify-between text-sm">
-                    <span>Last Month</span>
-                    <span>{staffMember.performance.lastMonth}%</span>
-                  </div>
-                  <Progress value={staffMember.performance.lastMonth} />
+              )}
+              {staffMember.updatedAt && (
+                <div className="flex items-center gap-2 text-sm">
+                  <ClockIcon className="text-muted-foreground h-4 w-4" />
+                  <span>Last updated: {formatDate(staffMember.updatedAt)}</span>
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Factory Assignment */}
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle>Factory Assignment</CardTitle>
-          <CardDescription>Current workplace information</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 rounded-full p-3">
-                <BuildingIcon className="text-primary h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-medium">{staffMember.factory.name}</h3>
-                <p className="text-muted-foreground text-sm">
-                  Factory ID: {staffMember.factory.id}
-                </p>
-              </div>
-            </div>
-            <div className="md:ml-12">
-              <p className="text-sm">
-                <span className="font-medium">Department:</span>{' '}
-                {staffMember.factory.department}
-              </p>
-              <p className="text-sm">
-                <span className="font-medium">Manager:</span>{' '}
-                {staffMember.factory.manager}
-              </p>
-            </div>
-            <div className="md:ml-auto">
-              <Button variant="outline" size="sm">
-                View Factory
-                <ChevronRightIcon className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Tasks and History */}
-      <Tabs defaultValue="active-tasks" className="mt-6">
-        <TabsList>
-          <TabsTrigger value="active-tasks">Active Tasks</TabsTrigger>
-          <TabsTrigger value="task-history">Task History</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="active-tasks" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Active Tasks</CardTitle>
-              <CardDescription>
-                Currently assigned tasks and their status
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Task ID</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Priority</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Deadline</TableHead>
-                    <TableHead>Progress</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {activeTasks.map(task => (
-                    <TableRow key={task.id}>
-                      <TableCell className="font-medium">{task.id}</TableCell>
-                      <TableCell>{task.title}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            task.priority === 'High'
-                              ? 'destructive'
-                              : task.priority === 'Medium'
-                                ? 'default'
-                                : 'outline'
-                          }
-                        >
-                          {task.priority}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            task.status === 'In Progress'
-                              ? 'default'
-                              : task.status === 'Pending'
-                                ? 'secondary'
-                                : 'outline'
-                          }
-                        >
-                          {task.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{formatDate(task.deadline)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Progress
-                            value={task.progress}
-                            className="h-2 w-24"
-                          />
-                          <span className="text-xs">{task.progress}%</span>
+              )}
+              {staffMember.staffedFactory && (
+                <>
+                  <Separator className="my-2" />
+                  <div className="text-muted-foreground text-sm">Factory</div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <BuildingIcon className="text-muted-foreground h-4 w-4" />
+                    <div>
+                      <div>{staffMember.staffedFactory.name}</div>
+                      {staffMember.staffedFactory.address && (
+                        <div className="text-muted-foreground text-xs">
+                          {staffMember.staffedFactory.address.street ||
+                            'No address'}
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
-        <TabsContent value="task-history" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Task History</CardTitle>
-              <CardDescription>
-                Previously completed tasks and performance
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Task ID</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Completed Date</TableHead>
-                    <TableHead>Rating</TableHead>
-                    <TableHead>Notes</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {taskHistory.map(task => (
-                    <TableRow key={task.id}>
-                      <TableCell className="font-medium">{task.id}</TableCell>
-                      <TableCell>{task.title}</TableCell>
-                      <TableCell>{formatDate(task.completedDate)}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            task.rating === 'Excellent'
-                              ? 'default'
-                              : task.rating === 'Good'
-                                ? 'secondary'
-                                : 'outline'
-                          }
-                        >
-                          {task.rating}
-                        </Badge>
-                      </TableCell>
-                      <TableCell
-                        className="max-w-xs truncate"
-                        title={task.notes}
-                      >
-                        {task.notes}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" size="sm">
-                View Full History
-              </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        {/* Stats and Tasks */}
+        <div className="space-y-6 md:col-span-3">
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-4">
+            <StatCard
+              title="Completed Tasks"
+              value={dashboardData.completedTasks.toString()}
+              change={
+                dashboardData.lastMonthCompletedTasks > 0
+                  ? `+${dashboardData.lastMonthCompletedTasks}`
+                  : dashboardData.lastMonthCompletedTasks.toString()
+              }
+              changeType={
+                dashboardData.lastMonthCompletedTasks >= 0
+                  ? 'positive'
+                  : 'negative'
+              }
+              icon={<BadgeCheckIcon className="h-5 w-5" />}
+            />
+            <StatCard
+              title="Active Tasks"
+              value={dashboardData.totalActiveTasks.toString()}
+              change={
+                dashboardData.lastMonthActiveTasks > 0
+                  ? `+${dashboardData.lastMonthActiveTasks}`
+                  : dashboardData.lastMonthActiveTasks.toString()
+              }
+              changeType={
+                dashboardData.lastMonthActiveTasks >= 0
+                  ? 'positive'
+                  : 'negative'
+              }
+              icon={<ClipboardIcon className="h-5 w-5" />}
+            />
+          </div>
+
+          {/* Tasks and History */}
+          <Tabs defaultValue="active-tasks">
+            <TabsList>
+              <TabsTrigger value="active-tasks">Active Tasks</TabsTrigger>
+              <TabsTrigger value="task-history">Task History</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="active-tasks">
+              <Card>
+                <CardContent>
+                  {dashboardData.activeTasks.length > 0 ? (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Task</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Start Date</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {dashboardData.activeTasks.map(task => (
+                          <TableRow key={task.id}>
+                            <TableCell>
+                              <div className="font-medium">{task.taskname}</div>
+                              <div className="text-muted-foreground text-xs">
+                                {task.id}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                variant={
+                                  task.taskType === 'PRODUCTION'
+                                    ? 'destructive'
+                                    : task.taskType === 'QUALITY_CHECK'
+                                      ? 'default'
+                                      : 'outline'
+                                }
+                              >
+                                {task.taskType}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                variant={
+                                  task.status === 'IN_PROGRESS'
+                                    ? 'default'
+                                    : task.status === 'PENDING'
+                                      ? 'secondary'
+                                      : 'outline'
+                                }
+                              >
+                                {task.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>{formatDate(task.startDate)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <div className="text-muted-foreground py-4 text-center">
+                      No active tasks found.
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="task-history">
+              <Card>
+                <CardContent>
+                  {dashboardData.taskHistory.length > 0 ? (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Task</TableHead>
+                          <TableHead>Completed</TableHead>
+                          <TableHead>Type</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {dashboardData.taskHistory.map(task => (
+                          <TableRow key={task.id}>
+                            <TableCell>
+                              <div className="font-medium">{task.taskname}</div>
+                              <div className="text-muted-foreground text-xs">
+                                {task.id}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {task.completedDate
+                                ? formatDate(task.completedDate)
+                                : 'N/A'}
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                variant={
+                                  task.taskType === 'PRODUCTION'
+                                    ? 'default'
+                                    : task.taskType === 'QUALITY_CHECK'
+                                      ? 'secondary'
+                                      : 'outline'
+                                }
+                              >
+                                {task.taskType}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <div className="text-muted-foreground py-4 text-center">
+                      No task history found.
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
     </DashboardShell>
   );
 }

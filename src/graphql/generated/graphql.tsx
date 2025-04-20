@@ -556,6 +556,7 @@ export type Mutation = {
   login: AuthResponseDto;
   logout: Scalars['String']['output'];
   markNotificationAsRead: NotificationEntity;
+  reassignNewStaffForOrder: OrderEntity;
   refreshToken: AuthResponseDto;
   register: AuthResponseDto;
   rejectOrder: OrderEntity;
@@ -797,6 +798,12 @@ export type MutationLoginArgs = {
 
 export type MutationMarkNotificationAsReadArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type MutationReassignNewStaffForOrderArgs = {
+  newStaffId: Scalars['String']['input'];
+  orderId: Scalars['String']['input'];
 };
 
 
@@ -1129,11 +1136,13 @@ export type PaymentTransactionEntity = {
   customer?: Maybe<UserEntity>;
   customerId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
+  imageUrls?: Maybe<Array<Scalars['String']['output']>>;
   paymentGatewayTransactionId: Scalars['String']['output'];
   paymentMethod: PaymentMethod;
   status: TransactionStatus;
   transactionLog: Scalars['String']['output'];
   type: TransactionType;
+  userBank?: Maybe<UserBankEntity>;
 };
 
 export type ProductDesignEntity = {
@@ -1216,7 +1225,9 @@ export type Query = {
   factoryOrders: Array<OrderEntity>;
   factoryProduct: FactoryProductEntity;
   factoryProducts: Array<FactoryProductEntity>;
+  findActiveTasksByStaffId: Array<TaskEntity>;
   findTasksByStaffId: Array<TaskEntity>;
+  findTasksHistoryByStaffId: Array<TaskEntity>;
   formatAddress: FormattedAddressModel;
   getAdminDashboard: AdminDashboardResponse;
   getAllDiscountByProductId: Array<SystemConfigDiscountEntity>;
@@ -1232,6 +1243,7 @@ export type Query = {
   getManagerOrderDashboard: ManagerOrderDashboardEntity;
   getMe: UserEntity;
   getMyFactory: FactoryEntity;
+  getStaffDashboard: StaffDashboardResponse;
   getTemplateProductDesigns: Array<ProductDesignEntity>;
   myNotifications: Array<NotificationEntity>;
   myOrders: Array<OrderEntity>;
@@ -1313,7 +1325,17 @@ export type QueryFactoryProductArgs = {
 };
 
 
+export type QueryFindActiveTasksByStaffIdArgs = {
+  staffId: Scalars['String']['input'];
+};
+
+
 export type QueryFindTasksByStaffIdArgs = {
+  staffId: Scalars['String']['input'];
+};
+
+
+export type QueryFindTasksHistoryByStaffIdArgs = {
   staffId: Scalars['String']['input'];
 };
 
@@ -1346,6 +1368,11 @@ export type QueryGetFactoryByIdArgs = {
 
 export type QueryGetFactoryDetailDashboardArgs = {
   factoryId: Scalars['String']['input'];
+};
+
+
+export type QueryGetStaffDashboardArgs = {
+  userId: Scalars['String']['input'];
 };
 
 
@@ -1514,6 +1541,17 @@ export type ShippingService = {
   serviceId: Scalars['Int']['output'];
   serviceTypeId: Scalars['Int']['output'];
   shortName: Scalars['String']['output'];
+};
+
+export type StaffDashboardResponse = {
+  __typename?: 'StaffDashboardResponse';
+  activeTasks: Array<TaskEntity>;
+  completedTasks: Scalars['Int']['output'];
+  lastMonthActiveTasks: Scalars['Int']['output'];
+  lastMonthCompletedTasks: Scalars['Int']['output'];
+  taskHistory: Array<TaskEntity>;
+  totalActiveTasks: Scalars['Int']['output'];
+  totalTaskHistory: Scalars['Int']['output'];
 };
 
 export type SystemConfigBankEntity = {
@@ -1730,6 +1768,20 @@ export type UpdateUserDto = {
   updatedBy?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UserBankEntity = {
+  __typename?: 'UserBankEntity';
+  accountName: Scalars['String']['output'];
+  accountNumber: Scalars['String']['output'];
+  bank?: Maybe<SystemConfigBankEntity>;
+  bankId: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  isDefault: Scalars['Boolean']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  user?: Maybe<UserEntity>;
+  userId: Scalars['String']['output'];
+};
+
 export type UserEntity = {
   __typename?: 'UserEntity';
   createdAt: Scalars['DateTime']['output'];
@@ -1906,6 +1958,13 @@ export type GetFactoryDetailDashboardQueryVariables = Exact<{
 
 
 export type GetFactoryDetailDashboardQuery = { __typename?: 'Query', getFactoryDetailDashboard: { __typename?: 'FactoryDetailDashboardResponse', inProductionOrders: number, lastMonthInProductionOrders: number, lastMonthPendingOrders: number, lastMonthTotalOrders: number, lastMonthTotalRevenue: number, pendingOrders: number, totalOrders: number, totalRevenue: number, productionProgress: Array<{ __typename?: 'FactoryOrderWithProgress', id: string, status: string, createdAt: any, totalProductionCost: number }>, qualityIssues: Array<{ __typename?: 'QualityIssueWithFactory', id: string, reportedAt: any, issueType: string, status: string, description: string, factoryOrder: { __typename?: 'FactoryOrderInfo', id: string, status: string } }>, recentOrders: Array<{ __typename?: 'FactoryOrderWithCustomer', id: string, status: string, totalProductionCost: number, createdAt: any, customerOrder: { __typename?: 'CustomerOrderInfo', id: string, status: string, totalPrice: number } }> } };
+
+export type GetStaffDashboardQueryVariables = Exact<{
+  userId: Scalars['String']['input'];
+}>;
+
+
+export type GetStaffDashboardQuery = { __typename?: 'Query', getStaffDashboard: { __typename?: 'StaffDashboardResponse', completedTasks: number, lastMonthActiveTasks: number, lastMonthCompletedTasks: number, totalActiveTasks: number, totalTaskHistory: number, activeTasks: Array<{ __typename?: 'TaskEntity', id: string, note?: string | null, startDate: any, orderId?: string | null, status: string, taskType: string, taskname: string, userId?: string | null, completedDate?: any | null, description: string, assignedDate: any }>, taskHistory: Array<{ __typename?: 'TaskEntity', id: string, note?: string | null, startDate: any, orderId?: string | null, status: string, taskType: string, taskname: string, userId?: string | null, completedDate?: any | null, description: string, assignedDate: any }> }, user: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, email?: string | null, deletedAt?: any | null, createdAt: any, updatedAt?: any | null, gender: boolean, dateOfBirth?: any | null, staffedFactory?: { __typename?: 'FactoryEntity', name: string, factoryOwnerId: string, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, provinceID: number, street: string, wardCode: string } | null } | null } };
 
 export type UpdateDesignPositionMutationVariables = Exact<{
   input: UpdateDesignPositionDto;
@@ -3315,6 +3374,101 @@ export type GetFactoryDetailDashboardQueryHookResult = ReturnType<typeof useGetF
 export type GetFactoryDetailDashboardLazyQueryHookResult = ReturnType<typeof useGetFactoryDetailDashboardLazyQuery>;
 export type GetFactoryDetailDashboardSuspenseQueryHookResult = ReturnType<typeof useGetFactoryDetailDashboardSuspenseQuery>;
 export type GetFactoryDetailDashboardQueryResult = Apollo.QueryResult<GetFactoryDetailDashboardQuery, GetFactoryDetailDashboardQueryVariables>;
+export const GetStaffDashboardDocument = gql`
+    query GetStaffDashboard($userId: String!) {
+  getStaffDashboard(userId: $userId) {
+    activeTasks {
+      id
+      note
+      startDate
+      orderId
+      status
+      taskType
+      taskname
+      userId
+      completedDate
+      description
+      assignedDate
+    }
+    completedTasks
+    lastMonthActiveTasks
+    lastMonthCompletedTasks
+    taskHistory {
+      id
+      note
+      startDate
+      orderId
+      status
+      taskType
+      taskname
+      userId
+      completedDate
+      description
+      assignedDate
+    }
+    totalActiveTasks
+    totalTaskHistory
+  }
+  user(id: $userId) {
+    id
+    imageUrl
+    isActive
+    name
+    phoneNumber
+    role
+    staffedFactory {
+      name
+      factoryOwnerId
+      address {
+        districtID
+        factoryId
+        provinceID
+        street
+        wardCode
+      }
+    }
+    email
+    deletedAt
+    createdAt
+    updatedAt
+    gender
+    dateOfBirth
+  }
+}
+    `;
+
+/**
+ * __useGetStaffDashboardQuery__
+ *
+ * To run a query within a React component, call `useGetStaffDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStaffDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStaffDashboardQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetStaffDashboardQuery(baseOptions: Apollo.QueryHookOptions<GetStaffDashboardQuery, GetStaffDashboardQueryVariables> & ({ variables: GetStaffDashboardQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetStaffDashboardQuery, GetStaffDashboardQueryVariables>(GetStaffDashboardDocument, options);
+      }
+export function useGetStaffDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetStaffDashboardQuery, GetStaffDashboardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetStaffDashboardQuery, GetStaffDashboardQueryVariables>(GetStaffDashboardDocument, options);
+        }
+export function useGetStaffDashboardSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetStaffDashboardQuery, GetStaffDashboardQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetStaffDashboardQuery, GetStaffDashboardQueryVariables>(GetStaffDashboardDocument, options);
+        }
+export type GetStaffDashboardQueryHookResult = ReturnType<typeof useGetStaffDashboardQuery>;
+export type GetStaffDashboardLazyQueryHookResult = ReturnType<typeof useGetStaffDashboardLazyQuery>;
+export type GetStaffDashboardSuspenseQueryHookResult = ReturnType<typeof useGetStaffDashboardSuspenseQuery>;
+export type GetStaffDashboardQueryResult = Apollo.QueryResult<GetStaffDashboardQuery, GetStaffDashboardQueryVariables>;
 export const UpdateDesignPositionDocument = gql`
     mutation UpdateDesignPosition($input: UpdateDesignPositionDto!) {
   updateDesignPosition(input: $input) {

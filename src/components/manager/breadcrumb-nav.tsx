@@ -49,29 +49,31 @@ export function ManagerBreadcrumbNav() {
 
   const segments = pathname.split('/').filter(Boolean);
 
-  // Create breadcrumb items based on the path segments
-  const breadcrumbItems = segments.map((segment, index) => {
+  // Create breadcrumb items with separators between them
+  const breadcrumbItems: React.ReactNode[] = [];
+
+  segments.forEach((segment, index) => {
     const href = `/${segments.slice(0, index + 1).join('/')}`;
     const isLast = index === segments.length - 1;
-
     const label = formatLabel(segment);
 
     if (isLast) {
-      return (
+      breadcrumbItems.push(
         <BreadcrumbItem key={href}>
           <BreadcrumbPage>{label}</BreadcrumbPage>
-        </BreadcrumbItem>
+        </BreadcrumbItem>,
       );
+    } else {
+      breadcrumbItems.push(
+        <BreadcrumbItem key={href}>
+          <BreadcrumbLink asChild>
+            <Link href={href}>{label}</Link>
+          </BreadcrumbLink>
+        </BreadcrumbItem>,
+      );
+      // Add separator as a separate item
+      breadcrumbItems.push(<BreadcrumbSeparator key={`${href}-separator`} />);
     }
-
-    return (
-      <BreadcrumbItem key={href}>
-        <BreadcrumbLink asChild>
-          <Link href={href}>{label}</Link>
-        </BreadcrumbLink>
-        <BreadcrumbSeparator />
-      </BreadcrumbItem>
-    );
   });
 
   return (
@@ -83,8 +85,8 @@ export function ManagerBreadcrumbNav() {
               <HomeIcon className="size-4" />
             </Link>
           </BreadcrumbLink>
-          <BreadcrumbSeparator />
         </BreadcrumbItem>
+        <BreadcrumbSeparator />
         {breadcrumbItems}
       </BreadcrumbList>
     </Breadcrumb>
