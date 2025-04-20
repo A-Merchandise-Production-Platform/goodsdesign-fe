@@ -35,12 +35,9 @@ export default function CartPage() {
   const router = useRouter();
   const { data, loading, refetch } = useGetUserCartItemsQuery();
   const [isCheckingOut, setIsCheckingOut] = useState<boolean>(false);
-  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>(
-    {},
-  );
-  const [productVariants, setProductVariants] = useState<
-    Record<string, SystemConfigVariantEntity[]>
-  >({});
+  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>({});
+  const [productVariants, setProductVariants] = useState<Record<string, SystemConfigVariantEntity[]>>({});
+  const [isLoadingVariants, setIsLoadingVariants] = useState(false);
 
   const [getProductVariants] = useGetProductVariantByIdLazyQuery();
 
@@ -96,6 +93,72 @@ export default function CartPage() {
     return groups;
   }, [cartItems]);
 
+  // Calculate price info for a group of items
+  const calculateGroupPriceInfo = (items: CartItemEntity[]) => {
+    // Get total quantity for the group to determine discount
+    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+    
+    // Get discounts from first item (all items in group share same product)
+    const discounts = items[0]?.systemConfigVariant?.product?.discounts || [];
+    let discountPercent = 0;
+
+    // Find applicable discount based on total group quantity
+    for (const discount of discounts) {
+      if (totalQuantity >= discount.minQuantity && discount.discountPercent > discountPercent) {
+        discountPercent = discount.discountPercent;
+      }
+    }
+
+    // Calculate prices for each item with the same discount
+    const itemPrices: Record<string, ItemPriceCalculation> = {};
+    items.forEach(item => {
+      if (!item.systemConfigVariant || !item.design) {
+        itemPrices[item.id] = {
+          originalPrice: 0,
+          unitPrice: 0,
+          totalPrice: 0,
+          discountApplied: false,
+          discountPercent: 0,
+        };
+        return;
+      }
+
+      const blankPrice = item.systemConfigVariant.price || 0;
+      const positionPrices = item.design.designPositions?.reduce(
+        (total: number, position: DesignPositionEntity) => {
+          if (position.designJSON && position.designJSON.length > 0) {
+            return total + (position.positionType?.basePrice || 0);
+          }
+          return total;
+        },
+        0,
+      ) || 0;
+
+      const originalPrice = blankPrice + positionPrices;
+      const unitPrice = originalPrice * (1 - discountPercent);
+
+      itemPrices[item.id] = {
+        originalPrice,
+        unitPrice,
+        totalPrice: unitPrice * item.quantity,
+        discountApplied: discountPercent > 0,
+        discountPercent: discountPercent * 100,
+      };
+    });
+
+    return itemPrices;
+  };
+
+  // Calculate price info for all groups
+  const priceInfos = useMemo(() => {
+    const allPrices: Record<string, ItemPriceCalculation> = {};
+    Object.values(groupedCartItems).forEach(items => {
+      const groupPrices = calculateGroupPriceInfo(items);
+      Object.assign(allPrices, groupPrices);
+    });
+    return allPrices;
+  }, [groupedCartItems]);
+
   // Handle removing a design (all its variants)
   const handleRemoveDesign = async (items: CartItemEntity[]) => {
     try {
@@ -148,103 +211,37 @@ export default function CartPage() {
 
       if (uniqueProductIds.size === 0) return;
 
+      setIsLoadingVariants(true);
       try {
         const variants: Record<string, SystemConfigVariantEntity[]> = {};
         await Promise.all(
-          Array.from(uniqueProductIds).map(async productId => {
+          Array.from(uniqueProductIds).map(async (productId) => {
             const result = await getProductVariants({
               variables: { productId },
             });
             if (result.data?.product?.variants) {
-              variants[productId] = result.data.product
-                .variants as SystemConfigVariantEntity[];
+              variants[productId] = result.data.product.variants as SystemConfigVariantEntity[];
             }
-          }),
+          })
         );
         setProductVariants(variants);
       } catch (error) {
         console.error('Error fetching variants:', error);
+      } finally {
+        setIsLoadingVariants(false);
       }
     };
 
     fetchVariants();
   }, [cartItems, getProductVariants]);
 
-  // Function to calculate price for a single cart item
-  const calculateItemPrice = (item: CartItemEntity): ItemPriceCalculation => {
-    if (
-      !item.design ||
-      !item.systemConfigVariant ||
-      !item.design.designPositions
-    ) {
-      return {
-        originalPrice: 0,
-        unitPrice: 0,
-        totalPrice: 0,
-        discountApplied: false,
-        discountPercent: 0,
-      };
-    }
-    const blankPrice = item.systemConfigVariant.price || 0;
-    // Calculate total for positions that have designs
-    const positionPrices = item.design.designPositions.reduce(
-      (total: number, position: DesignPositionEntity) => {
-        // Only add price if position has designJSON (has design)
-        if (position.designJSON && position.designJSON.length > 0) {
-          return total + (position.positionType?.basePrice || 0);
-        }
-        return total;
-      },
-      0,
-    );
-
-    // Calculate base price without discounts
-    const basePrice = blankPrice + positionPrices;
-
-    // Check for applicable discounts
-    const discounts = item.systemConfigVariant.product.discounts || [];
-    let discountPercent = 0;
-
-    for (const discount of discounts) {
-      if (
-        item.quantity >= discount.minQuantity &&
-        discount.discountPercent > discountPercent
-      ) {
-        discountPercent = discount.discountPercent;
-      }
-    }
-
-    // Apply discount if applicable
-    const discountedPrice = basePrice * (1 - discountPercent);
-
-    return {
-      originalPrice: basePrice,
-      unitPrice: discountedPrice,
-      totalPrice: discountedPrice * item.quantity,
-      discountApplied: discountPercent > 0,
-      discountPercent: discountPercent * 100,
-    };
-  };
-
-  // Calculate price info for all items
-  const priceInfos = useMemo(() => {
-    const infos: Record<string, ItemPriceCalculation> = {};
-    cartItems.forEach(item => {
-      infos[item.id] = calculateItemPrice(item);
-    });
-    return infos;
-  }, [cartItems]);
-
   // Get only selected cart items
   const selectedCartItems = cartItems.filter(item => selectedItems[item.id]);
 
   // Calculate cart totals for selected items only
-  const cartTotal = selectedCartItems.reduce(
-    (total: number, item: CartItemEntity) => {
-      return total + calculateItemPrice(item).totalPrice;
-    },
-    0,
-  );
+  const cartTotal = selectedCartItems.reduce((total: number, item: CartItemEntity) => {
+    return total + (priceInfos[item.id]?.totalPrice || 0);
+  }, 0);
 
   // Handle quantity changes
   const handleQuantityChange = (id: string, newQuantity: number): void => {
@@ -280,11 +277,7 @@ export default function CartPage() {
     cartItems.length > 0 && cartItems.every(item => selectedItems[item.id]);
 
   // Handle adding new size
-  const handleAddSize = (
-    designId: string,
-    variantId: string,
-    quantity: number,
-  ): void => {
+  const handleAddSize = (designId: string, variantId: string, quantity: number): void => {
     createCartItem({
       variables: {
         createCartItemInput: {
@@ -347,9 +340,7 @@ export default function CartPage() {
                 onRemoveVariant={handleRemoveVariant}
                 isUpdating={updateCartItemLoading}
                 onAddSize={handleAddSize}
-                availableVariants={
-                  productId ? productVariants[productId] : undefined
-                }
+                availableVariants={productId ? productVariants[productId] : undefined}
               />
             );
           })}

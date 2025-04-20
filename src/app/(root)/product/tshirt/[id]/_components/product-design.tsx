@@ -682,15 +682,19 @@ export default function ProductDesigner({
 
         // Use setTimeout to push this to the next tick, avoiding the setState in render error
         setTimeout(() => {
-          onUpdatePosition({
-            variables: {
-              input: {
-                designId: designId,
-                productPositionTypeId: positionTypeId,
-                designJSON: currentDesigns,
+          try {
+            onUpdatePosition({
+              variables: {
+                input: {
+                  designId: designId,
+                  productPositionTypeId: positionTypeId,
+                  designJSON: currentDesigns,
+                },
               },
-            },
-          });
+            });
+          } catch (error) {
+            console.error('Error updating position:', error);
+          }
         }, 0);
       }
     }
@@ -868,40 +872,51 @@ export default function ProductDesigner({
     loadSavedDesign();
   }, [view, designsInitialized, currentTexture]);
 
-  // Generate initial thumbnail if none exists
+  // Generate initial thumbnail
+  const hasGeneratedThumbnail = useRef(false);
   useEffect(() => {
-    const generateInitialThumbnail = async () => {
-      if (!onThumbnail || thumbnailUrl !== null || !fabricCanvasRef.current)
-        return;
+    if (!designsInitialized || hasGeneratedThumbnail.current) return;
 
-      const captureCallback = async (dataUrl: string) => {
-        try {
-          const response = await fetch(dataUrl);
-          const blob = await response.blob();
-          const file = new File([blob], `tshirt-3d-${view}.png`, {
-            type: 'image/png',
-          });
+    // Wait for canvas to be fully ready
+    if (thumbnailUrl === null || thumbnailUrl === '') {
+      const timer = setTimeout(() => {
+        if (!fabricCanvasRef.current || !onThumbnail) return;
 
-          const mockEvent = {
-            target: {
-              files: [file],
-            },
-          } as unknown as React.ChangeEvent<HTMLInputElement>;
+        hasGeneratedThumbnail.current = true; // Set flag before async operations
 
-          await onThumbnail(mockEvent);
-        } catch (error) {
-          console.error('Error generating initial thumbnail:', error);
-        } finally {
-          setModelExportCallback(undefined);
-        }
-      };
+        const captureCallback = async (dataUrl: string) => {
+          try {
+            // Convert dataUrl to File
+            const response = await fetch(dataUrl);
+            const blob = await response.blob();
+            const file = new File([blob], `tshirt-3d-${view}.png`, {
+              type: 'image/png',
+            });
 
-      // Trigger the model capture
-      setModelExportCallback(() => captureCallback);
-    };
+            // Create a mock event with the file
+            const mockEvent = {
+              target: {
+                files: [file],
+              },
+            } as unknown as React.ChangeEvent<HTMLInputElement>;
 
-    generateInitialThumbnail();
-  }, [thumbnailUrl, onThumbnail, view]);
+            // Upload thumbnail
+            await onThumbnail(mockEvent);
+          } catch (error) {
+            console.error('Error capturing initial thumbnail:', error);
+            hasGeneratedThumbnail.current = false; // Reset flag if failed
+          } finally {
+            setModelExportCallback(undefined);
+          }
+        };
+
+        // Set the callback to capture the model view
+        setModelExportCallback(() => captureCallback);
+      }, 0);
+
+      return () => clearTimeout(timer);
+    }
+  }, [designsInitialized]); // Only run when designs are initialized
 
   // Update 3D model when designs change
   useEffect(() => {
@@ -1060,38 +1075,45 @@ export default function ProductDesigner({
     <div className="flex h-screen flex-col">
       <DesignHeader
         onSave={async () => {
-          saveCurrentDesign();
+          try {
+            saveCurrentDesign();
 
-          // Then capture and update thumbnail
-          const captureCallback = async (dataUrl: string) => {
-            try {
-              // Convert dataUrl to File
-              const response = await fetch(dataUrl);
-              const blob = await response.blob();
-              const file = new File([blob], `tshirt-3d-${view}.png`, {
-                type: 'image/png',
-              });
+            // Then capture and update thumbnail
+            const captureCallback = async (dataUrl: string) => {
+              try {
+                // Convert dataUrl to File
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                const file = new File([blob], `tshirt-3d-${view}.png`, {
+                  type: 'image/png',
+                });
 
-              // Create a mock event with the file
-              const mockEvent = {
-                target: {
-                  files: [file],
-                },
-              } as unknown as React.ChangeEvent<HTMLInputElement>;
+                // Create a mock event with the file
+                const mockEvent = {
+                  target: {
+                    files: [file],
+                  },
+                } as unknown as React.ChangeEvent<HTMLInputElement>;
 
-              // Upload thumbnail using the provided callback
-              if (onThumbnail) {
-                await onThumbnail(mockEvent);
+                // Upload thumbnail using the provided callback
+                if (onThumbnail) {
+                  await onThumbnail(mockEvent);
+                }
+                
+                // Show success message after both save and thumbnail update complete
+                toast.success('Design saved successfully!');
+              } catch (error) {
+                toast.error('Failed to save design!');
+              } finally {
+                setModelExportCallback(undefined);
               }
-            } catch (error) {
-              console.error('Error capturing thumbnail:', error);
-            } finally {
-              setModelExportCallback(undefined);
-            }
-          };
+            };
 
-          // Set the callback to capture the model view
-          setModelExportCallback(() => captureCallback);
+            // Set the callback to capture the model view
+            setModelExportCallback(() => captureCallback);
+          } catch (error) {
+            console.error('Error saving design:', error);
+          }
         }}
         onExport={handleExport} // Keep the download button functionality
       />
@@ -1247,10 +1269,45 @@ export default function ProductDesigner({
         onIncrement={() => setCartQuantity(prev => Math.min(prev + 1, 99))}
         onDecrement={() => setCartQuantity(prev => Math.max(prev - 1, 1))}
         isInCart={isInCart}
-        onCreateCartItem={() => {
+        onCreateCartItem={async () => {
           try {
+            // First capture and update thumbnail
+            const captureCallback = async (dataUrl: string) => {
+              try {
+                // Convert dataUrl to File
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                const file = new File([blob], `tshirt-3d-${view}.png`, {
+                  type: 'image/png',
+                });
+
+                // Create a mock event with the file
+                const mockEvent = {
+                  target: {
+                    files: [file],
+                  },
+                } as unknown as React.ChangeEvent<HTMLInputElement>;
+
+                // Upload thumbnail using the provided callback
+                if (onThumbnail) {
+                  await onThumbnail(mockEvent);
+                }
+              } catch (error) {
+                console.error('Error capturing thumbnail:', error);
+              } finally {
+                setModelExportCallback(undefined);
+              }
+            };
+
+            // Generate thumbnail first
+            setModelExportCallback(() => captureCallback);
+
+            // Wait for a moment to ensure thumbnail is processed
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Then add to cart
             if (onCreateCartItem && designId) {
-              onCreateCartItem({
+              await onCreateCartItem({
                 variables: {
                   createCartItemInput: {
                     designId,
@@ -1263,6 +1320,7 @@ export default function ProductDesigner({
               toast.success(`Product has been added to cart`);
             }
           } catch (error) {
+            console.error('Error adding to cart:', error);
             toast.error(`Failed to add product to cart`);
           }
         }}
