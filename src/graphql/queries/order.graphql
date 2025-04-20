@@ -49,6 +49,19 @@ query GetMyOrders {
     isDelayed
     orderDate
     orderDetails {
+      systemConfigVariant {
+        id
+        isActive
+        isDeleted
+        price
+        color
+        size
+        model
+        product {
+            name
+            imageUrl
+          }
+      }
       checkQualities {
         totalChecked
         status
@@ -229,6 +242,19 @@ query GetMyFactoryOrders {
     isDelayed
     orderDate
     orderDetails {
+      systemConfigVariant {
+        id
+        isActive
+        isDeleted
+        price
+        color
+        size
+        model
+        product {
+            name
+            imageUrl
+          }
+      }
       checkQualities {
         totalChecked
         status
@@ -410,6 +436,19 @@ query GetOrdersByFactoryId($factoryId: String!) {
     isDelayed
     orderDate
     orderDetails {
+      systemConfigVariant {
+        id
+        isActive
+        isDeleted
+        price
+        color
+        size
+        model
+        product {
+            name
+            imageUrl
+          }
+      }
       checkQualities {
         totalChecked
         status
@@ -591,6 +630,19 @@ query GetOrder($orderId: String!) {
     isDelayed
     orderDate
     orderDetails {
+      systemConfigVariant {
+        id
+        isActive
+        isDeleted
+        price
+        color
+        size
+        model
+        product {
+            name
+            imageUrl
+          }
+      }
       checkQualities {
         id
         totalChecked
@@ -772,6 +824,19 @@ query GetAllOrders {
     isDelayed
     orderDate
     orderDetails {
+      systemConfigVariant {
+        id
+        isActive
+        isDeleted
+        price
+        color
+        size
+        model
+        product {
+            name
+            imageUrl
+          }
+      }
       checkQualities {
         totalChecked
         status
@@ -952,6 +1017,19 @@ query GetMyStaffOrders {
     isDelayed
     orderDate
     orderDetails {
+      systemConfigVariant {
+        id
+        isActive
+        isDeleted
+        price
+        color
+        size
+        model
+        product {
+            name
+            imageUrl
+          }
+      }
       checkQualities {
         totalChecked
         status
