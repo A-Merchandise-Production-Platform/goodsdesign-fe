@@ -333,6 +333,21 @@ export type FactoryDashboardResponse = {
   totalRevenue: Scalars['Int']['output'];
 };
 
+export type FactoryDetailDashboardResponse = {
+  __typename?: 'FactoryDetailDashboardResponse';
+  inProductionOrders: Scalars['Int']['output'];
+  lastMonthInProductionOrders: Scalars['Int']['output'];
+  lastMonthPendingOrders: Scalars['Int']['output'];
+  lastMonthTotalOrders: Scalars['Int']['output'];
+  lastMonthTotalRevenue: Scalars['Int']['output'];
+  pendingOrders: Scalars['Int']['output'];
+  productionProgress: Array<FactoryOrderWithProgress>;
+  qualityIssues: Array<QualityIssueWithFactory>;
+  recentOrders: Array<FactoryOrderWithCustomer>;
+  totalOrders: Scalars['Int']['output'];
+  totalRevenue: Scalars['Int']['output'];
+};
+
 export type FactoryEntity = {
   __typename?: 'FactoryEntity';
   address?: Maybe<AddressEntity>;
@@ -504,6 +519,7 @@ export type Mutation = {
   addOrderProgressReport: OrderProgressReportEntity;
   assignStaffToFactory: FactoryEntity;
   calculateShippingFee: ShippingFee;
+  changeFactoryStaff: FactoryEntity;
   changeFactoryStatus: FactoryEntity;
   changeOrderToShipping: OrderEntity;
   clearCart: Scalars['Boolean']['output'];
@@ -540,6 +556,7 @@ export type Mutation = {
   login: AuthResponseDto;
   logout: Scalars['String']['output'];
   markNotificationAsRead: NotificationEntity;
+  reassignNewStaffForOrder: OrderEntity;
   refreshToken: AuthResponseDto;
   register: AuthResponseDto;
   rejectOrder: OrderEntity;
@@ -569,6 +586,7 @@ export type Mutation = {
   updateProfile: UserEntity;
   updateSystemConfigBank: SystemConfigBankEntity;
   updateSystemConfigDiscount: SystemConfigDiscountEntity;
+  updateSystemConfigOrder: SystemConfigOrderEntity;
   updateSystemConfigVariant: SystemConfigVariantEntity;
   updateUser: UserEntity;
   uploadFile: FileUploadResponse;
@@ -593,6 +611,12 @@ export type MutationAssignStaffToFactoryArgs = {
 
 export type MutationCalculateShippingFeeArgs = {
   input: CalculateShippingFeeDto;
+};
+
+
+export type MutationChangeFactoryStaffArgs = {
+  factoryId: Scalars['String']['input'];
+  newStaffId: Scalars['String']['input'];
 };
 
 
@@ -778,6 +802,12 @@ export type MutationMarkNotificationAsReadArgs = {
 };
 
 
+export type MutationReassignNewStaffForOrderArgs = {
+  newStaffId: Scalars['String']['input'];
+  orderId: Scalars['String']['input'];
+};
+
+
 export type MutationRefreshTokenArgs = {
   refreshTokenInput: RefreshTokenDto;
 };
@@ -930,6 +960,11 @@ export type MutationUpdateSystemConfigBankArgs = {
 export type MutationUpdateSystemConfigDiscountArgs = {
   id: Scalars['String']['input'];
   updateDiscountInput: UpdateSystemConfigDiscountDto;
+};
+
+
+export type MutationUpdateSystemConfigOrderArgs = {
+  updateConfigInput: UpdateSystemConfigOrderDto;
 };
 
 
@@ -1107,11 +1142,13 @@ export type PaymentTransactionEntity = {
   customer?: Maybe<UserEntity>;
   customerId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
+  imageUrls?: Maybe<Array<Scalars['String']['output']>>;
   paymentGatewayTransactionId: Scalars['String']['output'];
   paymentMethod: PaymentMethod;
   status: TransactionStatus;
   transactionLog: Scalars['String']['output'];
   type: TransactionType;
+  userBank?: Maybe<UserBankEntity>;
 };
 
 export type ProductDesignEntity = {
@@ -1194,7 +1231,9 @@ export type Query = {
   factoryOrders: Array<OrderEntity>;
   factoryProduct: FactoryProductEntity;
   factoryProducts: Array<FactoryProductEntity>;
+  findActiveTasksByStaffId: Array<TaskEntity>;
   findTasksByStaffId: Array<TaskEntity>;
+  findTasksHistoryByStaffId: Array<TaskEntity>;
   formatAddress: FormattedAddressModel;
   getAdminDashboard: AdminDashboardResponse;
   getAllDiscountByProductId: Array<SystemConfigDiscountEntity>;
@@ -1205,10 +1244,12 @@ export type Query = {
   getEnhancedManagerDashboard: EnhancedManagerDashboardResponse;
   getFactoryById: FactoryEntity;
   getFactoryDashboard: FactoryDashboardResponse;
+  getFactoryDetailDashboard: FactoryDetailDashboardResponse;
   getManagerDashboard: ManagerDashboardResponse;
   getManagerOrderDashboard: ManagerOrderDashboardEntity;
   getMe: UserEntity;
   getMyFactory: FactoryEntity;
+  getStaffDashboard: StaffDashboardResponse;
   getTemplateProductDesigns: Array<ProductDesignEntity>;
   myNotifications: Array<NotificationEntity>;
   myOrders: Array<OrderEntity>;
@@ -1237,6 +1278,7 @@ export type Query = {
   systemConfigBanks: Array<SystemConfigBankEntity>;
   systemConfigDiscount: SystemConfigDiscountEntity;
   systemConfigDiscounts: Array<SystemConfigDiscountEntity>;
+  systemConfigOrder: SystemConfigOrderEntity;
   systemConfigVariant: SystemConfigVariantEntity;
   systemConfigVariants: Array<SystemConfigVariantEntity>;
   systemConfigVariantsByProduct: Array<SystemConfigVariantEntity>;
@@ -1290,7 +1332,17 @@ export type QueryFactoryProductArgs = {
 };
 
 
+export type QueryFindActiveTasksByStaffIdArgs = {
+  staffId: Scalars['String']['input'];
+};
+
+
 export type QueryFindTasksByStaffIdArgs = {
+  staffId: Scalars['String']['input'];
+};
+
+
+export type QueryFindTasksHistoryByStaffIdArgs = {
   staffId: Scalars['String']['input'];
 };
 
@@ -1318,6 +1370,16 @@ export type QueryGetCartItemArgs = {
 
 export type QueryGetFactoryByIdArgs = {
   factoryId: Scalars['String']['input'];
+};
+
+
+export type QueryGetFactoryDetailDashboardArgs = {
+  factoryId: Scalars['String']['input'];
+};
+
+
+export type QueryGetStaffDashboardArgs = {
+  userId: Scalars['String']['input'];
 };
 
 
@@ -1488,6 +1550,17 @@ export type ShippingService = {
   shortName: Scalars['String']['output'];
 };
 
+export type StaffDashboardResponse = {
+  __typename?: 'StaffDashboardResponse';
+  activeTasks: Array<TaskEntity>;
+  completedTasks: Scalars['Int']['output'];
+  lastMonthActiveTasks: Scalars['Int']['output'];
+  lastMonthCompletedTasks: Scalars['Int']['output'];
+  taskHistory: Array<TaskEntity>;
+  totalActiveTasks: Scalars['Int']['output'];
+  totalTaskHistory: Scalars['Int']['output'];
+};
+
 export type SystemConfigBankEntity = {
   __typename?: 'SystemConfigBankEntity';
   bin: Scalars['String']['output'];
@@ -1511,6 +1584,27 @@ export type SystemConfigDiscountEntity = {
   name: Scalars['String']['output'];
   product: ProductEntity;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type SystemConfigOrderEntity = {
+  __typename?: 'SystemConfigOrderEntity';
+  acceptHoursForFactory: Scalars['Int']['output'];
+  capacityScoreWeight: Scalars['Float']['output'];
+  checkQualityTimesDays: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  leadTimeScoreWeight: Scalars['Float']['output'];
+  legitPointScoreWeight: Scalars['Float']['output'];
+  legitPointToSuspend: Scalars['Int']['output'];
+  limitFactoryRejectOrders: Scalars['Int']['output'];
+  limitReworkTimes: Scalars['Int']['output'];
+  maxLegitPoint: Scalars['Int']['output'];
+  maxProductionCapacity: Scalars['Int']['output'];
+  maxProductionTimeInMinutes: Scalars['Int']['output'];
+  productionCapacityScoreWeight: Scalars['Float']['output'];
+  reduceLegitPointIfReject: Scalars['Int']['output'];
+  shippingDays: Scalars['Int']['output'];
+  specializationScoreWeight: Scalars['Float']['output'];
+  type: Scalars['String']['output'];
 };
 
 export type SystemConfigVariantEntity = {
@@ -1680,6 +1774,24 @@ export type UpdateSystemConfigDiscountDto = {
   productId?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateSystemConfigOrderDto = {
+  acceptHoursForFactory?: InputMaybe<Scalars['Int']['input']>;
+  capacityScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  checkQualityTimesDays?: InputMaybe<Scalars['Int']['input']>;
+  leadTimeScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  legitPointScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  legitPointToSuspend?: InputMaybe<Scalars['Int']['input']>;
+  limitFactoryRejectOrders?: InputMaybe<Scalars['Int']['input']>;
+  limitReworkTimes?: InputMaybe<Scalars['Int']['input']>;
+  maxLegitPoint?: InputMaybe<Scalars['Int']['input']>;
+  maxProductionCapacity?: InputMaybe<Scalars['Int']['input']>;
+  maxProductionTimeInMinutes?: InputMaybe<Scalars['Int']['input']>;
+  productionCapacityScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  reduceLegitPointIfReject?: InputMaybe<Scalars['Int']['input']>;
+  shippingDays?: InputMaybe<Scalars['Int']['input']>;
+  specializationScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+};
+
 export type UpdateSystemConfigVariantInput = {
   color?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
@@ -1700,6 +1812,20 @@ export type UpdateUserDto = {
   phoneNumber?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<Scalars['String']['input']>;
   updatedBy?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserBankEntity = {
+  __typename?: 'UserBankEntity';
+  accountName: Scalars['String']['output'];
+  accountNumber: Scalars['String']['output'];
+  bank?: Maybe<SystemConfigBankEntity>;
+  bankId: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  isDefault: Scalars['Boolean']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  user?: Maybe<UserEntity>;
+  userId: Scalars['String']['output'];
 };
 
 export type UserEntity = {
