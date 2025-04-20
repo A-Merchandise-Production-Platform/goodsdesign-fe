@@ -64,9 +64,9 @@ export default function Page() {
 
       const newThumbnailUrl = uploadResult.data?.uploadFile?.url;
       if (!newThumbnailUrl) {
-        toast.error('Upload completed but no URL was returned');
         return null;
       }
+      
       // Update the thumbnail
       await updateThumbnailProductDesign({
         variables: {
@@ -76,15 +76,11 @@ export default function Page() {
         },
       });
 
-      // Update state and show success message
+      // Update state
       setCurrentThumbnailUrl(newThumbnailUrl);
-      toast.success('Thumbnail updated successfully');
       return newThumbnailUrl;
     } catch (error) {
       console.error('Thumbnail operation failed:', error);
-      toast.error(
-        error instanceof Error ? error.message : 'Failed to process thumbnail',
-      );
       return null;
     }
   };
@@ -103,20 +99,11 @@ export default function Page() {
       // Check if the upload was successful
       if (result.data?.uploadFile?.url) {
         const fileUrl = result.data.uploadFile.url;
-        toast.success(`File uploaded successfully!`);
         return fileUrl;
-      } else {
-        toast.error('Upload completed but no URL was returned');
-        return null;
       }
+      return null;
     } catch (error) {
-      // Detailed error logging
       console.error('Upload error:', error);
-
-      // User-friendly error message
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      toast.error(`Upload failed: ${errorMessage}`);
       return null;
     }
   };
@@ -141,7 +128,13 @@ export default function Page() {
         onUpload={handleUploadFile}
         onThumbnail={handleThumbnail}
         onUpdateVariant={updateVariant}
-        onUpdatePosition={updateDesignPosition}
+        onUpdatePosition={async options => {
+          try {
+            await updateDesignPosition(options);
+          } catch (error) {
+            console.error('Error updating position:', error);
+          }
+        }}
         onCreateCartItem={async options => {
           await createCartItem(options);
           cartRefetch();

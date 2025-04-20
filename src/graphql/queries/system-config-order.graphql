@@ -1,0 +1,25 @@
+query SystemConfigOrder {
+  systemConfigOrder {
+    acceptHoursForFactory
+    capacityScoreWeight
+    checkQualityTimesDays
+    leadTimeScoreWeight
+    legitPointScoreWeight
+    legitPointToSuspend
+    limitFactoryRejectOrders
+    limitReworkTimes
+    maxLegitPoint
+    maxProductionCapacity
+    maxProductionTimeInMinutes
+    productionCapacityScoreWeight
+    reduceLegitPointIfReject
+    shippingDays
+    specializationScoreWeight
+  }
+}
+
+mutation UpdateSystemConfigOrder($updateConfigInput: UpdateSystemConfigOrderDto!) {
+  updateSystemConfigOrder(updateConfigInput: $updateConfigInput) {
+    id
+  }
+}

@@ -178,8 +178,7 @@ export default function TShirtPage() {
             isFinalized: false,
             isPublic: false,
             isTemplate: false,
-            thumbnailUrl:
-              'https://res.cloudinary.com/drzhutfzg/image/upload/v1743667680/files/nzqefspirtnzateljqzo.png',
+            thumbnailUrl: null,
           },
         },
       });
