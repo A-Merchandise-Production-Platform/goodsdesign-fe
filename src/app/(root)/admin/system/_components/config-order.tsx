@@ -147,7 +147,7 @@ export default function SystemConfigOrder() {
 
       {/* Scoring Weights Section */}
       <Card className="border-slate-200 shadow-md">
-        <CardHeader className="bg-slate-50 border-b border-slate-200">
+        <CardHeader className="border-b border-slate-200">
           <div className="flex justify-between items-center">
             <div>
               <CardTitle className="text-slate-800">Scoring Weights</CardTitle>
@@ -227,7 +227,7 @@ export default function SystemConfigOrder() {
 
       {/* Thresholds and Limits Section */}
       <Card className="border-slate-200 shadow-md">
-        <CardHeader className="bg-slate-50 border-b border-slate-200">
+        <CardHeader className="border-b border-slate-200">
           <CardTitle className="text-slate-800">Thresholds and Limits</CardTitle>
           <CardDescription>Configure system-wide thresholds for factory qualification and operation</CardDescription>
         </CardHeader>
@@ -334,7 +334,7 @@ export default function SystemConfigOrder() {
 
       {/* Time and Scheduling Section */}
       <Card className="border-slate-200 shadow-md">
-        <CardHeader className="bg-slate-50 border-b border-slate-200">
+        <CardHeader className="border-b border-slate-200">
           <CardTitle className="text-slate-800">Time and Scheduling</CardTitle>
           <CardDescription>Configure time-related parameters for order processing</CardDescription>
         </CardHeader>

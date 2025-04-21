@@ -32,10 +32,17 @@ export const getStatusBadge = (status: string) => {
     PENDING_ACCEPTANCE: { label: 'Pending Acceptance', variant: 'outline' },
     REJECTED: { label: 'Rejected', variant: 'destructive' },
     IN_PRODUCTION: { label: 'In Production', variant: 'secondary' },
+
     WAITING_FOR_CHECKING_QUALITY: {
       label: 'Quality Check',
-      variant: 'outline',
+      variant: 'default',
     },
+    DONE_CHECK_QUALITY: {
+      label: 'Quality Check Done',
+      variant: 'secondary',
+    },
+    APPROVED: { label: 'Approved', variant: 'default' },
+
     REWORK_REQUIRED: { label: 'Rework Required', variant: 'destructive' },
     REWORK_IN_PROGRESS: { label: 'Rework in Progress', variant: 'secondary' },
     WAITING_PAYMENT: { label: 'Waiting Payment', variant: 'outline' },
