@@ -54,7 +54,7 @@ import { getStatusBadge } from '../../_components/order-status';
 
 export default function MyStaffTasksPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState('quality-check');
   const [isQualityCheckDialogOpen, setIsQualityCheckDialogOpen] =
     useState(false);
   const [selectedCheckQuality, setSelectedCheckQuality] = useState<any>(null);
@@ -218,11 +218,129 @@ export default function MyStaffTasksPage() {
           </div>
         </div>
 
-        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+        <Tabs
+          defaultValue="quality-check"
+          value={activeTab}
+          onValueChange={setActiveTab}
+        >
           <TabsList>
-            <TabsTrigger value="all">All Tasks</TabsTrigger>
             <TabsTrigger value="quality-check">Quality Checks</TabsTrigger>
+            <TabsTrigger value="all">All Tasks</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="quality-check" className="mt-6">
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="text-primary h-8 w-8 animate-spin" />
+              </div>
+            ) : filteredOrders.length > 0 ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quality Checks</CardTitle>
+                  <CardDescription>
+                    Orders waiting for quality inspection
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-6">
+                    {filteredOrders.map((order: any) => (
+                      <Card key={order.id} className="overflow-hidden">
+                        <CardHeader className="bg-muted/50">
+                          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                            <div>
+                              <CardTitle className="flex items-center gap-2">
+                                Order #{order.id.substring(0, 8)}
+                                {getStatusBadge(order.status)}
+                              </CardTitle>
+                              <CardDescription className="mt-1">
+                                {formatDate(order.orderDate)} •{' '}
+                                {order.customer?.name}
+                              </CardDescription>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                  (window.location.href = `/staff/tasks/${order.id}`)
+                                }
+                              >
+                                View Details
+                              </Button>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="pt-6">
+                          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {order.orderDetails?.map((item: any) => (
+                              <div
+                                key={item.id}
+                                className="flex gap-4 rounded-lg border p-4"
+                              >
+                                <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md">
+                                  <Image
+                                    src={
+                                      item.design?.thumbnailUrl ||
+                                      '/placeholder.svg?height=64&width=64'
+                                    }
+                                    alt={
+                                      item.systemConfigVariant?.product
+                                        ?.name || 'Product'
+                                    }
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
+                                <div>
+                                  <h3 className="font-medium">
+                                    {
+                                      item.systemConfigVariant?.product
+                                        ?.name
+                                    }
+                                  </h3>
+                                  <p className="text-muted-foreground text-sm">
+                                    Quantity: {item.quantity} • Size:{' '}
+                                    {item.systemConfigVariant?.size}
+                                  </p>
+                                  <div className="mt-1 flex items-center gap-1">
+                                    <span
+                                      className="inline-block h-3 w-3 rounded-full"
+                                      style={{
+                                        backgroundColor:
+                                          item.systemConfigVariant
+                                            ?.color || 'transparent',
+                                      }}
+                                    ></span>
+                                    <span className="text-xs">
+                                      {item.systemConfigVariant?.color}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <CheckCircle className="text-muted-foreground mb-4 h-12 w-12" />
+                  <h2 className="mb-2 text-xl font-semibold">
+                    No Quality Checks Pending
+                  </h2>
+                  <p className="text-muted-foreground max-w-md text-center">
+                    There are no orders waiting for quality inspection at the
+                    moment.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
 
           <TabsContent value="all" className="mt-6">
             {loading ? (
@@ -302,120 +420,6 @@ export default function MyStaffTasksPage() {
                     {searchTerm
                       ? 'No orders match your search criteria. Try a different search term.'
                       : "You don't have any assigned orders at the moment."}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="quality-check" className="mt-6">
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="text-primary h-8 w-8 animate-spin" />
-              </div>
-            ) : filteredOrders.length > 0 ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Quality Checks</CardTitle>
-                  <CardDescription>
-                    Orders waiting for quality inspection
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-6">
-                    {filteredOrders.map((order: any) => (
-                      <Card key={order.id} className="overflow-hidden">
-                        <CardHeader className="bg-muted/50">
-                          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                            <div>
-                              <CardTitle className="flex items-center gap-2">
-                                Order #{order.id.substring(0, 8)}
-                                {getStatusBadge(order.status)}
-                              </CardTitle>
-                              <CardDescription className="mt-1">
-                                {formatDate(order.orderDate)} •{' '}
-                                {order.customer?.name}
-                              </CardDescription>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                  (window.location.href = `/staff/tasks/${order.id}`)
-                                }
-                              >
-                                View Details
-                              </Button>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="pt-6">
-                          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {order.orderDetails?.map((item: any) => (
-                              <div
-                                key={item.id}
-                                className="flex gap-4 rounded-lg border p-4"
-                              >
-                                <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md">
-                                  <Image
-                                    src={
-                                      item.design?.thumbnailUrl ||
-                                      '/placeholder.svg?height=64&width=64'
-                                    }
-                                    alt={
-                                      item.design?.systemConfigVariant?.product
-                                        ?.name || 'Product'
-                                    }
-                                    fill
-                                    className="object-cover"
-                                  />
-                                </div>
-                                <div>
-                                  <h3 className="font-medium">
-                                    {
-                                      item.design?.systemConfigVariant?.product
-                                        ?.name
-                                    }
-                                  </h3>
-                                  <p className="text-muted-foreground text-sm">
-                                    Quantity: {item.quantity} • Size:{' '}
-                                    {item.design?.systemConfigVariant?.size}
-                                  </p>
-                                  <div className="mt-1 flex items-center gap-1">
-                                    <span
-                                      className="inline-block h-3 w-3 rounded-full"
-                                      style={{
-                                        backgroundColor:
-                                          item.design?.systemConfigVariant
-                                            ?.color || 'transparent',
-                                      }}
-                                    ></span>
-                                    <span className="text-xs">
-                                      {item.design?.systemConfigVariant?.color}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <CheckCircle className="text-muted-foreground mb-4 h-12 w-12" />
-                  <h2 className="mb-2 text-xl font-semibold">
-                    No Quality Checks Pending
-                  </h2>
-                  <p className="text-muted-foreground max-w-md text-center">
-                    There are no orders waiting for quality inspection at the
-                    moment.
                   </p>
                 </CardContent>
               </Card>

@@ -77,7 +77,7 @@ export default function Page() {
           input: {
             thumbnailUrl: newThumbnailUrl,
             isFinalized: false,
-            isPublic: user?.role === Roles.Admin ? true : false,
+            isPublic: false,
             isTemplate: user?.role === Roles.Admin ? true : false,
           },
           fileUrl: currentThumbnailUrl,

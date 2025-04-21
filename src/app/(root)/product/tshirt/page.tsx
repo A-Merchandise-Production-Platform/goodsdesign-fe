@@ -176,7 +176,7 @@ export default function TShirtPage() {
           input: {
             systemConfigVariantId,
             isFinalized: false,
-            isPublic: user?.role === Roles.Admin ? true : false,
+            isPublic: false,
             isTemplate: user?.role === Roles.Admin ? true : false,
             thumbnailUrl: null,
           },
@@ -190,7 +190,7 @@ export default function TShirtPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <Link
-        href={user?.role === Roles.Admin ? "/admin/templates" : "/"}
+        href={user?.role === Roles.Admin ? '/admin/templates' : '/'}
         className="text-muted-foreground hover:text-foreground mb-6 flex items-center transition-colors"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />

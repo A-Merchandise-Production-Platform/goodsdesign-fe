@@ -1,8 +1,8 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, SlidersHorizontal } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -11,6 +11,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -25,9 +33,34 @@ import { formatDate } from '@/lib/utils';
 
 import { getStatusBadge } from '../../_components/order-status';
 
+// Extract all status types from the getStatusBadge function
+const STATUS_OPTIONS = [
+  'ALL',
+  'PENDING',
+  'PROCESSING',
+  'COMPLETED',
+  'CANCELLED',
+  'SHIPPED',
+  'PAID',
+  'UNPAID',
+  'PAYMENT_RECEIVED',
+  'WAITING_FILL_INFORMATION',
+  'NEED_MANAGER_HANDLE',
+  'PENDING_ACCEPTANCE',
+  'REJECTED',
+  'IN_PRODUCTION',
+  'WAITING_FOR_CHECKING_QUALITY',
+  'REWORK_REQUIRED',
+  'REWORK_IN_PROGRESS',
+  'WAITING_PAYMENT',
+  'READY_FOR_SHIPPING',
+  'SHIPPING',
+];
+
 export default function FactoryOrdersPage() {
   const { data, loading } = useGetMyFactoryOrdersQuery();
   const router = useRouter();
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
   const viewOrderDetails = (orderId: string) => {
     router.push(`/factory/orders/${orderId}`);
@@ -37,7 +70,7 @@ export default function FactoryOrdersPage() {
     return <OrdersLoadingSkeleton />;
   }
 
-  const orders = data?.factoryOrders
+  const allOrders = data?.factoryOrders
     ? [...data.factoryOrders].sort((a, b) => {
         return (
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
@@ -45,19 +78,37 @@ export default function FactoryOrdersPage() {
       })
     : [];
 
+  // Filter orders based on selected status
+  const orders =
+    statusFilter === 'ALL'
+      ? allOrders
+      : allOrders.filter(order => order.status === statusFilter);
+
   return (
     <div className="">
       <Card>
-        <CardHeader>
-          <CardTitle>Factory Orders</CardTitle>
-          <CardDescription>
-            Manage and view all your factory orders
-          </CardDescription>
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle>Factory Orders</CardTitle>
+            <CardDescription>
+              Manage and view all your factory orders
+            </CardDescription>
+          </div>
+          <div className="mt-4 sm:mt-0">
+            <StatusFilter
+              selectedStatus={statusFilter}
+              onStatusChange={setStatusFilter}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {orders.length === 0 ? (
             <div className="py-6 text-center">
-              <p className="text-muted-foreground">No factory orders found</p>
+              <p className="text-muted-foreground">
+                {statusFilter === 'ALL'
+                  ? 'No factory orders found'
+                  : `No orders with status "${statusFilter}" found`}
+              </p>
             </div>
           ) : (
             <Table>
@@ -98,6 +149,54 @@ export default function FactoryOrdersPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+interface StatusFilterProps {
+  selectedStatus: string;
+  onStatusChange: (status: string) => void;
+}
+
+function StatusFilter({ selectedStatus, onStatusChange }: StatusFilterProps) {
+  // Get the label for the current status
+  const getStatusLabel = (status: string) => {
+    if (status === 'ALL') return 'All Statuses';
+
+    // Convert from SNAKE_CASE to Title Case
+    return status
+      .split('_')
+      .map(word => word.charAt(0) + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="flex items-center gap-2">
+          <SlidersHorizontal className="h-4 w-4" />
+          <span>Status: {getStatusLabel(selectedStatus)}</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56" align="end">
+        <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {STATUS_OPTIONS.map(status => (
+          <DropdownMenuCheckboxItem
+            key={status}
+            checked={selectedStatus === status}
+            onCheckedChange={() => onStatusChange(status)}
+          >
+            {status === 'ALL' ? (
+              'All Statuses'
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="ml-1">{getStatusLabel(status)}</span>
+              </div>
+            )}
+          </DropdownMenuCheckboxItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
