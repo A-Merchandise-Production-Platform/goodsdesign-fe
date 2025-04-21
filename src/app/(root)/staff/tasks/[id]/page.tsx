@@ -63,7 +63,7 @@ import {
   useGetOrderQuery,
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
-import { filesToBase64 } from '@/utils/handle-upload';
+import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -103,6 +103,7 @@ export default function StaffCheckQualityDetailsPage() {
       orderId: id,
     },
   });
+  const [uploadFile, { loading: uploadFileloading }] = useUploadFileMutation();
 
   // Done check quality mutation
   const [doneCheckQuality, { loading: doneCheckQualityLoading }] =
@@ -160,21 +161,59 @@ export default function StaffCheckQualityDetailsPage() {
     setPreviewImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Upload images to server (mock implementation)
+  const handleUploadFile = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return null;
+
+    try {
+      const result = await uploadFile({
+        variables: { file },
+      });
+
+      // Check if the upload was successful
+      if (result.data?.uploadFile?.url) {
+        const fileUrl = result.data.uploadFile.url;
+        return fileUrl;
+      }
+      return null;
+    } catch (error) {
+      console.error('Upload error:', error);
+      return null;
+    }
+  };
+
+  // Upload images to server
   const uploadImages = async (): Promise<string[]> => {
     if (images.length === 0) return [];
 
     setImageUploading(true);
 
     try {
-      // Convert images to base64 strings
-      const base64Strings = await filesToBase64(images);
+      // Upload each image and collect URLs
+      const uploadPromises = images.map(async (file) => {
+        // Create a properly typed mock event
+        const mockEvent = {
+          target: {
+            files: [file] as unknown as FileList
+          },
+          preventDefault: () => {},
+          currentTarget: {} as HTMLInputElement,
+        } as React.ChangeEvent<HTMLInputElement>;
 
-      // Return the base64 strings to be stored in the database
-      return base64Strings;
+        const fileUrl = await handleUploadFile(mockEvent);
+        return fileUrl;
+      });
+
+      // Wait for all uploads to complete
+      const urls = await Promise.all(uploadPromises);
+      
+      // Filter out any failed uploads (null values)
+      return urls.filter((url): url is string => url !== null);
     } catch (error) {
-      console.error('Error converting images to base64:', error);
-      toast.error('Failed to process images');
+      console.error('Error uploading images:', error);
+      toast.error('Failed to upload images');
       return [];
     } finally {
       setImageUploading(false);
