@@ -16,10 +16,7 @@ export default function ProfileLayout({
   const navItems: NavItem[] = useMemo(() => {
     const items: NavItem[] = [
       { href: '/profile', label: 'Profile' },
-      { href: '/profile/account', label: 'Account' },
-      { href: '/profile/appearance', label: 'Appearance' },
-      { href: '/profile/notifications', label: 'Notifications' },
-      { href: '/profile/display', label: 'Display' },
+      { href: '/profile/payments', label: 'Payments' },
     ];
 
     if (user?.role === Roles.Factoryowner) {
@@ -30,7 +27,7 @@ export default function ProfileLayout({
   }, [user]);
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="container mx-auto">
       <MySidebar navItems={navItems}>{children}</MySidebar>
     </div>
   );

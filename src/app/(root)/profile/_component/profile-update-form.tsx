@@ -40,7 +40,10 @@ import {
 } from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
-import { useUpdateProfileMutation } from '@/graphql/generated/graphql';
+import {
+  useGetMeQuery,
+  useUpdateProfileMutation,
+} from '@/graphql/generated/graphql';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth.store';
 
@@ -61,16 +64,31 @@ const profileFormSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export default function ProfilePage() {
-  const { user } = useAuthStore();
+  const { user, setUser } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+
+  // Add the GetMe query with fetchPolicy
+  const { refetch: refetchGetMe } = useGetMeQuery({
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'network-only',
+  });
+
   const [updateProfile, { loading: isUpdating }] = useUpdateProfileMutation({
-    onCompleted: () => {
+    onCompleted: data => {
       toast.success('Profile updated successfully');
+      setUpdateSuccess(true);
+
+      form.reset(form.getValues(), { keepValues: true });
+
+      refetchGetMe();
     },
     onError: () => {
       toast.error('Failed to update profile');
+      setUpdateSuccess(false);
     },
-    refetchQueries: ['GetMe'],
+    // Set aggressive fetch policy
+    fetchPolicy: 'network-only',
   });
   const [originalValues, setOriginalValues] =
     useState<ProfileFormValues | null>(null);
@@ -159,6 +177,13 @@ export default function ProfilePage() {
 
     updateProfile({ variables: { updateProfileInput: updateInput } });
   }
+
+  // Watch for form changes to reset the updateSuccess state
+  useEffect(() => {
+    if (updateSuccess && form.formState.isDirty) {
+      setUpdateSuccess(false);
+    }
+  }, [form.formState.isDirty, updateSuccess]);
 
   form.watch();
 
@@ -372,7 +397,9 @@ export default function ProfilePage() {
               <CardFooter>
                 <Button
                   type="submit"
-                  disabled={isLoading || !hasChanges || isUpdating}
+                  disabled={
+                    isLoading || !hasChanges || isUpdating || updateSuccess
+                  }
                   className="ml-auto"
                 >
                   {isLoading ? (

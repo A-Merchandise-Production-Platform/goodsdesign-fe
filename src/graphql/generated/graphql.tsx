@@ -231,6 +231,14 @@ export type CreateSystemConfigVariantInput = {
   size?: InputMaybe<Scalars['String']['input']>;
 };
 
+/** Create User Bank Input */
+export type CreateUserBankInput = {
+  accountName: Scalars['String']['input'];
+  accountNumber: Scalars['String']['input'];
+  bankId: Scalars['String']['input'];
+  isDefault?: Scalars['Boolean']['input'];
+};
+
 /** Create user input */
 export type CreateUserDto = {
   dateOfBirth?: InputMaybe<Scalars['String']['input']>;
@@ -552,6 +560,7 @@ export type Mutation = {
   createSystemConfigDiscount: SystemConfigDiscountEntity;
   createSystemConfigVariant: SystemConfigVariantEntity;
   createUser: UserEntity;
+  createUserBank: UserBankEntity;
   deleteAddress: AddressEntity;
   deleteCartItem: CartItemEntity;
   deleteCategory: CategoryEntity;
@@ -559,6 +568,7 @@ export type Mutation = {
   deleteFile: Scalars['Boolean']['output'];
   deleteProduct: ProductEntity;
   deleteUser: UserEntity;
+  deleteUserBank: UserBankEntity;
   doneCheckQuality: CheckQualityEntity;
   doneProductionOrderDetails: OrderDetailEntity;
   doneReworkForOrderDetails: OrderDetailEntity;
@@ -600,6 +610,7 @@ export type Mutation = {
   updateSystemConfigOrder: SystemConfigOrderEntity;
   updateSystemConfigVariant: SystemConfigVariantEntity;
   updateUser: UserEntity;
+  updateUserBank: UserBankEntity;
   uploadFile: FileUploadResponse;
 };
 
@@ -741,6 +752,11 @@ export type MutationCreateUserArgs = {
 };
 
 
+export type MutationCreateUserBankArgs = {
+  createUserBankInput: CreateUserBankInput;
+};
+
+
 export type MutationDeleteAddressArgs = {
   id: Scalars['String']['input'];
 };
@@ -773,6 +789,11 @@ export type MutationDeleteProductArgs = {
 
 
 export type MutationDeleteUserArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteUserBankArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -987,6 +1008,12 @@ export type MutationUpdateSystemConfigVariantArgs = {
 export type MutationUpdateUserArgs = {
   id: Scalars['String']['input'];
   updateUserInput: UpdateUserDto;
+};
+
+
+export type MutationUpdateUserBankArgs = {
+  id: Scalars['String']['input'];
+  updateUserBankInput: UpdateUserBankInput;
 };
 
 
@@ -1296,6 +1323,8 @@ export type Query = {
   systemConfigVariants: Array<SystemConfigVariantEntity>;
   systemConfigVariantsByProduct: Array<SystemConfigVariantEntity>;
   user: UserEntity;
+  userBank: UserBankEntity;
+  userBanks: Array<UserBankEntity>;
   userCartItems: Array<CartItemEntity>;
   users: Array<UserEntity>;
   ward: Ward;
@@ -1477,6 +1506,11 @@ export type QuerySystemConfigVariantsByProductArgs = {
 
 
 export type QueryUserArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryUserBankArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -1814,6 +1848,13 @@ export type UpdateSystemConfigVariantInput = {
   size?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateUserBankInput = {
+  accountName?: InputMaybe<Scalars['String']['input']>;
+  accountNumber?: InputMaybe<Scalars['String']['input']>;
+  bankId?: InputMaybe<Scalars['String']['input']>;
+  isDefault?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 /** Update user input */
 export type UpdateUserDto = {
   dateOfBirth?: InputMaybe<Scalars['String']['input']>;
@@ -1843,6 +1884,7 @@ export type UserBankEntity = {
 
 export type UserEntity = {
   __typename?: 'UserEntity';
+  bankAccounts?: Maybe<Array<UserBankEntity>>;
   createdAt: Scalars['DateTime']['output'];
   createdBy?: Maybe<Scalars['String']['output']>;
   dateOfBirth?: Maybe<Scalars['DateTime']['output']>;
@@ -2420,6 +2462,33 @@ export type FindTasksByStaffIdQueryVariables = Exact<{
 
 
 export type FindTasksByStaffIdQuery = { __typename?: 'Query', findTasksByStaffId: Array<{ __typename?: 'TaskEntity', assignedDate: any, completedDate?: any | null, description: string, expiredTime: any, id: string, note?: string | null, startDate: any, status: string, taskType: string, taskname: string, assignee?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null }>, user: { __typename?: 'UserEntity', createdAt: any, createdBy?: string | null, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, isDeleted: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, staffedFactory?: { __typename?: 'FactoryEntity', name: string } | null } };
+
+export type GetMyUserBanksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMyUserBanksQuery = { __typename?: 'Query', userBanks: Array<{ __typename?: 'UserBankEntity', accountName: string, accountNumber: string, bankId: string, createdAt: any, id: string, isDefault: boolean, updatedAt: any, bank?: { __typename?: 'SystemConfigBankEntity', bin: string, code: string, id: string, isActive: boolean, isDeleted: boolean, logo: string, name: string, shortName: string } | null }> };
+
+export type CreateUserBankMutationVariables = Exact<{
+  createUserBankInput: CreateUserBankInput;
+}>;
+
+
+export type CreateUserBankMutation = { __typename?: 'Mutation', createUserBank: { __typename?: 'UserBankEntity', id: string } };
+
+export type UpdateUserBankMutationVariables = Exact<{
+  updateUserBankId: Scalars['String']['input'];
+  updateUserBankInput: UpdateUserBankInput;
+}>;
+
+
+export type UpdateUserBankMutation = { __typename?: 'Mutation', updateUserBank: { __typename?: 'UserBankEntity', id: string } };
+
+export type DeleteUserBankMutationVariables = Exact<{
+  deleteUserBankId: Scalars['String']['input'];
+}>;
+
+
+export type DeleteUserBankMutation = { __typename?: 'Mutation', deleteUserBank: { __typename?: 'UserBankEntity', id: string } };
 
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -7459,6 +7528,161 @@ export type FindTasksByStaffIdQueryHookResult = ReturnType<typeof useFindTasksBy
 export type FindTasksByStaffIdLazyQueryHookResult = ReturnType<typeof useFindTasksByStaffIdLazyQuery>;
 export type FindTasksByStaffIdSuspenseQueryHookResult = ReturnType<typeof useFindTasksByStaffIdSuspenseQuery>;
 export type FindTasksByStaffIdQueryResult = Apollo.QueryResult<FindTasksByStaffIdQuery, FindTasksByStaffIdQueryVariables>;
+export const GetMyUserBanksDocument = gql`
+    query GetMyUserBanks {
+  userBanks {
+    accountName
+    accountNumber
+    bank {
+      bin
+      code
+      id
+      isActive
+      isDeleted
+      logo
+      name
+      shortName
+    }
+    bankId
+    createdAt
+    id
+    isDefault
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGetMyUserBanksQuery__
+ *
+ * To run a query within a React component, call `useGetMyUserBanksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMyUserBanksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMyUserBanksQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetMyUserBanksQuery(baseOptions?: Apollo.QueryHookOptions<GetMyUserBanksQuery, GetMyUserBanksQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMyUserBanksQuery, GetMyUserBanksQueryVariables>(GetMyUserBanksDocument, options);
+      }
+export function useGetMyUserBanksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMyUserBanksQuery, GetMyUserBanksQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMyUserBanksQuery, GetMyUserBanksQueryVariables>(GetMyUserBanksDocument, options);
+        }
+export function useGetMyUserBanksSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMyUserBanksQuery, GetMyUserBanksQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetMyUserBanksQuery, GetMyUserBanksQueryVariables>(GetMyUserBanksDocument, options);
+        }
+export type GetMyUserBanksQueryHookResult = ReturnType<typeof useGetMyUserBanksQuery>;
+export type GetMyUserBanksLazyQueryHookResult = ReturnType<typeof useGetMyUserBanksLazyQuery>;
+export type GetMyUserBanksSuspenseQueryHookResult = ReturnType<typeof useGetMyUserBanksSuspenseQuery>;
+export type GetMyUserBanksQueryResult = Apollo.QueryResult<GetMyUserBanksQuery, GetMyUserBanksQueryVariables>;
+export const CreateUserBankDocument = gql`
+    mutation CreateUserBank($createUserBankInput: CreateUserBankInput!) {
+  createUserBank(createUserBankInput: $createUserBankInput) {
+    id
+  }
+}
+    `;
+export type CreateUserBankMutationFn = Apollo.MutationFunction<CreateUserBankMutation, CreateUserBankMutationVariables>;
+
+/**
+ * __useCreateUserBankMutation__
+ *
+ * To run a mutation, you first call `useCreateUserBankMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateUserBankMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createUserBankMutation, { data, loading, error }] = useCreateUserBankMutation({
+ *   variables: {
+ *      createUserBankInput: // value for 'createUserBankInput'
+ *   },
+ * });
+ */
+export function useCreateUserBankMutation(baseOptions?: Apollo.MutationHookOptions<CreateUserBankMutation, CreateUserBankMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateUserBankMutation, CreateUserBankMutationVariables>(CreateUserBankDocument, options);
+      }
+export type CreateUserBankMutationHookResult = ReturnType<typeof useCreateUserBankMutation>;
+export type CreateUserBankMutationResult = Apollo.MutationResult<CreateUserBankMutation>;
+export type CreateUserBankMutationOptions = Apollo.BaseMutationOptions<CreateUserBankMutation, CreateUserBankMutationVariables>;
+export const UpdateUserBankDocument = gql`
+    mutation UpdateUserBank($updateUserBankId: String!, $updateUserBankInput: UpdateUserBankInput!) {
+  updateUserBank(id: $updateUserBankId, updateUserBankInput: $updateUserBankInput) {
+    id
+  }
+}
+    `;
+export type UpdateUserBankMutationFn = Apollo.MutationFunction<UpdateUserBankMutation, UpdateUserBankMutationVariables>;
+
+/**
+ * __useUpdateUserBankMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserBankMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserBankMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserBankMutation, { data, loading, error }] = useUpdateUserBankMutation({
+ *   variables: {
+ *      updateUserBankId: // value for 'updateUserBankId'
+ *      updateUserBankInput: // value for 'updateUserBankInput'
+ *   },
+ * });
+ */
+export function useUpdateUserBankMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserBankMutation, UpdateUserBankMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserBankMutation, UpdateUserBankMutationVariables>(UpdateUserBankDocument, options);
+      }
+export type UpdateUserBankMutationHookResult = ReturnType<typeof useUpdateUserBankMutation>;
+export type UpdateUserBankMutationResult = Apollo.MutationResult<UpdateUserBankMutation>;
+export type UpdateUserBankMutationOptions = Apollo.BaseMutationOptions<UpdateUserBankMutation, UpdateUserBankMutationVariables>;
+export const DeleteUserBankDocument = gql`
+    mutation DeleteUserBank($deleteUserBankId: String!) {
+  deleteUserBank(id: $deleteUserBankId) {
+    id
+  }
+}
+    `;
+export type DeleteUserBankMutationFn = Apollo.MutationFunction<DeleteUserBankMutation, DeleteUserBankMutationVariables>;
+
+/**
+ * __useDeleteUserBankMutation__
+ *
+ * To run a mutation, you first call `useDeleteUserBankMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteUserBankMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteUserBankMutation, { data, loading, error }] = useDeleteUserBankMutation({
+ *   variables: {
+ *      deleteUserBankId: // value for 'deleteUserBankId'
+ *   },
+ * });
+ */
+export function useDeleteUserBankMutation(baseOptions?: Apollo.MutationHookOptions<DeleteUserBankMutation, DeleteUserBankMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteUserBankMutation, DeleteUserBankMutationVariables>(DeleteUserBankDocument, options);
+      }
+export type DeleteUserBankMutationHookResult = ReturnType<typeof useDeleteUserBankMutation>;
+export type DeleteUserBankMutationResult = Apollo.MutationResult<DeleteUserBankMutation>;
+export type DeleteUserBankMutationOptions = Apollo.BaseMutationOptions<DeleteUserBankMutation, DeleteUserBankMutationVariables>;
 export const GetUsersDocument = gql`
     query GetUsers {
   users {
