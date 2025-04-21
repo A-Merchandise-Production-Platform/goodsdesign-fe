@@ -91,7 +91,6 @@ export default function StaffCheckQualityDetailsPage() {
   const [note, setNote] = useState('');
   const [images, setImages] = useState<File[]>([]);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
-  const [imageUploading, setImageUploading] = useState(false);
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -175,11 +174,14 @@ export default function StaffCheckQualityDetailsPage() {
       // Check if the upload was successful
       if (result.data?.uploadFile?.url) {
         const fileUrl = result.data.uploadFile.url;
+        toast.success('Image uploaded successfully');
         return fileUrl;
       }
+      toast.error('Failed to get upload URL');
       return null;
     } catch (error) {
       console.error('Upload error:', error);
+      toast.error('Failed to upload image');
       return null;
     }
   };
@@ -187,8 +189,6 @@ export default function StaffCheckQualityDetailsPage() {
   // Upload images to server
   const uploadImages = async (): Promise<string[]> => {
     if (images.length === 0) return [];
-
-    setImageUploading(true);
 
     try {
       // Upload each image and collect URLs
@@ -215,8 +215,6 @@ export default function StaffCheckQualityDetailsPage() {
       console.error('Error uploading images:', error);
       toast.error('Failed to upload images');
       return [];
-    } finally {
-      setImageUploading(false);
     }
   };
 
@@ -915,10 +913,14 @@ export default function StaffCheckQualityDetailsPage() {
                           type="button"
                           variant="outline"
                           onClick={() => fileInputRef.current?.click()}
-                          disabled={imageUploading || doneCheckQualityLoading}
+                          disabled={uploadFileloading || doneCheckQualityLoading}
                         >
-                          <Upload className="mr-2 h-4 w-4" />
-                          Select Images
+                          {uploadFileloading ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Upload className="mr-2 h-4 w-4" />
+                          )}
+                          {uploadFileloading ? 'Uploading...' : 'Select Images'}
                         </Button>
                         <Input
                           ref={fileInputRef}
@@ -927,7 +929,7 @@ export default function StaffCheckQualityDetailsPage() {
                           multiple
                           className="hidden"
                           onChange={handleFileChange}
-                          disabled={imageUploading || doneCheckQualityLoading}
+                          disabled={uploadFileloading || doneCheckQualityLoading}
                         />
 
                         <span className="text-muted-foreground text-sm">
@@ -952,7 +954,7 @@ export default function StaffCheckQualityDetailsPage() {
                                 setImages([]);
                               }}
                               disabled={
-                                imageUploading || doneCheckQualityLoading
+                                uploadFileloading || doneCheckQualityLoading
                               }
                             >
                               <Trash2 className="mr-1 h-4 w-4" />
@@ -986,7 +988,7 @@ export default function StaffCheckQualityDetailsPage() {
                                     removeImage(index);
                                   }}
                                   disabled={
-                                    imageUploading || doneCheckQualityLoading
+                                    uploadFileloading || doneCheckQualityLoading
                                   }
                                 >
                                   <X className="h-3 w-3" />
@@ -1013,7 +1015,7 @@ export default function StaffCheckQualityDetailsPage() {
                   <Button
                     variant="outline"
                     onClick={() => setActiveTab('details')}
-                    disabled={imageUploading || doneCheckQualityLoading}
+                    disabled={uploadFileloading || doneCheckQualityLoading}
                     className="w-full sm:w-auto"
                   >
                     Back to Details
@@ -1021,7 +1023,7 @@ export default function StaffCheckQualityDetailsPage() {
                   <Button
                     onClick={handleSubmitQualityCheck}
                     disabled={
-                      imageUploading ||
+                      uploadFileloading ||
                       doneCheckQualityLoading ||
                       passedQuantity + failedQuantity <= 0 ||
                       passedQuantity + failedQuantity >
@@ -1029,7 +1031,7 @@ export default function StaffCheckQualityDetailsPage() {
                     }
                     className="w-full sm:w-auto"
                   >
-                    {(imageUploading || doneCheckQualityLoading) && (
+                    {(uploadFileloading || doneCheckQualityLoading) && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Complete Quality Check
@@ -1111,8 +1113,8 @@ export default function StaffCheckQualityDetailsPage() {
                   setSelectedImageIndex(previewImages.length - 2);
                 }
               }}
-              disabled={imageUploading || doneCheckQualityLoading}
-            >
+              disabled={uploadFileloading || doneCheckQualityLoading}
+              >
               <Trash2 className="mr-2 h-4 w-4" />
               Remove Image
             </Button>
