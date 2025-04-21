@@ -776,22 +776,8 @@ export default function StaffCheckQualityDetailsPage() {
 
           {/* Quality Check Form Tab */}
           <TabsContent value="quality-check">
-            {order.status !== OrderStatus.WaitingForCheckingQuality &&
-            selectedCheckQuality.status !== "PENDING" ? (
-              // you cannot check quality if order status is not waiting for checking quality
-              <Card className="text-center">
-                <CardContent className="flex flex-col items-center justify-center py-16">
-                  <AlertTriangle className="mb-4 h-12 w-12 text-red-500" />
-                  <h2 className="mb-2 text-xl font-semibold">
-                    Quality Check Not Allowed
-                  </h2>
-                  <p className="text-muted-foreground mx-auto mb-6 max-w-md">
-                    You cannot perform a quality check on this order because its
-                    status is not valid for quality checking.
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
+            {order.status === OrderStatus.WaitingForCheckingQuality &&
+            selectedCheckQuality.status === OrderStatus.Pending ? (
               <Card>
                 <CardHeader>
                   <CardTitle>Quality Check Form</CardTitle>
@@ -1009,6 +995,20 @@ export default function StaffCheckQualityDetailsPage() {
                     Complete Quality Check
                   </Button>
                 </CardFooter>
+              </Card>
+            ) : (
+              // you cannot check quality if order status is not waiting for checking quality
+              <Card className="text-center">
+                <CardContent className="flex flex-col items-center justify-center py-16">
+                  <AlertTriangle className="mb-4 h-12 w-12 text-red-500" />
+                  <h2 className="mb-2 text-xl font-semibold">
+                    Quality Check Not Allowed
+                  </h2>
+                  <p className="text-muted-foreground mx-auto mb-6 max-w-md">
+                    You cannot perform a quality check on this order because its
+                    status is not valid for quality checking.
+                  </p>
+                </CardContent>
               </Card>
             )}
           </TabsContent>
