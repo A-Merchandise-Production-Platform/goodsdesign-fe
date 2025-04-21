@@ -140,14 +140,28 @@ export default function StaffCheckQualityDetailsPage() {
   }, [selectedOrderDetailIndex, selectedCheckQualityIndex]);
 
   // Handle file selection
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const newFiles = Array.from(e.target.files);
-      setImages(prev => [...prev, ...newFiles]);
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
 
-      // Create preview URLs
-      const newPreviewUrls = newFiles.map(file => URL.createObjectURL(file));
-      setPreviewImages(prev => [...prev, ...newPreviewUrls]);
+    const newFiles = Array.from(e.target.files);
+    
+    // Upload each file one by one
+    for (const file of newFiles) {
+      const mockEvent = {
+        target: {
+          files: [file] as unknown as FileList
+        },
+        preventDefault: () => {},
+        currentTarget: {} as HTMLInputElement,
+      } as React.ChangeEvent<HTMLInputElement>;
+
+      const fileUrl = await handleUploadFile(mockEvent);
+      
+      if (fileUrl) {
+        // Store the actual uploaded URL instead of creating a blob URL
+        setImages(prev => [...prev, file]);
+        setPreviewImages(prev => [...prev, fileUrl]);
+      }
     }
   };
 
@@ -186,37 +200,6 @@ export default function StaffCheckQualityDetailsPage() {
     }
   };
 
-  // Upload images to server
-  const uploadImages = async (): Promise<string[]> => {
-    if (images.length === 0) return [];
-
-    try {
-      // Upload each image and collect URLs
-      const uploadPromises = images.map(async (file) => {
-        // Create a properly typed mock event
-        const mockEvent = {
-          target: {
-            files: [file] as unknown as FileList
-          },
-          preventDefault: () => {},
-          currentTarget: {} as HTMLInputElement,
-        } as React.ChangeEvent<HTMLInputElement>;
-
-        const fileUrl = await handleUploadFile(mockEvent);
-        return fileUrl;
-      });
-
-      // Wait for all uploads to complete
-      const urls = await Promise.all(uploadPromises);
-      
-      // Filter out any failed uploads (null values)
-      return urls.filter((url): url is string => url !== null);
-    } catch (error) {
-      console.error('Error uploading images:', error);
-      toast.error('Failed to upload images');
-      return [];
-    }
-  };
 
   // Handle quality check submission
   const handleSubmitQualityCheck = async () => {
@@ -227,17 +210,14 @@ export default function StaffCheckQualityDetailsPage() {
       return;
     }
 
-    // Upload images first
-    const uploadedImageUrls = await uploadImages();
-
-    // Submit quality check
+    // Submit quality check with the actual uploaded URLs
     doneCheckQuality({
       variables: {
         input: {
           checkQualityId: selectedCheckQuality.id,
           failedQuantity,
           passedQuantity,
-          imageUrls: uploadedImageUrls,
+          imageUrls: previewImages,
           note,
         },
       },
