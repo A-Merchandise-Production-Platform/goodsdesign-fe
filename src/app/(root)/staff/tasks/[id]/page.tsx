@@ -57,6 +57,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import {
+  OrderDetailStatus,
   OrderStatus,
   useDoneCheckQualityMutation,
   useGetOrderQuery,
@@ -777,7 +778,7 @@ export default function StaffCheckQualityDetailsPage() {
           {/* Quality Check Form Tab */}
           <TabsContent value="quality-check">
             {order.status === OrderStatus.WaitingForCheckingQuality &&
-            selectedCheckQuality.status === OrderStatus.Pending ? (
+            selectedCheckQuality.status === OrderDetailStatus.Pending ? (
               <Card>
                 <CardHeader>
                   <CardTitle>Quality Check Form</CardTitle>

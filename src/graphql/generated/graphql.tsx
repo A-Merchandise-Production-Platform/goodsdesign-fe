@@ -1033,6 +1033,7 @@ export enum OrderDetailStatus {
   DoneProduction = 'DONE_PRODUCTION',
   InProduction = 'IN_PRODUCTION',
   Pending = 'PENDING',
+  Rejected = 'REJECTED',
   ReadyForShipping = 'READY_FOR_SHIPPING',
   ReworkDone = 'REWORK_DONE',
   ReworkInProgress = 'REWORK_IN_PROGRESS',
