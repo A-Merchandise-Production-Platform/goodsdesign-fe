@@ -57,12 +57,13 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import {
+  OrderDetailStatus,
   OrderStatus,
   useDoneCheckQualityMutation,
   useGetOrderQuery,
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
-import { filesToBase64 } from '@/utils/handle-upload';
+import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -90,7 +91,6 @@ export default function StaffCheckQualityDetailsPage() {
   const [note, setNote] = useState('');
   const [images, setImages] = useState<File[]>([]);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
-  const [imageUploading, setImageUploading] = useState(false);
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -102,6 +102,7 @@ export default function StaffCheckQualityDetailsPage() {
       orderId: id,
     },
   });
+  const [uploadFile, { loading: uploadFileloading }] = useUploadFileMutation();
 
   // Done check quality mutation
   const [doneCheckQuality, { loading: doneCheckQualityLoading }] =
@@ -159,24 +160,61 @@ export default function StaffCheckQualityDetailsPage() {
     setPreviewImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Upload images to server (mock implementation)
+  const handleUploadFile = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return null;
+
+    try {
+      const result = await uploadFile({
+        variables: { file },
+      });
+
+      // Check if the upload was successful
+      if (result.data?.uploadFile?.url) {
+        const fileUrl = result.data.uploadFile.url;
+        toast.success('Image uploaded successfully');
+        return fileUrl;
+      }
+      toast.error('Failed to get upload URL');
+      return null;
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Failed to upload image');
+      return null;
+    }
+  };
+
+  // Upload images to server
   const uploadImages = async (): Promise<string[]> => {
     if (images.length === 0) return [];
 
-    setImageUploading(true);
-
     try {
-      // Convert images to base64 strings
-      const base64Strings = await filesToBase64(images);
+      // Upload each image and collect URLs
+      const uploadPromises = images.map(async (file) => {
+        // Create a properly typed mock event
+        const mockEvent = {
+          target: {
+            files: [file] as unknown as FileList
+          },
+          preventDefault: () => {},
+          currentTarget: {} as HTMLInputElement,
+        } as React.ChangeEvent<HTMLInputElement>;
 
-      // Return the base64 strings to be stored in the database
-      return base64Strings;
+        const fileUrl = await handleUploadFile(mockEvent);
+        return fileUrl;
+      });
+
+      // Wait for all uploads to complete
+      const urls = await Promise.all(uploadPromises);
+      
+      // Filter out any failed uploads (null values)
+      return urls.filter((url): url is string => url !== null);
     } catch (error) {
-      console.error('Error converting images to base64:', error);
-      toast.error('Failed to process images');
+      console.error('Error uploading images:', error);
+      toast.error('Failed to upload images');
       return [];
-    } finally {
-      setImageUploading(false);
     }
   };
 
@@ -777,7 +815,7 @@ export default function StaffCheckQualityDetailsPage() {
           {/* Quality Check Form Tab */}
           <TabsContent value="quality-check">
             {order.status === OrderStatus.WaitingForCheckingQuality &&
-            selectedCheckQuality.status === OrderStatus.Pending ? (
+            selectedCheckQuality.status === OrderDetailStatus.Pending ? (
               <Card>
                 <CardHeader>
                   <CardTitle>Quality Check Form</CardTitle>
@@ -875,10 +913,14 @@ export default function StaffCheckQualityDetailsPage() {
                           type="button"
                           variant="outline"
                           onClick={() => fileInputRef.current?.click()}
-                          disabled={imageUploading || doneCheckQualityLoading}
+                          disabled={uploadFileloading || doneCheckQualityLoading}
                         >
-                          <Upload className="mr-2 h-4 w-4" />
-                          Select Images
+                          {uploadFileloading ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Upload className="mr-2 h-4 w-4" />
+                          )}
+                          {uploadFileloading ? 'Uploading...' : 'Select Images'}
                         </Button>
                         <Input
                           ref={fileInputRef}
@@ -887,7 +929,7 @@ export default function StaffCheckQualityDetailsPage() {
                           multiple
                           className="hidden"
                           onChange={handleFileChange}
-                          disabled={imageUploading || doneCheckQualityLoading}
+                          disabled={uploadFileloading || doneCheckQualityLoading}
                         />
 
                         <span className="text-muted-foreground text-sm">
@@ -912,7 +954,7 @@ export default function StaffCheckQualityDetailsPage() {
                                 setImages([]);
                               }}
                               disabled={
-                                imageUploading || doneCheckQualityLoading
+                                uploadFileloading || doneCheckQualityLoading
                               }
                             >
                               <Trash2 className="mr-1 h-4 w-4" />
@@ -946,7 +988,7 @@ export default function StaffCheckQualityDetailsPage() {
                                     removeImage(index);
                                   }}
                                   disabled={
-                                    imageUploading || doneCheckQualityLoading
+                                    uploadFileloading || doneCheckQualityLoading
                                   }
                                 >
                                   <X className="h-3 w-3" />
@@ -973,7 +1015,7 @@ export default function StaffCheckQualityDetailsPage() {
                   <Button
                     variant="outline"
                     onClick={() => setActiveTab('details')}
-                    disabled={imageUploading || doneCheckQualityLoading}
+                    disabled={uploadFileloading || doneCheckQualityLoading}
                     className="w-full sm:w-auto"
                   >
                     Back to Details
@@ -981,7 +1023,7 @@ export default function StaffCheckQualityDetailsPage() {
                   <Button
                     onClick={handleSubmitQualityCheck}
                     disabled={
-                      imageUploading ||
+                      uploadFileloading ||
                       doneCheckQualityLoading ||
                       passedQuantity + failedQuantity <= 0 ||
                       passedQuantity + failedQuantity >
@@ -989,7 +1031,7 @@ export default function StaffCheckQualityDetailsPage() {
                     }
                     className="w-full sm:w-auto"
                   >
-                    {(imageUploading || doneCheckQualityLoading) && (
+                    {(uploadFileloading || doneCheckQualityLoading) && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Complete Quality Check
@@ -1071,8 +1113,8 @@ export default function StaffCheckQualityDetailsPage() {
                   setSelectedImageIndex(previewImages.length - 2);
                 }
               }}
-              disabled={imageUploading || doneCheckQualityLoading}
-            >
+              disabled={uploadFileloading || doneCheckQualityLoading}
+              >
               <Trash2 className="mr-2 h-4 w-4" />
               Remove Image
             </Button>
