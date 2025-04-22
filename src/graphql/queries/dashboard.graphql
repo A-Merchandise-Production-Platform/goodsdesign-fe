@@ -187,3 +187,57 @@ query GetAdminDashboard {
     totalSalesChangeType
   }
 }
+
+query GetMyFactoryDashboard {
+  getMyFactoryDashboard {
+    inProductionOrders
+    pendingOrders
+    productionProgress {
+      id
+      status
+
+      createdAt
+      totalProductionCost
+    }
+    qualityIssues {
+      id
+      reportedAt
+      status
+      description
+    }
+    recentOrders {
+      id
+      status
+      totalProductionCost
+      createdAt
+    }
+    revenueData {
+      month
+      revenue
+    }
+    stats {
+      legitPoints {
+        percentChange
+        isPositive
+        value
+      }
+      monthlyRevenue {
+        isPositive
+        percentChange
+        value
+      }
+      qualityScore {
+        isPositive
+        percentChange
+        value
+      }
+      totalOrders {
+        isPositive
+        percentChange
+        value
+      }
+    }
+    totalOrders
+    totalRevenue
+  }
+}

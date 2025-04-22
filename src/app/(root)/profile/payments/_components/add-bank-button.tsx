@@ -130,7 +130,7 @@ export default function AddBankButton() {
                     disabled={submitting}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full truncate">
                         <SelectValue placeholder="Select a bank" />
                       </SelectTrigger>
                     </FormControl>
@@ -151,10 +151,13 @@ export default function AddBankButton() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormDescription>
-                    Select your bank from the list.
-                  </FormDescription>
-                  <FormMessage />
+                  {form.formState.errors.bankId ? (
+                    <FormMessage />
+                  ) : (
+                    <FormDescription>
+                      Select your bank from the list.
+                    </FormDescription>
+                  )}
                 </FormItem>
               )}
             />
@@ -172,10 +175,14 @@ export default function AddBankButton() {
                       disabled={submitting}
                     />
                   </FormControl>
-                  <FormDescription>
-                    The name associated with your bank account.
-                  </FormDescription>
-                  <FormMessage />
+
+                  {form.formState.errors.accountName ? (
+                    <FormMessage />
+                  ) : (
+                    <FormDescription>
+                      The name associated with your bank account.
+                    </FormDescription>
+                  )}
                 </FormItem>
               )}
             />
@@ -193,8 +200,11 @@ export default function AddBankButton() {
                       disabled={submitting}
                     />
                   </FormControl>
-                  <FormDescription>Your bank account number.</FormDescription>
-                  <FormMessage />
+                  {form.formState.errors.accountNumber ? (
+                    <FormMessage />
+                  ) : (
+                    <FormDescription>Your bank account number.</FormDescription>
+                  )}
                 </FormItem>
               )}
             />

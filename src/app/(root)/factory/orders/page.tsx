@@ -32,6 +32,8 @@ import { useGetMyFactoryOrdersQuery } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
 
 import { getStatusBadge } from '../../_components/order-status';
+import { DashboardShell } from '@/components/dashboard-shell';
+import { Input } from '@/components/ui/input';
 
 // Extract all status types from the getStatusBadge function
 const STATUS_OPTIONS = [
@@ -85,22 +87,20 @@ export default function FactoryOrdersPage() {
       : allOrders.filter(order => order.status === statusFilter);
 
   return (
-    <div className="">
+    <DashboardShell
+      title="Factory Orders"
+      subtitle="Manage and view all your factory orders"
+    >
+      <div className="flex items-center gap-4">
+        <div className="flex-1">
+          <Input placeholder="Search by order ID" className="w-96" />
+        </div>
+        <StatusFilter
+          selectedStatus={statusFilter}
+          onStatusChange={setStatusFilter}
+        />
+      </div>
       <Card>
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <CardTitle>Factory Orders</CardTitle>
-            <CardDescription>
-              Manage and view all your factory orders
-            </CardDescription>
-          </div>
-          <div className="mt-4 sm:mt-0">
-            <StatusFilter
-              selectedStatus={statusFilter}
-              onStatusChange={setStatusFilter}
-            />
-          </div>
-        </CardHeader>
         <CardContent>
           {orders.length === 0 ? (
             <div className="py-6 text-center">
@@ -148,7 +148,7 @@ export default function FactoryOrdersPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </DashboardShell>
   );
 }
 
