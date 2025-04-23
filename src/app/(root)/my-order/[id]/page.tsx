@@ -72,6 +72,7 @@ import {
   getPaymentStatusBadge,
   getStatusBadge,
   orderStatusSteps,
+  refundStatusSteps,
 } from '../../_components/order-status';
 
 // Helper function to format time
@@ -390,25 +391,35 @@ export default function OrderDetailsPage() {
               <div
                 className="bg-primary absolute top-0 left-0 h-full transition-all duration-500"
                 style={{
-                  width: `${
-                    ((orderStatusSteps.findIndex(
-                      step => step.group === currentStatusGroup,
-                    ) +
-                      1) /
-                      orderStatusSteps.length) *
-                    100
-                  }%`,
+                  width: `${(order.status === 'WAITING_FOR_REFUND' || order.status === 'REFUNDED'
+                    ? ((refundStatusSteps.findIndex(
+                        step => step.statuses.includes(order.status),
+                      ) + 1) /
+                      refundStatusSteps.length)
+                    : ((orderStatusSteps.findIndex(
+                        step => step.group === currentStatusGroup,
+                      ) + 1) /
+                      orderStatusSteps.length)) *
+                    100}%`,
                 }}
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-6 md:grid-cols-3 lg:grid-cols-6">
-              {orderStatusSteps.map((step, index) => {
-                const isActive = step.group === currentStatusGroup;
-                const isPast =
-                  orderStatusSteps.findIndex(
-                    s => s.group === currentStatusGroup,
-                  ) > index;
+            <div className={`grid grid-cols-2 gap-2 pt-6 md:grid-cols-2 ${
+              order.status === 'WAITING_FOR_REFUND' || order.status === 'REFUNDED'
+                ? 'lg:grid-cols-2'
+                : 'lg:grid-cols-6'
+            }`}>
+              {(order.status === 'WAITING_FOR_REFUND' || order.status === 'REFUNDED'
+                ? refundStatusSteps
+                : orderStatusSteps
+              ).map((step, index) => {
+                const isActive = order.status === 'WAITING_FOR_REFUND' || order.status === 'REFUNDED'
+                  ? step.statuses.includes(order.status)
+                  : step.group === currentStatusGroup;
+                const isPast = order.status === 'WAITING_FOR_REFUND' || order.status === 'REFUNDED'
+                  ? refundStatusSteps.findIndex(s => s.statuses.includes(order.status)) > index
+                  : orderStatusSteps.findIndex(s => s.group === currentStatusGroup) > index;
                 const Icon = step.icon;
 
                 return (
