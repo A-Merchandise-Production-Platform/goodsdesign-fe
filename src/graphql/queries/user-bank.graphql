@@ -1,0 +1,67 @@
+query GetMyUserBanks {
+  userBanks {
+    accountName
+    accountNumber
+    bank {
+      bin
+      code
+      id
+      isActive
+      isDeleted
+      logo
+      name
+      shortName
+    }
+    bankId
+    createdAt
+    id
+    isDefault
+    updatedAt
+  }
+}
+
+query GetUserBanksByUserId($userBanksByUserIdId: String!) {
+  userBanksByUserId(id: $userBanksByUserIdId) {
+    accountName
+    accountNumber
+    bank {
+      bin
+      code
+      id
+      isActive
+      isDeleted
+      logo
+      name
+      shortName
+    }
+    bankId
+    createdAt
+    id
+    isDefault
+    updatedAt
+  }
+}
+
+mutation CreateUserBank($createUserBankInput: CreateUserBankInput!) {
+  createUserBank(createUserBankInput: $createUserBankInput) {
+    id
+  }
+}
+
+mutation UpdateUserBank(
+  $updateUserBankId: String!
+  $updateUserBankInput: UpdateUserBankInput!
+) {
+  updateUserBank(
+    id: $updateUserBankId
+    updateUserBankInput: $updateUserBankInput
+  ) {
+    id
+  }
+}
+
+mutation DeleteUserBank($deleteUserBankId: String!) {
+  deleteUserBank(id: $deleteUserBankId) {
+    id
+  }
+}

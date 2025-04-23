@@ -18,15 +18,18 @@ export default function AuthProvider({
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const { setUser, accessToken, isAuth } = useAuthStore();
-  const [getMeQuery] = useGetMeLazyQuery({
+  const [getMeQuery, { called, loading }] = useGetMeLazyQuery({
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'network-only',
     onCompleted: data => {
-      setUser(data.getMe as UserEntity);
+      if (data && data.getMe) {
+        setUser(data.getMe as UserEntity);
+      }
     },
     onError: error => {
       console.log(error);
       toast.error(error.message);
     },
-    fetchPolicy: 'no-cache',
   });
 
   useEffect(() => {
@@ -39,9 +42,9 @@ export default function AuthProvider({
     };
 
     rehydrateAuth();
-  }, []);
+  }, [isAuth, accessToken, getMeQuery]);
 
-  if (isLoading) {
+  if (isLoading || loading) {
     return <LoadingScreen message="Loading user..." />;
   }
 

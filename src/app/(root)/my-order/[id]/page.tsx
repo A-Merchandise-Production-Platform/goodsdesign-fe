@@ -15,6 +15,7 @@ import {
   Star,
   Truck,
   XCircle,
+  StarIcon,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -65,7 +66,7 @@ import {
   useFeedbackOrderMutation,
   useGetOrderQuery,
 } from '@/graphql/generated/graphql';
-import { formatDate } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 
 import {
   getPaymentStatusBadge,
@@ -443,7 +444,7 @@ export default function OrderDetailsPage() {
         onValueChange={setActiveTab}
         className="mb-6"
       >
-        <TabsList className="mb-6 grid grid-cols-4">
+        <TabsList className="mb-6 grid grid-cols-5">
           <TabsTrigger value="overview">
             <FileText className="mr-2 h-4 w-4" />
             Overview
@@ -459,6 +460,10 @@ export default function OrderDetailsPage() {
           <TabsTrigger value="payment">
             <PaymentIcon className="mr-2 h-4 w-4" />
             Payment
+          </TabsTrigger>
+          <TabsTrigger value="rating">
+            <StarIcon className="mr-2 h-4 w-4" />
+            Rating
           </TabsTrigger>
         </TabsList>
 
@@ -934,6 +939,54 @@ export default function OrderDetailsPage() {
               </div>
             </CardFooter>
           </Card>
+        </TabsContent>
+
+        <TabsContent value='rating'>
+        <Card className="overflow-hidden">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2">
+          Customer Rating
+        </CardTitle>
+        <CardDescription>Rating status and feedback</CardDescription>
+      </CardHeader>
+      <CardContent className="pt-6">
+        {order.rating ? (
+          <div className="space-y-4">
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-muted-foreground">Rating {order.ratedAt ? "at " + formatDate(order.ratedAt) : ""}</span>
+              <div className="flex items-center gap-1.5">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={cn(
+                      "h-5 w-5",
+                      star <= order.rating! ? "fill-primary text-primary" : "text-muted stroke-muted-foreground",
+                    )}
+                  />
+                ))}
+                <span className="ml-2 text-sm font-medium">{order.rating} out of 5</span>
+              </div>
+            </div>
+
+            {order.ratingComment && (
+              <div className="space-y-2">
+                <span className="text-sm font-medium text-muted-foreground">Comment</span>
+                <div className="rounded-lg bg-muted/50 p-3 text-sm">"{order.ratingComment}"</div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center py-6 text-center">
+            <div className="space-y-2">
+              <div className="flex justify-center">
+                <Star className="h-10 w-10 text-muted stroke-muted-foreground" />
+              </div>
+              <p className="text-muted-foreground">Waiting for customer rating</p>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
         </TabsContent>
       </Tabs>
 
