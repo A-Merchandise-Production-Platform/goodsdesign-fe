@@ -1228,3 +1228,25 @@ mutation AddOrderProgressReport($input: AddOrderProgressReportInput!) {
     id
   }
 }
+
+mutation CreateRefundForOrder($orderId: String!) {
+  createRefundForOrder(orderId: $orderId) {
+  id  
+  }
+}
+
+mutation ProcessWithdrawal($imageUrls: [String!]!, $paymentId: String!, $userBankId: String!) {
+  processWithdrawal(imageUrls: $imageUrls, paymentId: $paymentId, userBankId: $userBankId)
+}
+
+mutation StartReworkByManager($orderId: String!) {
+  startReworkByManager(orderId: $orderId) {
+  id  
+  }
+}
+
+mutation AssignFactoryToOrder($factoryId: String!, $orderId: String!) {
+  assignFactoryToOrder(factoryId: $factoryId, orderId: $orderId) {
+    id
+  }
+}

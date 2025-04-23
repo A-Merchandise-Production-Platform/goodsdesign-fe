@@ -536,6 +536,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   acceptOrderForFactory: OrderEntity;
   addOrderProgressReport: OrderProgressReportEntity;
+  assignFactoryToOrder: OrderEntity;
   assignStaffToFactory: FactoryEntity;
   calculateShippingFee: ShippingFee;
   changeFactoryStaff: FactoryEntity;
@@ -555,6 +556,7 @@ export type Mutation = {
   createProduct: ProductEntity;
   createProductDesign: ProductDesignEntity;
   createProductPositionType: ProductPositionTypeEntity;
+  createRefundForOrder: OrderEntity;
   createShippingOrder: ShippingOrder;
   createSystemConfigBank: SystemConfigBankEntity;
   createSystemConfigDiscount: SystemConfigDiscountEntity;
@@ -577,6 +579,7 @@ export type Mutation = {
   login: AuthResponseDto;
   logout: Scalars['String']['output'];
   markNotificationAsRead: NotificationEntity;
+  processWithdrawal: Scalars['String']['output'];
   reassignNewStaffForOrder: OrderEntity;
   refreshToken: AuthResponseDto;
   register: AuthResponseDto;
@@ -592,6 +595,7 @@ export type Mutation = {
   sendEmail: Scalars['Boolean']['output'];
   shippedOrder: OrderEntity;
   startRework: OrderEntity;
+  startReworkByManager: OrderEntity;
   toggleActiveCategory: CategoryEntity;
   toggleActiveProduct: ProductEntity;
   updateAddress: AddressEntity;
@@ -622,6 +626,12 @@ export type MutationAcceptOrderForFactoryArgs = {
 
 export type MutationAddOrderProgressReportArgs = {
   input: AddOrderProgressReportInput;
+};
+
+
+export type MutationAssignFactoryToOrderArgs = {
+  factoryId: Scalars['String']['input'];
+  orderId: Scalars['String']['input'];
 };
 
 
@@ -724,6 +734,11 @@ export type MutationCreateProductDesignArgs = {
 
 export type MutationCreateProductPositionTypeArgs = {
   input: CreateProductPositionTypeDto;
+};
+
+
+export type MutationCreateRefundForOrderArgs = {
+  orderId: Scalars['String']['input'];
 };
 
 
@@ -834,6 +849,13 @@ export type MutationMarkNotificationAsReadArgs = {
 };
 
 
+export type MutationProcessWithdrawalArgs = {
+  imageUrls: Array<Scalars['String']['input']>;
+  paymentId: Scalars['String']['input'];
+  userBankId: Scalars['String']['input'];
+};
+
+
 export type MutationReassignNewStaffForOrderArgs = {
   newStaffId: Scalars['String']['input'];
   orderId: Scalars['String']['input'];
@@ -907,6 +929,11 @@ export type MutationShippedOrderArgs = {
 
 
 export type MutationStartReworkArgs = {
+  orderId: Scalars['String']['input'];
+};
+
+
+export type MutationStartReworkByManagerArgs = {
   orderId: Scalars['String']['input'];
 };
 
@@ -1060,7 +1087,6 @@ export enum OrderDetailStatus {
   DoneProduction = 'DONE_PRODUCTION',
   InProduction = 'IN_PRODUCTION',
   Pending = 'PENDING',
-  Rejected = 'REJECTED',
   ReadyForShipping = 'READY_FOR_SHIPPING',
   ReworkDone = 'REWORK_DONE',
   ReworkInProgress = 'REWORK_IN_PROGRESS',
@@ -1130,6 +1156,7 @@ export enum OrderStatus {
   Pending = 'PENDING',
   PendingAcceptance = 'PENDING_ACCEPTANCE',
   ReadyForShipping = 'READY_FOR_SHIPPING',
+  Refunded = 'REFUNDED',
   Rejected = 'REJECTED',
   ReworkInProgress = 'REWORK_IN_PROGRESS',
   ReworkRequired = 'REWORK_REQUIRED',
@@ -1137,6 +1164,7 @@ export enum OrderStatus {
   Shipping = 'SHIPPING',
   WaitingFillInformation = 'WAITING_FILL_INFORMATION',
   WaitingForCheckingQuality = 'WAITING_FOR_CHECKING_QUALITY',
+  WaitingForRefund = 'WAITING_FOR_REFUND',
   WaitingPayment = 'WAITING_PAYMENT'
 }
 
@@ -1171,6 +1199,7 @@ export type PaymentEntity = {
 
 /** Method of payment */
 export enum PaymentMethod {
+  Bank = 'BANK',
   Payos = 'PAYOS',
   Vnpay = 'VNPAY'
 }
@@ -1326,6 +1355,7 @@ export type Query = {
   user: UserEntity;
   userBank: UserBankEntity;
   userBanks: Array<UserBankEntity>;
+  userBanksByUserId: Array<UserBankEntity>;
   userCartItems: Array<CartItemEntity>;
   users: Array<UserEntity>;
   ward: Ward;
@@ -1512,6 +1542,11 @@ export type QueryUserArgs = {
 
 
 export type QueryUserBankArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryUserBanksByUserIdArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -2252,6 +2287,37 @@ export type AddOrderProgressReportMutationVariables = Exact<{
 
 export type AddOrderProgressReportMutation = { __typename?: 'Mutation', addOrderProgressReport: { __typename?: 'OrderProgressReportEntity', id: string } };
 
+export type CreateRefundForOrderMutationVariables = Exact<{
+  orderId: Scalars['String']['input'];
+}>;
+
+
+export type CreateRefundForOrderMutation = { __typename?: 'Mutation', createRefundForOrder: { __typename?: 'OrderEntity', id: string } };
+
+export type ProcessWithdrawalMutationVariables = Exact<{
+  imageUrls: Array<Scalars['String']['input']> | Scalars['String']['input'];
+  paymentId: Scalars['String']['input'];
+  userBankId: Scalars['String']['input'];
+}>;
+
+
+export type ProcessWithdrawalMutation = { __typename?: 'Mutation', processWithdrawal: string };
+
+export type StartReworkByManagerMutationVariables = Exact<{
+  orderId: Scalars['String']['input'];
+}>;
+
+
+export type StartReworkByManagerMutation = { __typename?: 'Mutation', startReworkByManager: { __typename?: 'OrderEntity', id: string } };
+
+export type AssignFactoryToOrderMutationVariables = Exact<{
+  factoryId: Scalars['String']['input'];
+  orderId: Scalars['String']['input'];
+}>;
+
+
+export type AssignFactoryToOrderMutation = { __typename?: 'Mutation', assignFactoryToOrder: { __typename?: 'OrderEntity', id: string } };
+
 export type ProductDesignsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -2468,6 +2534,13 @@ export type GetMyUserBanksQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetMyUserBanksQuery = { __typename?: 'Query', userBanks: Array<{ __typename?: 'UserBankEntity', accountName: string, accountNumber: string, bankId: string, createdAt: any, id: string, isDefault: boolean, updatedAt: any, bank?: { __typename?: 'SystemConfigBankEntity', bin: string, code: string, id: string, isActive: boolean, isDeleted: boolean, logo: string, name: string, shortName: string } | null }> };
+
+export type GetUserBanksByUserIdQueryVariables = Exact<{
+  userBanksByUserIdId: Scalars['String']['input'];
+}>;
+
+
+export type GetUserBanksByUserIdQuery = { __typename?: 'Query', userBanksByUserId: Array<{ __typename?: 'UserBankEntity', accountName: string, accountNumber: string, bankId: string, createdAt: any, id: string, isDefault: boolean, updatedAt: any, bank?: { __typename?: 'SystemConfigBankEntity', bin: string, code: string, id: string, isActive: boolean, isDeleted: boolean, logo: string, name: string, shortName: string } | null }> };
 
 export type CreateUserBankMutationVariables = Exact<{
   createUserBankInput: CreateUserBankInput;
@@ -6045,6 +6118,143 @@ export function useAddOrderProgressReportMutation(baseOptions?: Apollo.MutationH
 export type AddOrderProgressReportMutationHookResult = ReturnType<typeof useAddOrderProgressReportMutation>;
 export type AddOrderProgressReportMutationResult = Apollo.MutationResult<AddOrderProgressReportMutation>;
 export type AddOrderProgressReportMutationOptions = Apollo.BaseMutationOptions<AddOrderProgressReportMutation, AddOrderProgressReportMutationVariables>;
+export const CreateRefundForOrderDocument = gql`
+    mutation CreateRefundForOrder($orderId: String!) {
+  createRefundForOrder(orderId: $orderId) {
+    id
+  }
+}
+    `;
+export type CreateRefundForOrderMutationFn = Apollo.MutationFunction<CreateRefundForOrderMutation, CreateRefundForOrderMutationVariables>;
+
+/**
+ * __useCreateRefundForOrderMutation__
+ *
+ * To run a mutation, you first call `useCreateRefundForOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateRefundForOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createRefundForOrderMutation, { data, loading, error }] = useCreateRefundForOrderMutation({
+ *   variables: {
+ *      orderId: // value for 'orderId'
+ *   },
+ * });
+ */
+export function useCreateRefundForOrderMutation(baseOptions?: Apollo.MutationHookOptions<CreateRefundForOrderMutation, CreateRefundForOrderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateRefundForOrderMutation, CreateRefundForOrderMutationVariables>(CreateRefundForOrderDocument, options);
+      }
+export type CreateRefundForOrderMutationHookResult = ReturnType<typeof useCreateRefundForOrderMutation>;
+export type CreateRefundForOrderMutationResult = Apollo.MutationResult<CreateRefundForOrderMutation>;
+export type CreateRefundForOrderMutationOptions = Apollo.BaseMutationOptions<CreateRefundForOrderMutation, CreateRefundForOrderMutationVariables>;
+export const ProcessWithdrawalDocument = gql`
+    mutation ProcessWithdrawal($imageUrls: [String!]!, $paymentId: String!, $userBankId: String!) {
+  processWithdrawal(
+    imageUrls: $imageUrls
+    paymentId: $paymentId
+    userBankId: $userBankId
+  )
+}
+    `;
+export type ProcessWithdrawalMutationFn = Apollo.MutationFunction<ProcessWithdrawalMutation, ProcessWithdrawalMutationVariables>;
+
+/**
+ * __useProcessWithdrawalMutation__
+ *
+ * To run a mutation, you first call `useProcessWithdrawalMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useProcessWithdrawalMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [processWithdrawalMutation, { data, loading, error }] = useProcessWithdrawalMutation({
+ *   variables: {
+ *      imageUrls: // value for 'imageUrls'
+ *      paymentId: // value for 'paymentId'
+ *      userBankId: // value for 'userBankId'
+ *   },
+ * });
+ */
+export function useProcessWithdrawalMutation(baseOptions?: Apollo.MutationHookOptions<ProcessWithdrawalMutation, ProcessWithdrawalMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ProcessWithdrawalMutation, ProcessWithdrawalMutationVariables>(ProcessWithdrawalDocument, options);
+      }
+export type ProcessWithdrawalMutationHookResult = ReturnType<typeof useProcessWithdrawalMutation>;
+export type ProcessWithdrawalMutationResult = Apollo.MutationResult<ProcessWithdrawalMutation>;
+export type ProcessWithdrawalMutationOptions = Apollo.BaseMutationOptions<ProcessWithdrawalMutation, ProcessWithdrawalMutationVariables>;
+export const StartReworkByManagerDocument = gql`
+    mutation StartReworkByManager($orderId: String!) {
+  startReworkByManager(orderId: $orderId) {
+    id
+  }
+}
+    `;
+export type StartReworkByManagerMutationFn = Apollo.MutationFunction<StartReworkByManagerMutation, StartReworkByManagerMutationVariables>;
+
+/**
+ * __useStartReworkByManagerMutation__
+ *
+ * To run a mutation, you first call `useStartReworkByManagerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStartReworkByManagerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [startReworkByManagerMutation, { data, loading, error }] = useStartReworkByManagerMutation({
+ *   variables: {
+ *      orderId: // value for 'orderId'
+ *   },
+ * });
+ */
+export function useStartReworkByManagerMutation(baseOptions?: Apollo.MutationHookOptions<StartReworkByManagerMutation, StartReworkByManagerMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<StartReworkByManagerMutation, StartReworkByManagerMutationVariables>(StartReworkByManagerDocument, options);
+      }
+export type StartReworkByManagerMutationHookResult = ReturnType<typeof useStartReworkByManagerMutation>;
+export type StartReworkByManagerMutationResult = Apollo.MutationResult<StartReworkByManagerMutation>;
+export type StartReworkByManagerMutationOptions = Apollo.BaseMutationOptions<StartReworkByManagerMutation, StartReworkByManagerMutationVariables>;
+export const AssignFactoryToOrderDocument = gql`
+    mutation AssignFactoryToOrder($factoryId: String!, $orderId: String!) {
+  assignFactoryToOrder(factoryId: $factoryId, orderId: $orderId) {
+    id
+  }
+}
+    `;
+export type AssignFactoryToOrderMutationFn = Apollo.MutationFunction<AssignFactoryToOrderMutation, AssignFactoryToOrderMutationVariables>;
+
+/**
+ * __useAssignFactoryToOrderMutation__
+ *
+ * To run a mutation, you first call `useAssignFactoryToOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssignFactoryToOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [assignFactoryToOrderMutation, { data, loading, error }] = useAssignFactoryToOrderMutation({
+ *   variables: {
+ *      factoryId: // value for 'factoryId'
+ *      orderId: // value for 'orderId'
+ *   },
+ * });
+ */
+export function useAssignFactoryToOrderMutation(baseOptions?: Apollo.MutationHookOptions<AssignFactoryToOrderMutation, AssignFactoryToOrderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AssignFactoryToOrderMutation, AssignFactoryToOrderMutationVariables>(AssignFactoryToOrderDocument, options);
+      }
+export type AssignFactoryToOrderMutationHookResult = ReturnType<typeof useAssignFactoryToOrderMutation>;
+export type AssignFactoryToOrderMutationResult = Apollo.MutationResult<AssignFactoryToOrderMutation>;
+export type AssignFactoryToOrderMutationOptions = Apollo.BaseMutationOptions<AssignFactoryToOrderMutation, AssignFactoryToOrderMutationVariables>;
 export const ProductDesignsDocument = gql`
     query ProductDesigns {
   productDesigns {
@@ -7584,6 +7794,62 @@ export type GetMyUserBanksQueryHookResult = ReturnType<typeof useGetMyUserBanksQ
 export type GetMyUserBanksLazyQueryHookResult = ReturnType<typeof useGetMyUserBanksLazyQuery>;
 export type GetMyUserBanksSuspenseQueryHookResult = ReturnType<typeof useGetMyUserBanksSuspenseQuery>;
 export type GetMyUserBanksQueryResult = Apollo.QueryResult<GetMyUserBanksQuery, GetMyUserBanksQueryVariables>;
+export const GetUserBanksByUserIdDocument = gql`
+    query GetUserBanksByUserId($userBanksByUserIdId: String!) {
+  userBanksByUserId(id: $userBanksByUserIdId) {
+    accountName
+    accountNumber
+    bank {
+      bin
+      code
+      id
+      isActive
+      isDeleted
+      logo
+      name
+      shortName
+    }
+    bankId
+    createdAt
+    id
+    isDefault
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGetUserBanksByUserIdQuery__
+ *
+ * To run a query within a React component, call `useGetUserBanksByUserIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserBanksByUserIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserBanksByUserIdQuery({
+ *   variables: {
+ *      userBanksByUserIdId: // value for 'userBanksByUserIdId'
+ *   },
+ * });
+ */
+export function useGetUserBanksByUserIdQuery(baseOptions: Apollo.QueryHookOptions<GetUserBanksByUserIdQuery, GetUserBanksByUserIdQueryVariables> & ({ variables: GetUserBanksByUserIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserBanksByUserIdQuery, GetUserBanksByUserIdQueryVariables>(GetUserBanksByUserIdDocument, options);
+      }
+export function useGetUserBanksByUserIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserBanksByUserIdQuery, GetUserBanksByUserIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserBanksByUserIdQuery, GetUserBanksByUserIdQueryVariables>(GetUserBanksByUserIdDocument, options);
+        }
+export function useGetUserBanksByUserIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetUserBanksByUserIdQuery, GetUserBanksByUserIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetUserBanksByUserIdQuery, GetUserBanksByUserIdQueryVariables>(GetUserBanksByUserIdDocument, options);
+        }
+export type GetUserBanksByUserIdQueryHookResult = ReturnType<typeof useGetUserBanksByUserIdQuery>;
+export type GetUserBanksByUserIdLazyQueryHookResult = ReturnType<typeof useGetUserBanksByUserIdLazyQuery>;
+export type GetUserBanksByUserIdSuspenseQueryHookResult = ReturnType<typeof useGetUserBanksByUserIdSuspenseQuery>;
+export type GetUserBanksByUserIdQueryResult = Apollo.QueryResult<GetUserBanksByUserIdQuery, GetUserBanksByUserIdQueryVariables>;
 export const CreateUserBankDocument = gql`
     mutation CreateUserBank($createUserBankInput: CreateUserBankInput!) {
   createUserBank(createUserBankInput: $createUserBankInput) {
