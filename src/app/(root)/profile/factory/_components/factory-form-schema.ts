@@ -29,11 +29,8 @@ export const factoryFormSchema = z.object({
   }),
 
   // Operational Details
-  totalEmployees: z.number().int().positive().optional(),
   maxPrintingCapacity: z.number().int().positive().optional(),
-  operationalHours: z.string().optional(),
   leadTime: z.number().int().positive().optional(),
-  minimumOrderQuantity: z.number().int().positive().optional(),
 
   // Quality and Specialization
   qualityCertifications: z.string().optional(),
@@ -64,7 +61,6 @@ export const defaultValues: Partial<FactoryFormValues> = {
     wardCode: '20102',
     street: '123 Main St',
   },
-  totalEmployees: undefined,
   maxPrintingCapacity: undefined,
   qualityCertifications: '',
   printingMethods: [],
@@ -72,8 +68,6 @@ export const defaultValues: Partial<FactoryFormValues> = {
   contactPersonName: '',
   contactPersonRole: '',
   contactPersonPhone: '',
-  operationalHours: '',
   leadTime: undefined,
-  minimumOrderQuantity: undefined,
   systemConfigVariantIds: [],
 };

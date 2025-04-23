@@ -70,11 +70,8 @@ export default function UpdateFactoryForm() {
               street: data.getMyFactory.address.street ?? '123 Main St',
             }
           : undefined,
-        totalEmployees: data.getMyFactory.totalEmployees ?? 0,
         maxPrintingCapacity: data.getMyFactory.maxPrintingCapacity ?? 0,
-        operationalHours: data.getMyFactory.operationalHours ?? '',
         leadTime: data.getMyFactory.leadTime ?? 0,
-        minimumOrderQuantity: data.getMyFactory.minimumOrderQuantity ?? 0,
         qualityCertifications: data.getMyFactory.qualityCertifications ?? '',
         printingMethods: data.getMyFactory.printingMethods ?? [],
         specializations: data.getMyFactory.specializations ?? [],
@@ -100,6 +97,7 @@ export default function UpdateFactoryForm() {
     });
 
   function onSubmit(data: FactoryFormValues) {
+    console.log(data);
     updateFactoryInfo({
       variables: {
         updateFactoryInfoInput: {
@@ -200,7 +198,7 @@ export default function UpdateFactoryForm() {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
+                className="space-y-6 pb-8"
               >
                 <Tabs
                   value={activeTab}

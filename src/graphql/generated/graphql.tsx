@@ -348,6 +348,8 @@ export type FactoryDashboardResponse = {
   productionProgress: Array<FactoryOrderWithProgress>;
   qualityIssues: Array<QualityIssueWithFactory>;
   recentOrders: Array<FactoryOrderWithCustomer>;
+  revenueData: Array<MonthlyRevenue>;
+  stats: FactoryStats;
   totalOrders: Scalars['Int']['output'];
   totalRevenue: Scalars['Int']['output'];
 };
@@ -367,6 +369,16 @@ export type FactoryDetailDashboardResponse = {
   totalRevenue: Scalars['Int']['output'];
 };
 
+export type FactoryDetails = {
+  __typename?: 'FactoryDetails';
+  address: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  leadTime: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  productionCapacity: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+};
+
 export type FactoryEntity = {
   __typename?: 'FactoryEntity';
   address?: Maybe<AddressEntity>;
@@ -384,6 +396,7 @@ export type FactoryEntity = {
   formattedAddress?: Maybe<Scalars['String']['output']>;
   isSubmitted?: Maybe<Scalars['Boolean']['output']>;
   leadTime?: Maybe<Scalars['Int']['output']>;
+  legitPoint?: Maybe<Scalars['Int']['output']>;
   maxPrintingCapacity?: Maybe<Scalars['Int']['output']>;
   minimumOrderQuantity?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
@@ -468,6 +481,14 @@ export type FactoryProgressReportType = {
   reportDate: Scalars['DateTime']['output'];
 };
 
+export type FactoryStats = {
+  __typename?: 'FactoryStats';
+  legitPoints: StatValue;
+  monthlyRevenue: StatValue;
+  qualityScore: StatValue;
+  totalOrders: StatValue;
+};
+
 /** The status of the factory */
 export enum FactoryStatus {
   Approved = 'APPROVED',
@@ -530,6 +551,12 @@ export type ManagerOrderDashboardEntity = {
   lastMonthPendingOrders: Scalars['Int']['output'];
   pendingOrders: Scalars['Int']['output'];
   totalOrders: Scalars['Int']['output'];
+};
+
+export type MonthlyRevenue = {
+  __typename?: 'MonthlyRevenue';
+  month: Scalars['String']['output'];
+  revenue: Scalars['Int']['output'];
 };
 
 export type Mutation = {
@@ -1048,6 +1075,28 @@ export type MutationUploadFileArgs = {
   file?: InputMaybe<Scalars['Upload']['input']>;
 };
 
+export type MyStaffDashboardResponse = {
+  __typename?: 'MyStaffDashboardResponse';
+  currentFactory: FactoryDetails;
+  recentOrders: Array<RecentOrderInfo>;
+  stats: MyStaffStats;
+};
+
+export type MyStaffStatValue = {
+  __typename?: 'MyStaffStatValue';
+  isPositive: Scalars['Boolean']['output'];
+  percentChange: Scalars['Int']['output'];
+  value: Scalars['Int']['output'];
+};
+
+export type MyStaffStats = {
+  __typename?: 'MyStaffStats';
+  activeTasks: MyStaffStatValue;
+  completedTasks: MyStaffStatValue;
+  deliveredOrders: MyStaffStatValue;
+  pendingOrders: MyStaffStatValue;
+};
+
 export type NotificationEntity = {
   __typename?: 'NotificationEntity';
   content?: Maybe<Scalars['String']['output']>;
@@ -1313,12 +1362,13 @@ export type Query = {
   getCartItemCount: Scalars['Float']['output'];
   getEnhancedManagerDashboard: EnhancedManagerDashboardResponse;
   getFactoryById: FactoryEntity;
-  getFactoryDashboard: FactoryDashboardResponse;
   getFactoryDetailDashboard: FactoryDetailDashboardResponse;
   getManagerDashboard: ManagerDashboardResponse;
   getManagerOrderDashboard: ManagerOrderDashboardEntity;
   getMe: UserEntity;
   getMyFactory: FactoryEntity;
+  getMyFactoryDashboard: FactoryDashboardResponse;
+  getMyStaffDashboard: MyStaffDashboardResponse;
   getStaffDashboard: StaffDashboardResponse;
   getTemplateProductDesigns: Array<ProductDesignEntity>;
   myNotifications: Array<NotificationEntity>;
@@ -1560,6 +1610,16 @@ export type QueryWardsArgs = {
   districtId: Scalars['Int']['input'];
 };
 
+export type RecentOrderInfo = {
+  __typename?: 'RecentOrderInfo';
+  customer: Scalars['String']['output'];
+  date: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  priority: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+  total: Scalars['Int']['output'];
+};
+
 /** Refresh token input */
 export type RefreshTokenDto = {
   refreshToken: Scalars['String']['input'];
@@ -1642,6 +1702,13 @@ export type StaffDashboardResponse = {
   taskHistory: Array<TaskEntity>;
   totalActiveTasks: Scalars['Int']['output'];
   totalTaskHistory: Scalars['Int']['output'];
+};
+
+export type StatValue = {
+  __typename?: 'StatValue';
+  isPositive?: Maybe<Scalars['Boolean']['output']>;
+  percentChange?: Maybe<Scalars['Int']['output']>;
+  value: Scalars['Int']['output'];
 };
 
 export type SystemConfigBankEntity = {
@@ -1771,15 +1838,12 @@ export type UpdateFactoryInfoDto = {
   establishedDate?: InputMaybe<Scalars['DateTime']['input']>;
   leadTime?: InputMaybe<Scalars['Int']['input']>;
   maxPrintingCapacity?: InputMaybe<Scalars['Int']['input']>;
-  minimumOrderQuantity?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  operationalHours?: InputMaybe<Scalars['String']['input']>;
   printingMethods?: InputMaybe<Array<Scalars['String']['input']>>;
   qualityCertifications?: InputMaybe<Scalars['String']['input']>;
   specializations?: InputMaybe<Array<Scalars['String']['input']>>;
   systemConfigVariantIds?: InputMaybe<Array<Scalars['String']['input']>>;
   taxIdentificationNumber?: InputMaybe<Scalars['String']['input']>;
-  totalEmployees?: InputMaybe<Scalars['Int']['input']>;
   website?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -2107,6 +2171,16 @@ export type GetAdminDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetAdminDashboardQuery = { __typename?: 'Query', getAdminDashboard: { __typename?: 'AdminDashboardResponse', activeFactories: number, activeUsers: number, activeUsersChange: number, activeUsersChangeType: ChangeType, pendingOrders: number, pendingOrdersChange: number, pendingOrdersChangeType: ChangeType, totalCustomers: number, totalFactories: number, totalOrders: number, totalProducts: number, totalProductsChange: number, totalProductsChangeType: ChangeType, totalRevenue: number, totalSales: number, totalSalesChange: number, totalSalesChangeType: ChangeType, factoryPerformance: Array<{ __typename?: 'FactoryPerformance', factoryId: string, orderCount: number, totalRevenue: number }>, recentOrders: Array<{ __typename?: 'OrderWithFactory', id: string, orderDate: any, status: string, totalPrice: number, factory?: { __typename?: 'FactoryInfo', id: string, name: string, factoryStatus: string } | null }> } };
+
+export type GetMyFactoryDashboardQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMyFactoryDashboardQuery = { __typename?: 'Query', getMyFactoryDashboard: { __typename?: 'FactoryDashboardResponse', inProductionOrders: number, pendingOrders: number, totalOrders: number, totalRevenue: number, productionProgress: Array<{ __typename?: 'FactoryOrderWithProgress', id: string, status: string, createdAt: any, totalProductionCost: number }>, qualityIssues: Array<{ __typename?: 'QualityIssueWithFactory', id: string, reportedAt: any, status: string, description: string }>, recentOrders: Array<{ __typename?: 'FactoryOrderWithCustomer', id: string, status: string, totalProductionCost: number, createdAt: any }>, revenueData: Array<{ __typename?: 'MonthlyRevenue', month: string, revenue: number }>, stats: { __typename?: 'FactoryStats', legitPoints: { __typename?: 'StatValue', percentChange?: number | null, isPositive?: boolean | null, value: number }, monthlyRevenue: { __typename?: 'StatValue', isPositive?: boolean | null, percentChange?: number | null, value: number }, qualityScore: { __typename?: 'StatValue', isPositive?: boolean | null, percentChange?: number | null, value: number }, totalOrders: { __typename?: 'StatValue', isPositive?: boolean | null, percentChange?: number | null, value: number } } } };
+
+export type GetMyStaffDashboardQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMyStaffDashboardQuery = { __typename?: 'Query', getMyStaffDashboard: { __typename?: 'MyStaffDashboardResponse', currentFactory: { __typename?: 'FactoryDetails', address: string, id: string, leadTime: string, name: string, productionCapacity: string, status: string }, recentOrders: Array<{ __typename?: 'RecentOrderInfo', customer: string, date: string, id: string, priority: string, status: string, total: number }>, stats: { __typename?: 'MyStaffStats', activeTasks: { __typename?: 'MyStaffStatValue', percentChange: number, isPositive: boolean, value: number }, completedTasks: { __typename?: 'MyStaffStatValue', isPositive: boolean, percentChange: number, value: number }, deliveredOrders: { __typename?: 'MyStaffStatValue', isPositive: boolean, percentChange: number, value: number }, pendingOrders: { __typename?: 'MyStaffStatValue', isPositive: boolean, percentChange: number, value: number } } } };
 
 export type UpdateDesignPositionMutationVariables = Exact<{
   input: UpdateDesignPositionDto;
@@ -3781,6 +3855,168 @@ export type GetAdminDashboardQueryHookResult = ReturnType<typeof useGetAdminDash
 export type GetAdminDashboardLazyQueryHookResult = ReturnType<typeof useGetAdminDashboardLazyQuery>;
 export type GetAdminDashboardSuspenseQueryHookResult = ReturnType<typeof useGetAdminDashboardSuspenseQuery>;
 export type GetAdminDashboardQueryResult = Apollo.QueryResult<GetAdminDashboardQuery, GetAdminDashboardQueryVariables>;
+export const GetMyFactoryDashboardDocument = gql`
+    query GetMyFactoryDashboard {
+  getMyFactoryDashboard {
+    inProductionOrders
+    pendingOrders
+    productionProgress {
+      id
+      status
+      createdAt
+      totalProductionCost
+    }
+    qualityIssues {
+      id
+      reportedAt
+      status
+      description
+    }
+    recentOrders {
+      id
+      status
+      totalProductionCost
+      createdAt
+    }
+    revenueData {
+      month
+      revenue
+    }
+    stats {
+      legitPoints {
+        percentChange
+        isPositive
+        value
+      }
+      monthlyRevenue {
+        isPositive
+        percentChange
+        value
+      }
+      qualityScore {
+        isPositive
+        percentChange
+        value
+      }
+      totalOrders {
+        isPositive
+        percentChange
+        value
+      }
+    }
+    totalOrders
+    totalRevenue
+  }
+}
+    `;
+
+/**
+ * __useGetMyFactoryDashboardQuery__
+ *
+ * To run a query within a React component, call `useGetMyFactoryDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMyFactoryDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMyFactoryDashboardQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetMyFactoryDashboardQuery(baseOptions?: Apollo.QueryHookOptions<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>(GetMyFactoryDashboardDocument, options);
+      }
+export function useGetMyFactoryDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>(GetMyFactoryDashboardDocument, options);
+        }
+export function useGetMyFactoryDashboardSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>(GetMyFactoryDashboardDocument, options);
+        }
+export type GetMyFactoryDashboardQueryHookResult = ReturnType<typeof useGetMyFactoryDashboardQuery>;
+export type GetMyFactoryDashboardLazyQueryHookResult = ReturnType<typeof useGetMyFactoryDashboardLazyQuery>;
+export type GetMyFactoryDashboardSuspenseQueryHookResult = ReturnType<typeof useGetMyFactoryDashboardSuspenseQuery>;
+export type GetMyFactoryDashboardQueryResult = Apollo.QueryResult<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>;
+export const GetMyStaffDashboardDocument = gql`
+    query GetMyStaffDashboard {
+  getMyStaffDashboard {
+    currentFactory {
+      address
+      id
+      leadTime
+      name
+      productionCapacity
+      status
+    }
+    recentOrders {
+      customer
+      date
+      id
+      priority
+      status
+      total
+    }
+    stats {
+      activeTasks {
+        percentChange
+        isPositive
+        value
+      }
+      completedTasks {
+        isPositive
+        percentChange
+        value
+      }
+      deliveredOrders {
+        isPositive
+        percentChange
+        value
+      }
+      pendingOrders {
+        isPositive
+        percentChange
+        value
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetMyStaffDashboardQuery__
+ *
+ * To run a query within a React component, call `useGetMyStaffDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMyStaffDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMyStaffDashboardQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetMyStaffDashboardQuery(baseOptions?: Apollo.QueryHookOptions<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>(GetMyStaffDashboardDocument, options);
+      }
+export function useGetMyStaffDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>(GetMyStaffDashboardDocument, options);
+        }
+export function useGetMyStaffDashboardSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>(GetMyStaffDashboardDocument, options);
+        }
+export type GetMyStaffDashboardQueryHookResult = ReturnType<typeof useGetMyStaffDashboardQuery>;
+export type GetMyStaffDashboardLazyQueryHookResult = ReturnType<typeof useGetMyStaffDashboardLazyQuery>;
+export type GetMyStaffDashboardSuspenseQueryHookResult = ReturnType<typeof useGetMyStaffDashboardSuspenseQuery>;
+export type GetMyStaffDashboardQueryResult = Apollo.QueryResult<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>;
 export const UpdateDesignPositionDocument = gql`
     mutation UpdateDesignPosition($input: UpdateDesignPositionDto!) {
   updateDesignPosition(input: $input) {

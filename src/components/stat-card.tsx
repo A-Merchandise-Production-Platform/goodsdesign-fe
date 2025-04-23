@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils';
 export interface StatCardProps {
   title: string;
   value: string;
-  change: string;
-  changeType: 'positive' | 'negative';
+  change?: string;
+  changeType?: 'positive' | 'negative';
   icon: React.ReactNode;
 }
 
@@ -28,24 +28,26 @@ export function StatCard({
           </div>
           <div className="bg-primary/10 rounded-full p-2">{icon}</div>
         </div>
-        <div className="mt-4 flex items-end">
-          <span
-            className={cn(
-              'inline-flex items-center text-xs font-medium',
-              changeType === 'positive' ? 'text-green-600' : 'text-red-600',
-            )}
-          >
-            {changeType === 'positive' ? (
-              <ArrowUpIcon className="mr-1 h-3 w-3" />
-            ) : (
-              <ArrowDownIcon className="mr-1 h-3 w-3" />
-            )}
-            {change}
-          </span>
-          <span className="text-muted-foreground ml-1 text-xs">
-            vs. last month
-          </span>
-        </div>
+        {change ? (
+          <div className="mt-4 flex items-end">
+            <span
+              className={cn(
+                'inline-flex items-center text-xs font-medium',
+                changeType === 'positive' ? 'text-green-600' : 'text-red-600',
+              )}
+            >
+              {changeType === 'positive' ? (
+                <ArrowUpIcon className="mr-1 h-3 w-3" />
+              ) : (
+                <ArrowDownIcon className="mr-1 h-3 w-3" />
+              )}
+              {change}
+            </span>
+            <span className="text-muted-foreground ml-1 text-xs">
+              vs. last month
+            </span>
+          </div>
+        ) : null}
       </CardContent>
     </Card>
   );

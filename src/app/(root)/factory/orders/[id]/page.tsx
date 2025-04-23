@@ -79,6 +79,7 @@ import {
 } from '@/graphql/generated/graphql';
 import { cn, formatDate } from '@/lib/utils';
 import { filesToBase64 } from '@/utils/handle-upload';
+import { DashboardShell } from '@/components/dashboard-shell';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -234,16 +235,6 @@ export default function FactoryOrderDetailsPage() {
       [paymentId]: !prev[paymentId],
     }));
   };
-
-  // Back to orders button
-  const BackButton = () => (
-    <div className="mb-6">
-      <Button variant="outline" onClick={() => router.push('/factory/orders')}>
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Orders
-      </Button>
-    </div>
-  );
 
   // Get current status group
   const getCurrentStatusGroup = (status: string) => {
@@ -486,8 +477,7 @@ export default function FactoryOrderDetailsPage() {
   // Error or empty order state
   if (error || !order) {
     return (
-      <div className="container mx-auto px-4 py-10">
-        <BackButton />
+      <div>
         <Card className="text-center">
           <CardContent className="flex flex-col items-center justify-center py-16">
             {error ? (
@@ -523,9 +513,7 @@ export default function FactoryOrderDetailsPage() {
   // Empty order details
   if (order.orderDetails && order.orderDetails.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-10">
-        <BackButton />
-
+      <div>
         {/* Order Header */}
         <Card className="mb-6">
           <CardHeader>
@@ -572,16 +560,17 @@ export default function FactoryOrderDetailsPage() {
   const currentStatusGroup = getCurrentStatusGroup(order.status);
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <BackButton />
-
+    <DashboardShell
+      title="Factory Order Details"
+      subtitle="Manage and view all your factory orders"
+    >
       {/* Order Header */}
       <Card className="mb-6">
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <CardTitle className="text-2xl font-bold">
-                Order #{order.id.substring(0, 8)}
+                Order #{order.id}
               </CardTitle>
               <CardDescription className="mt-2">
                 <div className="flex items-center">
@@ -1054,8 +1043,7 @@ export default function FactoryOrderDetailsPage() {
                               {item.systemConfigVariant?.product?.name}
                             </h3>
                             <p className="text-muted-foreground text-sm">
-                              Size: {item.systemConfigVariant?.size} •
-                              Color:{' '}
+                              Size: {item.systemConfigVariant?.size} • Color:{' '}
                               <span className="inline-flex items-center">
                                 <span
                                   className="mr-1 inline-block h-3 w-3 rounded-full"
@@ -1701,6 +1689,6 @@ export default function FactoryOrderDetailsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </DashboardShell>
   );
 }

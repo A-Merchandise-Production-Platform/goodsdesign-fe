@@ -2,7 +2,7 @@
 
 import { ArrowLeft, Factory, Loader2, Truck, Users } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { DashboardShell } from '@/components/dashboard-shell';
@@ -60,13 +60,13 @@ export default function FactoryDetailPage() {
   const [selectedStaffId, setSelectedStaffId] = useState<string>('');
   const [isStaffSelected, setIsStaffSelected] = useState(false);
 
-  useState(() => {
+  useEffect(() => {
     if (selectedStaffId) {
       setIsStaffSelected(true);
     } else {
       setIsStaffSelected(false);
     }
-  });
+  }, [selectedStaffId]);
 
   const handleApproveFactory = () => {
     changeFactoryStatus({

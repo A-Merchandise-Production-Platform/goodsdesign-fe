@@ -64,6 +64,7 @@ import {
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
+import { DashboardShell } from '@/components/dashboard-shell';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -144,19 +145,19 @@ export default function StaffCheckQualityDetailsPage() {
     if (!e.target.files || e.target.files.length === 0) return;
 
     const newFiles = Array.from(e.target.files);
-    
+
     // Upload each file one by one
     for (const file of newFiles) {
       const mockEvent = {
         target: {
-          files: [file] as unknown as FileList
+          files: [file] as unknown as FileList,
         },
         preventDefault: () => {},
         currentTarget: {} as HTMLInputElement,
       } as React.ChangeEvent<HTMLInputElement>;
 
       const fileUrl = await handleUploadFile(mockEvent);
-      
+
       if (fileUrl) {
         // Store the actual uploaded URL instead of creating a blob URL
         setImages(prev => [...prev, file]);
@@ -200,7 +201,6 @@ export default function StaffCheckQualityDetailsPage() {
     }
   };
 
-
   // Handle quality check submission
   const handleSubmitQualityCheck = async () => {
     if (!selectedCheckQuality) return;
@@ -230,21 +230,10 @@ export default function StaffCheckQualityDetailsPage() {
     setIsImagePreviewOpen(true);
   };
 
-  // Back button
-  const BackButton = () => (
-    <div className="mb-6">
-      <Button variant="outline" onClick={() => router.push('/staff/tasks')}>
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Tasks
-      </Button>
-    </div>
-  );
-
   // Error or empty state
   if (error || !order) {
     return (
-      <div className="container mx-auto px-4 py-10">
-        <BackButton />
+      <div>
         <Card className="text-center">
           <CardContent className="flex flex-col items-center justify-center py-16">
             {error ? (
@@ -280,8 +269,7 @@ export default function StaffCheckQualityDetailsPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-10">
-        <BackButton />
+      <div>
         <div className="flex items-center justify-center py-20">
           <Loader2 className="text-primary h-8 w-8 animate-spin" />
           <span className="ml-2">Loading order details...</span>
@@ -297,8 +285,7 @@ export default function StaffCheckQualityDetailsPage() {
 
   if (!hasQualityChecks) {
     return (
-      <div className="container mx-auto px-4 py-10">
-        <BackButton />
+      <div>
         <Card className="text-center">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <AlertTriangle className="mb-4 h-12 w-12 text-amber-500" />
@@ -318,16 +305,14 @@ export default function StaffCheckQualityDetailsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <BackButton />
-
+    <div>
       {/* Header */}
       <Card className="mb-6">
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <CardTitle className="text-2xl font-bold">
-                Order #{order.id.substring(0, 8)}
+                Order #{order.id}
               </CardTitle>
               <CardDescription className="mt-2">
                 <div className="flex items-center">
@@ -893,7 +878,9 @@ export default function StaffCheckQualityDetailsPage() {
                           type="button"
                           variant="outline"
                           onClick={() => fileInputRef.current?.click()}
-                          disabled={uploadFileloading || doneCheckQualityLoading}
+                          disabled={
+                            uploadFileloading || doneCheckQualityLoading
+                          }
                         >
                           {uploadFileloading ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -909,7 +896,9 @@ export default function StaffCheckQualityDetailsPage() {
                           multiple
                           className="hidden"
                           onChange={handleFileChange}
-                          disabled={uploadFileloading || doneCheckQualityLoading}
+                          disabled={
+                            uploadFileloading || doneCheckQualityLoading
+                          }
                         />
 
                         <span className="text-muted-foreground text-sm">
@@ -1094,7 +1083,7 @@ export default function StaffCheckQualityDetailsPage() {
                 }
               }}
               disabled={uploadFileloading || doneCheckQualityLoading}
-              >
+            >
               <Trash2 className="mr-2 h-4 w-4" />
               Remove Image
             </Button>
