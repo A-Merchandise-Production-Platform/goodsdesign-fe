@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, SlidersHorizontal } from 'lucide-react';
+import { ArrowRight, Filter } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -42,21 +42,17 @@ const STATUS_OPTIONS = [
   'PROCESSING',
   'COMPLETED',
   'CANCELLED',
-  'SHIPPED',
-  'PAID',
-  'UNPAID',
-  'PAYMENT_RECEIVED',
-  'WAITING_FILL_INFORMATION',
   'NEED_MANAGER_HANDLE',
   'PENDING_ACCEPTANCE',
-  'REJECTED',
   'IN_PRODUCTION',
+  "WAITING_FOR_REFUND",
+  "REFUNDED",
   'WAITING_FOR_CHECKING_QUALITY',
   'REWORK_REQUIRED',
   'REWORK_IN_PROGRESS',
-  'WAITING_PAYMENT',
   'READY_FOR_SHIPPING',
   'SHIPPING',
+  'SHIPPED',
 ];
 
 export default function FactoryOrdersPage() {
@@ -173,7 +169,7 @@ function StatusFilter({ selectedStatus, onStatusChange }: StatusFilterProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="flex items-center gap-2">
-          <SlidersHorizontal className="h-4 w-4" />
+          <Filter className="h-4 w-4" />
           <span>Status: {getStatusLabel(selectedStatus)}</span>
         </Button>
       </DropdownMenuTrigger>

@@ -20,6 +20,28 @@ query GetMyUserBanks {
   }
 }
 
+query GetUserBanksByUserId($userBanksByUserIdId: String!) {
+  userBanksByUserId(id: $userBanksByUserIdId) {
+    accountName
+    accountNumber
+    bank {
+      bin
+      code
+      id
+      isActive
+      isDeleted
+      logo
+      name
+      shortName
+    }
+    bankId
+    createdAt
+    id
+    isDefault
+    updatedAt
+  }
+}
+
 mutation CreateUserBank($createUserBankInput: CreateUserBankInput!) {
   createUserBank(createUserBankInput: $createUserBankInput) {
     id

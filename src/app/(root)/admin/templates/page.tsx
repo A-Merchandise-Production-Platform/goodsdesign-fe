@@ -310,33 +310,27 @@ export default function Page() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={e => handleEdit(e, design.id)}>
-                        <Pencil className="mr-2 h-4 w-4" />
+                        <Pencil className="mr-4 h-4 w-4" />
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="flex items-center justify-between"
-                        onClick={e => e.stopPropagation()}
+                        className="flex items-center"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTogglePublic(e, design.id, design.isPublic);
+                        }}
                       >
-                        <span>Public</span>
                         <Switch
                           checked={design.isPublic}
-                          onCheckedChange={() => {
-                            const event = {
-                              stopPropagation: () => {},
-                            } as React.MouseEvent;
-                            handleTogglePublic(
-                              event,
-                              design.id,
-                              design.isPublic,
-                            );
-                          }}
+                          onCheckedChange={() => {}}
                         />
+                        <span>Public</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-destructive focus:text-destructive"
                         onClick={e => openDeleteDialog(e, design.id)}
                       >
-                        <Trash2 className="mr-2 h-4 w-4" />
+                        <Trash2 className="text-destructive focus:text-destructive mr-4 h-4 w-4" />
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>

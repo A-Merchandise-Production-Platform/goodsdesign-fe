@@ -60,7 +60,9 @@ export default function Home() {
         <ProductSection products={sortedProducts} />
 
         <DesignSection
-          designs={proDesData?.getTemplateProductDesigns || []}
+          designs={(proDesData?.getTemplateProductDesigns || []).filter(
+            design => design.isPublic === true,
+          )}
           onDuplicate={duplicateProductDesign}
           isLoading={duplicateLoading}
         />

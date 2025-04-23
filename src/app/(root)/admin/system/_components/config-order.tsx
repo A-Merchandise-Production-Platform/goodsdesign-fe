@@ -147,10 +147,10 @@ export default function SystemConfigOrder() {
 
       {/* Scoring Weights Section */}
       <Card className="border-slate-200 shadow-md">
-        <CardHeader className="bg-slate-50 border-b border-slate-200">
+        <CardHeader className="border-b border-slate-200">
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle className="text-slate-800">Scoring Weights</CardTitle>
+              <CardTitle className="">Scoring Weights</CardTitle>
               <CardDescription>Configure the importance of each factor in factory selection</CardDescription>
             </div>
             <TooltipProvider>
@@ -227,7 +227,7 @@ export default function SystemConfigOrder() {
 
       {/* Thresholds and Limits Section */}
       <Card className="border-slate-200 shadow-md">
-        <CardHeader className="bg-slate-50 border-b border-slate-200">
+        <CardHeader className="border-b border-slate-200">
           <CardTitle className="text-slate-800">Thresholds and Limits</CardTitle>
           <CardDescription>Configure system-wide thresholds for factory qualification and operation</CardDescription>
         </CardHeader>
@@ -334,8 +334,8 @@ export default function SystemConfigOrder() {
 
       {/* Time and Scheduling Section */}
       <Card className="border-slate-200 shadow-md">
-        <CardHeader className="bg-slate-50 border-b border-slate-200">
-          <CardTitle className="text-slate-800">Time and Scheduling</CardTitle>
+        <CardHeader className="border-b border-slate-200">
+          <CardTitle className="">Time and Scheduling</CardTitle>
           <CardDescription>Configure time-related parameters for order processing</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 p-6">
@@ -417,7 +417,7 @@ function ConfigField({
 }: ConfigFieldProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor={name} className="font-medium text-slate-700">
+      <Label htmlFor={name} className="font-medium">
         {label}
       </Label>
       <div className="flex gap-2">
@@ -443,7 +443,7 @@ function ConfigField({
           </Button>
         )}
       </div>
-      <p className="text-sm text-slate-500">{description}</p>
+      <p className="text-sm text-primary">{description}</p>
     </div>
   )
 }

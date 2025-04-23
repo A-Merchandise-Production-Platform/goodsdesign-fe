@@ -6,7 +6,7 @@ import SystemConfigOrder from './_components/config-order';
 
 export default function Page() {
   return (
-    <div className="bg-background container mx-auto rounded-lg">
+    <div className="bg-background container mx-auto rounded-lg pb-12">
       <Tabs defaultValue="banks">
         <TabsList className="mb-4">
           <TabsTrigger value="banks">Banks</TabsTrigger>

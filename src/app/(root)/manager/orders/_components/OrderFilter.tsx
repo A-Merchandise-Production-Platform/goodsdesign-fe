@@ -1,6 +1,6 @@
 'use client';
 
-import { FilterIcon } from 'lucide-react';
+import { Filter as FilterIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,6 @@ const STATUS_OPTIONS = [
   { value: 'PROCESSING', label: 'Processing' },
   { value: 'COMPLETED', label: 'Completed' },
   { value: 'CANCELLED', label: 'Cancelled' },
-  { value: 'SHIPPED', label: 'Shipped' },
   { value: 'PAID', label: 'Paid' },
   { value: 'UNPAID', label: 'Unpaid' },
   { value: 'PAYMENT_RECEIVED', label: 'Payment Received' },
@@ -27,11 +26,14 @@ const STATUS_OPTIONS = [
   { value: 'PENDING_ACCEPTANCE', label: 'Pending Acceptance' },
   { value: 'REJECTED', label: 'Rejected' },
   { value: 'IN_PRODUCTION', label: 'In Production' },
+  { value: 'WAITING_FOR_REFUND', label: 'Waiting for Refund' },
+  { value: 'REFUNDED', label: 'Refunded' },
   { value: 'WAITING_FOR_CHECKING_QUALITY', label: 'Quality Check' },
   { value: 'REWORK_REQUIRED', label: 'Rework Required' },
   { value: 'REWORK_IN_PROGRESS', label: 'Rework in Progress' },
   { value: 'WAITING_PAYMENT', label: 'Waiting Payment' },
   { value: 'READY_FOR_SHIPPING', label: 'Ready for Shipping' },
+  { value: 'SHIPPED', label: 'Shipped' },
 ];
 
 interface OrderFilterProps {

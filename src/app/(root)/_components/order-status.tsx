@@ -32,10 +32,19 @@ export const getStatusBadge = (status: string) => {
     PENDING_ACCEPTANCE: { label: 'Pending Acceptance', variant: 'outline' },
     REJECTED: { label: 'Rejected', variant: 'destructive' },
     IN_PRODUCTION: { label: 'In Production', variant: 'secondary' },
+
     WAITING_FOR_CHECKING_QUALITY: {
       label: 'Quality Check',
-      variant: 'outline',
+      variant: 'default',
     },
+    DONE_CHECK_QUALITY: {
+      label: 'Quality Check Done',
+      variant: 'secondary',
+    },
+    APPROVED: { label: 'Approved', variant: 'default' },
+    REFUNDED: { label: 'Refunded', variant: 'default' },
+    WAITING_FOR_REFUND: { label: 'Waiting for Refund', variant: 'secondary' },
+
     REWORK_REQUIRED: { label: 'Rework Required', variant: 'destructive' },
     REWORK_IN_PROGRESS: { label: 'Rework in Progress', variant: 'secondary' },
     WAITING_PAYMENT: { label: 'Waiting Payment', variant: 'outline' },
@@ -67,6 +76,22 @@ export const getPaymentStatusBadge = (status: string) => {
   return <Badge variant={config.variant}>{config.label}</Badge>;
 };
 
+// Refund status timeline steps
+export const refundStatusSteps = [
+  {
+    group: 'waiting_refund',
+    statuses: ['WAITING_FOR_REFUND'],
+    label: 'Waiting for Refund',
+    icon: FileText,
+  },
+  {
+    group: 'refunded',
+    statuses: ['REFUNDED'],
+    label: 'Refunded',
+    icon: CheckCircle2,
+  },
+];
+
 // Order status timeline steps
 export const orderStatusSteps = [
   {
@@ -89,7 +114,7 @@ export const orderStatusSteps = [
   },
   {
     group: 'quality',
-    statuses: ['WAITING_FOR_CHECKING_QUALITY', 'REWORK_REQUIRED', ,],
+    statuses: ['WAITING_FOR_CHECKING_QUALITY', 'REWORK_REQUIRED'],
     label: 'Quality Check',
     icon: CheckCircle2,
   },
