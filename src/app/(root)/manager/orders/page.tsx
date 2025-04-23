@@ -12,7 +12,6 @@ import { useCallback, useState } from 'react';
 
 import { DashboardShell } from '@/components/dashboard-shell';
 import { StatCard } from '@/components/stat-card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -39,6 +38,7 @@ import { formatDate } from '@/lib/utils';
 
 import { OrderFilter } from './_components/OrderFilter';
 import { OrderSearch } from './_components/OrderSearch';
+import { getStatusBadge } from '../../_components/order-status';
 
 export default function ManagerOrdersPage() {
   const { data, loading } = useGetAllOrdersQuery();
@@ -59,45 +59,6 @@ export default function ManagerOrdersPage() {
   const handleFilterChange = useCallback((statuses: string[]) => {
     setSelectedStatuses(statuses);
   }, []);
-
-  const getStatusBadge = (status: string) => {
-    const statusMap: Record<
-      string,
-      {
-        label: string;
-        variant: 'default' | 'secondary' | 'destructive' | 'outline';
-      }
-    > = {
-      PENDING: { label: 'Pending', variant: 'outline' },
-      PROCESSING: { label: 'Processing', variant: 'secondary' },
-      COMPLETED: { label: 'Completed', variant: 'default' },
-      CANCELLED: { label: 'Cancelled', variant: 'destructive' },
-      SHIPPED: { label: 'Shipped', variant: 'default' },
-      PAID: { label: 'Paid', variant: 'default' },
-      UNPAID: { label: 'Unpaid', variant: 'outline' },
-      PAYMENT_RECEIVED: { label: 'Payment Received', variant: 'default' },
-      WAITING_FILL_INFORMATION: {
-        label: 'Waiting for Information',
-        variant: 'outline',
-      },
-      NEED_MANAGER_HANDLE: { label: 'Needs Manager', variant: 'outline' },
-      PENDING_ACCEPTANCE: { label: 'Pending Acceptance', variant: 'outline' },
-      REJECTED: { label: 'Rejected', variant: 'destructive' },
-      IN_PRODUCTION: { label: 'In Production', variant: 'secondary' },
-      WAITING_FOR_CHECKING_QUALITY: {
-        label: 'Quality Check',
-        variant: 'outline',
-      },
-      REWORK_REQUIRED: { label: 'Rework Required', variant: 'destructive' },
-      REWORK_IN_PROGRESS: { label: 'Rework in Progress', variant: 'secondary' },
-      WAITING_PAYMENT: { label: 'Waiting Payment', variant: 'outline' },
-      READY_FOR_SHIPPING: { label: 'Ready for Shipping', variant: 'secondary' },
-    };
-
-    const config = statusMap[status] || { label: status, variant: 'outline' };
-
-    return <Badge variant={config.variant}>{config.label}</Badge>;
-  };
 
   if (loading || dashboardLoading) {
     return <OrdersLoadingSkeleton />;

@@ -22,7 +22,7 @@ import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { useState } from "react"
 
-import { getPaymentStatusBadge, getStatusBadge, orderStatusSteps } from "@/app/(root)/_components/order-status"
+import { getPaymentStatusBadge, getStatusBadge, orderStatusSteps, refundStatusSteps } from "@/app/(root)/_components/order-status"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
@@ -538,19 +538,35 @@ export default function FactoryOrderDetailsPage() {
               <div
                 className="bg-primary absolute top-0 left-0 h-full transition-all duration-500"
                 style={{
-                  width: `${
-                    ((orderStatusSteps.findIndex((step) => step.group === currentStatusGroup) + 1) /
-                      orderStatusSteps.length) *
-                    100
-                  }%`,
+                  width: `${(currentOrder.status === 'WAITING_FOR_REFUND' || currentOrder.status === 'REFUNDED'
+                    ? ((refundStatusSteps.findIndex(
+                        step => step.statuses.includes(currentOrder.status),
+                      ) + 1) /
+                      refundStatusSteps.length)
+                    : ((orderStatusSteps.findIndex(
+                        step => step.group === currentStatusGroup,
+                      ) + 1) /
+                      orderStatusSteps.length)) *
+                    100}%`,
                 }}
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-6 md:grid-cols-3 lg:grid-cols-6">
-              {orderStatusSteps.map((step, index) => {
-                const isActive = step.group === currentStatusGroup
-                const isPast = orderStatusSteps.findIndex((s) => s.group === currentStatusGroup) > index
+            <div className={`grid grid-cols-2 gap-2 pt-6 md:grid-cols-2 ${
+              currentOrder.status === 'WAITING_FOR_REFUND' || currentOrder.status === 'REFUNDED'
+                ? 'lg:grid-cols-2'
+                : 'lg:grid-cols-6'
+            }`}>
+              {(currentOrder.status === 'WAITING_FOR_REFUND' || currentOrder.status === 'REFUNDED'
+                ? refundStatusSteps
+                : orderStatusSteps
+              ).map((step, index) => {
+                const isActive = currentOrder.status === 'WAITING_FOR_REFUND' || currentOrder.status === 'REFUNDED'
+                  ? step.statuses.includes(currentOrder.status)
+                  : step.group === currentStatusGroup;
+                const isPast = currentOrder.status === 'WAITING_FOR_REFUND' || currentOrder.status === 'REFUNDED'
+                  ? refundStatusSteps.findIndex(s => s.statuses.includes(currentOrder.status)) > index
+                  : orderStatusSteps.findIndex(s => s.group === currentStatusGroup) > index
                 const Icon = step.icon
 
                 return (

@@ -1,6 +1,13 @@
 'use client';
 
-import { Factory, LockKeyholeIcon, LogOut, Settings, User } from 'lucide-react';
+import {
+  ClipboardList,
+  Factory,
+  LockKeyholeIcon,
+  LogOut,
+  Settings,
+  User,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -18,10 +25,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   FactoryStatus,
+  Roles,
   useLogoutMutation,
   UserEntity,
 } from '@/graphql/generated/graphql';
-import { useSocketIo } from '@/hooks/io/useSocketIO';
 import { useAuthStore } from '@/stores/auth.store';
 import { useSocketStore } from '@/stores/socket-io-store';
 
@@ -79,7 +86,7 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
           </Link>
         )}
         {isAuth &&
-        user.role.toUpperCase() === 'FACTORYOWNER' &&
+        user.role.toUpperCase() === Roles.Factoryowner &&
         user.ownedFactory?.factoryStatus === FactoryStatus.Approved ? (
           <Link href={'/factory'}>
             <DropdownMenuItem>
@@ -88,7 +95,7 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
             </DropdownMenuItem>
           </Link>
         ) : null}
-        {isAuth && user.role.toUpperCase() === 'STAFF' && (
+        {isAuth && user.role.toUpperCase() === Roles.Staff && (
           <Link href={'/staff'}>
             <DropdownMenuItem>
               <LockKeyholeIcon className="mr-2 h-4 w-4" />
@@ -96,7 +103,7 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
             </DropdownMenuItem>
           </Link>
         )}
-        {isAuth && user.role.toUpperCase() === 'MANAGER' && (
+        {isAuth && user.role.toUpperCase() === Roles.Manager && (
           <Link href={'/manager'}>
             <DropdownMenuItem>
               <LockKeyholeIcon className="mr-2 h-4 w-4" />
@@ -104,12 +111,14 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
             </DropdownMenuItem>
           </Link>
         )}
-        <Link href={'/my-order'}>
-          <DropdownMenuItem>
-            <LockKeyholeIcon className="mr-2 h-4 w-4" />
-            <span>My Order</span>
-          </DropdownMenuItem>
-        </Link>
+        {isAuth && user.role.toUpperCase() === Roles.Customer && (
+          <Link href={'/my-order'}>
+            <DropdownMenuItem>
+              <ClipboardList className="mr-2 h-4 w-4" />
+              <span>My Order</span>
+            </DropdownMenuItem>
+          </Link>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
