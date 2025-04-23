@@ -30,7 +30,6 @@ import { DesignCard } from './_components/design-card';
 
 export default function MyDesignPage() {
   const { user } = useAuthStore();
-  const router = useRouter();
   const { data, loading, refetch } = useProductDesignsByUserQuery();
   const [updateDesign] = useUpdateProductDesignMutation();
   const [removeProductDesign] = useRemoveProductDesignMutation();
@@ -43,10 +42,6 @@ export default function MyDesignPage() {
       <ErrorPage message="You not allowed to access this page" code={403} />
     );
   }
-
-  const handleEdit = (id: string) => {
-    router.push(`/product/tshirt/${id}`);
-  };
 
   const handleDelete = async (id: string) => {
     setDesignToDelete(id);
@@ -117,9 +112,9 @@ export default function MyDesignPage() {
       <div>
         <div className="flex flex-col gap-4 pb-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-2xl font-bold tracking-tight">My Designs</h1>
-          <Link href="/">
+          <Link href="/product/tshirt">
             <Button className="w-full sm:w-auto">
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="h-4 w-4" />
               Create New Design
             </Button>
           </Link>
@@ -130,7 +125,6 @@ export default function MyDesignPage() {
               <DesignCard
                 key={design.id}
                 design={design}
-                onEdit={handleEdit}
                 onDelete={handleDelete}
                 onDuplicate={handleDuplicate}
                 onTogglePublic={handleTogglePublic}
@@ -145,9 +139,9 @@ export default function MyDesignPage() {
                 <h3 className="mt-6 text-xl font-semibold">No designs found</h3>
                 <p className="text-muted-foreground mt-2 text-sm"></p>
 
-                <Link href="/">
+                <Link href="/product/tshirt">
                   <Button className="mt-6">
-                    <Plus className="mr-2 h-4 w-4" />
+                    <Plus className="h-4 w-4" />
                     Create New Design
                   </Button>
                 </Link>

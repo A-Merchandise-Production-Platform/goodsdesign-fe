@@ -1,4 +1,4 @@
-import { Copy, Info, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { Copy, Eye, Info, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
@@ -58,7 +58,6 @@ type ProductDesign = {
 
 interface DesignCardProps {
   design: ProductDesign;
-  onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
   onDuplicate?: (id: string) => void;
   onTogglePublic?: (
@@ -70,7 +69,6 @@ interface DesignCardProps {
 
 export function DesignCard({
   design,
-  onEdit,
   onDelete,
   onDuplicate,
   onTogglePublic,
@@ -86,23 +84,24 @@ export function DesignCard({
   const router = useRouter();
 
   const calculateTotalPrice = () => {
-    const variantPrice = systemConfigVariant?.price || 0;
+    const variantPrice = systemConfigVariant?.price ?? 0;
     const positionsPrice = (designPositions || []).reduce((total, pos) => {
-      if (pos?.designJSON?.length > 0 && pos.positionType?.basePrice) {
-        return total + pos.positionType.basePrice;
-      }
-      return total;
+      const hasDesign = Boolean(pos?.designJSON?.length);
+      const positionPrice = pos?.positionType?.basePrice ?? 0;
+      return hasDesign ? total + positionPrice : total;
     }, 0);
     return variantPrice + positionsPrice;
   };
 
   const handleCardClick = () => {
-    router.push(`/product/tshirt/${id}`);
+    const path = isFinalized ? 'view' : 'product';
+    router.push(`/${path}/tshirt/${id}`);
   };
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onEdit?.(id);
+    const path = isFinalized ? 'view' : 'product';
+    router.push(`/${path}/tshirt/${id}`);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -164,8 +163,17 @@ export function DesignCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={handleEdit}>
-                <Pencil className="mr-4 h-4 w-4" />
-                Edit
+                {isFinalized ? (
+                  <>
+                    <Eye className="mr-4 h-4 w-4" />
+                    View
+                  </>
+                ) : (
+                  <>
+                    <Pencil className="mr-4 h-4 w-4" />
+                    Edit
+                  </>
+                )}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDuplicate}>
                 <Copy className="mr-4 h-4 w-4" />
@@ -182,7 +190,7 @@ export function DesignCard({
                 className="text-destructive focus:text-destructive"
                 onClick={handleDelete}
               >
-                <Trash2 className="mr-4 h-4 w-4" />
+                <Trash2 className="text-destructive focus:text-destructive mr-4 h-4 w-4" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -217,7 +225,14 @@ export function DesignCard({
                 Private
               </Badge>
             )}
-            {isFinalized && <Badge variant="outline">Finalized</Badge>}
+            {isFinalized && (
+              <Badge
+                variant="outline"
+                className="border-blue-200 bg-blue-50 text-blue-700"
+              >
+                Ordered
+              </Badge>
+            )}
           </div>
 
           {systemConfigVariant && (
