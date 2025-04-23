@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, SlidersHorizontal } from 'lucide-react';
+import { ArrowRight, Filter } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -169,7 +169,7 @@ function StatusFilter({ selectedStatus, onStatusChange }: StatusFilterProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="flex items-center gap-2">
-          <SlidersHorizontal className="h-4 w-4" />
+          <Filter className="h-4 w-4" />
           <span>Status: {getStatusLabel(selectedStatus)}</span>
         </Button>
       </DropdownMenuTrigger>
