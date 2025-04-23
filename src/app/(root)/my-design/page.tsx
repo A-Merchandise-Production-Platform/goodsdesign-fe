@@ -2,27 +2,112 @@
 
 import { Plus, Search } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 import ErrorPage from '@/components/shared/error-page';
 import { Sidebar } from '@/components/shared/sidebar';
 import { Button } from '@/components/ui/button';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   Roles,
   useProductDesignsByUserQuery,
+  useRemoveProductDesignMutation,
+  useUpdateProductDesignMutation,
+  useDuplicateProductDesignMutation,
 } from '@/graphql/generated/graphql';
 import { useAuthStore } from '@/stores/auth.store';
+import { toast } from 'sonner';
 
 import { DesignCard } from './_components/design-card';
 
 export default function MyDesignPage() {
-  const { data, loading } = useProductDesignsByUserQuery();
   const { user } = useAuthStore();
+  const router = useRouter();
+  const { data, loading, refetch } = useProductDesignsByUserQuery();
+  const [updateDesign] = useUpdateProductDesignMutation();
+  const [removeProductDesign] = useRemoveProductDesignMutation();
+  const [duplicateDesign] = useDuplicateProductDesignMutation();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [designToDelete, setDesignToDelete] = useState<string | null>(null);
 
   if (user?.role !== Roles.Customer) {
     return (
       <ErrorPage message="You not allowed to access this page" code={403} />
     );
   }
+
+  const handleEdit = (id: string) => {
+    router.push(`/product/tshirt/${id}`);
+  };
+
+  const handleDelete = async (id: string) => {
+    setDesignToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!designToDelete) return;
+
+    try {
+      await removeProductDesign({
+        variables: {
+          removeProductDesignId: designToDelete,
+        },
+      });
+      toast.success('Design deleted successfully!');
+      await refetch();
+    } catch (error) {
+      toast.error('Failed to delete design. Please try again.');
+    }
+    setDeleteDialogOpen(false);
+    setDesignToDelete(null);
+  };
+
+  const handleTogglePublic = async (
+    id: string,
+    currentState: boolean,
+    isFinalized: boolean,
+  ) => {
+    try {
+      await updateDesign({
+        variables: {
+          updateProductDesignId: id,
+          input: {
+            isPublic: !currentState,
+            isTemplate: false,
+            isFinalized: isFinalized,
+          },
+        },
+      });
+      toast.success(`Design is now ${!currentState ? 'public' : 'private'}`);
+      // Refresh data after successful update
+      await refetch();
+    } catch (error) {
+      toast.error('Failed to update design. Please try again.');
+    }
+  };
+
+  const handleDuplicate = async (id: string) => {
+    try {
+      await duplicateDesign({
+        variables: {
+          duplicateProductDesignId: id
+        }
+      });
+      toast.success('Design duplicated successfully!');
+      await refetch();
+    } catch (error) {
+      toast.error('Failed to duplicate design. Please try again.');
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 gap-4 px-4 pt-4 pb-2 md:grid-cols-[200px_1fr]">
@@ -41,33 +126,16 @@ export default function MyDesignPage() {
         </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {data?.productDesignsByUser?.length ? (
-            data.productDesignsByUser.map(design => {
-              // Get base product price from systemConfigVariant
-              const variantPrice = design.systemConfigVariant?.price ?? 0;
-
-              // Calculate total for positions that have designs
-              const positionPrices =
-                design.designPositions?.reduce((total: number, position) => {
-                  if (position.designJSON && position.designJSON.length > 0) {
-                    return total + (position.positionType?.basePrice ?? 0);
-                  }
-                  return total;
-                }, 0) ?? 0;
-
-              // Calculate total base price
-              const basePrice = variantPrice + positionPrices;
-
-              return (
-                <DesignCard
-                  key={design.id}
-                  id={design.id}
-                  image={design.thumbnailUrl || undefined}
-                  name={design.systemConfigVariant?.product.name}
-                  price={basePrice}
-                  category={design.systemConfigVariant?.product?.category?.name}
-                />
-              );
-            })
+            data.productDesignsByUser.map(design => (
+              <DesignCard
+                key={design.id}
+                design={design}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onDuplicate={handleDuplicate}
+                onTogglePublic={handleTogglePublic}
+              />
+            ))
           ) : (
             <div className="container mx-auto py-6">
               <div className="flex h-[400px] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
@@ -88,6 +156,30 @@ export default function MyDesignPage() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this design? This action cannot be
+              undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
