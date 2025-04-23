@@ -369,6 +369,16 @@ export type FactoryDetailDashboardResponse = {
   totalRevenue: Scalars['Int']['output'];
 };
 
+export type FactoryDetails = {
+  __typename?: 'FactoryDetails';
+  address: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  leadTime: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  productionCapacity: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+};
+
 export type FactoryEntity = {
   __typename?: 'FactoryEntity';
   address?: Maybe<AddressEntity>;
@@ -1038,6 +1048,28 @@ export type MutationUploadFileArgs = {
   file?: InputMaybe<Scalars['Upload']['input']>;
 };
 
+export type MyStaffDashboardResponse = {
+  __typename?: 'MyStaffDashboardResponse';
+  currentFactory: FactoryDetails;
+  recentOrders: Array<RecentOrderInfo>;
+  stats: MyStaffStats;
+};
+
+export type MyStaffStatValue = {
+  __typename?: 'MyStaffStatValue';
+  isPositive: Scalars['Boolean']['output'];
+  percentChange: Scalars['Int']['output'];
+  value: Scalars['Int']['output'];
+};
+
+export type MyStaffStats = {
+  __typename?: 'MyStaffStats';
+  activeTasks: MyStaffStatValue;
+  completedTasks: MyStaffStatValue;
+  deliveredOrders: MyStaffStatValue;
+  pendingOrders: MyStaffStatValue;
+};
+
 export type NotificationEntity = {
   __typename?: 'NotificationEntity';
   content?: Maybe<Scalars['String']['output']>;
@@ -1306,6 +1338,7 @@ export type Query = {
   getMe: UserEntity;
   getMyFactory: FactoryEntity;
   getMyFactoryDashboard: FactoryDashboardResponse;
+  getMyStaffDashboard: MyStaffDashboardResponse;
   getStaffDashboard: StaffDashboardResponse;
   getTemplateProductDesigns: Array<ProductDesignEntity>;
   myNotifications: Array<NotificationEntity>;
@@ -1539,6 +1572,16 @@ export type QueryWardArgs = {
 
 export type QueryWardsArgs = {
   districtId: Scalars['Int']['input'];
+};
+
+export type RecentOrderInfo = {
+  __typename?: 'RecentOrderInfo';
+  customer: Scalars['String']['output'];
+  date: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  priority: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+  total: Scalars['Int']['output'];
 };
 
 /** Refresh token input */
@@ -2097,6 +2140,11 @@ export type GetMyFactoryDashboardQueryVariables = Exact<{ [key: string]: never; 
 
 
 export type GetMyFactoryDashboardQuery = { __typename?: 'Query', getMyFactoryDashboard: { __typename?: 'FactoryDashboardResponse', inProductionOrders: number, pendingOrders: number, totalOrders: number, totalRevenue: number, productionProgress: Array<{ __typename?: 'FactoryOrderWithProgress', id: string, status: string, createdAt: any, totalProductionCost: number }>, qualityIssues: Array<{ __typename?: 'QualityIssueWithFactory', id: string, reportedAt: any, status: string, description: string }>, recentOrders: Array<{ __typename?: 'FactoryOrderWithCustomer', id: string, status: string, totalProductionCost: number, createdAt: any }>, revenueData: Array<{ __typename?: 'MonthlyRevenue', month: string, revenue: number }>, stats: { __typename?: 'FactoryStats', legitPoints: { __typename?: 'StatValue', percentChange?: number | null, isPositive?: boolean | null, value: number }, monthlyRevenue: { __typename?: 'StatValue', isPositive?: boolean | null, percentChange?: number | null, value: number }, qualityScore: { __typename?: 'StatValue', isPositive?: boolean | null, percentChange?: number | null, value: number }, totalOrders: { __typename?: 'StatValue', isPositive?: boolean | null, percentChange?: number | null, value: number } } } };
+
+export type GetMyStaffDashboardQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMyStaffDashboardQuery = { __typename?: 'Query', getMyStaffDashboard: { __typename?: 'MyStaffDashboardResponse', currentFactory: { __typename?: 'FactoryDetails', address: string, id: string, leadTime: string, name: string, productionCapacity: string, status: string }, recentOrders: Array<{ __typename?: 'RecentOrderInfo', customer: string, date: string, id: string, priority: string, status: string, total: number }>, stats: { __typename?: 'MyStaffStats', activeTasks: { __typename?: 'MyStaffStatValue', percentChange: number, isPositive: boolean, value: number }, completedTasks: { __typename?: 'MyStaffStatValue', isPositive: boolean, percentChange: number, value: number }, deliveredOrders: { __typename?: 'MyStaffStatValue', isPositive: boolean, percentChange: number, value: number }, pendingOrders: { __typename?: 'MyStaffStatValue', isPositive: boolean, percentChange: number, value: number } } } };
 
 export type UpdateDesignPositionMutationVariables = Exact<{
   input: UpdateDesignPositionDto;
@@ -3819,6 +3867,82 @@ export type GetMyFactoryDashboardQueryHookResult = ReturnType<typeof useGetMyFac
 export type GetMyFactoryDashboardLazyQueryHookResult = ReturnType<typeof useGetMyFactoryDashboardLazyQuery>;
 export type GetMyFactoryDashboardSuspenseQueryHookResult = ReturnType<typeof useGetMyFactoryDashboardSuspenseQuery>;
 export type GetMyFactoryDashboardQueryResult = Apollo.QueryResult<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>;
+export const GetMyStaffDashboardDocument = gql`
+    query GetMyStaffDashboard {
+  getMyStaffDashboard {
+    currentFactory {
+      address
+      id
+      leadTime
+      name
+      productionCapacity
+      status
+    }
+    recentOrders {
+      customer
+      date
+      id
+      priority
+      status
+      total
+    }
+    stats {
+      activeTasks {
+        percentChange
+        isPositive
+        value
+      }
+      completedTasks {
+        isPositive
+        percentChange
+        value
+      }
+      deliveredOrders {
+        isPositive
+        percentChange
+        value
+      }
+      pendingOrders {
+        isPositive
+        percentChange
+        value
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetMyStaffDashboardQuery__
+ *
+ * To run a query within a React component, call `useGetMyStaffDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMyStaffDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMyStaffDashboardQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetMyStaffDashboardQuery(baseOptions?: Apollo.QueryHookOptions<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>(GetMyStaffDashboardDocument, options);
+      }
+export function useGetMyStaffDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>(GetMyStaffDashboardDocument, options);
+        }
+export function useGetMyStaffDashboardSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>(GetMyStaffDashboardDocument, options);
+        }
+export type GetMyStaffDashboardQueryHookResult = ReturnType<typeof useGetMyStaffDashboardQuery>;
+export type GetMyStaffDashboardLazyQueryHookResult = ReturnType<typeof useGetMyStaffDashboardLazyQuery>;
+export type GetMyStaffDashboardSuspenseQueryHookResult = ReturnType<typeof useGetMyStaffDashboardSuspenseQuery>;
+export type GetMyStaffDashboardQueryResult = Apollo.QueryResult<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>;
 export const UpdateDesignPositionDocument = gql`
     mutation UpdateDesignPosition($input: UpdateDesignPositionDto!) {
   updateDesignPosition(input: $input) {

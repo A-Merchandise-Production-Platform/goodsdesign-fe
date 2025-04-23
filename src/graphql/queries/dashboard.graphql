@@ -241,3 +241,46 @@ query GetMyFactoryDashboard {
     totalRevenue
   }
 }
+
+query GetMyStaffDashboard {
+  getMyStaffDashboard {
+    currentFactory {
+      address
+      id
+      leadTime
+      name
+      productionCapacity
+      status
+    }
+    recentOrders {
+      customer
+      date
+      id
+      priority
+      status
+      total
+    }
+    stats {
+      activeTasks {
+        percentChange
+        isPositive
+        value
+      }
+      completedTasks {
+        isPositive
+        percentChange
+        value
+      }
+      deliveredOrders {
+        isPositive
+        percentChange
+        value
+      }
+      pendingOrders {
+        isPositive
+        percentChange
+        value
+      }
+    }
+  }
+}

@@ -51,6 +51,7 @@ import {
 import { formatDate } from '@/lib/utils';
 
 import { getStatusBadge } from '../../_components/order-status';
+import { DashboardShell } from '@/components/dashboard-shell';
 
 export default function MyStaffTasksPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -196,39 +197,34 @@ export default function MyStaffTasksPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-10">
+    <DashboardShell
+      title="My Tasks"
+      subtitle="Manage your assigned orders and quality checks"
+    >
       <div className="flex flex-col space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">My Tasks</h1>
-            <p className="text-muted-foreground">
-              Manage your assigned orders and quality checks
-            </p>
-          </div>
-
-          <div className="relative w-full md:w-64">
-            <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
-            <Input
-              type="search"
-              placeholder="Search orders..."
-              className="pl-8"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-
         <Tabs
           defaultValue="quality-check"
           value={activeTab}
           onValueChange={setActiveTab}
         >
-          <TabsList>
-            <TabsTrigger value="quality-check">Quality Checks</TabsTrigger>
-            <TabsTrigger value="all">All Tasks</TabsTrigger>
-          </TabsList>
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <TabsList>
+              <TabsTrigger value="quality-check">Quality Checks</TabsTrigger>
+              <TabsTrigger value="all">All Tasks</TabsTrigger>
+            </TabsList>
+            <div className="relative w-full md:w-64">
+              <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
+              <Input
+                type="search"
+                placeholder="Search orders..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
 
-          <TabsContent value="quality-check" className="mt-6">
+          <TabsContent value="quality-check" className="mt-4">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="text-primary h-8 w-8 animate-spin" />
@@ -285,8 +281,8 @@ export default function MyStaffTasksPage() {
                                       '/placeholder.svg?height=64&width=64'
                                     }
                                     alt={
-                                      item.systemConfigVariant?.product
-                                        ?.name || 'Product'
+                                      item.systemConfigVariant?.product?.name ||
+                                      'Product'
                                     }
                                     fill
                                     className="object-cover"
@@ -294,10 +290,7 @@ export default function MyStaffTasksPage() {
                                 </div>
                                 <div>
                                   <h3 className="font-medium">
-                                    {
-                                      item.systemConfigVariant?.product
-                                        ?.name
-                                    }
+                                    {item.systemConfigVariant?.product?.name}
                                   </h3>
                                   <p className="text-muted-foreground text-sm">
                                     Quantity: {item.quantity} • Size:{' '}
@@ -308,8 +301,8 @@ export default function MyStaffTasksPage() {
                                       className="inline-block h-3 w-3 rounded-full"
                                       style={{
                                         backgroundColor:
-                                          item.systemConfigVariant
-                                            ?.color || 'transparent',
+                                          item.systemConfigVariant?.color ||
+                                          'transparent',
                                       }}
                                     ></span>
                                     <span className="text-xs">
@@ -652,6 +645,6 @@ export default function MyStaffTasksPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </DashboardShell>
   );
 }

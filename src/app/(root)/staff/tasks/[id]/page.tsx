@@ -63,6 +63,7 @@ import {
 } from '@/graphql/generated/graphql';
 import { formatDate } from '@/lib/utils';
 import { filesToBase64 } from '@/utils/handle-upload';
+import { DashboardShell } from '@/components/dashboard-shell';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -212,21 +213,10 @@ export default function StaffCheckQualityDetailsPage() {
     setIsImagePreviewOpen(true);
   };
 
-  // Back button
-  const BackButton = () => (
-    <div className="mb-6">
-      <Button variant="outline" onClick={() => router.push('/staff/tasks')}>
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Tasks
-      </Button>
-    </div>
-  );
-
   // Error or empty state
   if (error || !order) {
     return (
-      <div className="container mx-auto px-4 py-10">
-        <BackButton />
+      <div>
         <Card className="text-center">
           <CardContent className="flex flex-col items-center justify-center py-16">
             {error ? (
@@ -262,8 +252,7 @@ export default function StaffCheckQualityDetailsPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-10">
-        <BackButton />
+      <div>
         <div className="flex items-center justify-center py-20">
           <Loader2 className="text-primary h-8 w-8 animate-spin" />
           <span className="ml-2">Loading order details...</span>
@@ -279,8 +268,7 @@ export default function StaffCheckQualityDetailsPage() {
 
   if (!hasQualityChecks) {
     return (
-      <div className="container mx-auto px-4 py-10">
-        <BackButton />
+      <div>
         <Card className="text-center">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <AlertTriangle className="mb-4 h-12 w-12 text-amber-500" />
@@ -300,16 +288,14 @@ export default function StaffCheckQualityDetailsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <BackButton />
-
+    <div>
       {/* Header */}
       <Card className="mb-6">
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <CardTitle className="text-2xl font-bold">
-                Order #{order.id.substring(0, 8)}
+                Order #{order.id}
               </CardTitle>
               <CardDescription className="mt-2">
                 <div className="flex items-center">
@@ -411,8 +397,8 @@ export default function StaffCheckQualityDetailsPage() {
                     {orderDetails.map((detail, index) => (
                       <SelectItem key={detail.id} value={index.toString()}>
                         {detail.systemConfigVariant?.product?.name} -{' '}
-                        {detail.systemConfigVariant?.size} (
-                        {detail.quantity} items)
+                        {detail.systemConfigVariant?.size} ({detail.quantity}{' '}
+                        items)
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -464,8 +450,8 @@ export default function StaffCheckQualityDetailsPage() {
                           '/placeholder.svg?height=200&width=200'
                         }
                         alt={
-                          selectedOrderDetail.systemConfigVariant
-                            ?.product?.name || 'Product'
+                          selectedOrderDetail.systemConfigVariant?.product
+                            ?.name || 'Product'
                         }
                         fill
                         className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -474,19 +460,13 @@ export default function StaffCheckQualityDetailsPage() {
                   </Link>
                   <div>
                     <h3 className="mb-1 text-lg font-semibold">
-                      {
-                        selectedOrderDetail.systemConfigVariant?.product
-                          ?.name
-                      }
+                      {selectedOrderDetail.systemConfigVariant?.product?.name}
                     </h3>
                     <div className="mb-2 grid gap-2 md:grid-cols-3">
                       <div>
                         <p className="text-muted-foreground text-sm">Size</p>
                         <p className="font-medium">
-                          {
-                            selectedOrderDetail.systemConfigVariant
-                              ?.size
-                          }
+                          {selectedOrderDetail.systemConfigVariant?.size}
                         </p>
                       </div>
                       <div>
@@ -500,10 +480,7 @@ export default function StaffCheckQualityDetailsPage() {
                                   ?.color || 'transparent',
                             }}
                           ></span>
-                          {
-                            selectedOrderDetail.systemConfigVariant
-                              ?.color
-                          }
+                          {selectedOrderDetail.systemConfigVariant?.color}
                         </p>
                       </div>
                       <div>
@@ -566,8 +543,8 @@ export default function StaffCheckQualityDetailsPage() {
                           </span>
                           <span className="font-medium">
                             {
-                              selectedOrderDetail.systemConfigVariant
-                                ?.product?.name
+                              selectedOrderDetail.systemConfigVariant?.product
+                                ?.name
                             }
                           </span>
                         </div>
@@ -576,10 +553,7 @@ export default function StaffCheckQualityDetailsPage() {
                             Size
                           </span>
                           <span className="font-medium">
-                            {
-                              selectedOrderDetail.systemConfigVariant
-                                ?.size
-                            }
+                            {selectedOrderDetail.systemConfigVariant?.size}
                           </span>
                         </div>
                         <div className="flex justify-between border-b pb-1">
@@ -596,10 +570,7 @@ export default function StaffCheckQualityDetailsPage() {
                                   'transparent',
                               }}
                             ></span>
-                            {
-                              selectedOrderDetail.systemConfigVariant
-                                ?.color
-                            }
+                            {selectedOrderDetail.systemConfigVariant?.color}
                           </span>
                         </div>
                         <div className="flex justify-between border-b pb-1">
