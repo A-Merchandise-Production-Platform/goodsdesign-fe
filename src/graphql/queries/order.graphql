@@ -139,6 +139,7 @@ query GetMyOrders {
       paymentLog
       amount
       transactions {
+        imageUrls
         transactionLog
         status
         paymentMethod
@@ -332,6 +333,7 @@ query GetMyFactoryOrders {
       paymentLog
       amount
       transactions {
+        imageUrls
         transactionLog
         status
         paymentMethod
@@ -526,6 +528,7 @@ query GetOrdersByFactoryId($factoryId: String!) {
       paymentLog
       amount
       transactions {
+        imageUrls
         transactionLog
         status
         paymentMethod
@@ -721,6 +724,7 @@ query GetOrder($orderId: String!) {
       paymentLog
       amount
       transactions {
+        imageUrls
         transactionLog
         status
         paymentMethod
@@ -914,6 +918,7 @@ query GetAllOrders {
       paymentLog
       amount
       transactions {
+        imageUrls
         transactionLog
         status
         paymentMethod
@@ -1107,6 +1112,7 @@ query GetMyStaffOrders {
       paymentLog
       amount
       transactions {
+        imageUrls
         transactionLog
         status
         paymentMethod
