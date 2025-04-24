@@ -1,22 +1,18 @@
-import { Copy, Eye, Info, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { Copy, Info, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Switch } from '@/components/ui/switch';
 import { formatPrice } from '@/lib/utils';
+import { useAuthStore } from '@/stores/auth.store';
+import { Roles } from '@/graphql/generated/graphql';
 
 // Only include the fields we use
 type ProductDesign = {
@@ -56,29 +52,22 @@ type ProductDesign = {
 
 interface DesignCardProps {
   design: ProductDesign;
-  onDelete?: (id: string) => void;
   onDuplicate?: (id: string) => void;
-  onTogglePublic?: (
-    id: string,
-    currentState: boolean,
-    isFinalized: boolean,
-  ) => void;
+  isLoading?: boolean;
 }
 
 export function DesignCard({
   design,
-  onDelete,
   onDuplicate,
-  onTogglePublic,
+  isLoading,
 }: DesignCardProps) {
   const {
     id,
     thumbnailUrl,
     systemConfigVariant,
     designPositions = [],
-    isPublic = false,
-    isFinalized = false,
   } = design;
+  const { user } = useAuthStore();
   const router = useRouter();
 
   const calculateTotalPrice = () => {
@@ -92,34 +81,12 @@ export function DesignCard({
   };
 
   const handleCardClick = () => {
-    const path = isFinalized ? 'view' : 'product';
-    router.push(`/${path}/tshirt/${id}`);
-  };
-
-  const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const path = isFinalized ? 'view' : 'product';
-    router.push(`/${path}/tshirt/${id}`);
-  };
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDelete?.(id);
-  };
-
-  const handleDuplicate = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDuplicate?.(id);
-  };
-
-  const handleTogglePublic = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onTogglePublic?.(id, isPublic, isFinalized);
+    router.push(`/view/tshirt/${id}`);
   };
 
   return (
     <Card
-      className="relative cursor-pointer overflow-hidden transition-shadow hover:shadow-lg pt-2"
+      className="relative cursor-pointer overflow-hidden pt-2 transition-shadow hover:shadow-lg"
       onClick={handleCardClick}
     >
       <div className="relative aspect-square w-full">
@@ -150,53 +117,9 @@ export function DesignCard({
             ) : null,
           )}
         </div>
-
-        {/* Action dropdown */}
-        <div className="absolute top-2 right-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
-              <button className="hover:bg-muted flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-sm">
-                <MoreVertical className="h-4 w-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleEdit}>
-                {isFinalized ? (
-                  <>
-                    <Eye className="mr-4 h-4 w-4" />
-                    View
-                  </>
-                ) : (
-                  <>
-                    <Pencil className="mr-4 h-4 w-4" />
-                    Edit
-                  </>
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDuplicate}>
-                <Copy className="mr-4 h-4 w-4" />
-                Duplicate
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="flex items-center"
-                onClick={handleTogglePublic}
-              >
-                <Switch checked={isPublic} onCheckedChange={() => {}} />
-                <span>Public</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
-                onClick={handleDelete}
-              >
-                <Trash2 className="text-destructive focus:text-destructive mr-4 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
       </div>
 
-      <CardContent className="">
+      <CardContent className="relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {systemConfigVariant?.color && (
@@ -207,29 +130,6 @@ export function DesignCard({
                 }}
                 title={systemConfigVariant.color}
               />
-            )}
-            {isPublic ? (
-              <Badge
-                variant="outline"
-                className="border-green-200 bg-green-50 text-green-700"
-              >
-                Public
-              </Badge>
-            ) : (
-              <Badge
-                variant="outline"
-                className="border-gray-200 bg-gray-50 text-gray-700"
-              >
-                Private
-              </Badge>
-            )}
-            {isFinalized && (
-              <Badge
-                variant="outline"
-                className="border-blue-200 bg-blue-50 text-blue-700"
-              >
-                Ordered
-              </Badge>
             )}
           </div>
 
@@ -277,6 +177,25 @@ export function DesignCard({
             </div>
           )}
         </div>
+
+        {user?.role == Roles.Customer && onDuplicate && (
+          <Button
+            size="icon"
+            variant="ghost"
+            className="absolute top-[-45px] right-2"
+            disabled={isLoading}
+            onClick={e => {
+              e.stopPropagation();
+              onDuplicate(id);
+            }}
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
