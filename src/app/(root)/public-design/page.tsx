@@ -1,11 +1,29 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/shared/sidebar';
-import { useProductDesignsQuery } from '@/graphql/generated/graphql';
+import {
+  useDuplicateProductDesignMutation,
+  usePublicProductDesignsQuery,
+} from '@/graphql/generated/graphql';
 import { Search } from 'lucide-react';
 import { DesignCard } from './_components/design-card';
+import { toast } from 'sonner';
 
 export default function PublicDesignPage() {
-  const { data, loading } = useProductDesignsQuery();
+  const router = useRouter();
+
+  const { data, loading } = usePublicProductDesignsQuery();
+  const [duplicateProductDesign, { loading: duplicateLoading }] =
+    useDuplicateProductDesignMutation({
+      onCompleted: data => {
+        toast.success('Created product design successfully');
+        router.push(`/product/tshirt/${data.duplicateProductDesign.id}`);
+      },
+      onError: () => {
+        toast.error('Failed to create product design');
+      },
+    });
+
   return (
     <div className="grid grid-cols-1 gap-4 px-4 pt-4 pb-2 md:grid-cols-[200px_1fr]">
       <div>
@@ -13,11 +31,24 @@ export default function PublicDesignPage() {
       </div>
       <div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {data?.productDesigns?.length ? (
-            data.productDesigns.map(design => (
+          {loading ? (
+            // Loading skeleton
+            Array.from({ length: 8 }).map((_, index) => (
+              <div key={index} className="h-[300px] rounded-lg bg-muted animate-pulse" />
+            ))
+          ) : data?.publicProductDesigns?.length ? (
+            data.publicProductDesigns.map(design => (
               <DesignCard
                 key={design.id}
                 design={design}
+                onDuplicate={(id) => {
+                  duplicateProductDesign({
+                    variables: {
+                      duplicateProductDesignId: id,
+                    }
+                  });
+                }}
+                isLoading={duplicateLoading}
               />
             ))
           ) : (

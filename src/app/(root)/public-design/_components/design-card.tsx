@@ -1,8 +1,9 @@
-import { Info } from 'lucide-react';
+import { Copy, Info, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Popover,
@@ -10,6 +11,8 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { formatPrice } from '@/lib/utils';
+import { useAuthStore } from '@/stores/auth.store';
+import { Roles } from '@/graphql/generated/graphql';
 
 // Only include the fields we use
 type ProductDesign = {
@@ -49,15 +52,22 @@ type ProductDesign = {
 
 interface DesignCardProps {
   design: ProductDesign;
+  onDuplicate?: (id: string) => void;
+  isLoading?: boolean;
 }
 
-export function DesignCard({ design }: DesignCardProps) {
+export function DesignCard({
+  design,
+  onDuplicate,
+  isLoading,
+}: DesignCardProps) {
   const {
     id,
     thumbnailUrl,
     systemConfigVariant,
     designPositions = [],
   } = design;
+  const { user } = useAuthStore();
   const router = useRouter();
 
   const calculateTotalPrice = () => {
@@ -76,7 +86,7 @@ export function DesignCard({ design }: DesignCardProps) {
 
   return (
     <Card
-      className="relative cursor-pointer overflow-hidden transition-shadow hover:shadow-lg pt-2"
+      className="relative cursor-pointer overflow-hidden pt-2 transition-shadow hover:shadow-lg"
       onClick={handleCardClick}
     >
       <div className="relative aspect-square w-full">
@@ -109,7 +119,7 @@ export function DesignCard({ design }: DesignCardProps) {
         </div>
       </div>
 
-      <CardContent className="">
+      <CardContent className="relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {systemConfigVariant?.color && (
@@ -167,6 +177,25 @@ export function DesignCard({ design }: DesignCardProps) {
             </div>
           )}
         </div>
+
+        {user?.role == Roles.Customer && onDuplicate && (
+          <Button
+            size="icon"
+            variant="ghost"
+            className="absolute top-[-45px] right-2"
+            disabled={isLoading}
+            onClick={e => {
+              e.stopPropagation();
+              onDuplicate(id);
+            }}
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

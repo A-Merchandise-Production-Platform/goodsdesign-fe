@@ -1392,6 +1392,7 @@ export type Query = {
   products: Array<ProductEntity>;
   province: Province;
   provinces: Array<Province>;
+  publicProductDesigns: Array<ProductDesignEntity>;
   staffOrders: Array<OrderEntity>;
   staffs: Array<UserEntity>;
   systemConfigBank: SystemConfigBankEntity;
@@ -2444,6 +2445,11 @@ export type GetTemplateProductDesignsQueryVariables = Exact<{ [key: string]: nev
 
 
 export type GetTemplateProductDesignsQuery = { __typename?: 'Query', getTemplateProductDesigns: Array<{ __typename?: 'ProductDesignEntity', id: string, isPublic: boolean, isTemplate: boolean, isFinalized: boolean, thumbnailUrl?: string | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, category?: { __typename?: 'CategoryEntity', name: string } | null } } | null }> };
+
+export type PublicProductDesignsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PublicProductDesignsQuery = { __typename?: 'Query', publicProductDesigns: Array<{ __typename?: 'ProductDesignEntity', id: string, isPublic: boolean, isTemplate: boolean, isFinalized: boolean, thumbnailUrl?: string | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, category?: { __typename?: 'CategoryEntity', name: string } | null } } | null }> };
 
 export type DuplicateProductDesignMutationVariables = Exact<{
   duplicateProductDesignId: Scalars['ID']['input'];
@@ -6902,6 +6908,70 @@ export type GetTemplateProductDesignsQueryHookResult = ReturnType<typeof useGetT
 export type GetTemplateProductDesignsLazyQueryHookResult = ReturnType<typeof useGetTemplateProductDesignsLazyQuery>;
 export type GetTemplateProductDesignsSuspenseQueryHookResult = ReturnType<typeof useGetTemplateProductDesignsSuspenseQuery>;
 export type GetTemplateProductDesignsQueryResult = Apollo.QueryResult<GetTemplateProductDesignsQuery, GetTemplateProductDesignsQueryVariables>;
+export const PublicProductDesignsDocument = gql`
+    query PublicProductDesigns {
+  publicProductDesigns {
+    id
+    isPublic
+    isTemplate
+    isFinalized
+    thumbnailUrl
+    designPositions {
+      positionType {
+        id
+        positionName
+        basePrice
+      }
+      designJSON
+    }
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+      product {
+        name
+        category {
+          name
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __usePublicProductDesignsQuery__
+ *
+ * To run a query within a React component, call `usePublicProductDesignsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePublicProductDesignsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePublicProductDesignsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePublicProductDesignsQuery(baseOptions?: Apollo.QueryHookOptions<PublicProductDesignsQuery, PublicProductDesignsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PublicProductDesignsQuery, PublicProductDesignsQueryVariables>(PublicProductDesignsDocument, options);
+      }
+export function usePublicProductDesignsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PublicProductDesignsQuery, PublicProductDesignsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PublicProductDesignsQuery, PublicProductDesignsQueryVariables>(PublicProductDesignsDocument, options);
+        }
+export function usePublicProductDesignsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<PublicProductDesignsQuery, PublicProductDesignsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PublicProductDesignsQuery, PublicProductDesignsQueryVariables>(PublicProductDesignsDocument, options);
+        }
+export type PublicProductDesignsQueryHookResult = ReturnType<typeof usePublicProductDesignsQuery>;
+export type PublicProductDesignsLazyQueryHookResult = ReturnType<typeof usePublicProductDesignsLazyQuery>;
+export type PublicProductDesignsSuspenseQueryHookResult = ReturnType<typeof usePublicProductDesignsSuspenseQuery>;
+export type PublicProductDesignsQueryResult = Apollo.QueryResult<PublicProductDesignsQuery, PublicProductDesignsQueryVariables>;
 export const DuplicateProductDesignDocument = gql`
     mutation DuplicateProductDesign($duplicateProductDesignId: ID!) {
   duplicateProductDesign(id: $duplicateProductDesignId) {

@@ -167,6 +167,37 @@ query GetTemplateProductDesigns {
   }
 }
 
+query PublicProductDesigns {
+  publicProductDesigns {
+    id
+    isPublic
+    isTemplate
+    isFinalized
+    thumbnailUrl
+    designPositions {
+      positionType {
+        id
+        positionName
+        basePrice
+      }
+      designJSON
+    }
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+      product {
+        name
+        category {
+          name
+        }
+      }
+    }
+  }
+}
+
 mutation DuplicateProductDesign($duplicateProductDesignId: ID!) {
   duplicateProductDesign(id: $duplicateProductDesignId) {
     id
