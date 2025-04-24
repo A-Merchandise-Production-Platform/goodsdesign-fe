@@ -2395,7 +2395,7 @@ export type AssignFactoryToOrderMutation = { __typename?: 'Mutation', assignFact
 export type ProductDesignsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ProductDesignsQuery = { __typename?: 'Query', productDesigns: Array<{ __typename?: 'ProductDesignEntity', id: string, thumbnailUrl?: string | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', product: { __typename?: 'ProductEntity', name: string, category?: { __typename?: 'CategoryEntity', name: string } | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null }> };
+export type ProductDesignsQuery = { __typename?: 'Query', productDesigns: Array<{ __typename?: 'ProductDesignEntity', id: string, isPublic: boolean, isTemplate: boolean, isFinalized: boolean, thumbnailUrl?: string | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, category?: { __typename?: 'CategoryEntity', name: string } | null } } | null }> };
 
 export type ProductDesignsByUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -6501,15 +6501,10 @@ export const ProductDesignsDocument = gql`
     query ProductDesigns {
   productDesigns {
     id
+    isPublic
+    isTemplate
+    isFinalized
     thumbnailUrl
-    systemConfigVariant {
-      product {
-        name
-        category {
-          name
-        }
-      }
-    }
     designPositions {
       positionType {
         id
@@ -6517,6 +6512,19 @@ export const ProductDesignsDocument = gql`
         basePrice
       }
       designJSON
+    }
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+      product {
+        name
+        category {
+          name
+        }
+      }
     }
   }
 }

@@ -1,15 +1,10 @@
 query ProductDesigns {
   productDesigns {
     id
+    isPublic
+    isTemplate
+    isFinalized
     thumbnailUrl
-    systemConfigVariant {
-      product {
-        name
-        category {
-          name
-        }
-      }
-    }
     designPositions {
       positionType {
         id
@@ -17,6 +12,19 @@ query ProductDesigns {
         basePrice
       }
       designJSON
+    }
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+      product {
+        name
+        category {
+          name
+        }
+      }
     }
   }
 }

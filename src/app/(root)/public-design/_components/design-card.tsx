@@ -1,21 +1,14 @@
-import { Copy, Eye, Info, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { Info } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Switch } from '@/components/ui/switch';
 import { formatPrice } from '@/lib/utils';
 
 // Only include the fields we use
@@ -56,28 +49,14 @@ type ProductDesign = {
 
 interface DesignCardProps {
   design: ProductDesign;
-  onDelete?: (id: string) => void;
-  onDuplicate?: (id: string) => void;
-  onTogglePublic?: (
-    id: string,
-    currentState: boolean,
-    isFinalized: boolean,
-  ) => void;
 }
 
-export function DesignCard({
-  design,
-  onDelete,
-  onDuplicate,
-  onTogglePublic,
-}: DesignCardProps) {
+export function DesignCard({ design }: DesignCardProps) {
   const {
     id,
     thumbnailUrl,
     systemConfigVariant,
     designPositions = [],
-    isPublic = false,
-    isFinalized = false,
   } = design;
   const router = useRouter();
 
@@ -92,29 +71,7 @@ export function DesignCard({
   };
 
   const handleCardClick = () => {
-    const path = isFinalized ? 'view' : 'product';
-    router.push(`/${path}/tshirt/${id}`);
-  };
-
-  const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const path = isFinalized ? 'view' : 'product';
-    router.push(`/${path}/tshirt/${id}`);
-  };
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDelete?.(id);
-  };
-
-  const handleDuplicate = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDuplicate?.(id);
-  };
-
-  const handleTogglePublic = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onTogglePublic?.(id, isPublic, isFinalized);
+    router.push(`/view/tshirt/${id}`);
   };
 
   return (
@@ -150,50 +107,6 @@ export function DesignCard({
             ) : null,
           )}
         </div>
-
-        {/* Action dropdown */}
-        <div className="absolute top-2 right-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
-              <button className="hover:bg-muted flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-sm">
-                <MoreVertical className="h-4 w-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleEdit}>
-                {isFinalized ? (
-                  <>
-                    <Eye className="mr-4 h-4 w-4" />
-                    View
-                  </>
-                ) : (
-                  <>
-                    <Pencil className="mr-4 h-4 w-4" />
-                    Edit
-                  </>
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDuplicate}>
-                <Copy className="mr-4 h-4 w-4" />
-                Duplicate
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="flex items-center"
-                onClick={handleTogglePublic}
-              >
-                <Switch checked={isPublic} onCheckedChange={() => {}} />
-                <span>Public</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
-                onClick={handleDelete}
-              >
-                <Trash2 className="text-destructive focus:text-destructive mr-4 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
       </div>
 
       <CardContent className="">
@@ -207,29 +120,6 @@ export function DesignCard({
                 }}
                 title={systemConfigVariant.color}
               />
-            )}
-            {isPublic ? (
-              <Badge
-                variant="outline"
-                className="border-green-200 bg-green-50 text-green-700"
-              >
-                Public
-              </Badge>
-            ) : (
-              <Badge
-                variant="outline"
-                className="border-gray-200 bg-gray-50 text-gray-700"
-              >
-                Private
-              </Badge>
-            )}
-            {isFinalized && (
-              <Badge
-                variant="outline"
-                className="border-blue-200 bg-blue-50 text-blue-700"
-              >
-                Ordered
-              </Badge>
             )}
           </div>
 
