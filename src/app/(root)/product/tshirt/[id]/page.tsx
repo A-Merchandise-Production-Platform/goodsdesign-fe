@@ -134,15 +134,18 @@ export default function Page() {
     return <NotFound />;
   }
 
+  const isOwner = user?.id === proDesData.productDesign.user?.id;
+
   // Redirect to view page if design is public
-  if (proDesData.productDesign.isPublic) {
+  if (
+    (!isOwner && proDesData.productDesign.isPublic) ||
+    proDesData.productDesign.isFinalized
+  ) {
     router.push(`/view/tshirt/${id}`);
     return null;
   }
 
   // Check if user is the owner
-  const isOwner = user?.id === proDesData.productDesign.user?.id;
-
   if (!isOwner) {
     return <NotFound />;
   }
