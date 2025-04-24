@@ -81,6 +81,11 @@ query ProductDesignById($productDesignId: ID!) {
       }
       designJSON
     }
+    user {
+      id
+      name
+      role
+    }
   }
 }
 
