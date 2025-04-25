@@ -14,7 +14,7 @@ export const useSocketStore = create<SocketState>(set => ({
   socket: null,
   isConnected: false,
   connect: (token: string) => {
-    const socket = io(envConfig().ioUrl || 'http://localhost:5000', {
+    const socket = io(envConfig().ioUrl || 'http://api.goodsdesign.uydev.id.vn', {
       path: '/socket.io',
       auth: { token },
       transports: ['websocket', 'polling'],
