@@ -32,7 +32,13 @@ export const useSocketStore = create<SocketState>(set => ({
     });
 
     socket.on('connect_error', error => {
-      console.error('Socket connection error:', error);
+      console.error('Socket connection error:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+        cause: error.cause,
+        // Add any other relevant error properties you want to log
+      });
       set({ isConnected: false });
     });
 
