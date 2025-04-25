@@ -3,15 +3,16 @@
 import { useParams } from 'next/navigation';
 
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  useProductDesignByIdQuery,
-} from '@/graphql/generated/graphql';
+import { Roles, useProductDesignByIdQuery } from '@/graphql/generated/graphql';
 
 import ProductDesigner from './_components/product-design';
+import { useAuthStore } from '@/stores/auth.store';
+import NotFound from '@/app/not-found';
 
 export default function Page() {
   const params = useParams();
   const id = params.id as string;
+  const { isAuth, user } = useAuthStore();
 
   const { data: proDesData, loading: proDesLoading } =
     useProductDesignByIdQuery({
@@ -32,12 +33,24 @@ export default function Page() {
     );
   }
 
+  if (!proDesData?.productDesign) {
+    return <NotFound />;
+  }
+
+  const isPublic = proDesData.productDesign.isPublic;
+  const isOwner = user?.id === proDesData.productDesign.user?.id;
+  const isNotCustomer = isAuth && user?.role !== Roles.Customer;
+
+  if (!isPublic && !isOwner && !isNotCustomer) {
+    return <NotFound />;
+  }
+
   return (
     <div className="container mx-auto min-h-screen">
       <ProductDesigner
+        designId={id}
         initialDesigns={proDesData?.productDesign?.designPositions}
         productVariant={proDesData?.productDesign?.systemConfigVariant}
-        designId={id}
       />
     </div>
   );

@@ -261,11 +261,11 @@ export default function Page() {
           <Button onClick={handleCreateNew}>Create New Design</Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {filteredDesigns.map(design => (
             <Card
               key={design.id}
-              className="relative cursor-pointer overflow-hidden transition-shadow hover:shadow-lg"
+              className="relative cursor-pointer overflow-hidden transition-shadow hover:shadow-lg pt-2"
               onClick={() => handleCardClick(design.id)}
             >
               <div className="relative aspect-square w-full">
@@ -337,7 +337,7 @@ export default function Page() {
                   </DropdownMenu>
                 </div>
               </div>
-              <CardContent className="p-4">
+              <CardContent className="">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div

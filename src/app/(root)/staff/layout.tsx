@@ -1,22 +1,11 @@
-import { Metadata } from 'next';
-
-import StaffGuardProvider from '@/providers/staff-guard-provider';
+'use client';
 
 import StaffSidebarLayout from './_components/sidebar-layout';
 
-export const metadata: Metadata = {
-  title: 'Staff',
-  description: 'Staff panel',
-};
-
-export default function AdminLayout({
+export default function StaffLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <StaffGuardProvider>
-      <StaffSidebarLayout>{children}</StaffSidebarLayout>
-    </StaffGuardProvider>
-  );
+  return <StaffSidebarLayout>{children}</StaffSidebarLayout>;
 }

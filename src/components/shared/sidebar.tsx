@@ -1,5 +1,6 @@
 'use client';
 
+import { Home, Paintbrush, SquareBottomDashedScissors } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
@@ -15,8 +16,17 @@ export function Sidebar() {
 
   const navItems: NavItem[] = useMemo(
     () => [
-      { href: '/', label: 'Home' },
-      { href: '/my-design', label: 'My Designs' },
+      { href: '/', label: 'Home', icon: <Home size={16} /> },
+      {
+        href: '/public-design',
+        label: 'Public Designs',
+        icon: <SquareBottomDashedScissors size={16} />,
+      },
+      {
+        href: '/my-design',
+        label: 'My Designs',
+        icon: <Paintbrush size={16} />,
+      },
     ],
     [],
   );

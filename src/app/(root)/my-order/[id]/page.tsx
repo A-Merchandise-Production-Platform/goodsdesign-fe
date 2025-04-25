@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import {
   ArrowLeft,
   Calendar,
@@ -391,35 +392,51 @@ export default function OrderDetailsPage() {
               <div
                 className="bg-primary absolute top-0 left-0 h-full transition-all duration-500"
                 style={{
-                  width: `${(order.status === 'WAITING_FOR_REFUND' || order.status === 'REFUNDED'
-                    ? ((refundStatusSteps.findIndex(
-                        step => step.statuses.includes(order.status),
-                      ) + 1) /
-                      refundStatusSteps.length)
-                    : ((orderStatusSteps.findIndex(
-                        step => step.group === currentStatusGroup,
-                      ) + 1) /
-                      orderStatusSteps.length)) *
-                    100}%`,
+                  width: `${
+                    (order.status === 'WAITING_FOR_REFUND' ||
+                    order.status === 'REFUNDED'
+                      ? (refundStatusSteps.findIndex(step =>
+                          step.statuses.includes(order.status),
+                        ) +
+                          1) /
+                        refundStatusSteps.length
+                      : (orderStatusSteps.findIndex(
+                          step => step.group === currentStatusGroup,
+                        ) +
+                          1) /
+                        orderStatusSteps.length) * 100
+                  }%`,
                 }}
               />
             </div>
 
-            <div className={`grid grid-cols-2 gap-2 pt-6 md:grid-cols-2 ${
-              order.status === 'WAITING_FOR_REFUND' || order.status === 'REFUNDED'
-                ? 'lg:grid-cols-2'
-                : 'lg:grid-cols-6'
-            }`}>
-              {(order.status === 'WAITING_FOR_REFUND' || order.status === 'REFUNDED'
+            <div
+              className={`grid grid-cols-2 gap-2 pt-6 md:grid-cols-2 ${
+                order.status === 'WAITING_FOR_REFUND' ||
+                order.status === 'REFUNDED'
+                  ? 'lg:grid-cols-2'
+                  : 'lg:grid-cols-6'
+              }`}
+            >
+              {(order.status === 'WAITING_FOR_REFUND' ||
+              order.status === 'REFUNDED'
                 ? refundStatusSteps
                 : orderStatusSteps
               ).map((step, index) => {
-                const isActive = order.status === 'WAITING_FOR_REFUND' || order.status === 'REFUNDED'
-                  ? step.statuses.includes(order.status)
-                  : step.group === currentStatusGroup;
-                const isPast = order.status === 'WAITING_FOR_REFUND' || order.status === 'REFUNDED'
-                  ? refundStatusSteps.findIndex(s => s.statuses.includes(order.status)) > index
-                  : orderStatusSteps.findIndex(s => s.group === currentStatusGroup) > index;
+                const isActive =
+                  order.status === 'WAITING_FOR_REFUND' ||
+                  order.status === 'REFUNDED'
+                    ? step.statuses.includes(order.status)
+                    : step.group === currentStatusGroup;
+                const isPast =
+                  order.status === 'WAITING_FOR_REFUND' ||
+                  order.status === 'REFUNDED'
+                    ? refundStatusSteps.findIndex(s =>
+                        s.statuses.includes(order.status),
+                      ) > index
+                    : orderStatusSteps.findIndex(
+                        s => s.group === currentStatusGroup,
+                      ) > index;
                 const Icon = step.icon;
 
                 return (
@@ -658,8 +675,7 @@ export default function OrderDetailsPage() {
                               {item.systemConfigVariant?.product?.name}
                             </h3>
                             <p className="text-muted-foreground text-sm">
-                              Size: {item.systemConfigVariant?.size} •
-                              Color:{' '}
+                              Size: {item.systemConfigVariant?.size} • Color:{' '}
                               <span className="inline-flex items-center">
                                 <span
                                   className="mr-1 inline-block h-3 w-3 rounded-full"
@@ -865,21 +881,52 @@ export default function OrderDetailsPage() {
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {payment.transactions.map(transaction => (
-                                <TableRow key={transaction.id}>
-                                  <TableCell>
-                                    {formatDate(transaction.createdAt)}
-                                  </TableCell>
-                                  <TableCell>
-                                    {transaction.paymentMethod}
-                                  </TableCell>
-                                  <TableCell>
-                                    {formatCurrency(transaction.amount)}
-                                  </TableCell>
-                                  <TableCell>
-                                    {getPaymentStatusBadge(transaction.status)}
-                                  </TableCell>
-                                </TableRow>
+                              {payment.transactions?.map(transaction => (
+                                <React.Fragment key={transaction.id}>
+                                  <TableRow>
+                                    <TableCell>
+                                      {formatDate(transaction.createdAt)}
+                                    </TableCell>
+                                    <TableCell>
+                                      {transaction.paymentMethod}
+                                    </TableCell>
+                                    <TableCell>
+                                      {formatCurrency(transaction.amount)}
+                                    </TableCell>
+                                    <TableCell>
+                                      {getPaymentStatusBadge(
+                                        transaction.status,
+                                      )}
+                                    </TableCell>
+                                  </TableRow>
+                                  {transaction.imageUrls &&
+                                    transaction.imageUrls.length > 0 && (
+                                      <TableRow>
+                                        <TableCell colSpan={4} className="p-4">
+                                          <h4 className="mb-2 text-sm font-medium">
+                                            Transaction Images
+                                          </h4>
+                                          <div className="grid grid-cols-4 gap-2">
+                                            {transaction.imageUrls.map(
+                                              (url, idx) => (
+                                                <div
+                                                  key={idx}
+                                                  className="relative aspect-square overflow-hidden rounded-md"
+                                                >
+                                                  <Image
+                                                    src={url}
+                                                    alt={`Transaction image ${idx + 1}`}
+                                                    fill
+                                                    className="object-cover"
+                                                  />
+                                                </div>
+                                              ),
+                                            )}
+                                          </div>
+                                        </TableCell>
+                                      </TableRow>
+                                    )}
+                                </React.Fragment>
                               ))}
                             </TableBody>
                           </Table>
@@ -952,52 +999,65 @@ export default function OrderDetailsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value='rating'>
-        <Card className="overflow-hidden">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2">
-          Customer Rating
-        </CardTitle>
-        <CardDescription>Rating status and feedback</CardDescription>
-      </CardHeader>
-      <CardContent className="pt-6">
-        {order.rating ? (
-          <div className="space-y-4">
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-muted-foreground">Rating {order.ratedAt ? "at " + formatDate(order.ratedAt) : ""}</span>
-              <div className="flex items-center gap-1.5">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={cn(
-                      "h-5 w-5",
-                      star <= order.rating! ? "fill-primary text-primary" : "text-muted stroke-muted-foreground",
-                    )}
-                  />
-                ))}
-                <span className="ml-2 text-sm font-medium">{order.rating} out of 5</span>
-              </div>
-            </div>
+        <TabsContent value="rating">
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2">
+                Customer Rating
+              </CardTitle>
+              <CardDescription>Rating status and feedback</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {order.rating ? (
+                <div className="space-y-4">
+                  <div className="flex flex-col gap-2">
+                    <span className="text-muted-foreground text-sm font-medium">
+                      Rating{' '}
+                      {order.ratedAt ? 'at ' + formatDate(order.ratedAt) : ''}
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <Star
+                          key={star}
+                          className={cn(
+                            'h-5 w-5',
+                            star <= order.rating!
+                              ? 'fill-primary text-primary'
+                              : 'text-muted stroke-muted-foreground',
+                          )}
+                        />
+                      ))}
+                      <span className="ml-2 text-sm font-medium">
+                        {order.rating} out of 5
+                      </span>
+                    </div>
+                  </div>
 
-            {order.ratingComment && (
-              <div className="space-y-2">
-                <span className="text-sm font-medium text-muted-foreground">Comment</span>
-                <div className="rounded-lg bg-muted/50 p-3 text-sm">"{order.ratingComment}"</div>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="flex items-center justify-center py-6 text-center">
-            <div className="space-y-2">
-              <div className="flex justify-center">
-                <Star className="h-10 w-10 text-muted stroke-muted-foreground" />
-              </div>
-              <p className="text-muted-foreground">Waiting for customer rating</p>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                  {order.ratingComment && (
+                    <div className="space-y-2">
+                      <span className="text-muted-foreground text-sm font-medium">
+                        Comment
+                      </span>
+                      <div className="bg-muted/50 rounded-lg p-3 text-sm">
+                        "{order.ratingComment}"
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center py-6 text-center">
+                  <div className="space-y-2">
+                    <div className="flex justify-center">
+                      <Star className="text-muted stroke-muted-foreground h-10 w-10" />
+                    </div>
+                    <p className="text-muted-foreground">
+                      Waiting for customer rating
+                    </p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
 

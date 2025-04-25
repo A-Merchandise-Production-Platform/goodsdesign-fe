@@ -1,8 +1,7 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -18,6 +17,7 @@ import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook'
 
 import ProductDesigner from './_components/product-design';
 import { useAuthStore } from '@/stores/auth.store';
+import NotFound from '@/app/not-found';
 
 export default function Page() {
   const params = useParams();
@@ -116,6 +116,8 @@ export default function Page() {
     }
   };
 
+  const router = useRouter();
+
   if (proDesLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -126,6 +128,26 @@ export default function Page() {
         </div>
       </div>
     );
+  }
+
+  if (!proDesData?.productDesign) {
+    return <NotFound />;
+  }
+
+  const isOwner = user?.id === proDesData.productDesign.user?.id;
+
+  // Redirect to view page if design is public
+  if (
+    (!isOwner && proDesData.productDesign.isPublic) ||
+    proDesData.productDesign.isFinalized
+  ) {
+    router.push(`/view/tshirt/${id}`);
+    return null;
+  }
+
+  // Check if user is the owner
+  if (!isOwner) {
+    return <NotFound />;
   }
 
   return (

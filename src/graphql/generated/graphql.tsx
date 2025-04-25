@@ -348,6 +348,8 @@ export type FactoryDashboardResponse = {
   productionProgress: Array<FactoryOrderWithProgress>;
   qualityIssues: Array<QualityIssueWithFactory>;
   recentOrders: Array<FactoryOrderWithCustomer>;
+  revenueData: Array<MonthlyRevenue>;
+  stats: FactoryStats;
   totalOrders: Scalars['Int']['output'];
   totalRevenue: Scalars['Int']['output'];
 };
@@ -367,6 +369,16 @@ export type FactoryDetailDashboardResponse = {
   totalRevenue: Scalars['Int']['output'];
 };
 
+export type FactoryDetails = {
+  __typename?: 'FactoryDetails';
+  address: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  leadTime: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  productionCapacity: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+};
+
 export type FactoryEntity = {
   __typename?: 'FactoryEntity';
   address?: Maybe<AddressEntity>;
@@ -384,6 +396,7 @@ export type FactoryEntity = {
   formattedAddress?: Maybe<Scalars['String']['output']>;
   isSubmitted?: Maybe<Scalars['Boolean']['output']>;
   leadTime?: Maybe<Scalars['Int']['output']>;
+  legitPoint?: Maybe<Scalars['Int']['output']>;
   maxPrintingCapacity?: Maybe<Scalars['Int']['output']>;
   minimumOrderQuantity?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
@@ -468,6 +481,14 @@ export type FactoryProgressReportType = {
   reportDate: Scalars['DateTime']['output'];
 };
 
+export type FactoryStats = {
+  __typename?: 'FactoryStats';
+  legitPoints: StatValue;
+  monthlyRevenue: StatValue;
+  qualityScore: StatValue;
+  totalOrders: StatValue;
+};
+
 /** The status of the factory */
 export enum FactoryStatus {
   Approved = 'APPROVED',
@@ -530,6 +551,12 @@ export type ManagerOrderDashboardEntity = {
   lastMonthPendingOrders: Scalars['Int']['output'];
   pendingOrders: Scalars['Int']['output'];
   totalOrders: Scalars['Int']['output'];
+};
+
+export type MonthlyRevenue = {
+  __typename?: 'MonthlyRevenue';
+  month: Scalars['String']['output'];
+  revenue: Scalars['Int']['output'];
 };
 
 export type Mutation = {
@@ -1048,6 +1075,28 @@ export type MutationUploadFileArgs = {
   file?: InputMaybe<Scalars['Upload']['input']>;
 };
 
+export type MyStaffDashboardResponse = {
+  __typename?: 'MyStaffDashboardResponse';
+  currentFactory: FactoryDetails;
+  recentOrders: Array<RecentOrderInfo>;
+  stats: MyStaffStats;
+};
+
+export type MyStaffStatValue = {
+  __typename?: 'MyStaffStatValue';
+  isPositive: Scalars['Boolean']['output'];
+  percentChange: Scalars['Int']['output'];
+  value: Scalars['Int']['output'];
+};
+
+export type MyStaffStats = {
+  __typename?: 'MyStaffStats';
+  activeTasks: MyStaffStatValue;
+  completedTasks: MyStaffStatValue;
+  deliveredOrders: MyStaffStatValue;
+  pendingOrders: MyStaffStatValue;
+};
+
 export type NotificationEntity = {
   __typename?: 'NotificationEntity';
   content?: Maybe<Scalars['String']['output']>;
@@ -1313,12 +1362,13 @@ export type Query = {
   getCartItemCount: Scalars['Float']['output'];
   getEnhancedManagerDashboard: EnhancedManagerDashboardResponse;
   getFactoryById: FactoryEntity;
-  getFactoryDashboard: FactoryDashboardResponse;
   getFactoryDetailDashboard: FactoryDetailDashboardResponse;
   getManagerDashboard: ManagerDashboardResponse;
   getManagerOrderDashboard: ManagerOrderDashboardEntity;
   getMe: UserEntity;
   getMyFactory: FactoryEntity;
+  getMyFactoryDashboard: FactoryDashboardResponse;
+  getMyStaffDashboard: MyStaffDashboardResponse;
   getStaffDashboard: StaffDashboardResponse;
   getTemplateProductDesigns: Array<ProductDesignEntity>;
   myNotifications: Array<NotificationEntity>;
@@ -1342,6 +1392,7 @@ export type Query = {
   products: Array<ProductEntity>;
   province: Province;
   provinces: Array<Province>;
+  publicProductDesigns: Array<ProductDesignEntity>;
   staffOrders: Array<OrderEntity>;
   staffs: Array<UserEntity>;
   systemConfigBank: SystemConfigBankEntity;
@@ -1560,6 +1611,16 @@ export type QueryWardsArgs = {
   districtId: Scalars['Int']['input'];
 };
 
+export type RecentOrderInfo = {
+  __typename?: 'RecentOrderInfo';
+  customer: Scalars['String']['output'];
+  date: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  priority: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+  total: Scalars['Int']['output'];
+};
+
 /** Refresh token input */
 export type RefreshTokenDto = {
   refreshToken: Scalars['String']['input'];
@@ -1642,6 +1703,13 @@ export type StaffDashboardResponse = {
   taskHistory: Array<TaskEntity>;
   totalActiveTasks: Scalars['Int']['output'];
   totalTaskHistory: Scalars['Int']['output'];
+};
+
+export type StatValue = {
+  __typename?: 'StatValue';
+  isPositive?: Maybe<Scalars['Boolean']['output']>;
+  percentChange?: Maybe<Scalars['Int']['output']>;
+  value: Scalars['Int']['output'];
 };
 
 export type SystemConfigBankEntity = {
@@ -1771,15 +1839,12 @@ export type UpdateFactoryInfoDto = {
   establishedDate?: InputMaybe<Scalars['DateTime']['input']>;
   leadTime?: InputMaybe<Scalars['Int']['input']>;
   maxPrintingCapacity?: InputMaybe<Scalars['Int']['input']>;
-  minimumOrderQuantity?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  operationalHours?: InputMaybe<Scalars['String']['input']>;
   printingMethods?: InputMaybe<Array<Scalars['String']['input']>>;
   qualityCertifications?: InputMaybe<Scalars['String']['input']>;
   specializations?: InputMaybe<Array<Scalars['String']['input']>>;
   systemConfigVariantIds?: InputMaybe<Array<Scalars['String']['input']>>;
   taxIdentificationNumber?: InputMaybe<Scalars['String']['input']>;
-  totalEmployees?: InputMaybe<Scalars['Int']['input']>;
   website?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -2108,6 +2173,16 @@ export type GetAdminDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetAdminDashboardQuery = { __typename?: 'Query', getAdminDashboard: { __typename?: 'AdminDashboardResponse', activeFactories: number, activeUsers: number, activeUsersChange: number, activeUsersChangeType: ChangeType, pendingOrders: number, pendingOrdersChange: number, pendingOrdersChangeType: ChangeType, totalCustomers: number, totalFactories: number, totalOrders: number, totalProducts: number, totalProductsChange: number, totalProductsChangeType: ChangeType, totalRevenue: number, totalSales: number, totalSalesChange: number, totalSalesChangeType: ChangeType, factoryPerformance: Array<{ __typename?: 'FactoryPerformance', factoryId: string, orderCount: number, totalRevenue: number }>, recentOrders: Array<{ __typename?: 'OrderWithFactory', id: string, orderDate: any, status: string, totalPrice: number, factory?: { __typename?: 'FactoryInfo', id: string, name: string, factoryStatus: string } | null }> } };
 
+export type GetMyFactoryDashboardQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMyFactoryDashboardQuery = { __typename?: 'Query', getMyFactoryDashboard: { __typename?: 'FactoryDashboardResponse', inProductionOrders: number, pendingOrders: number, totalOrders: number, totalRevenue: number, productionProgress: Array<{ __typename?: 'FactoryOrderWithProgress', id: string, status: string, createdAt: any, totalProductionCost: number }>, qualityIssues: Array<{ __typename?: 'QualityIssueWithFactory', id: string, reportedAt: any, status: string, description: string }>, recentOrders: Array<{ __typename?: 'FactoryOrderWithCustomer', id: string, status: string, totalProductionCost: number, createdAt: any }>, revenueData: Array<{ __typename?: 'MonthlyRevenue', month: string, revenue: number }>, stats: { __typename?: 'FactoryStats', legitPoints: { __typename?: 'StatValue', percentChange?: number | null, isPositive?: boolean | null, value: number }, monthlyRevenue: { __typename?: 'StatValue', isPositive?: boolean | null, percentChange?: number | null, value: number }, qualityScore: { __typename?: 'StatValue', isPositive?: boolean | null, percentChange?: number | null, value: number }, totalOrders: { __typename?: 'StatValue', isPositive?: boolean | null, percentChange?: number | null, value: number } } } };
+
+export type GetMyStaffDashboardQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMyStaffDashboardQuery = { __typename?: 'Query', getMyStaffDashboard: { __typename?: 'MyStaffDashboardResponse', currentFactory: { __typename?: 'FactoryDetails', address: string, id: string, leadTime: string, name: string, productionCapacity: string, status: string }, recentOrders: Array<{ __typename?: 'RecentOrderInfo', customer: string, date: string, id: string, priority: string, status: string, total: number }>, stats: { __typename?: 'MyStaffStats', activeTasks: { __typename?: 'MyStaffStatValue', percentChange: number, isPositive: boolean, value: number }, completedTasks: { __typename?: 'MyStaffStatValue', isPositive: boolean, percentChange: number, value: number }, deliveredOrders: { __typename?: 'MyStaffStatValue', isPositive: boolean, percentChange: number, value: number }, pendingOrders: { __typename?: 'MyStaffStatValue', isPositive: boolean, percentChange: number, value: number } } } };
+
 export type UpdateDesignPositionMutationVariables = Exact<{
   input: UpdateDesignPositionDto;
 }>;
@@ -2184,36 +2259,36 @@ export type CreateOrderMutation = { __typename?: 'Mutation', createOrder: { __ty
 export type GetMyOrdersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMyOrdersQuery = { __typename?: 'Query', myOrders: Array<{ __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null }> };
+export type GetMyOrdersQuery = { __typename?: 'Query', myOrders: Array<{ __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', imageUrls?: Array<string> | null, transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null }> };
 
 export type GetMyFactoryOrdersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMyFactoryOrdersQuery = { __typename?: 'Query', factoryOrders: Array<{ __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null }> };
+export type GetMyFactoryOrdersQuery = { __typename?: 'Query', factoryOrders: Array<{ __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', imageUrls?: Array<string> | null, transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null }> };
 
 export type GetOrdersByFactoryIdQueryVariables = Exact<{
   factoryId: Scalars['String']['input'];
 }>;
 
 
-export type GetOrdersByFactoryIdQuery = { __typename?: 'Query', ordersByFactoryId: Array<{ __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null }> };
+export type GetOrdersByFactoryIdQuery = { __typename?: 'Query', ordersByFactoryId: Array<{ __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', imageUrls?: Array<string> | null, transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null }> };
 
 export type GetOrderQueryVariables = Exact<{
   orderId: Scalars['String']['input'];
 }>;
 
 
-export type GetOrderQuery = { __typename?: 'Query', order: { __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', id: string, totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null } };
+export type GetOrderQuery = { __typename?: 'Query', order: { __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', id: string, totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', imageUrls?: Array<string> | null, transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null } };
 
 export type GetAllOrdersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllOrdersQuery = { __typename?: 'Query', orders: Array<{ __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null }> };
+export type GetAllOrdersQuery = { __typename?: 'Query', orders: Array<{ __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', imageUrls?: Array<string> | null, transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null }> };
 
 export type GetMyStaffOrdersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMyStaffOrdersQuery = { __typename?: 'Query', staffOrders: Array<{ __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null }> };
+export type GetMyStaffOrdersQuery = { __typename?: 'Query', staffOrders: Array<{ __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId: string, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', imageUrls?: Array<string> | null, transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null }> };
 
 export type AcceptOrderForFactoryMutationVariables = Exact<{
   orderId: Scalars['String']['input'];
@@ -2321,7 +2396,7 @@ export type AssignFactoryToOrderMutation = { __typename?: 'Mutation', assignFact
 export type ProductDesignsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ProductDesignsQuery = { __typename?: 'Query', productDesigns: Array<{ __typename?: 'ProductDesignEntity', id: string, thumbnailUrl?: string | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', product: { __typename?: 'ProductEntity', name: string, category?: { __typename?: 'CategoryEntity', name: string } | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null }> };
+export type ProductDesignsQuery = { __typename?: 'Query', productDesigns: Array<{ __typename?: 'ProductDesignEntity', id: string, isPublic: boolean, isTemplate: boolean, isFinalized: boolean, thumbnailUrl?: string | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, category?: { __typename?: 'CategoryEntity', name: string } | null } } | null }> };
 
 export type ProductDesignsByUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2333,7 +2408,7 @@ export type ProductDesignByIdQueryVariables = Exact<{
 }>;
 
 
-export type ProductDesignByIdQuery = { __typename?: 'Query', productDesign: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, isFinalized: boolean, isPublic: boolean, isTemplate: boolean, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null } };
+export type ProductDesignByIdQuery = { __typename?: 'Query', productDesign: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, isFinalized: boolean, isPublic: boolean, isTemplate: boolean, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null, user?: { __typename?: 'UserEntity', id: string, name?: string | null, role: Roles } | null } };
 
 export type CreateProductDesignMutationVariables = Exact<{
   input: CreateProductDesignDto;
@@ -2370,6 +2445,11 @@ export type GetTemplateProductDesignsQueryVariables = Exact<{ [key: string]: nev
 
 
 export type GetTemplateProductDesignsQuery = { __typename?: 'Query', getTemplateProductDesigns: Array<{ __typename?: 'ProductDesignEntity', id: string, isPublic: boolean, isTemplate: boolean, isFinalized: boolean, thumbnailUrl?: string | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, category?: { __typename?: 'CategoryEntity', name: string } | null } } | null }> };
+
+export type PublicProductDesignsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PublicProductDesignsQuery = { __typename?: 'Query', publicProductDesigns: Array<{ __typename?: 'ProductDesignEntity', id: string, isPublic: boolean, isTemplate: boolean, isFinalized: boolean, thumbnailUrl?: string | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', id: string, positionName: string, basePrice: number } | null }> | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, category?: { __typename?: 'CategoryEntity', name: string } | null } } | null }> };
 
 export type DuplicateProductDesignMutationVariables = Exact<{
   duplicateProductDesignId: Scalars['ID']['input'];
@@ -3781,6 +3861,168 @@ export type GetAdminDashboardQueryHookResult = ReturnType<typeof useGetAdminDash
 export type GetAdminDashboardLazyQueryHookResult = ReturnType<typeof useGetAdminDashboardLazyQuery>;
 export type GetAdminDashboardSuspenseQueryHookResult = ReturnType<typeof useGetAdminDashboardSuspenseQuery>;
 export type GetAdminDashboardQueryResult = Apollo.QueryResult<GetAdminDashboardQuery, GetAdminDashboardQueryVariables>;
+export const GetMyFactoryDashboardDocument = gql`
+    query GetMyFactoryDashboard {
+  getMyFactoryDashboard {
+    inProductionOrders
+    pendingOrders
+    productionProgress {
+      id
+      status
+      createdAt
+      totalProductionCost
+    }
+    qualityIssues {
+      id
+      reportedAt
+      status
+      description
+    }
+    recentOrders {
+      id
+      status
+      totalProductionCost
+      createdAt
+    }
+    revenueData {
+      month
+      revenue
+    }
+    stats {
+      legitPoints {
+        percentChange
+        isPositive
+        value
+      }
+      monthlyRevenue {
+        isPositive
+        percentChange
+        value
+      }
+      qualityScore {
+        isPositive
+        percentChange
+        value
+      }
+      totalOrders {
+        isPositive
+        percentChange
+        value
+      }
+    }
+    totalOrders
+    totalRevenue
+  }
+}
+    `;
+
+/**
+ * __useGetMyFactoryDashboardQuery__
+ *
+ * To run a query within a React component, call `useGetMyFactoryDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMyFactoryDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMyFactoryDashboardQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetMyFactoryDashboardQuery(baseOptions?: Apollo.QueryHookOptions<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>(GetMyFactoryDashboardDocument, options);
+      }
+export function useGetMyFactoryDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>(GetMyFactoryDashboardDocument, options);
+        }
+export function useGetMyFactoryDashboardSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>(GetMyFactoryDashboardDocument, options);
+        }
+export type GetMyFactoryDashboardQueryHookResult = ReturnType<typeof useGetMyFactoryDashboardQuery>;
+export type GetMyFactoryDashboardLazyQueryHookResult = ReturnType<typeof useGetMyFactoryDashboardLazyQuery>;
+export type GetMyFactoryDashboardSuspenseQueryHookResult = ReturnType<typeof useGetMyFactoryDashboardSuspenseQuery>;
+export type GetMyFactoryDashboardQueryResult = Apollo.QueryResult<GetMyFactoryDashboardQuery, GetMyFactoryDashboardQueryVariables>;
+export const GetMyStaffDashboardDocument = gql`
+    query GetMyStaffDashboard {
+  getMyStaffDashboard {
+    currentFactory {
+      address
+      id
+      leadTime
+      name
+      productionCapacity
+      status
+    }
+    recentOrders {
+      customer
+      date
+      id
+      priority
+      status
+      total
+    }
+    stats {
+      activeTasks {
+        percentChange
+        isPositive
+        value
+      }
+      completedTasks {
+        isPositive
+        percentChange
+        value
+      }
+      deliveredOrders {
+        isPositive
+        percentChange
+        value
+      }
+      pendingOrders {
+        isPositive
+        percentChange
+        value
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetMyStaffDashboardQuery__
+ *
+ * To run a query within a React component, call `useGetMyStaffDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMyStaffDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMyStaffDashboardQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetMyStaffDashboardQuery(baseOptions?: Apollo.QueryHookOptions<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>(GetMyStaffDashboardDocument, options);
+      }
+export function useGetMyStaffDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>(GetMyStaffDashboardDocument, options);
+        }
+export function useGetMyStaffDashboardSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>(GetMyStaffDashboardDocument, options);
+        }
+export type GetMyStaffDashboardQueryHookResult = ReturnType<typeof useGetMyStaffDashboardQuery>;
+export type GetMyStaffDashboardLazyQueryHookResult = ReturnType<typeof useGetMyStaffDashboardLazyQuery>;
+export type GetMyStaffDashboardSuspenseQueryHookResult = ReturnType<typeof useGetMyStaffDashboardSuspenseQuery>;
+export type GetMyStaffDashboardQueryResult = Apollo.QueryResult<GetMyStaffDashboardQuery, GetMyStaffDashboardQueryVariables>;
 export const UpdateDesignPositionDocument = gql`
     mutation UpdateDesignPosition($input: UpdateDesignPositionDto!) {
   updateDesignPosition(input: $input) {
@@ -4553,6 +4795,7 @@ export const GetMyOrdersDocument = gql`
       paymentLog
       amount
       transactions {
+        imageUrls
         transactionLog
         status
         paymentMethod
@@ -4780,6 +5023,7 @@ export const GetMyFactoryOrdersDocument = gql`
       paymentLog
       amount
       transactions {
+        imageUrls
         transactionLog
         status
         paymentMethod
@@ -5007,6 +5251,7 @@ export const GetOrdersByFactoryIdDocument = gql`
       paymentLog
       amount
       transactions {
+        imageUrls
         transactionLog
         status
         paymentMethod
@@ -5236,6 +5481,7 @@ export const GetOrderDocument = gql`
       paymentLog
       amount
       transactions {
+        imageUrls
         transactionLog
         status
         paymentMethod
@@ -5464,6 +5710,7 @@ export const GetAllOrdersDocument = gql`
       paymentLog
       amount
       transactions {
+        imageUrls
         transactionLog
         status
         paymentMethod
@@ -5691,6 +5938,7 @@ export const GetMyStaffOrdersDocument = gql`
       paymentLog
       amount
       transactions {
+        imageUrls
         transactionLog
         status
         paymentMethod
@@ -6259,15 +6507,10 @@ export const ProductDesignsDocument = gql`
     query ProductDesigns {
   productDesigns {
     id
+    isPublic
+    isTemplate
+    isFinalized
     thumbnailUrl
-    systemConfigVariant {
-      product {
-        name
-        category {
-          name
-        }
-      }
-    }
     designPositions {
       positionType {
         id
@@ -6275,6 +6518,19 @@ export const ProductDesignsDocument = gql`
         basePrice
       }
       designJSON
+    }
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+      product {
+        name
+        category {
+          name
+        }
+      }
     }
   }
 }
@@ -6396,6 +6652,11 @@ export const ProductDesignByIdDocument = gql`
         basePrice
       }
       designJSON
+    }
+    user {
+      id
+      name
+      role
     }
   }
 }
@@ -6652,6 +6913,70 @@ export type GetTemplateProductDesignsQueryHookResult = ReturnType<typeof useGetT
 export type GetTemplateProductDesignsLazyQueryHookResult = ReturnType<typeof useGetTemplateProductDesignsLazyQuery>;
 export type GetTemplateProductDesignsSuspenseQueryHookResult = ReturnType<typeof useGetTemplateProductDesignsSuspenseQuery>;
 export type GetTemplateProductDesignsQueryResult = Apollo.QueryResult<GetTemplateProductDesignsQuery, GetTemplateProductDesignsQueryVariables>;
+export const PublicProductDesignsDocument = gql`
+    query PublicProductDesigns {
+  publicProductDesigns {
+    id
+    isPublic
+    isTemplate
+    isFinalized
+    thumbnailUrl
+    designPositions {
+      positionType {
+        id
+        positionName
+        basePrice
+      }
+      designJSON
+    }
+    systemConfigVariant {
+      id
+      price
+      color
+      size
+      model
+      product {
+        name
+        category {
+          name
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __usePublicProductDesignsQuery__
+ *
+ * To run a query within a React component, call `usePublicProductDesignsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePublicProductDesignsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePublicProductDesignsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePublicProductDesignsQuery(baseOptions?: Apollo.QueryHookOptions<PublicProductDesignsQuery, PublicProductDesignsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PublicProductDesignsQuery, PublicProductDesignsQueryVariables>(PublicProductDesignsDocument, options);
+      }
+export function usePublicProductDesignsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PublicProductDesignsQuery, PublicProductDesignsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PublicProductDesignsQuery, PublicProductDesignsQueryVariables>(PublicProductDesignsDocument, options);
+        }
+export function usePublicProductDesignsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<PublicProductDesignsQuery, PublicProductDesignsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PublicProductDesignsQuery, PublicProductDesignsQueryVariables>(PublicProductDesignsDocument, options);
+        }
+export type PublicProductDesignsQueryHookResult = ReturnType<typeof usePublicProductDesignsQuery>;
+export type PublicProductDesignsLazyQueryHookResult = ReturnType<typeof usePublicProductDesignsLazyQuery>;
+export type PublicProductDesignsSuspenseQueryHookResult = ReturnType<typeof usePublicProductDesignsSuspenseQuery>;
+export type PublicProductDesignsQueryResult = Apollo.QueryResult<PublicProductDesignsQuery, PublicProductDesignsQueryVariables>;
 export const DuplicateProductDesignDocument = gql`
     mutation DuplicateProductDesign($duplicateProductDesignId: ID!) {
   duplicateProductDesign(id: $duplicateProductDesignId) {

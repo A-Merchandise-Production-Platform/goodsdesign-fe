@@ -44,7 +44,6 @@ export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
     onCompleted: () => {
       router.push('/login');
       logout();
-      toast.success('Logged out successfully');
     },
     onError: error => {
       toast.error(error.message);
