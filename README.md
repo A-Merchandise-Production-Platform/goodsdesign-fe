@@ -106,7 +106,6 @@ To run this project, you will need to set up the following environment variables
 
 ```env
 NEXT_PUBLIC_API_URL=your_api_url_here
-NEXT_PUBLIC_ANALYTICS_ID=your_analytics_id_here
 ```
 
-Replace `your_api_url_here` and `your_analytics_id_here` with your actual API URL and analytics ID, respectively.
+Replace `your_api_url_here`` with your actual API URL and analytics ID, respectively.
