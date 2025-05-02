@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import { type Product } from './product-table';
+import EditProductForm from './edit-product-form';
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -77,7 +78,7 @@ export const columns: ColumnDef<Product>[] = [
             >
               Copy product ID
             </DropdownMenuItem>
-            <DropdownMenuItem>Edit product</DropdownMenuItem>
+            <EditProductForm product={product} />
             <DropdownMenuItem className="text-destructive">
               Delete product
             </DropdownMenuItem>
