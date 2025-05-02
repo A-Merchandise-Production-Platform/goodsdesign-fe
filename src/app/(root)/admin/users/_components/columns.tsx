@@ -29,6 +29,7 @@ import {
   GetUsersQuery,
   useDeleteUserMutation,
 } from '@/graphql/generated/graphql';
+import EditUserForm from './edit-user-form';
 
 export type User = GetUsersQuery['users'][number];
 
@@ -62,7 +63,7 @@ function UserActions({ user }: { user: User }) {
           Copy user ID
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Edit user</DropdownMenuItem>
+        <EditUserForm user={user} />
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <DropdownMenuItem

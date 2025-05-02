@@ -3,6 +3,7 @@ query GetAllProducts {
     category {
       name
     }
+    categoryId
     id
     imageUrl
     isActive

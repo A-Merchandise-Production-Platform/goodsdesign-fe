@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import { type Category } from './category-table';
+import EditCategoryForm from './edit-category-form';
 
 export const columns: ColumnDef<Category>[] = [
   {
@@ -50,27 +51,29 @@ export const columns: ColumnDef<Category>[] = [
       const category = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(category.id)}
-            >
-              Copy category ID
-            </DropdownMenuItem>
-            <DropdownMenuItem>Edit category</DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive">
-              Delete category
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center space-x-2">
+          <EditCategoryForm category={category} />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(category.id)}
+              >
+                Copy category ID
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-destructive">
+                Delete category
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       );
     },
   },
