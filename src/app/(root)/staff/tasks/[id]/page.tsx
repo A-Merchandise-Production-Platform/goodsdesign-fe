@@ -779,7 +779,8 @@ export default function StaffCheckQualityDetailsPage() {
 
           {/* Quality Check Form Tab */}
           <TabsContent value="quality-check">
-            {order.status === OrderStatus.WaitingForCheckingQuality &&
+            {(order.status === OrderStatus.WaitingForCheckingQuality ||
+              order.status === OrderStatus.ReworkRequired) &&
             selectedCheckQuality.status === OrderDetailStatus.Pending ? (
               <Card>
                 <CardHeader>
