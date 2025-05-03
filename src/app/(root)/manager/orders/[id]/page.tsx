@@ -228,14 +228,14 @@ export default function FactoryOrderDetailsPage() {
   const [processWithdrawal, { loading: processWithdrawalLoading }] =
     useProcessWithdrawalMutation({
       onCompleted: () => {
-        toast('Withdrawal processed successfully');
+        toast.success('Withdrawal processed successfully');
         setShowWithdrawalDialog(false);
         withdrawalForm.reset();
         setUploadedImages([]);
         refetch();
       },
       onError: error => {
-        toast(error.message);
+        toast.error(error.message);
       },
     });
 
