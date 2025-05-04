@@ -71,6 +71,11 @@ export type AuthResponseDto = {
   user: UserEntity;
 };
 
+export type CalculateShippingCostAndFactoryDto = {
+  addressId: Scalars['String']['input'];
+  cartIds: Array<Scalars['String']['input']>;
+};
+
 export type CalculateShippingFeeDto = {
   fromDistrictId: Scalars['Int']['input'];
   fromWardCode: Scalars['String']['input'];
@@ -580,6 +585,7 @@ export type Mutation = {
   addOrderProgressReport: OrderProgressReportEntity;
   assignFactoryToOrder: OrderEntity;
   assignStaffToFactory: FactoryEntity;
+  calculateShippingCostAndFactoryForCart: ShippingCostAndFactoryResponse;
   calculateShippingFee: ShippingFee;
   changeFactoryStaff: FactoryEntity;
   changeFactoryStatus: FactoryEntity;
@@ -682,6 +688,11 @@ export type MutationAssignFactoryToOrderArgs = {
 export type MutationAssignStaffToFactoryArgs = {
   factoryId: Scalars['String']['input'];
   staffId: Scalars['String']['input'];
+};
+
+
+export type MutationCalculateShippingCostAndFactoryForCartArgs = {
+  input: CalculateShippingCostAndFactoryDto;
 };
 
 
@@ -1228,6 +1239,7 @@ export enum OrderStatus {
   Completed = 'COMPLETED',
   InProduction = 'IN_PRODUCTION',
   NeedManagerHandle = 'NEED_MANAGER_HANDLE',
+  NeedManagerHandleRework = 'NEED_MANAGER_HANDLE_REWORK',
   PaymentReceived = 'PAYMENT_RECEIVED',
   Pending = 'PENDING',
   PendingAcceptance = 'PENDING_ACCEPTANCE',
@@ -1693,6 +1705,12 @@ export enum Roles {
   Manager = 'MANAGER',
   Staff = 'STAFF'
 }
+
+export type ShippingCostAndFactoryResponse = {
+  __typename?: 'ShippingCostAndFactoryResponse';
+  selectedFactory?: Maybe<FactoryEntity>;
+  shippingFee: ShippingFee;
+};
 
 export type ShippingFee = {
   __typename?: 'ShippingFee';
@@ -2478,6 +2496,13 @@ export type AssignFactoryToOrderMutationVariables = Exact<{
 
 
 export type AssignFactoryToOrderMutation = { __typename?: 'Mutation', assignFactoryToOrder: { __typename?: 'OrderEntity', id: string } };
+
+export type CalculateShippingCostAndFactoryForCartMutationVariables = Exact<{
+  input: CalculateShippingCostAndFactoryDto;
+}>;
+
+
+export type CalculateShippingCostAndFactoryForCartMutation = { __typename?: 'Mutation', calculateShippingCostAndFactoryForCart: { __typename?: 'ShippingCostAndFactoryResponse', shippingFee: { __typename?: 'ShippingFee', total: number }, selectedFactory?: { __typename?: 'FactoryEntity', name: string, address?: { __typename?: 'AddressEntity', formattedAddress?: string | null } | null } | null } };
 
 export type ProductDesignsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -6631,6 +6656,47 @@ export function useAssignFactoryToOrderMutation(baseOptions?: Apollo.MutationHoo
 export type AssignFactoryToOrderMutationHookResult = ReturnType<typeof useAssignFactoryToOrderMutation>;
 export type AssignFactoryToOrderMutationResult = Apollo.MutationResult<AssignFactoryToOrderMutation>;
 export type AssignFactoryToOrderMutationOptions = Apollo.BaseMutationOptions<AssignFactoryToOrderMutation, AssignFactoryToOrderMutationVariables>;
+export const CalculateShippingCostAndFactoryForCartDocument = gql`
+    mutation CalculateShippingCostAndFactoryForCart($input: CalculateShippingCostAndFactoryDto!) {
+  calculateShippingCostAndFactoryForCart(input: $input) {
+    shippingFee {
+      total
+    }
+    selectedFactory {
+      name
+      address {
+        formattedAddress
+      }
+    }
+  }
+}
+    `;
+export type CalculateShippingCostAndFactoryForCartMutationFn = Apollo.MutationFunction<CalculateShippingCostAndFactoryForCartMutation, CalculateShippingCostAndFactoryForCartMutationVariables>;
+
+/**
+ * __useCalculateShippingCostAndFactoryForCartMutation__
+ *
+ * To run a mutation, you first call `useCalculateShippingCostAndFactoryForCartMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCalculateShippingCostAndFactoryForCartMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [calculateShippingCostAndFactoryForCartMutation, { data, loading, error }] = useCalculateShippingCostAndFactoryForCartMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCalculateShippingCostAndFactoryForCartMutation(baseOptions?: Apollo.MutationHookOptions<CalculateShippingCostAndFactoryForCartMutation, CalculateShippingCostAndFactoryForCartMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CalculateShippingCostAndFactoryForCartMutation, CalculateShippingCostAndFactoryForCartMutationVariables>(CalculateShippingCostAndFactoryForCartDocument, options);
+      }
+export type CalculateShippingCostAndFactoryForCartMutationHookResult = ReturnType<typeof useCalculateShippingCostAndFactoryForCartMutation>;
+export type CalculateShippingCostAndFactoryForCartMutationResult = Apollo.MutationResult<CalculateShippingCostAndFactoryForCartMutation>;
+export type CalculateShippingCostAndFactoryForCartMutationOptions = Apollo.BaseMutationOptions<CalculateShippingCostAndFactoryForCartMutation, CalculateShippingCostAndFactoryForCartMutationVariables>;
 export const ProductDesignsDocument = gql`
     query ProductDesigns {
   productDesigns {

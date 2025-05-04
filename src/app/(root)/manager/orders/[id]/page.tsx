@@ -1,33 +1,35 @@
 'use client';
 import {
   ArrowLeft,
+  BanIcon,
   Calendar,
   CheckCircle2,
   Clock,
   CreditCard,
-  CreditCardIcon as PaymentIcon,
   FileText,
   History,
   Package,
+  CreditCardIcon as PaymentIcon,
   ShoppingBag,
+  Star,
+  StarIcon,
   Truck,
   XCircle,
-  StarIcon,
-  Star,
-  BanIcon,
 } from 'lucide-react';
-import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
+import { OrderHeader } from '@/app/(root)/_components/order-header';
 import {
   getPaymentStatusBadge,
   getStatusBadge,
-  orderStatusSteps,
-  refundStatusSteps,
+  orderStatusSteps
 } from '@/app/(root)/_components/order-status';
+import { OrderStatusTimeline } from '@/app/(root)/_components/order-status-timeline';
+import { RejectionHistory } from '@/app/(root)/_components/rejection-history';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -37,7 +39,31 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import {
   Table,
@@ -59,42 +85,13 @@ import {
   useStartReworkByManagerMutation,
   useSystemConfigOrderQuery,
 } from '@/graphql/generated/graphql';
-import { cn, formatDate } from '@/lib/utils';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Input } from '@/components/ui/input';
-import { AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { toast } from 'sonner';
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
-import { OrderHeader } from '@/app/(root)/_components/order-header';
-import { OrderStatusTimeline } from '@/app/(root)/_components/order-status-timeline';
-import { RejectionHistory } from '@/app/(root)/_components/rejection-history';
+import { cn, formatDate } from '@/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AlertCircle } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import * as z from 'zod';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {

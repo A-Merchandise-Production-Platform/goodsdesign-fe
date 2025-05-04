@@ -10,6 +10,7 @@ import {
   CartItemEntity,
   DesignPositionEntity,
   SystemConfigVariantEntity,
+  useCalculateShippingCostAndFactoryForCartMutation,
   useCreateCartItemMutation,
   useCreateOrderMutation,
   useDeleteCartItemMutation,
@@ -23,7 +24,6 @@ import { CartItem } from './_components/cart-item';
 import { EmptyCart } from './_components/empty-cart';
 import { LoadingCart } from './_components/loading-cart';
 import { OrderSummary } from './_components/order-summary';
-import { AddressValue } from '@/components/shared/address/address-selector';
 
 // Type for voucher entity from the query
 type VoucherEntityType = AvailableVouchersQuery['availableVouchers'][0];
@@ -53,6 +53,9 @@ export default function CartPage() {
   const [selectedAddress, setSelectedAddress] = useState<AddressEntity | null>(
     null,
   );
+  const [shippingCost, setShippingCost] = useState<number>(0);
+
+  const [calculateShippingCostAndFactoryForCart, { loading: calculateShippingCostAndFactoryForCartLoading }] = useCalculateShippingCostAndFactoryForCartMutation();
 
   const [getProductVariants] = useGetProductVariantByIdLazyQuery();
 
@@ -263,7 +266,34 @@ export default function CartPage() {
   }, [cartItems, getProductVariants]);
 
   // Get only selected cart items
-  const selectedCartItems = cartItems.filter(item => selectedItems[item.id]);
+  const selectedCartItems = useMemo(() => 
+    cartItems.filter(item => selectedItems[item.id]),
+    [cartItems, selectedItems]
+  );
+
+  // Calculate shipping cost when address or selected items change
+  useEffect(() => {
+    if (selectedAddress?.id && selectedCartItems.length > 0) {
+      calculateShippingCostAndFactoryForCart({
+        variables: {
+          input: {
+            addressId: selectedAddress.id,
+            cartIds: selectedCartItems.map(item => item.id),
+          }
+        }
+      }).then(response => {
+        const shippingCostResponse = response.data?.calculateShippingCostAndFactoryForCart?.shippingFee?.total || 0;
+        if (shippingCostResponse != 0) {
+          setShippingCost(shippingCostResponse);
+        }
+      }).catch(error => {
+        toast.error('Failed to calculate shipping cost');
+        console.error('Shipping calculation error:', error);
+      });
+    } else {
+      setShippingCost(0);
+    }
+  }, [selectedAddress, selectedCartItems, calculateShippingCostAndFactoryForCart]);
 
   // Calculate cart totals for selected items only
   const cartTotal = selectedCartItems.reduce(
@@ -401,6 +431,7 @@ export default function CartPage() {
         <OrderSummary
           selectedItemCount={selectedCartItems.length}
           cartTotal={cartTotal}
+          shippingCost={shippingCost}
           onCheckout={handleCheckout}
           isProcessing={isCheckingOut}
           selectedVoucher={selectedVoucher}
