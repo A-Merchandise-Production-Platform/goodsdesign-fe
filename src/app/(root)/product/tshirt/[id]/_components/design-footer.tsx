@@ -32,6 +32,7 @@ interface DesignFooterProps {
   onCreateCartItem: () => void;
   loading?: boolean;
   isInCart?: boolean;
+  uploadLoading?: boolean;
 }
 
 const DesignFooter: React.FC<DesignFooterProps> = ({
@@ -43,6 +44,7 @@ const DesignFooter: React.FC<DesignFooterProps> = ({
   loading,
   onCreateCartItem,
   isInCart,
+  uploadLoading = false,
 }) => {
   const { user } = useAuthStore();
 
@@ -110,7 +112,7 @@ const DesignFooter: React.FC<DesignFooterProps> = ({
                 variant="outline"
                 size="icon"
                 onClick={onDecrement}
-                disabled={isInCart}
+                disabled={isInCart || uploadLoading}
               >
                 <MinusCircle className="h-4 w-4" />
               </Button>
@@ -119,17 +121,17 @@ const DesignFooter: React.FC<DesignFooterProps> = ({
                 variant="outline"
                 size="icon"
                 onClick={onIncrement}
-                disabled={isInCart}
+                disabled={isInCart || uploadLoading}
               >
                 <PlusCircle className="h-4 w-4" />
               </Button>
             </div>
           </span>
           <Button
-            disabled={loading || isInCart}
+            disabled={loading || isInCart || uploadLoading}
             onClick={onCreateCartItem}
             className={
-              isInCart ? 'bg-muted hover:bg-muted cursor-not-allowed' : ''
+              isInCart || uploadLoading ? 'bg-muted hover:bg-muted cursor-not-allowed' : ''
             }
           >
             {loading && <Loader2 className="animate-spin" />}
