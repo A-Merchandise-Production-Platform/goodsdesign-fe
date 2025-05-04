@@ -228,14 +228,14 @@ export default function FactoryOrderDetailsPage() {
   const [processWithdrawal, { loading: processWithdrawalLoading }] =
     useProcessWithdrawalMutation({
       onCompleted: () => {
-        toast('Withdrawal processed successfully');
+        toast.success('Withdrawal processed successfully');
         setShowWithdrawalDialog(false);
         withdrawalForm.reset();
         setUploadedImages([]);
         refetch();
       },
       onError: error => {
-        toast(error.message);
+        toast.error(error.message);
       },
     });
 
@@ -290,22 +290,26 @@ export default function FactoryOrderDetailsPage() {
     try {
       toast.loading('Uploading images...', { id: 'upload' });
 
-      const uploadPromises = Array.from(files).map(async (file) => {
+      const uploadPromises = Array.from(files).map(async file => {
         const result = await uploadFile({
           variables: { file },
         });
-        return result.data?.uploadFile;
+        return result.data?.uploadFile?.url;
       });
 
       const uploadedUrls = await Promise.all(uploadPromises);
       const validUrls = uploadedUrls.filter((url): url is string => !!url);
 
-      setUploadedImages([...uploadedImages, ...validUrls]);
-      withdrawalForm.setValue('imageUrls', [...uploadedImages, ...validUrls]);
+      // Update both state and form value with the new URLs
+      const newImageUrls = [...uploadedImages, ...validUrls];
+      setUploadedImages(newImageUrls);
+      withdrawalForm.setValue('imageUrls', newImageUrls);
 
       toast.success('Images uploaded successfully', { id: 'upload' });
     } catch (error) {
-      toast.error('Failed to upload images. Please try again.', { id: 'upload' });
+      toast.error('Failed to upload images. Please try again.', {
+        id: 'upload',
+      });
       console.error('Upload error:', error);
     }
   };

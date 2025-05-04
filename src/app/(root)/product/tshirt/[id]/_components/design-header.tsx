@@ -1,14 +1,23 @@
-import { Download, Redo2, Save, Undo2 } from 'lucide-react';
+import { Download, FileBox, Redo2, Save, Undo2 } from 'lucide-react';
 import React from 'react';
 
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/stores/auth.store';
+import { Roles } from '@/graphql/generated/graphql';
 
 interface HeaderProps {
   onSave: () => Promise<void>;
   onExport?: () => void;
+  onDownload: () => void;
 }
 
-const DesignHeader: React.FC<HeaderProps> = ({ onSave, onExport }) => {
+const DesignHeader: React.FC<HeaderProps> = ({
+  onSave,
+  onExport,
+  onDownload,
+}) => {
+  const { isAuth, user } = useAuthStore();
+
   return (
     <header className="z-40 flex h-14 items-center justify-between px-6">
       <div className="flex items-center gap-4">
@@ -31,15 +40,27 @@ const DesignHeader: React.FC<HeaderProps> = ({ onSave, onExport }) => {
         >
           <Save className="h-4 w-4" />
         </Button>
-        {onExport && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onExport}
-            title="Export as image"
-          >
-            <Download className="h-4 w-4" />
-          </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onDownload}
+          title="Download asiImage"
+        >
+          <Download className="h-4 w-4" />
+        </Button>
+        {isAuth && user?.role !== Roles.Customer && (
+          <>
+            {onExport && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onExport}
+                title="Export as PDF"
+              >
+                <FileBox className="h-4 w-4" />
+              </Button>
+            )}
+          </>
         )}
       </div>
     </header>
