@@ -34,7 +34,7 @@ export default function Page() {
   const [updateDesignPosition] = useUpdateDesignPositionMutation();
   const [createCartItem, { loading: cartLoading }] =
     useCreateCartItemMutation();
-  const [updateVariant] = useUpdateProductDesignMutation();
+  const [updateProductDesign] = useUpdateProductDesignMutation();
   const [updateThumbnailProductDesign] =
     useUpdateThumbnailProductDesignMutation();
   const { data: cartData, refetch: cartRefetch } = useGetUserCartItemsQuery();
@@ -71,7 +71,7 @@ export default function Page() {
       }
 
       // Update the thumbnail
-      await updateThumbnailProductDesign({
+      await updateProductDesign({
         variables: {
           updateProductDesignId: id,
           input: {
@@ -80,12 +80,9 @@ export default function Page() {
             isPublic: false,
             isTemplate: user?.role === Roles.Admin ? true : false,
           },
-          fileUrl: currentThumbnailUrl,
         },
       });
 
-      // Update state
-      setCurrentThumbnailUrl(newThumbnailUrl);
       return newThumbnailUrl;
     } catch (error) {
       console.error('Thumbnail operation failed:', error);
@@ -157,7 +154,7 @@ export default function Page() {
         productVariant={proDesData?.productDesign?.systemConfigVariant}
         onUpload={handleUploadFile}
         onThumbnail={handleThumbnail}
-        onUpdateVariant={updateVariant}
+        onUpdateVariant={updateProductDesign}
         onUpdatePosition={async options => {
           try {
             await updateDesignPosition(options);

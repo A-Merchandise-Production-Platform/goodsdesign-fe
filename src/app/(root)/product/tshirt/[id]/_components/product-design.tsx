@@ -808,7 +808,10 @@ export default function ProductDesigner({
 
   // Save current canvas state
   const saveCurrentDesign = () => {
-    if (!fabricCanvasRef.current) return;
+    if (!fabricCanvasRef.current) {
+      toast.error('Canvas not initialized');
+      return;
+    }
 
     const objects = fabricCanvasRef.current.getObjects().filter((obj: any) => {
       // Filter out design zone indicator
@@ -880,7 +883,7 @@ export default function ProductDesigner({
               },
             });
           } catch (error) {
-            console.error('Error updating position:', error);
+            toast.error('Failed to save design');
           }
         }, 0);
       }
@@ -1261,9 +1264,45 @@ export default function ProductDesigner({
   return (
     <div className="flex h-screen flex-col">
       <DesignHeader
+        uploadLoading={uploadLoading}
         onSave={async () => {
-          saveCurrentDesign();
-          return Promise.resolve();
+          try {
+            saveCurrentDesign();
+            if (onThumbnail) {
+              const captureCallback = async (dataUrl: string) => {
+                try {
+                  // Convert dataUrl to File
+                  const response = await fetch(dataUrl);
+                  const blob = await response.blob();
+                  const file = new File([blob], `tshirt-3d-${view}.png`, {
+                    type: 'image/png',
+                  });
+
+                  // Create a mock event with the file
+                  const mockEvent = {
+                    target: {
+                      files: [file],
+                    },
+                  } as unknown as React.ChangeEvent<HTMLInputElement>;
+
+                  // Upload thumbnail using the provided callback
+                  await onThumbnail(mockEvent);
+                  // Only show success toast after both operations complete
+                  toast.success('All changes saved successfully');
+                } catch (error) {
+                  toast.error('Failed to save thumbnail');
+                } finally {
+                  setModelExportCallback(undefined);
+                }
+              };
+              // Generate thumbnail
+              setModelExportCallback(() => captureCallback);
+            }
+          } catch (error) {
+            console.error('Error saving design:', error);
+            toast.error('Failed to save changes');
+            return Promise.reject(error);
+          }
         }}
         onExport={handleExport}
         onDownload={handleDownload}
@@ -1401,6 +1440,7 @@ export default function ProductDesigner({
       </div>
 
       <DesignFooter
+        uploadLoading={uploadLoading}
         variantPrice={getVariant(selectedSize, selectedColor)?.price ?? 0}
         designPositions={['front', 'back', 'left sleeve', 'right sleeve'].map(
           pos => {
