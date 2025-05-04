@@ -50,6 +50,10 @@ export default function AddressesUpdateForm() {
       <CardContent className="space-y-4">
         {loading ? (
           <div>Loading...</div>
+        ) : data?.addresses.length === 0 ? (
+          <div className="text-muted-foreground text-center text-sm">
+            No addresses found
+          </div>
         ) : (
           data?.addresses.map(address => (
             <AddressCard key={address.id} address={address} />
@@ -62,15 +66,6 @@ export default function AddressesUpdateForm() {
 
 function AddressCard({ address }: { address: Partial<AddressEntity> }) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  const { data: locationData } = useGetAddressDetailsQuery({
-    variables: {
-      provinceId: address.provinceID!,
-      districtId: address.districtID!,
-      wardCode: address.wardCode!,
-    },
-    skip: !address.provinceID || !address.districtID || !address.wardCode,
-  });
 
   const [deleteAddress, { loading: deleteAddressLoading }] =
     useDeleteAddressMutation({
@@ -92,14 +87,13 @@ function AddressCard({ address }: { address: Partial<AddressEntity> }) {
     });
   };
 
+  console.log(address);
+
   return (
     <div className="flex items-center gap-4 rounded-lg border p-4 shadow-none">
       <div className="flex flex-1 items-center gap-2">
         <div className="flex items-center gap-2">
-          <div className="text-sm">{address.street},</div>
-          <div className="text-sm">{locationData?.ward?.wardName},</div>
-          <div className="text-sm">{locationData?.district?.districtName},</div>
-          <div className="text-sm">{locationData?.province?.provinceName}</div>
+          <div className="text-sm">{address.formattedAddress}</div>
         </div>
       </div>
       <div className="flex items-center gap-2">
@@ -170,12 +164,19 @@ function AddressForm() {
           districtID: address.districtId ?? 0,
           wardCode: address.wardCode ?? '',
           street: address.street ?? '',
+          formattedAddress: address.formattedAddress,
         },
       },
     });
   };
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={() => {
+        setIsOpen(!isOpen);
+        setAddress(undefined);
+      }}
+    >
       <DialogTrigger asChild>
         <Button>
           <PlusCircleIcon className="size-4" />

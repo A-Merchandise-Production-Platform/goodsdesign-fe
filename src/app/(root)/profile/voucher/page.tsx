@@ -1,6 +1,9 @@
 'use client';
 
-import { useAllVouchersOfUserQuery } from '@/graphql/generated/graphql';
+import {
+  useAllVouchersOfUserQuery,
+  useAvailableVouchersQuery,
+} from '@/graphql/generated/graphql';
 import { format } from 'date-fns';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -23,11 +26,11 @@ import { useDebounce } from '@/hooks/use-debounce';
 import { Progress } from '@/components/ui/progress';
 
 export default function Voucher() {
-  const { data, loading, error } = useAllVouchersOfUserQuery();
+  const { data, loading, error } = useAvailableVouchersQuery();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  const filteredVouchers = data?.allVouchersOfUser.filter(voucher => {
+  const filteredVouchers = data?.availableVouchers.filter(voucher => {
     if (!debouncedSearch) return true;
     const searchLower = debouncedSearch.toLowerCase();
     return (
@@ -103,9 +106,9 @@ export default function Voucher() {
             key={voucher.id}
             className="group overflow-hidden shadow-md transition-all hover:shadow-lg"
           >
-            <CardContent>
+            <CardContent className="flex flex-col">
               {/* Voucher header */}
-              <div className="mb-4 flex items-start justify-between">
+              <div className="mb-4 flex flex-1 items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
                     <Gift className="h-5 w-5 text-purple-500" />
@@ -114,7 +117,7 @@ export default function Voucher() {
                     </h3>
                   </div>
                   <p className="text-muted-foreground mt-1 text-sm">
-                    {voucher.description}
+                    {voucher.description || 'No description'}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -155,9 +158,13 @@ export default function Voucher() {
                     </>
                   ) : (
                     <>
-                      <span className="text-purple-600">
-                        {voucher.value}% OFF
-                      </span>
+                      <div className="flex items-center gap-2 text-purple-600">
+                        {voucher.value}% OFF{' '}
+                        <div className="text-sm text-gray-500">
+                          {voucher.maxDiscountValue &&
+                            `(Max ${formatPrice(voucher.maxDiscountValue)})`}
+                        </div>
+                      </div>
                     </>
                   )}
                 </div>
@@ -227,6 +234,12 @@ export default function Voucher() {
                 </div>
               </div>
             </CardContent>
+            <CardFooter className="block">
+              <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-600">
+                <span>Added:</span>
+                <span>{format(new Date(voucher.createdAt), 'PPPp')}</span>
+              </div>
+            </CardFooter>
           </Card>
         ))}
       </div>

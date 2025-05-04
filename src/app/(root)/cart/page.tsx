@@ -5,6 +5,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import {
+  AddressEntity,
+  AvailableVouchersQuery,
   CartItemEntity,
   DesignPositionEntity,
   SystemConfigVariantEntity,
@@ -21,6 +23,10 @@ import { CartItem } from './_components/cart-item';
 import { EmptyCart } from './_components/empty-cart';
 import { LoadingCart } from './_components/loading-cart';
 import { OrderSummary } from './_components/order-summary';
+import { AddressValue } from '@/components/shared/address/address-selector';
+
+// Type for voucher entity from the query
+type VoucherEntityType = AvailableVouchersQuery['availableVouchers'][0];
 
 // Interface for price calculation return values
 interface ItemPriceCalculation {
@@ -35,9 +41,18 @@ export default function CartPage() {
   const router = useRouter();
   const { data, loading, refetch } = useGetUserCartItemsQuery();
   const [isCheckingOut, setIsCheckingOut] = useState<boolean>(false);
-  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>({});
-  const [productVariants, setProductVariants] = useState<Record<string, SystemConfigVariantEntity[]>>({});
+  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>(
+    {},
+  );
+  const [productVariants, setProductVariants] = useState<
+    Record<string, SystemConfigVariantEntity[]>
+  >({});
   const [isLoadingVariants, setIsLoadingVariants] = useState(false);
+  const [selectedVoucher, setSelectedVoucher] =
+    useState<VoucherEntityType | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<AddressEntity | null>(
+    null,
+  );
 
   const [getProductVariants] = useGetProductVariantByIdLazyQuery();
 
@@ -49,7 +64,7 @@ export default function CartPage() {
       onError: error => {
         toast.error(error.message);
       },
-      refetchQueries: ["GetCartItemCount"]
+      refetchQueries: ['GetCartItemCount'],
     });
 
   const [createCartItem] = useCreateCartItemMutation({
@@ -60,11 +75,11 @@ export default function CartPage() {
     onError: error => {
       toast.error(error.message);
     },
-    refetchQueries: ["GetCartItemCount"]
+    refetchQueries: ['GetCartItemCount'],
   });
 
   const [deleteCartItem] = useDeleteCartItemMutation({
-    refetchQueries: ["GetCartItemCount"]
+    refetchQueries: ['GetCartItemCount'],
   });
 
   const [createOrder] = useCreateOrderMutation({
@@ -79,7 +94,7 @@ export default function CartPage() {
       toast.error(error.message);
       setIsCheckingOut(false);
     },
-    refetchQueries: ["GetCartItemCount"]
+    refetchQueries: ['GetCartItemCount'],
   });
 
   const cartItems = (data?.userCartItems || []) as CartItemEntity[];
@@ -102,14 +117,17 @@ export default function CartPage() {
   const calculateGroupPriceInfo = (items: CartItemEntity[]) => {
     // Get total quantity for the group to determine discount
     const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-    
+
     // Get discounts from first item (all items in group share same product)
     const discounts = items[0]?.systemConfigVariant?.product?.discounts || [];
     let discountPercent = 0;
 
     // Find applicable discount based on total group quantity
     for (const discount of discounts) {
-      if (totalQuantity >= discount.minQuantity && discount.discountPercent > discountPercent) {
+      if (
+        totalQuantity >= discount.minQuantity &&
+        discount.discountPercent > discountPercent
+      ) {
         discountPercent = discount.discountPercent;
       }
     }
@@ -129,15 +147,16 @@ export default function CartPage() {
       }
 
       const blankPrice = item.systemConfigVariant.price || 0;
-      const positionPrices = item.design.designPositions?.reduce(
-        (total: number, position: DesignPositionEntity) => {
-          if (position.designJSON && position.designJSON.length > 0) {
-            return total + (position.positionType?.basePrice || 0);
-          }
-          return total;
-        },
-        0,
-      ) || 0;
+      const positionPrices =
+        item.design.designPositions?.reduce(
+          (total: number, position: DesignPositionEntity) => {
+            if (position.designJSON && position.designJSON.length > 0) {
+              return total + (position.positionType?.basePrice || 0);
+            }
+            return total;
+          },
+          0,
+        ) || 0;
 
       const originalPrice = blankPrice + positionPrices;
       const unitPrice = originalPrice * (1 - discountPercent);
@@ -220,14 +239,15 @@ export default function CartPage() {
       try {
         const variants: Record<string, SystemConfigVariantEntity[]> = {};
         await Promise.all(
-          Array.from(uniqueProductIds).map(async (productId) => {
+          Array.from(uniqueProductIds).map(async productId => {
             const result = await getProductVariants({
               variables: { productId },
             });
             if (result.data?.product?.variants) {
-              variants[productId] = result.data.product.variants as SystemConfigVariantEntity[];
+              variants[productId] = result.data.product
+                .variants as SystemConfigVariantEntity[];
             }
-          })
+          }),
         );
         setProductVariants(variants);
       } catch (error) {
@@ -244,9 +264,12 @@ export default function CartPage() {
   const selectedCartItems = cartItems.filter(item => selectedItems[item.id]);
 
   // Calculate cart totals for selected items only
-  const cartTotal = selectedCartItems.reduce((total: number, item: CartItemEntity) => {
-    return total + (priceInfos[item.id]?.totalPrice || 0);
-  }, 0);
+  const cartTotal = selectedCartItems.reduce(
+    (total: number, item: CartItemEntity) => {
+      return total + (priceInfos[item.id]?.totalPrice || 0);
+    },
+    0,
+  );
 
   // Handle quantity changes
   const handleQuantityChange = (id: string, newQuantity: number): void => {
@@ -282,7 +305,11 @@ export default function CartPage() {
     cartItems.length > 0 && cartItems.every(item => selectedItems[item.id]);
 
   // Handle adding new size
-  const handleAddSize = (designId: string, variantId: string, quantity: number): void => {
+  const handleAddSize = (
+    designId: string,
+    variantId: string,
+    quantity: number,
+  ): void => {
     createCartItem({
       variables: {
         createCartItemInput: {
@@ -294,10 +321,20 @@ export default function CartPage() {
     });
   };
 
+  // Handle selecting a voucher
+  const handleSelectVoucher = (voucher: VoucherEntityType | null): void => {
+    setSelectedVoucher(voucher);
+  };
+
   // Handle checkout
   const handleCheckout = (): void => {
     if (selectedCartItems.length === 0) {
       toast.error('Please select items to checkout');
+      return;
+    }
+
+    if (!selectedAddress) {
+      toast.error('Please select an address');
       return;
     }
 
@@ -308,6 +345,8 @@ export default function CartPage() {
           orderDetails: selectedCartItems.map(item => ({
             cartItemId: item.id,
           })),
+          addressId: selectedAddress.id,
+          voucherId: selectedVoucher?.id,
         },
       },
     });
@@ -322,15 +361,15 @@ export default function CartPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-10">
+    <div className="container mx-auto pt-6">
       <CartHeader
         itemCount={cartItems.length}
         areAllItemsSelected={areAllItemsSelected}
         onToggleAll={handleToggleAll}
       />
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="space-y-4 lg:col-span-2">
           {Object.entries(groupedCartItems).map(([designId, items]) => {
             const productId = items[0].systemConfigVariant?.product?.id;
             return (
@@ -345,7 +384,9 @@ export default function CartPage() {
                 onRemoveVariant={handleRemoveVariant}
                 isUpdating={updateCartItemLoading}
                 onAddSize={handleAddSize}
-                availableVariants={productId ? productVariants[productId] : undefined}
+                availableVariants={
+                  productId ? productVariants[productId] : undefined
+                }
               />
             );
           })}
@@ -356,6 +397,9 @@ export default function CartPage() {
           cartTotal={cartTotal}
           onCheckout={handleCheckout}
           isProcessing={isCheckingOut}
+          selectedVoucher={selectedVoucher}
+          onSelectVoucher={handleSelectVoucher}
+          onSelectAddress={setSelectedAddress}
         />
       </div>
     </div>

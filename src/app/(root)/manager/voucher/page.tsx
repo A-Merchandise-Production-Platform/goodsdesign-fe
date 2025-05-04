@@ -161,9 +161,13 @@ export default function Voucher() {
                     </>
                   ) : (
                     <>
-                      <span className="text-purple-600">
+                      <div className="flex items-center gap-2 text-purple-600">
                         {voucher.value}% OFF
-                      </span>
+                        <div className="text-sm text-gray-500">
+                          {voucher.maxDiscountValue &&
+                            `(Max ${formatPrice(voucher.maxDiscountValue)})`}
+                        </div>
+                      </div>
                     </>
                   )}
                 </div>
@@ -226,10 +230,14 @@ export default function Voucher() {
                 </div>
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="block space-y-2">
               <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-600">
                 <span>ID:</span>
                 <span>{voucher.id}</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-600">
+                <span>Created:</span>
+                <span>{format(new Date(voucher.createdAt), 'PPPp')}</span>
               </div>
             </CardFooter>
           </Card>

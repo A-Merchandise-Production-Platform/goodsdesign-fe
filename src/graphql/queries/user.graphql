@@ -104,3 +104,10 @@ mutation UpdateProfile($updateProfileInput: UpdateProfileDto!) {
     updatedAt
   }
 }
+
+mutation UpdatePhoneNumber($updatePhoneNumberInput: UpdatePhoneNumberDto!) {
+  updatePhoneNumber(updatePhoneNumberInput: $updatePhoneNumberInput) {
+    id
+    phoneNumber
+  }
+}

@@ -12,6 +12,19 @@ query AvailableVouchers {
     value
     userId
     updatedAt
+    maxDiscountValue
+    usages {
+      voucherId
+      usedAt
+      orderId
+      id
+      user {
+        id
+        imageUrl
+        name
+        email
+      }
+    }
   }
 }
 
@@ -29,6 +42,7 @@ query AllVouchersOfUser {
     value
     userId
     updatedAt
+    maxDiscountValue
     usages {
       voucherId
       usedAt
@@ -58,6 +72,7 @@ query AllVouchersOfSystem {
     value
     userId
     updatedAt
+    maxDiscountValue
     usages {
       voucherId
       usedAt
@@ -87,6 +102,7 @@ mutation CreateVoucher($input: CreateVoucherInput!) {
     value
     userId
     updatedAt
+    maxDiscountValue
     usages {
       voucherId
       usedAt

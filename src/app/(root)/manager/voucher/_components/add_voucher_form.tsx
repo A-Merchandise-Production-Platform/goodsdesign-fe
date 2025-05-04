@@ -68,6 +68,14 @@ const formSchema = z
         message: 'Limited usage must be at least 1',
       })
       .optional(),
+    maxDiscountValue: z
+      .number({
+        invalid_type_error: 'Max discount value must be a number',
+      })
+      .refine(val => val === null || val >= 1000, {
+        message: 'Max discount value must be over 1000',
+      })
+      .optional(),
   })
   .refine(
     (data: { type: VoucherType; value: number | null }) => {
@@ -91,6 +99,20 @@ const formSchema = z
     {
       message: 'Fixed value must be at least 1000',
       path: ['value'],
+    },
+  )
+  .refine(
+    data => {
+      if (data.type === VoucherType.Percentage) {
+        return (
+          data.maxDiscountValue !== undefined && data.maxDiscountValue >= 0
+        );
+      }
+      return true;
+    },
+    {
+      message: 'Max discount value must be over 1000',
+      path: ['maxDiscountValue'],
     },
   );
 
@@ -136,8 +158,6 @@ export default function AddVoucherForm() {
     console.log('Form submitted:', completeValues);
     createVoucher({ variables: { input: completeValues } });
   };
-
-  console.log(form.watch('value'));
 
   return (
     <Dialog
@@ -206,41 +226,78 @@ export default function AddVoucherForm() {
             />
 
             {/* Value */}
-            <FormField
-              control={form.control}
-              name="value"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Value</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      disabled={loading}
-                      placeholder={
-                        voucherType === VoucherType.Percentage
-                          ? '0-100'
-                          : 'Min 1000'
-                      }
-                      {...field}
-                      onChange={e => {
-                        field.onChange(Number(e.target.value));
-                      }}
-                      value={field.value == null ? undefined : field.value}
-                      min={voucherType === VoucherType.Percentage ? 0 : 1000}
-                      max={
-                        voucherType === VoucherType.Percentage ? 100 : undefined
-                      }
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {voucherType === VoucherType.Percentage
-                      ? 'Percentage discount (0-100%)'
-                      : 'Fixed amount discount (min 1000)'}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+            <div className="flex items-center gap-4">
+              <FormField
+                control={form.control}
+                name="value"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Value</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        disabled={loading}
+                        placeholder={
+                          voucherType === VoucherType.Percentage
+                            ? '0-100'
+                            : 'Min 1000'
+                        }
+                        {...field}
+                        onChange={e => {
+                          field.onChange(Number(e.target.value));
+                        }}
+                        value={field.value == null ? undefined : field.value}
+                        min={voucherType === VoucherType.Percentage ? 0 : 1000}
+                        max={
+                          voucherType === VoucherType.Percentage
+                            ? 100
+                            : undefined
+                        }
+                      />
+                    </FormControl>
+                    {form.formState.errors.value ? (
+                      <FormMessage />
+                    ) : (
+                      <FormDescription>
+                        {voucherType === VoucherType.Percentage
+                          ? 'Percentage discount (0-100%)'
+                          : 'Fixed amount discount (min 1000)'}
+                      </FormDescription>
+                    )}
+                  </FormItem>
+                )}
+              />
+
+              {form.watch('type') === VoucherType.Percentage && (
+                <FormField
+                  control={form.control}
+                  name="maxDiscountValue"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Max Discount Value</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          disabled={loading}
+                          placeholder="Min 1000"
+                          {...field}
+                          onChange={e => {
+                            field.onChange(Number(e.target.value));
+                          }}
+                          value={field.value == null ? undefined : field.value}
+                          min={1000}
+                        />
+                      </FormControl>
+                      {form.formState.errors.maxDiscountValue ? (
+                        <FormMessage />
+                      ) : (
+                        <FormDescription>Max discount value</FormDescription>
+                      )}
+                    </FormItem>
+                  )}
+                />
               )}
-            />
+            </div>
 
             {/* Min Order Value */}
             <FormField

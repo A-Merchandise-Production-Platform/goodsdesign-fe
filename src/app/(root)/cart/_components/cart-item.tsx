@@ -161,8 +161,8 @@ export const CartItem: FC<CartItemProps> = ({
   };
 
   return (
-    <Card className="mb-4 overflow-hidden">
-      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:p-6">
+    <Card className="overflow-hidden p-0">
+      <div className="flex flex-col gap-4 p-4 sm:flex-row">
         <div className="flex gap-4">
           <Checkbox
             checked={isDesignSelected}

@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import {
   useSystemConfigOrderQuery,
   useUpdateSystemConfigOrderMutation,
+  VoucherType,
 } from '@/graphql/generated/graphql';
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -24,12 +25,20 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export default function SystemConfigOrder() {
   const { data, loading } = useSystemConfigOrderQuery();
   const [updateConfigOrder, { loading: updateConfigOrderLoading }] =
     useUpdateSystemConfigOrderMutation();
-  const [configValues, setConfigValues] = useState<Record<string, number>>({});
+  const [configValues, setConfigValues] = useState<Record<string, any>>({});
+  console.log(configValues);
   const [editedFields, setEditedFields] = useState<Set<string>>(new Set());
 
   // Scoring weight fields
@@ -55,10 +64,12 @@ export default function SystemConfigOrder() {
 
   useEffect(() => {
     if (data?.systemConfigOrder) {
-      const initialValues: Record<string, number> = {};
+      const initialValues: Record<string, any> = {};
       Object.entries(data.systemConfigOrder).forEach(([key, value]) => {
         if (key !== '__typename' && typeof value === 'number') {
           initialValues[key] = value;
+        } else if (key === 'voucherBaseTypeForRefund') {
+          initialValues[key] = value as VoucherType;
         }
       });
       setConfigValues(initialValues);
@@ -139,6 +150,70 @@ export default function SystemConfigOrder() {
     if (isValidWeights) return 'bg-green-500';
     if (totalWeight > 1) return 'bg-red-500';
     return 'bg-amber-500';
+  };
+
+  // Validate voucher value based on type
+  const validateVoucherValueAndType = (value: number, type: VoucherType) => {
+    if (type === VoucherType.Percentage) {
+      if (value < 0 || value > 100) {
+        return false;
+      }
+    }
+
+    if (type === VoucherType.FixedValue) {
+      if (value < 1000) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  // Get min/max values for voucher input based on type
+  const getVoucherInputProps = (type: VoucherType | undefined) => {
+    if (type === VoucherType.Percentage) {
+      return {
+        min: '0',
+        max: '100',
+        step: '1',
+      };
+    }
+    return {
+      min: '1000',
+      step: '1000',
+    };
+  };
+
+  // Check if voucher config is valid
+  const isValidVoucherConfig = useMemo(() => {
+    if (
+      !configValues.voucherBaseTypeForRefund ||
+      configValues.voucherBaseValueForRefund === undefined
+    ) {
+      return true; // No changes yet
+    }
+    return validateVoucherValueAndType(
+      configValues.voucherBaseValueForRefund,
+      configValues.voucherBaseTypeForRefund as VoucherType,
+    );
+  }, [
+    configValues.voucherBaseTypeForRefund,
+    configValues.voucherBaseValueForRefund,
+  ]);
+
+  // Handle voucher type change
+  const handleVoucherTypeChange = (value: string) => {
+    const type = value as VoucherType;
+    setConfigValues(prev => ({ ...prev, voucherBaseTypeForRefund: type }));
+    setEditedFields(prev => new Set(prev).add('voucherBaseTypeForRefund'));
+
+    // Reset value to default when changing type to ensure validity
+    const defaultValue = type === VoucherType.Percentage ? 10 : 1000;
+    setConfigValues(prev => ({
+      ...prev,
+      voucherBaseValueForRefund: defaultValue,
+    }));
+    setEditedFields(prev => new Set(prev).add('voucherBaseValueForRefund'));
   };
 
   if (loading) {
@@ -447,6 +522,117 @@ export default function SystemConfigOrder() {
           />
         </CardContent>
       </Card>
+
+      {/* Voucher Refund Settings Section */}
+      <Card className="border-border shadow-md">
+        <CardHeader className="border-border border-b">
+          <CardTitle>Voucher Refund Settings</CardTitle>
+          <CardDescription>
+            Configure default voucher settings for refunds
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="voucherBaseTypeForRefund" className="font-medium">
+                Voucher Type for Refund
+              </Label>
+              <Select
+                value={configValues.voucherBaseTypeForRefund}
+                onValueChange={handleVoucherTypeChange}
+              >
+                <SelectTrigger
+                  id="voucherBaseTypeForRefund"
+                  className={`${editedFields.has('voucherBaseTypeForRefund') ? (isValidVoucherConfig ? 'border-emerald-500' : 'border-red-500') : 'border-border'} w-full transition-colors focus:border-emerald-500 focus:ring-emerald-500`}
+                >
+                  <SelectValue placeholder="Select voucher type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={VoucherType.Percentage}>
+                    {VoucherType.Percentage}
+                  </SelectItem>
+                  <SelectItem value={VoucherType.FixedValue}>
+                    {VoucherType.FixedValue}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-muted-foreground text-sm">
+                Type of voucher to be issued for refunds
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="voucherBaseValueForRefund"
+                className="font-medium"
+              >
+                Voucher Value for Refund
+              </Label>
+              <Input
+                id="voucherBaseValueForRefund"
+                type="number"
+                value={configValues.voucherBaseValueForRefund}
+                onChange={e =>
+                  handleInputChange('voucherBaseValueForRefund', e.target.value)
+                }
+                {...getVoucherInputProps(configValues.voucherBaseTypeForRefund)}
+                className={`${editedFields.has('voucherBaseValueForRefund') ? (isValidVoucherConfig ? 'border-emerald-500' : 'border-red-500') : 'border-border'} transition-colors focus:border-emerald-500 focus:ring-emerald-500`}
+              />
+              <p className="text-muted-foreground text-sm">
+                {configValues.voucherBaseTypeForRefund ===
+                VoucherType.Percentage
+                  ? 'Percentage discount (0-100%)'
+                  : 'Fixed value amount (minimum 1,000)'}
+              </p>
+              {!isValidVoucherConfig &&
+                editedFields.has('voucherBaseValueForRefund') && (
+                  <p className="text-sm text-red-500">
+                    {configValues.voucherBaseTypeForRefund ===
+                    VoucherType.Percentage
+                      ? 'Percentage must be between 0 and 100%'
+                      : 'Fixed value must be at least 1,000'}
+                  </p>
+                )}
+            </div>
+          </div>
+
+          {(editedFields.has('voucherBaseTypeForRefund') ||
+            editedFields.has('voucherBaseValueForRefund')) && (
+            <div className="mt-4">
+              <Button
+                onClick={() => {
+                  updateConfigOrder({
+                    variables: {
+                      updateConfigInput: {
+                        ...configValues,
+                        voucherBaseTypeForRefund:
+                          configValues.voucherBaseTypeForRefund,
+                        voucherBaseValueForRefund:
+                          configValues.voucherBaseValueForRefund,
+                      },
+                    },
+                    onCompleted: () => {
+                      setEditedFields(prev => {
+                        const updated = new Set(prev);
+                        updated.delete('voucherBaseTypeForRefund');
+                        updated.delete('voucherBaseValueForRefund');
+                        return updated;
+                      });
+                    },
+                  });
+                }}
+                disabled={updateConfigOrderLoading || !isValidVoucherConfig}
+                className={`${isValidVoucherConfig ? 'bg-emerald-600 hover:bg-emerald-700' : 'cursor-not-allowed bg-slate-400'}`}
+              >
+                {updateConfigOrderLoading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                Save Voucher Settings
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -507,7 +693,7 @@ function ConfigField({
           </Button>
         )}
       </div>
-      <p className="text-primary text-sm">{description}</p>
+      <p className="text-muted-foreground text-sm">{description}</p>
     </div>
   );
 }
