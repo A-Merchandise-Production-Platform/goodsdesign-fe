@@ -578,12 +578,15 @@ export default function FactoryOrderDetailsPage() {
             shippingPrice: currentOrder.shippingPrice || 0,
             factory: currentOrder.factory ? {
               name: currentOrder.factory.name || undefined,
-              owner: {
-                name: currentOrder.factory.owner?.name || undefined
-              }
-            } : undefined
+              owner: currentOrder.factory.owner ? {
+                name: currentOrder.factory.owner.name || undefined,
+                email: currentOrder.factory.owner.email || undefined,
+                imageUrl: currentOrder.factory.owner.imageUrl || undefined,
+              } : undefined
+            } : undefined,
+            customerAddress: currentOrder.address?.formattedAddress || '',
+            factoryAddress: currentOrder.factory?.address?.formattedAddress || '',
           }}
-          showFactory={true}
         />
       )}
 

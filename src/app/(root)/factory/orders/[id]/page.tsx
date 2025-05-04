@@ -1,40 +1,38 @@
 'use client';
-import React from 'react';
-import { gql, useMutation } from '@apollo/client';
 import {
   AlertTriangle,
-  ArrowLeft,
   Calendar,
   CheckCheck,
   CheckCircle2,
-  ClipboardList,
   Clock,
   CreditCard,
-  CreditCardIcon as PaymentIcon,
   FileText,
   History,
   Package,
+  CreditCardIcon as PaymentIcon,
   Play,
   ShoppingBag,
+  Star,
+  StarIcon,
   ThumbsDown,
   ThumbsUp,
   Truck,
   XCircle,
-  Star,
-  StarIcon,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
 
+import { OrderHeader } from '@/app/(root)/_components/order-header';
 import {
   getPaymentStatusBadge,
   getStatusBadge,
   orderStatusSteps,
-  refundStatusSteps,
 } from '@/app/(root)/_components/order-status';
+import { OrderStatusTimeline } from '@/app/(root)/_components/order-status-timeline';
+import { DashboardShell } from '@/components/dashboard-shell';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -53,7 +51,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import {
   Table,
@@ -80,9 +77,6 @@ import {
 } from '@/graphql/generated/graphql';
 import { cn, formatDate } from '@/lib/utils';
 import { filesToBase64 } from '@/utils/handle-upload';
-import { DashboardShell } from '@/components/dashboard-shell';
-import { OrderHeader } from '@/app/(root)/_components/order-header';
-import { OrderStatusTimeline } from '@/app/(root)/_components/order-status-timeline';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -166,6 +160,7 @@ export default function FactoryOrderDetailsPage() {
       onCompleted: data => {
         refetch();
         toast.success('Order rejected successfully');
+        router.push(`/factory/orders`);
       },
       onError: error => {
         toast.error(error.message || 'Failed to reject order');
@@ -587,6 +582,20 @@ export default function FactoryOrderDetailsPage() {
             isDelayed: Boolean(order.isDelayed),
             currentProgress: order.currentProgress || 0,
             shippingPrice: order.shippingPrice || 0,
+            customerAddress: order.address?.formattedAddress || '',
+            factoryAddress: order.factory?.address?.formattedAddress || '',
+            factory: order.factory
+              ? {
+                  name: order.factory.name || undefined,
+                  owner: order.factory.owner
+                    ? {
+                        name: order.factory.owner.name || undefined,
+                        email: order.factory.owner.email || undefined,
+                        imageUrl: order.factory.owner.imageUrl || undefined,
+                      }
+                    : undefined,
+                }
+              : undefined,
           }}
         />
       )}

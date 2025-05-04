@@ -603,6 +603,7 @@ query GetOrder($orderId: String!) {
       provinceID
       street
       wardCode
+      formattedAddress
     }
     addressId
     assignedAt
@@ -627,6 +628,14 @@ query GetOrder($orderId: String!) {
         name
         imageUrl
         email
+      }
+      address {
+        districtID
+        street
+        id
+        provinceID
+        wardCode
+        formattedAddress
       }
     }
     id

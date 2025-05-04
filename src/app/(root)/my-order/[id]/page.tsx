@@ -313,6 +313,16 @@ export default function OrderDetailsPage() {
             isDelayed: Boolean(order.isDelayed),
             currentProgress: order.currentProgress || 0,
             shippingPrice: order.shippingPrice || 0,
+            customerAddress: order.address?.formattedAddress || '',
+            factoryAddress: order.factory?.address?.formattedAddress || '',
+            factory: order.factory ? {
+              name: order.factory.name || undefined,
+              owner: order.factory.owner ? {
+                name: order.factory.owner.name || undefined,
+                email: order.factory.owner.email || undefined,
+                imageUrl: order.factory.owner.imageUrl || undefined,
+              } : undefined
+            } : undefined,
           }} 
         />
       )}

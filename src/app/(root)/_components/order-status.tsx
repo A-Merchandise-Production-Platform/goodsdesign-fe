@@ -47,6 +47,7 @@ export const getStatusBadge = (status: string) => {
 
     REWORK_REQUIRED: { label: 'Rework Required', variant: 'destructive' },
     REWORK_IN_PROGRESS: { label: 'Rework in Progress', variant: 'secondary' },
+    REWORK_DONE: { label: 'Rework Done', variant: 'default' },
     WAITING_PAYMENT: { label: 'Waiting Payment', variant: 'outline' },
     READY_FOR_SHIPPING: { label: 'Ready for Shipping', variant: 'secondary' },
     SHIPPING: { label: 'Shipping', variant: 'secondary' },
