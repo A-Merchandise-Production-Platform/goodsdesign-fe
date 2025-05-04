@@ -13,6 +13,7 @@ import DesignFooter from './design-footer';
 import DesignHeader from './design-header';
 import { SHIRT_COLORS } from './shirt-colors';
 import ViewSelector from './view-selector';
+import jsPDF from 'jspdf';
 
 interface SerializedDesign {
   [key: string]: DesignObject[];
@@ -55,29 +56,223 @@ export default function ProductDesigner({
 
   // Handle export of 3D model
   const handleExport = () => {
+    console.log('Exporting 3D model...');
     const handleModelCapture = async (dataUrl: string) => {
       try {
-        // Download 3D view
-        const link3d = document.createElement('a');
-        link3d.href = dataUrl;
-        link3d.download = `tshirt-3d-${view}.png`;
-        document.body.appendChild(link3d);
-        link3d.click();
-        document.body.removeChild(link3d);
+        // Create a temporary canvas for each view
+        const views = ['front', 'back', 'left sleeve', 'right sleeve'];
+        const designImages: { view: string; dataUrl: string }[] = [];
 
-        // Download 2D canvas if available
-        if (fabricCanvasRef.current) {
-          const canvas2dDataUrl = fabricCanvasRef.current.toDataURL({
-            format: 'png',
-            quality: 1,
+        // First, collect all design images
+        for (const viewName of views) {
+          // Skip if no designs for this view
+          if (!designs[viewName] || designs[viewName].length === 0) {
+            continue;
+          }
+
+          // Create a temporary canvas for this view with higher resolution
+          const tempCanvas = document.createElement('canvas');
+          const scaleFactor = 2; // Double the resolution
+          tempCanvas.width = CANVAS_SIZE * scaleFactor;
+          tempCanvas.height = CANVAS_SIZE * scaleFactor;
+          const tempCtx = tempCanvas.getContext('2d', { alpha: true });
+          if (!tempCtx) continue;
+
+          // Set high quality rendering
+          tempCtx.imageSmoothingEnabled = true;
+          tempCtx.imageSmoothingQuality = 'high';
+
+          // Get design zone limits for this view
+          const limits = getDesignZoneLimits(viewName);
+
+          // Clear the canvas
+          tempCtx.clearRect(
+            0,
+            0,
+            CANVAS_SIZE * scaleFactor,
+            CANVAS_SIZE * scaleFactor,
+          );
+
+          // Draw the background texture for this view
+          if (fabricCanvasRef.current?.backgroundImage) {
+            const bgImage = fabricCanvasRef.current.backgroundImage as any;
+            const bgElement = bgImage._element as HTMLImageElement;
+            if (bgElement) {
+              const { left = 0, top = 0, scaleX = 1, scaleY = 1 } = bgImage;
+              tempCtx.drawImage(
+                bgElement,
+                0,
+                0,
+                bgElement.width,
+                bgElement.height,
+                left * scaleFactor,
+                top * scaleFactor,
+                bgElement.width * scaleX * scaleFactor,
+                bgElement.height * scaleY * scaleFactor,
+              );
+            }
+          }
+
+          // Draw only the designs for this view
+          const viewDesigns = designs[viewName] || [];
+          const imagePromises: Promise<void>[] = [];
+
+          for (const objData of viewDesigns) {
+            if (objData.type === 'textbox' && objData.text) {
+              // For text objects
+              const centerX = objData.left * scaleFactor;
+              const centerY = objData.top * scaleFactor;
+
+              tempCtx.save();
+              tempCtx.translate(centerX, centerY);
+              tempCtx.rotate(((objData.angle || 0) * Math.PI) / 180);
+              tempCtx.font = `${objData.fontSize || 40}px ${objData.fontFamily || 'Arial'}`;
+              tempCtx.fillStyle = objData.fill || '#000000';
+              tempCtx.textAlign = 'left';
+              tempCtx.textBaseline = 'top';
+              tempCtx.fillText(objData.text, 0, 0);
+              tempCtx.restore();
+            } else if (objData.type === 'image' && objData.src) {
+              // For image objects
+              const promise = new Promise<void>((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                  try {
+                    const centerX = objData.left * scaleFactor;
+                    const centerY = objData.top * scaleFactor;
+                    const width =
+                      objData.width * (objData.scaleX || 1) * scaleFactor;
+                    const height =
+                      objData.height * (objData.scaleY || 1) * scaleFactor;
+
+                    tempCtx.save();
+                    tempCtx.translate(centerX, centerY);
+                    tempCtx.rotate(((objData.angle || 0) * Math.PI) / 180);
+                    tempCtx.drawImage(img, 0, 0, width, height);
+                    tempCtx.restore();
+                    resolve();
+                  } catch (error) {
+                    reject(error);
+                  }
+                };
+                img.onerror = () => reject(new Error('Failed to load image'));
+                img.src = objData.src as string;
+              });
+              imagePromises.push(promise);
+            }
+          }
+
+          // Wait for all images to load with timeout
+          try {
+            await Promise.race([
+              Promise.all(imagePromises),
+              new Promise((_, reject) =>
+                setTimeout(
+                  () => reject(new Error('Image loading timeout')),
+                  5000,
+                ),
+              ),
+            ]);
+          } catch (error) {
+            console.error('Error loading images:', error);
+            continue;
+          }
+
+          // Create a new canvas for the design zone only with high resolution
+          const designZoneCanvas = document.createElement('canvas');
+          designZoneCanvas.width = (limits.maxX - limits.minX) * scaleFactor;
+          designZoneCanvas.height = (limits.maxY - limits.minY) * scaleFactor;
+          const designZoneCtx = designZoneCanvas.getContext('2d', {
+            alpha: true,
           });
+          if (!designZoneCtx) continue;
 
-          const link2d = document.createElement('a');
-          link2d.href = canvas2dDataUrl;
-          link2d.download = `tshirt-2d-${view}.png`;
-          document.body.appendChild(link2d);
-          link2d.click();
-          document.body.removeChild(link2d);
+          // Set high quality rendering
+          designZoneCtx.imageSmoothingEnabled = true;
+          designZoneCtx.imageSmoothingQuality = 'high';
+
+          // Copy only the design zone area
+          designZoneCtx.drawImage(
+            tempCanvas,
+            limits.minX * scaleFactor,
+            limits.minY * scaleFactor,
+            (limits.maxX - limits.minX) * scaleFactor,
+            (limits.maxY - limits.minY) * scaleFactor,
+            0,
+            0,
+            (limits.maxX - limits.minX) * scaleFactor,
+            (limits.maxY - limits.minY) * scaleFactor,
+          );
+
+          // Ensure canvas is fully rendered
+          await new Promise(resolve => setTimeout(resolve, 100));
+
+          // Convert to data URL with maximum quality
+          const dataUrl = designZoneCanvas.toDataURL('image/png', 1.0);
+          designImages.push({ view: viewName, dataUrl });
+        }
+
+        // Create PDF if we have any designs
+        if (designImages.length > 0) {
+          const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+            putOnlyUsedFonts: true,
+            floatPrecision: 16,
+          });
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+
+          // Add each design to the PDF
+          for (let i = 0; i < designImages.length; i++) {
+            const { view, dataUrl } = designImages[i];
+
+            if (i > 0) {
+              pdf.addPage();
+            }
+
+            // Add view name as title
+            pdf.setFontSize(16);
+            pdf.text(view.toUpperCase(), pageWidth / 2, 20, {
+              align: 'center',
+            });
+
+            // Create a temporary image to get dimensions
+            const img = new Image();
+            await new Promise<void>(resolve => {
+              img.onload = () => resolve();
+              img.src = dataUrl;
+            });
+
+            // Calculate dimensions to fit the image on the page while maintaining aspect ratio
+            const maxWidth = pageWidth - 40; // 20px margin on each side
+            const maxHeight = pageHeight - 50; // 30px for title + 20px margin
+            const scale = Math.min(
+              maxWidth / img.width,
+              maxHeight / img.height,
+            );
+            const scaledWidth = img.width * scale;
+            const scaledHeight = img.height * scale;
+            const x = (pageWidth - scaledWidth) / 2;
+            const y = 30; // Start below the title
+
+            // Add the image with high quality
+            pdf.addImage(
+              dataUrl,
+              'PNG',
+              x,
+              y,
+              scaledWidth,
+              scaledHeight,
+              undefined,
+              'FAST',
+            );
+          }
+
+          // Save the PDF
+          pdf.save('tshirt-designs.pdf');
         }
       } catch (error) {
         console.error('Error handling export:', error);
