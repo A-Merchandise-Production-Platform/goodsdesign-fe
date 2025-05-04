@@ -1,0 +1,119 @@
+query AvailableVouchers {
+  availableVouchers {
+    code
+    createdAt
+    description
+    id
+    isActive
+    isPublic
+    limitedUsage
+    minOrderValue
+    type
+    value
+    userId
+    updatedAt
+    maxDiscountValue
+    usages {
+      voucherId
+      usedAt
+      orderId
+      id
+      user {
+        id
+        imageUrl
+        name
+        email
+      }
+    }
+  }
+}
+
+query AllVouchersOfUser {
+  allVouchersOfUser {
+    code
+    createdAt
+    description
+    id
+    isActive
+    isPublic
+    limitedUsage
+    minOrderValue
+    type
+    value
+    userId
+    updatedAt
+    maxDiscountValue
+    usages {
+      voucherId
+      usedAt
+      orderId
+      id
+      user {
+        id
+        imageUrl
+        name
+        email
+      }
+    }
+  }
+}
+
+query AllVouchersOfSystem {
+  allSystemVouchers {
+    code
+    createdAt
+    description
+    id
+    isActive
+    isPublic
+    limitedUsage
+    minOrderValue
+    type
+    value
+    userId
+    updatedAt
+    maxDiscountValue
+    usages {
+      voucherId
+      usedAt
+      orderId
+      id
+      user {
+        id
+        imageUrl
+        name
+        email
+      }
+    }
+  }
+}
+
+mutation CreateVoucher($input: CreateVoucherInput!) {
+  createVoucher(input: $input) {
+    code
+    createdAt
+    description
+    id
+    isActive
+    isPublic
+    limitedUsage
+    minOrderValue
+    type
+    value
+    userId
+    updatedAt
+    maxDiscountValue
+    usages {
+      voucherId
+      usedAt
+      orderId
+      id
+      user {
+        id
+        imageUrl
+        name
+        email
+      }
+    }
+  }
+}

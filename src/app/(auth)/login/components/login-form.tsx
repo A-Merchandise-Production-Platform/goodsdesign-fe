@@ -37,7 +37,6 @@ export default function LoginForm() {
 
   const [loginMutation, { loading }] = useLoginMutation({
     onCompleted: data => {
-      console.log(data);
       toast.success('Logged in successfully');
       login({
         accessToken: data.login.accessToken,

@@ -15,10 +15,14 @@ query SystemConfigOrder {
     reduceLegitPointIfReject
     shippingDays
     specializationScoreWeight
+    voucherBaseTypeForRefund
+    voucherBaseValueForRefund
   }
 }
 
-mutation UpdateSystemConfigOrder($updateConfigInput: UpdateSystemConfigOrderDto!) {
+mutation UpdateSystemConfigOrder(
+  $updateConfigInput: UpdateSystemConfigOrderDto!
+) {
   updateSystemConfigOrder(updateConfigInput: $updateConfigInput) {
     id
   }
@@ -26,6 +30,6 @@ mutation UpdateSystemConfigOrder($updateConfigInput: UpdateSystemConfigOrderDto!
 
 mutation ReassignNewStaffForOrder($newStaffId: String!, $orderId: String!) {
   reassignNewStaffForOrder(newStaffId: $newStaffId, orderId: $orderId) {
-    id  
+    id
   }
 }

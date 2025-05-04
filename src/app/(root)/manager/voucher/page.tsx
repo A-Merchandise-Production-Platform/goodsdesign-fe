@@ -1,8 +1,8 @@
 'use client';
 
 import {
+  useAllVouchersOfSystemQuery,
   useAllVouchersOfUserQuery,
-  useAvailableVouchersQuery,
 } from '@/graphql/generated/graphql';
 import { format } from 'date-fns';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -20,17 +20,19 @@ import {
   Search,
 } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
-import { Input } from '@/components/ui/input';
-import { useState } from 'react';
-import { useDebounce } from '@/hooks/use-debounce';
+import { DashboardShell } from '@/components/dashboard-shell';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
+import { useEffect, useState } from 'react';
+import { useDebounce } from '@/hooks/use-debounce';
+import AddVoucherForm from '@/app/(root)/manager/voucher/_components/add_voucher_form';
 
 export default function Voucher() {
-  const { data, loading, error } = useAvailableVouchersQuery();
+  const { data, loading, error } = useAllVouchersOfSystemQuery();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  const filteredVouchers = data?.availableVouchers.filter(voucher => {
+  const filteredVouchers = data?.allSystemVouchers.filter(voucher => {
     if (!debouncedSearch) return true;
     const searchLower = debouncedSearch.toLowerCase();
     return (
@@ -87,7 +89,7 @@ export default function Voucher() {
   }
 
   return (
-    <div className="container mx-auto">
+    <DashboardShell title="Vouchers" subtitle="Manage system vouchers">
       <div className="mb-6 flex items-center">
         <div className="relative flex-1">
           <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-500" />
@@ -99,6 +101,7 @@ export default function Voucher() {
             className="w-96 pl-10"
           />
         </div>
+        <AddVoucherForm />
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredVouchers?.map(voucher => (
@@ -106,7 +109,7 @@ export default function Voucher() {
             key={voucher.id}
             className="group overflow-hidden shadow-md transition-all hover:shadow-lg"
           >
-            <CardContent className="flex flex-col">
+            <CardContent className="flex flex-1 flex-col">
               {/* Voucher header */}
               <div className="mb-4 flex flex-1 items-start justify-between">
                 <div>
@@ -117,7 +120,7 @@ export default function Voucher() {
                     </h3>
                   </div>
                   <p className="text-muted-foreground mt-1 text-sm">
-                    {voucher.description || 'No description'}
+                    {voucher.description}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -159,7 +162,7 @@ export default function Voucher() {
                   ) : (
                     <>
                       <div className="flex items-center gap-2 text-purple-600">
-                        {voucher.value}% OFF{' '}
+                        {voucher.value}% OFF
                         <div className="text-sm text-gray-500">
                           {voucher.maxDiscountValue &&
                             `(Max ${formatPrice(voucher.maxDiscountValue)})`}
@@ -199,50 +202,47 @@ export default function Voucher() {
                     {format(new Date(voucher.createdAt), 'MMM d, yyyy')}
                   </span>
                 </div>
-              </div>
 
-              {/* <div className="mt-4 flex items-center gap-4">
-                <Progress
-                  value={voucher.usages?.length ?? 0}
-                  max={voucher.limitedUsage ?? 0}
-                />
-              </div> */}
-
-              <div className="w-full">
-                <div className="mt-4 flex items-center gap-4">
-                  <div className="w-full max-w-md">
-                    <div className="relative">
-                      <Progress
-                        value={voucher.usages?.length ?? 0}
-                        max={voucher.limitedUsage ?? 0}
-                        className="h-4 w-full"
-                      />
-                      <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-white drop-shadow-sm">
-                        {((voucher.usages?.length ?? 0) /
-                          (voucher.limitedUsage ?? 0)) *
-                          100}
-                        %
+                <div className="w-full">
+                  <div className="mt-4 flex items-center gap-4">
+                    <div className="w-full max-w-md">
+                      <div className="relative">
+                        <Progress
+                          value={voucher.usages?.length ?? 0}
+                          max={voucher.limitedUsage ?? 0}
+                          className="h-4 w-full"
+                        />
+                        <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-white drop-shadow-sm">
+                          {((voucher.usages?.length ?? 0) /
+                            (voucher.limitedUsage ?? 0)) *
+                            100}
+                          %
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="whitespace-nowrap text-gray-600">
+                        {voucher.usages?.length ?? 0} /{' '}
+                        {voucher.limitedUsage ?? 0}
                       </span>
                     </div>
-                  </div>
-                  <div>
-                    <span className="whitespace-nowrap text-gray-600">
-                      {voucher.usages?.length ?? 0} /{' '}
-                      {voucher.limitedUsage ?? 0}
-                    </span>
                   </div>
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="block">
+            <CardFooter className="block space-y-2">
               <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-600">
-                <span>Added:</span>
+                <span>ID:</span>
+                <span>{voucher.id}</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-600">
+                <span>Created:</span>
                 <span>{format(new Date(voucher.createdAt), 'PPPp')}</span>
               </div>
             </CardFooter>
           </Card>
         ))}
       </div>
-    </div>
+    </DashboardShell>
   );
 }
