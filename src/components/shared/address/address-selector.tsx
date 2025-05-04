@@ -236,6 +236,7 @@ export interface AddressValue {
   districtId: number | null;
   wardCode: string | null;
   street: string;
+  formattedAddress: string;
 }
 
 interface AddressSelectorProps {
@@ -263,6 +264,7 @@ export function AddressSelector({
           districtId: null,
           wardCode: null,
           street: '',
+          formattedAddress: '',
         },
   );
 
@@ -298,22 +300,54 @@ export function AddressSelector({
     isControlled ? value!.street : internalValue.street,
   );
 
-  // Move these declarations up, after all the useState declarations but before the useEffect hooks
-  const currentValue = {
-    provinceId: selectedProvinceId,
-    districtId: selectedDistrictId,
-    wardCode: selectedWardCode,
-    street,
-  };
-
-  const prevValueRef = React.useRef(currentValue);
-
   const [getAllWardsByDistrictId, { data: wardData, loading: wardLoading }] =
     useGetAllWardsByDistrictIdLazyQuery({
       variables: {
         districtId: selectedDistrictId ?? 0,
       },
     });
+
+  // Create formatted address
+  const getFormattedAddress = React.useCallback(() => {
+    const provinceName = selectedProvinceId
+      ? data?.provinces.find(p => p.provinceId === selectedProvinceId)
+          ?.provinceName || ''
+      : '';
+
+    const districtName = selectedDistrictId
+      ? districtData?.districts.find(d => d.districtId === selectedDistrictId)
+          ?.districtName || ''
+      : '';
+
+    const wardName = selectedWardCode
+      ? wardData?.wards.find(w => w.wardCode === selectedWardCode)?.wardName ||
+        ''
+      : '';
+
+    const parts = [street, wardName, districtName, provinceName].filter(
+      Boolean,
+    );
+    return parts.join(', ');
+  }, [
+    selectedProvinceId,
+    selectedDistrictId,
+    selectedWardCode,
+    street,
+    data?.provinces,
+    districtData?.districts,
+    wardData?.wards,
+  ]);
+
+  // Move these declarations up, after all the useState declarations but before the useEffect hooks
+  const currentValue = {
+    provinceId: selectedProvinceId,
+    districtId: selectedDistrictId,
+    wardCode: selectedWardCode,
+    street,
+    formattedAddress: getFormattedAddress(),
+  };
+
+  const prevValueRef = React.useRef(currentValue);
 
   // Reset district and ward when province changes
   React.useEffect(() => {
@@ -401,6 +435,7 @@ export function AddressSelector({
           districtId: value.districtId,
           wardCode: value.wardCode,
           street: value.street,
+          formattedAddress: value.formattedAddress || getFormattedAddress(),
         };
       }
     }
@@ -411,6 +446,7 @@ export function AddressSelector({
     selectedProvinceId,
     selectedWardCode,
     street,
+    getFormattedAddress,
   ]);
 
   return (
