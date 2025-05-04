@@ -10,6 +10,7 @@ query Addresses {
 }
 mutation CreateAddress($createAddressInput: CreateAddressInput!) {
   createAddress(createAddressInput: $createAddressInput) {
+    id
     districtID
     provinceID
     street

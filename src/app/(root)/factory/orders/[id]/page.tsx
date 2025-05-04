@@ -18,7 +18,7 @@ import {
   ThumbsDown,
   ThumbsUp,
   Truck,
-  XCircle
+  XCircle,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -30,7 +30,7 @@ import { OrderHeader } from '@/app/(root)/_components/order-header';
 import {
   getPaymentStatusBadge,
   getStatusBadge,
-  orderStatusSteps
+  orderStatusSteps,
 } from '@/app/(root)/_components/order-status';
 import { OrderStatusTimeline } from '@/app/(root)/_components/order-status-timeline';
 import { DashboardShell } from '@/components/dashboard-shell';
@@ -565,16 +565,18 @@ export default function FactoryOrderDetailsPage() {
     >
       {/* Order Header */}
       {order && (
-        <OrderHeader 
+        <OrderHeader
           order={{
             id: order.id,
             orderDate: order.orderDate || '',
             status: order.status,
-            customer: order.customer ? {
-              name: order.customer.name || undefined,
-              email: order.customer.email || undefined,
-              imageUrl: order.customer.imageUrl || undefined,
-            } : undefined,
+            customer: order.customer
+              ? {
+                  name: order.customer.name || undefined,
+                  email: order.customer.email || undefined,
+                  imageUrl: order.customer.imageUrl || undefined,
+                }
+              : undefined,
             totalPrice: order.totalPrice || 0,
             totalItems: order.totalItems || 0,
             estimatedCompletionAt: order.estimatedCompletionAt || '',
@@ -583,23 +585,25 @@ export default function FactoryOrderDetailsPage() {
             shippingPrice: order.shippingPrice || 0,
             customerAddress: order.address?.formattedAddress || '',
             factoryAddress: order.factory?.address?.formattedAddress || '',
-            factory: order.factory ? {
-              name: order.factory.name || undefined,
-              owner: order.factory.owner ? {
-                name: order.factory.owner.name || undefined,
-                email: order.factory.owner.email || undefined,
-                imageUrl: order.factory.owner.imageUrl || undefined,
-              } : undefined
-            } : undefined,
-          }} 
+            factory: order.factory
+              ? {
+                  name: order.factory.name || undefined,
+                  owner: order.factory.owner
+                    ? {
+                        name: order.factory.owner.name || undefined,
+                        email: order.factory.owner.email || undefined,
+                        imageUrl: order.factory.owner.imageUrl || undefined,
+                      }
+                    : undefined,
+                }
+              : undefined,
+          }}
         />
       )}
 
-      
-
       {/* Factory Action Buttons */}
       {order.status === 'PENDING_ACCEPTANCE' && (
-        <Card className="mb-6 border-amber-200 bg-amber-50 dark:border-purple-900 dark:bg-purple-950">
+        <Card className="dark:bg-primary/30 dark:border-primary mb-6 border-amber-200 bg-amber-50">
           <CardContent className="pt-6">
             <div className="flex flex-col space-y-4">
               <Alert>
@@ -709,7 +713,10 @@ export default function FactoryOrderDetailsPage() {
       )}
 
       {/* Order Status Timeline */}
-      <OrderStatusTimeline status={order.status} currentStatusGroup={currentStatusGroup} />
+      <OrderStatusTimeline
+        status={order.status}
+        currentStatusGroup={currentStatusGroup}
+      />
 
       {/* Tabs */}
       <Tabs

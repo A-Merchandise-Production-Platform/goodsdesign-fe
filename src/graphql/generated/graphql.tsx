@@ -1228,7 +1228,6 @@ export enum OrderStatus {
   Completed = 'COMPLETED',
   InProduction = 'IN_PRODUCTION',
   NeedManagerHandle = 'NEED_MANAGER_HANDLE',
-  NeedManagerHandleRework = 'NEED_MANAGER_HANDLE_REWORK',
   PaymentReceived = 'PAYMENT_RECEIVED',
   Pending = 'PENDING',
   PendingAcceptance = 'PENDING_ACCEPTANCE',
@@ -1794,6 +1793,8 @@ export type SystemConfigOrderEntity = {
   shippingDays: Scalars['Int']['output'];
   specializationScoreWeight: Scalars['Float']['output'];
   type: Scalars['String']['output'];
+  voucherBaseLimitedUsage: Scalars['Int']['output'];
+  voucherBaseMaxDiscountValue: Scalars['Int']['output'];
   voucherBaseTypeForRefund: VoucherType;
   voucherBaseValueForRefund: Scalars['Int']['output'];
 };
@@ -1983,6 +1984,8 @@ export type UpdateSystemConfigOrderDto = {
   reduceLegitPointIfReject?: InputMaybe<Scalars['Int']['input']>;
   shippingDays?: InputMaybe<Scalars['Int']['input']>;
   specializationScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  voucherBaseLimitedUsage?: InputMaybe<Scalars['Int']['input']>;
+  voucherBaseMaxDiscountValue?: InputMaybe<Scalars['Int']['input']>;
   voucherBaseTypeForRefund?: InputMaybe<VoucherType>;
   voucherBaseValueForRefund?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -2113,7 +2116,7 @@ export type CreateAddressMutationVariables = Exact<{
 }>;
 
 
-export type CreateAddressMutation = { __typename?: 'Mutation', createAddress: { __typename?: 'AddressEntity', districtID: number, provinceID: number, street: string, wardCode: string, formattedAddress?: string | null } };
+export type CreateAddressMutation = { __typename?: 'Mutation', createAddress: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string, formattedAddress?: string | null } };
 
 export type DeleteAddressMutationVariables = Exact<{
   deleteAddressId: Scalars['String']['input'];
@@ -2657,7 +2660,7 @@ export type RemoveSystemConfigBankMutation = { __typename?: 'Mutation', removeSy
 export type SystemConfigOrderQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type SystemConfigOrderQuery = { __typename?: 'Query', systemConfigOrder: { __typename?: 'SystemConfigOrderEntity', acceptHoursForFactory: number, capacityScoreWeight: number, checkQualityTimesDays: number, leadTimeScoreWeight: number, legitPointScoreWeight: number, legitPointToSuspend: number, limitFactoryRejectOrders: number, limitReworkTimes: number, maxLegitPoint: number, maxProductionCapacity: number, maxProductionTimeInMinutes: number, productionCapacityScoreWeight: number, reduceLegitPointIfReject: number, shippingDays: number, specializationScoreWeight: number, voucherBaseTypeForRefund: VoucherType, voucherBaseValueForRefund: number } };
+export type SystemConfigOrderQuery = { __typename?: 'Query', systemConfigOrder: { __typename?: 'SystemConfigOrderEntity', acceptHoursForFactory: number, capacityScoreWeight: number, checkQualityTimesDays: number, leadTimeScoreWeight: number, legitPointScoreWeight: number, legitPointToSuspend: number, limitFactoryRejectOrders: number, limitReworkTimes: number, maxLegitPoint: number, maxProductionCapacity: number, maxProductionTimeInMinutes: number, productionCapacityScoreWeight: number, reduceLegitPointIfReject: number, shippingDays: number, specializationScoreWeight: number, voucherBaseTypeForRefund: VoucherType, voucherBaseValueForRefund: number, voucherBaseLimitedUsage: number, voucherBaseMaxDiscountValue: number } };
 
 export type UpdateSystemConfigOrderMutationVariables = Exact<{
   updateConfigInput: UpdateSystemConfigOrderDto;
@@ -2850,6 +2853,7 @@ export type AddressesQueryResult = Apollo.QueryResult<AddressesQuery, AddressesQ
 export const CreateAddressDocument = gql`
     mutation CreateAddress($createAddressInput: CreateAddressInput!) {
   createAddress(createAddressInput: $createAddressInput) {
+    id
     districtID
     provinceID
     street
@@ -7913,6 +7917,8 @@ export const SystemConfigOrderDocument = gql`
     specializationScoreWeight
     voucherBaseTypeForRefund
     voucherBaseValueForRefund
+    voucherBaseLimitedUsage
+    voucherBaseMaxDiscountValue
   }
 }
     `;

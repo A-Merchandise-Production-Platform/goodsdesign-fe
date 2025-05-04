@@ -1,7 +1,12 @@
 import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
+
+export enum StatCardType {
+  DEFAULT = 'default',
+  CURRENCY = 'currency',
+}
 
 export interface StatCardProps {
   title: string;
@@ -9,6 +14,7 @@ export interface StatCardProps {
   change?: number;
   changeType?: 'positive' | 'negative';
   icon: React.ReactNode;
+  type?: StatCardType;
 }
 
 export function StatCard({
@@ -17,6 +23,7 @@ export function StatCard({
   change,
   changeType = 'positive',
   icon,
+  type = StatCardType.DEFAULT,
 }: StatCardProps) {
   return (
     <Card>
@@ -24,7 +31,11 @@ export function StatCard({
         <div className="flex items-center justify-between">
           <div>
             <p className="text-muted-foreground text-sm font-medium">{title}</p>
-            <h3 className="mt-1 text-2xl font-bold">{value}</h3>
+            <h3 className="mt-1 text-2xl font-bold">
+              {type === StatCardType.CURRENCY
+                ? formatPrice(value)
+                : value.toLocaleString()}
+            </h3>
           </div>
           <div className="bg-primary/10 rounded-full p-2">{icon}</div>
         </div>
