@@ -54,7 +54,28 @@ export default function ProductDesigner({
     ((dataUrl: string) => void) | undefined
   >();
 
-  // Handle export of 3D model
+  // Handle download 3D model
+  const handleDownload = () => {
+    console.log('Exporting 3D model...');
+    const handleModelCapture = async (dataUrl: string) => {
+      try {
+        // Download 3D view
+        const link3d = document.createElement('a');
+        link3d.href = dataUrl;
+        link3d.download = `tshirt-3d-${view}.png`;
+        document.body.appendChild(link3d);
+        link3d.click();
+        document.body.removeChild(link3d);
+      } catch (error) {
+        console.error('Error handling export:', error);
+      } finally {
+        setModelExportCallback(undefined);
+      }
+    };
+    setModelExportCallback(() => handleModelCapture);
+  };
+
+  // Handle export design as PDF
   const handleExport = () => {
     console.log('Exporting 3D model...');
     const handleModelCapture = async (dataUrl: string) => {
@@ -1054,7 +1075,7 @@ export default function ProductDesigner({
 
   return (
     <div className="flex h-screen flex-col">
-      <DesignHeader onExport={handleExport} />
+      <DesignHeader onExport={handleExport} onDownload={handleDownload} />
 
       <div className="mx-auto flex flex-1">
         <div className="flex flex-1 flex-col">

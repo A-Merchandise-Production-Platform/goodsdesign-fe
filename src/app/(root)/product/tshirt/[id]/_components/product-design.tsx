@@ -100,7 +100,28 @@ export default function ProductDesigner({
     ((dataUrl: string) => void) | undefined
   >();
 
-  // Handle export of 3D model
+  // Handle download 3D model
+  const handleDownload = () => {
+    console.log('Exporting 3D model...');
+    const handleModelCapture = async (dataUrl: string) => {
+      try {
+        // Download 3D view
+        const link3d = document.createElement('a');
+        link3d.href = dataUrl;
+        link3d.download = `tshirt-3d-${view}.png`;
+        document.body.appendChild(link3d);
+        link3d.click();
+        document.body.removeChild(link3d);
+      } catch (error) {
+        console.error('Error handling export:', error);
+      } finally {
+        setModelExportCallback(undefined);
+      }
+    };
+    setModelExportCallback(() => handleModelCapture);
+  };
+
+  // Handle export design as PDF
   const handleExport = () => {
     console.log('Exporting 3D model...');
     const handleModelCapture = async (dataUrl: string) => {
@@ -1261,47 +1282,11 @@ export default function ProductDesigner({
     <div className="flex h-screen flex-col">
       <DesignHeader
         onSave={async () => {
-          try {
-            saveCurrentDesign();
-
-            // Then capture and update thumbnail
-            const captureCallback = async (dataUrl: string) => {
-              try {
-                // Convert dataUrl to File
-                const response = await fetch(dataUrl);
-                const blob = await response.blob();
-                const file = new File([blob], `tshirt-3d-${view}.png`, {
-                  type: 'image/png',
-                });
-
-                // Create a mock event with the file
-                const mockEvent = {
-                  target: {
-                    files: [file],
-                  },
-                } as unknown as React.ChangeEvent<HTMLInputElement>;
-
-                // Upload thumbnail using the provided callback
-                if (onThumbnail) {
-                  await onThumbnail(mockEvent);
-                }
-
-                // Show success message after both save and thumbnail update complete
-                toast.success('Design saved successfully!');
-              } catch (error) {
-                toast.error('Failed to save design!');
-              } finally {
-                setModelExportCallback(undefined);
-              }
-            };
-
-            // Set the callback to capture the model view
-            setModelExportCallback(() => captureCallback);
-          } catch (error) {
-            console.error('Error saving design:', error);
-          }
+          saveCurrentDesign();
+          return Promise.resolve();
         }}
-        onExport={handleExport} // Keep the download button functionality
+        onExport={handleExport}
+        onDownload={handleDownload}
       />
 
       <div className="flex flex-1">
