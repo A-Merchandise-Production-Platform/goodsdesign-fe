@@ -32,22 +32,22 @@ export default function ProductsPage() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Total Products"
-          value={totalProducts.toString()}
-          change={totalChange}
+          value={totalProducts}
+          change={Number(totalChange)}
           changeType="positive"
           icon={<PackageIcon className="h-5 w-5" />}
         />
         <StatCard
           title="New Products This Month"
-          value={newProducts.toString()}
-          change={newChange}
+          value={newProducts}
+          change={Number(newChange)}
           changeType="positive"
           icon={<PackagePlusIcon className="h-5 w-5" />}
         />
         <StatCard
           title="Active Products"
-          value={activeProducts.toString()}
-          change={activeChange}
+          value={activeProducts}
+          change={Number(activeChange)}
           changeType={
             activeProducts > totalProducts / 2 ? 'positive' : 'negative'
           }

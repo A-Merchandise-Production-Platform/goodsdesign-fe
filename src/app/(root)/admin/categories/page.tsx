@@ -32,22 +32,22 @@ export default function CategoriesPage() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Total Categories"
-          value={totalCategories.toString()}
-          change={totalChange}
+          value={totalCategories}
+          change={Number(totalChange)}
           changeType="positive"
           icon={<FolderIcon className="h-5 w-5" />}
         />
         <StatCard
           title="New Categories This Month"
-          value={newCategories.toString()}
-          change={newChange}
+          value={newCategories}
+          change={Number(newChange)}
           changeType="positive"
           icon={<FolderPlusIcon className="h-5 w-5" />}
         />
         <StatCard
           title="Active Categories"
-          value={activeCategories.toString()}
-          change={activeChange}
+          value={activeCategories}
+          change={Number(activeChange)}
           changeType="positive"
           icon={<FolderCheckIcon className="h-5 w-5" />}
         />

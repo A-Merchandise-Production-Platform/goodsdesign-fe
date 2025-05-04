@@ -26,6 +26,7 @@ export const factoryFormSchema = z.object({
     districtId: z.number().int().positive(),
     wardCode: z.string().min(1),
     street: z.string().min(1),
+    formattedAddress: z.string().optional(),
   }),
 
   // Operational Details
@@ -60,6 +61,7 @@ export const defaultValues: Partial<FactoryFormValues> = {
     districtId: 1442,
     wardCode: '20102',
     street: '123 Main St',
+    formattedAddress: '123 Main St, HCM, Vietnam',
   },
   maxPrintingCapacity: undefined,
   qualityCertifications: '',

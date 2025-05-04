@@ -39,13 +39,8 @@ export default function Page() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Factories"
-          value={
-            data?.getEnhancedManagerDashboard.stats.factories.total.toString() ??
-            '0'
-          }
-          change={
-            data?.getEnhancedManagerDashboard.stats.factories.change ?? '0'
-          }
+          value={data?.getEnhancedManagerDashboard.stats.factories.total ?? 0}
+          change={data?.getEnhancedManagerDashboard.stats.factories.change ?? 0}
           changeType={
             data?.getEnhancedManagerDashboard.stats.factories.changeType ===
             ChangeType.Positive
@@ -56,11 +51,8 @@ export default function Page() {
         />
         <StatCard
           title="Active Orders"
-          value={
-            data?.getEnhancedManagerDashboard.stats.orders.active.toString() ??
-            '0'
-          }
-          change={data?.getEnhancedManagerDashboard.stats.orders.change ?? '0'}
+          value={data?.getEnhancedManagerDashboard.stats.orders.active ?? 0}
+          change={data?.getEnhancedManagerDashboard.stats.orders.change ?? 0}
           changeType={
             data?.getEnhancedManagerDashboard.stats.orders.changeType ===
             ChangeType.Positive
@@ -71,11 +63,8 @@ export default function Page() {
         />
         <StatCard
           title="Staff Members"
-          value={
-            data?.getEnhancedManagerDashboard.stats.staff.total.toString() ??
-            '0'
-          }
-          change={data?.getEnhancedManagerDashboard.stats.staff.change ?? '0'}
+          value={data?.getEnhancedManagerDashboard.stats.staff.total ?? 0}
+          change={data?.getEnhancedManagerDashboard.stats.staff.change ?? 0}
           changeType={
             data?.getEnhancedManagerDashboard.stats.staff.changeType ===
             ChangeType.Positive
@@ -86,10 +75,8 @@ export default function Page() {
         />
         <StatCard
           title="Monthly Revenue"
-          value={formatPrice(
-            Number(data?.getEnhancedManagerDashboard.stats.revenue.monthly),
-          )}
-          change={data?.getEnhancedManagerDashboard.stats.revenue.change ?? '0'}
+          value={data?.getEnhancedManagerDashboard.stats.revenue.monthly ?? 0}
+          change={data?.getEnhancedManagerDashboard.stats.revenue.change ?? 0}
           changeType={
             data?.getEnhancedManagerDashboard.stats.revenue.changeType ===
             ChangeType.Positive

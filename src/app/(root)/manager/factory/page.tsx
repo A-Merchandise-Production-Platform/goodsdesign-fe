@@ -204,29 +204,29 @@ export default function Page() {
       <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Factories"
-          value={totalFactories.toString()}
-          change={totalChange.change}
+          value={totalFactories}
+          change={Number(totalChange.change)}
           changeType={totalChange.type}
           icon={<Building2Icon className="h-5 w-5" />}
         />
         <StatCard
           title="Active Factories"
-          value={activeCount.toString()}
-          change={activeChange.change}
+          value={activeCount}
+          change={Number(activeChange.change)}
           changeType={activeChange.type}
           icon={<CheckCircle2Icon className="h-5 w-5" />}
         />
         <StatCard
           title="Pending Approval"
-          value={pendingCount.toString()}
-          change={pendingChange.change}
+          value={pendingCount}
+          change={Number(pendingChange.change)}
           changeType={pendingChange.type}
           icon={<Calendar className="h-5 w-5" />}
         />
         <StatCard
           title="Rejected"
-          value={rejectedCount.toString()}
-          change={rejectedChange.change}
+          value={rejectedCount}
+          change={Number(rejectedChange.change)}
           changeType={rejectedChange.type}
           icon={<XCircleIcon className="h-5 w-5" />}
         />

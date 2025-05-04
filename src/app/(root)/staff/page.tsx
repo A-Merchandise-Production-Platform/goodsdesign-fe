@@ -80,8 +80,8 @@ export default function StaffPage() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Active Tasks"
-          value={dashboardData?.stats.activeTasks.value.toString() || '0'}
-          change={`${dashboardData?.stats.activeTasks.percentChange || 0}%`}
+          value={dashboardData?.stats.activeTasks.value || 0}
+          change={dashboardData?.stats.activeTasks.percentChange}
           changeType={
             dashboardData?.stats.activeTasks.isPositive
               ? 'positive'
@@ -91,8 +91,8 @@ export default function StaffPage() {
         />
         <StatCard
           title="Completed Tasks"
-          value={dashboardData?.stats.completedTasks.value.toString() || '0'}
-          change={`${dashboardData?.stats.completedTasks.percentChange || 0}%`}
+          value={dashboardData?.stats.completedTasks.value || 0}
+          change={dashboardData?.stats.completedTasks.percentChange}
           changeType={
             dashboardData?.stats.completedTasks.isPositive
               ? 'positive'
@@ -102,8 +102,8 @@ export default function StaffPage() {
         />
         <StatCard
           title="Pending Orders"
-          value={dashboardData?.stats.pendingOrders.value.toString() || '0'}
-          change={`${dashboardData?.stats.pendingOrders.percentChange || 0}%`}
+          value={dashboardData?.stats.pendingOrders.value || 0}
+          change={dashboardData?.stats.pendingOrders.percentChange}
           changeType={
             dashboardData?.stats.pendingOrders.isPositive
               ? 'positive'
@@ -113,8 +113,8 @@ export default function StaffPage() {
         />
         <StatCard
           title="Delivered Orders"
-          value={dashboardData?.stats.deliveredOrders.value.toString() || '0'}
-          change={`${dashboardData?.stats.deliveredOrders.percentChange || 0}%`}
+          value={dashboardData?.stats.deliveredOrders.value || 0}
+          change={dashboardData?.stats.deliveredOrders.percentChange}
           changeType={
             dashboardData?.stats.deliveredOrders.isPositive
               ? 'positive'
