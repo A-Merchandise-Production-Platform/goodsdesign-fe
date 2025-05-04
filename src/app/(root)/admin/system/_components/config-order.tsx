@@ -594,10 +594,59 @@ export default function SystemConfigOrder() {
                   </p>
                 )}
             </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="voucherBaseMaxDiscountValue"
+                className="font-medium"
+              >
+                Max Discount Value
+              </Label>
+              <Input
+                id="voucherBaseMaxDiscountValue"
+                type="number"
+                value={configValues.voucherBaseMaxDiscountValue}
+                onChange={e =>
+                  handleInputChange(
+                    'voucherBaseMaxDiscountValue',
+                    e.target.value,
+                  )
+                }
+                min="0"
+                step="1000"
+                className={`${editedFields.has('voucherBaseMaxDiscountValue') ? 'border-emerald-500' : 'border-border'} transition-colors focus:border-emerald-500 focus:ring-emerald-500`}
+              />
+              <p className="text-muted-foreground text-sm">
+                Maximum discount value applied for percentage vouchers (0 =
+                unlimited)
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="voucherBaseLimitedUsage" className="font-medium">
+                Limited Usage
+              </Label>
+              <Input
+                id="voucherBaseLimitedUsage"
+                type="number"
+                value={configValues.voucherBaseLimitedUsage}
+                onChange={e =>
+                  handleInputChange('voucherBaseLimitedUsage', e.target.value)
+                }
+                min="1"
+                step="1"
+                className={`${editedFields.has('voucherBaseLimitedUsage') ? 'border-emerald-500' : 'border-border'} transition-colors focus:border-emerald-500 focus:ring-emerald-500`}
+              />
+              <p className="text-muted-foreground text-sm">
+                Number of times a voucher can be used
+              </p>
+            </div>
           </div>
 
           {(editedFields.has('voucherBaseTypeForRefund') ||
-            editedFields.has('voucherBaseValueForRefund')) && (
+            editedFields.has('voucherBaseValueForRefund') ||
+            editedFields.has('voucherBaseMaxDiscountValue') ||
+            editedFields.has('voucherBaseLimitedUsage')) && (
             <div className="mt-4">
               <Button
                 onClick={() => {
@@ -609,6 +658,10 @@ export default function SystemConfigOrder() {
                           configValues.voucherBaseTypeForRefund,
                         voucherBaseValueForRefund:
                           configValues.voucherBaseValueForRefund,
+                        voucherBaseMaxDiscountValue:
+                          configValues.voucherBaseMaxDiscountValue,
+                        voucherBaseLimitedUsage:
+                          configValues.voucherBaseLimitedUsage,
                       },
                     },
                     onCompleted: () => {
@@ -616,6 +669,8 @@ export default function SystemConfigOrder() {
                         const updated = new Set(prev);
                         updated.delete('voucherBaseTypeForRefund');
                         updated.delete('voucherBaseValueForRefund');
+                        updated.delete('voucherBaseMaxDiscountValue');
+                        updated.delete('voucherBaseLimitedUsage');
                         return updated;
                       });
                     },

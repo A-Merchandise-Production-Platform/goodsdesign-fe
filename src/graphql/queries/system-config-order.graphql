@@ -17,6 +17,8 @@ query SystemConfigOrder {
     specializationScoreWeight
     voucherBaseTypeForRefund
     voucherBaseValueForRefund
+    voucherBaseLimitedUsage
+    voucherBaseMaxDiscountValue
   }
 }
 

@@ -93,7 +93,9 @@ function AddressCard({ address }: { address: Partial<AddressEntity> }) {
     <div className="flex items-center gap-4 rounded-lg border p-4 shadow-none">
       <div className="flex flex-1 items-center gap-2">
         <div className="flex items-center gap-2">
-          <div className="text-sm">{address.formattedAddress}</div>
+          <div className="text-sm">
+            {address.formattedAddress || address.street}
+          </div>
         </div>
       </div>
       <div className="flex items-center gap-2">
