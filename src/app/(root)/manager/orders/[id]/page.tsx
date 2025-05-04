@@ -91,6 +91,8 @@ import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
+import { OrderHeader } from '@/app/(root)/_components/order-header';
+import { OrderStatusTimeline } from '@/app/(root)/_components/order-status-timeline';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -557,183 +559,36 @@ export default function FactoryOrderDetailsPage() {
       {renderManagerActions()}
 
       {/* Order Header */}
-      <Card className="mb-6">
-        <CardHeader>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <CardTitle className="text-2xl font-bold">
-                Order #{currentOrder.id}
-              </CardTitle>
-              <CardDescription className="mt-2">
-                <div className="flex items-center">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {formatDate(currentOrder.orderDate)} at{' '}
-                  {formatTime(currentOrder.orderDate)}
-                </div>
-              </CardDescription>
-            </div>
-            <div className="mt-4 flex flex-col md:mt-0 md:flex-row md:items-center md:gap-4">
-              <div>{getStatusBadge(currentOrder.status)}</div>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <div className="flex flex-col space-y-1">
-              <span className="text-muted-foreground text-sm font-medium">
-                Customer
-              </span>
-              <div className="flex items-center">
-                <div className="relative mr-2 h-8 w-8 overflow-hidden rounded-full">
-                  <Image
-                    src={
-                      currentOrder?.customer?.imageUrl ||
-                      '/placeholder.svg?height=32&width=32' ||
-                      '/placeholder.svg'
-                    }
-                    alt={currentOrder?.customer?.name || 'Customer'}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div>
-                  <p className="font-medium">{currentOrder?.customer?.name}</p>
-                  <p className="text-muted-foreground text-sm">
-                    {currentOrder?.customer?.email}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-muted-foreground text-sm font-medium">
-                Total Amount
-              </span>
-              <span className="font-medium">
-                {formatCurrency(currentOrder.totalPrice)}
-              </span>
-              <span className="text-muted-foreground text-sm">
-                {currentOrder.totalItems} items
-              </span>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-muted-foreground text-sm font-medium">
-                Estimated Completion
-              </span>
-              <span className="font-medium">
-                {formatDate(currentOrder.estimatedCompletionAt)}
-              </span>
-              <span className="text-muted-foreground text-sm">
-                {currentOrder.isDelayed ? (
-                  <span className="text-destructive flex items-center">
-                    <Clock className="mr-1 h-3 w-3" /> Delayed
-                  </span>
-                ) : (
-                  'On schedule'
-                )}
-              </span>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-muted-foreground text-sm font-medium">
-                Progress
-              </span>
-              <Progress
-                value={currentOrder.currentProgress}
-                className="h-2 w-full"
-              />
-              <span className="text-muted-foreground text-sm">
-                {currentOrder.currentProgress}% complete
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {currentOrder && (
+        <OrderHeader 
+          order={{
+            id: currentOrder.id,
+            orderDate: currentOrder.orderDate || '',
+            status: currentOrder.status,
+            customer: currentOrder.customer ? {
+              name: currentOrder.customer.name || undefined,
+              email: currentOrder.customer.email || undefined,
+              imageUrl: currentOrder.customer.imageUrl || undefined,
+            } : undefined,
+            totalPrice: currentOrder.totalPrice || 0,
+            totalItems: currentOrder.totalItems || 0,
+            estimatedCompletionAt: currentOrder.estimatedCompletionAt || '',
+            isDelayed: Boolean(currentOrder.isDelayed),
+            currentProgress: currentOrder.currentProgress || 0,
+            shippingPrice: currentOrder.shippingPrice || 0,
+            factory: currentOrder.factory ? {
+              name: currentOrder.factory.name || undefined,
+              owner: {
+                name: currentOrder.factory.owner?.name || undefined
+              }
+            } : undefined
+          }}
+          showFactory={true}
+        />
+      )}
 
       {/* Order Status Timeline */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Order Status</CardTitle>
-          <CardDescription>
-            Current status and progress of the order
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="relative">
-            <div className="bg-muted absolute top-0 left-0 h-1 w-full">
-              <div
-                className="bg-primary absolute top-0 left-0 h-full transition-all duration-500"
-                style={{
-                  width: `${
-                    (currentOrder.status === 'WAITING_FOR_REFUND' ||
-                    currentOrder.status === 'REFUNDED'
-                      ? (refundStatusSteps.findIndex(step =>
-                          step.statuses.includes(currentOrder.status),
-                        ) +
-                          1) /
-                        refundStatusSteps.length
-                      : (orderStatusSteps.findIndex(
-                          step => step.group === currentStatusGroup,
-                        ) +
-                          1) /
-                        orderStatusSteps.length) * 100
-                  }%`,
-                }}
-              />
-            </div>
-
-            <div
-              className={`grid grid-cols-2 gap-2 pt-6 md:grid-cols-2 ${
-                currentOrder.status === 'WAITING_FOR_REFUND' ||
-                currentOrder.status === 'REFUNDED'
-                  ? 'lg:grid-cols-2'
-                  : 'lg:grid-cols-6'
-              }`}
-            >
-              {(currentOrder.status === 'WAITING_FOR_REFUND' ||
-              currentOrder.status === 'REFUNDED'
-                ? refundStatusSteps
-                : orderStatusSteps
-              ).map((step, index) => {
-                const isActive =
-                  currentOrder.status === 'WAITING_FOR_REFUND' ||
-                  currentOrder.status === 'REFUNDED'
-                    ? step.statuses.includes(currentOrder.status)
-                    : step.group === currentStatusGroup;
-                const isPast =
-                  currentOrder.status === 'WAITING_FOR_REFUND' ||
-                  currentOrder.status === 'REFUNDED'
-                    ? refundStatusSteps.findIndex(s =>
-                        s.statuses.includes(currentOrder.status),
-                      ) > index
-                    : orderStatusSteps.findIndex(
-                        s => s.group === currentStatusGroup,
-                      ) > index;
-                const Icon = step.icon;
-
-                return (
-                  <div key={step.group} className="flex flex-col items-center">
-                    <div
-                      className={`mb-2 flex h-10 w-10 items-center justify-center rounded-full ${
-                        isActive
-                          ? 'bg-primary text-primary-foreground'
-                          : isPast
-                            ? 'bg-primary/20 text-primary'
-                            : 'bg-muted text-muted-foreground'
-                      }`}
-                    >
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <span
-                      className={`text-center text-xs ${isActive ? 'font-medium' : 'text-muted-foreground'}`}
-                    >
-                      {step.label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <OrderStatusTimeline status={currentOrder.status} currentStatusGroup={currentStatusGroup} />
 
       {/* Tabs */}
       <Tabs
