@@ -76,6 +76,10 @@ import {
   refundStatusSteps,
 } from '../../_components/order-status';
 
+// Import the new components
+import { OrderHeader } from '@/app/(root)/_components/order-header';
+import { OrderStatusTimeline } from '@/app/(root)/_components/order-status-timeline';
+
 // Helper function to format time
 const formatTime = (dateString: string) => {
   return new Date(dateString).toLocaleTimeString('en-US', {
@@ -292,178 +296,29 @@ export default function OrderDetailsPage() {
       <BackButton />
 
       {/* Order Header */}
-      <Card className="mb-6">
-        <CardHeader>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <CardTitle className="text-2xl font-bold">
-                Order #{order.id.substring(0, 8)}
-              </CardTitle>
-              <CardDescription className="mt-2">
-                <div className="flex items-center">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {formatDate(order.orderDate)} at {formatTime(order.orderDate)}
-                </div>
-              </CardDescription>
-            </div>
-            <div className="mt-4 flex flex-col md:mt-0 md:flex-row md:items-center md:gap-4">
-              <div>{getStatusBadge(order.status)}</div>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <div className="flex flex-col space-y-1">
-              <span className="text-muted-foreground text-sm font-medium">
-                Customer
-              </span>
-              <div className="flex items-center">
-                <div className="relative mr-2 h-8 w-8 overflow-hidden rounded-full">
-                  <Image
-                    src={
-                      order?.customer?.imageUrl ||
-                      '/placeholder.svg?height=32&width=32'
-                    }
-                    alt={order?.customer?.name || 'Customer'}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div>
-                  <p className="font-medium">{order?.customer?.name}</p>
-                  <p className="text-muted-foreground text-sm">
-                    {order?.customer?.email}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-muted-foreground text-sm font-medium">
-                Total Amount
-              </span>
-              <span className="font-medium">
-                {formatCurrency(order.totalPrice)}
-              </span>
-              <span className="text-muted-foreground text-sm">
-                {order.totalItems} items
-              </span>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-muted-foreground text-sm font-medium">
-                Estimated Completion
-              </span>
-              <span className="font-medium">
-                {formatDate(order.estimatedCompletionAt)}
-              </span>
-              <span className="text-muted-foreground text-sm">
-                {order.isDelayed ? (
-                  <span className="text-destructive flex items-center">
-                    <Clock className="mr-1 h-3 w-3" /> Delayed
-                  </span>
-                ) : (
-                  'On schedule'
-                )}
-              </span>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-muted-foreground text-sm font-medium">
-                Progress
-              </span>
-              <Progress value={order.currentProgress} className="h-2 w-full" />
-              <span className="text-muted-foreground text-sm">
-                {order.currentProgress}% complete
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {order && (
+        <OrderHeader 
+          order={{
+            id: order.id,
+            orderDate: order.orderDate || '',
+            status: order.status,
+            customer: order.customer ? {
+              name: order.customer.name || undefined,
+              email: order.customer.email || undefined,
+              imageUrl: order.customer.imageUrl || undefined,
+            } : undefined,
+            totalPrice: order.totalPrice || 0,
+            totalItems: order.totalItems || 0,
+            estimatedCompletionAt: order.estimatedCompletionAt || '',
+            isDelayed: Boolean(order.isDelayed),
+            currentProgress: order.currentProgress || 0,
+            shippingPrice: order.shippingPrice || 0,
+          }} 
+        />
+      )}
 
       {/* Order Status Timeline */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Order Status</CardTitle>
-          <CardDescription>
-            Current status and progress of your order
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="relative">
-            <div className="bg-muted absolute top-0 left-0 h-1 w-full">
-              <div
-                className="bg-primary absolute top-0 left-0 h-full transition-all duration-500"
-                style={{
-                  width: `${
-                    (order.status === 'WAITING_FOR_REFUND' ||
-                    order.status === 'REFUNDED'
-                      ? (refundStatusSteps.findIndex(step =>
-                          step.statuses.includes(order.status),
-                        ) +
-                          1) /
-                        refundStatusSteps.length
-                      : (orderStatusSteps.findIndex(
-                          step => step.group === currentStatusGroup,
-                        ) +
-                          1) /
-                        orderStatusSteps.length) * 100
-                  }%`,
-                }}
-              />
-            </div>
-
-            <div
-              className={`grid grid-cols-2 gap-2 pt-6 md:grid-cols-2 ${
-                order.status === 'WAITING_FOR_REFUND' ||
-                order.status === 'REFUNDED'
-                  ? 'lg:grid-cols-2'
-                  : 'lg:grid-cols-6'
-              }`}
-            >
-              {(order.status === 'WAITING_FOR_REFUND' ||
-              order.status === 'REFUNDED'
-                ? refundStatusSteps
-                : orderStatusSteps
-              ).map((step, index) => {
-                const isActive =
-                  order.status === 'WAITING_FOR_REFUND' ||
-                  order.status === 'REFUNDED'
-                    ? step.statuses.includes(order.status)
-                    : step.group === currentStatusGroup;
-                const isPast =
-                  order.status === 'WAITING_FOR_REFUND' ||
-                  order.status === 'REFUNDED'
-                    ? refundStatusSteps.findIndex(s =>
-                        s.statuses.includes(order.status),
-                      ) > index
-                    : orderStatusSteps.findIndex(
-                        s => s.group === currentStatusGroup,
-                      ) > index;
-                const Icon = step.icon;
-
-                return (
-                  <div key={step.group} className="flex flex-col items-center">
-                    <div
-                      className={`mb-2 flex h-10 w-10 items-center justify-center rounded-full ${
-                        isActive
-                          ? 'bg-primary text-primary-foreground'
-                          : isPast
-                            ? 'bg-primary/20 text-primary'
-                            : 'bg-muted text-muted-foreground'
-                      }`}
-                    >
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <span
-                      className={`text-center text-xs ${isActive ? 'font-medium' : 'text-muted-foreground'}`}
-                    >
-                      {step.label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <OrderStatusTimeline status={order.status} currentStatusGroup={currentStatusGroup} />
 
       {/* Tabs */}
       <Tabs

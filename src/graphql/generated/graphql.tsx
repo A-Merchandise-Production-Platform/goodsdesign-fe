@@ -1228,6 +1228,7 @@ export enum OrderStatus {
   Completed = 'COMPLETED',
   InProduction = 'IN_PRODUCTION',
   NeedManagerHandle = 'NEED_MANAGER_HANDLE',
+  NeedManagerHandleRework = 'NEED_MANAGER_HANDLE_REWORK',
   PaymentReceived = 'PAYMENT_RECEIVED',
   Pending = 'PENDING',
   PendingAcceptance = 'PENDING_ACCEPTANCE',
