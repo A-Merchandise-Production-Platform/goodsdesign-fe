@@ -121,11 +121,11 @@ export default function OrderInformation({
   }, [selectedAddressId, addressesData, onAddressChange]);
 
   // Handle adding a new address and automatic selection
-  const handleAddressAdded = () => {
+  const handleAddressAdded = (id: string) => {
     refetchAddresses().then(result => {
       if (result.data?.addresses && result.data.addresses.length > 0) {
         // Select the newly added address (should be the last one)
-        setSelectedAddressId(result.data.addresses[0].id);
+        setSelectedAddressId(id);
         setIsAddressFormOpen(false);
         toast.success('Address added and selected');
       }
@@ -167,9 +167,9 @@ export default function OrderInformation({
                 </SelectContent>
               </Select>
             ) : (
-              <SelectTrigger className="w-full" disabled>
-                <SelectValue placeholder="No addresses available" />
-              </SelectTrigger>
+              <div className="text-muted-foreground w-[calc(100%-2.75rem)] truncate">
+                No addresses available
+              </div>
             )}
           </div>
 
@@ -205,13 +205,17 @@ export default function OrderInformation({
   );
 }
 
-function AddressForm({ onAddressAdded }: { onAddressAdded: () => void }) {
+function AddressForm({
+  onAddressAdded,
+}: {
+  onAddressAdded: (id: string) => void;
+}) {
   const [address, setAddress] = useState<AddressValue | undefined>(undefined);
 
   const [createAddress, { loading }] = useCreateAddressMutation({
-    onCompleted: () => {
+    onCompleted: data => {
       toast.success('Address created successfully');
-      onAddressAdded();
+      onAddressAdded(data.createAddress.id);
     },
     onError: () => {
       toast.error('Failed to create address');
@@ -234,11 +238,35 @@ function AddressForm({ onAddressAdded }: { onAddressAdded: () => void }) {
     });
   };
 
+  const handleAddressChange = (newAddress: AddressValue) => {
+    // If province changed, clear district and ward
+    if (newAddress.provinceId !== address?.provinceId) {
+      setAddress({
+        ...newAddress,
+        districtId: null,
+        wardCode: null,
+      });
+      return;
+    }
+
+    // If district changed, clear ward
+    if (newAddress.districtId !== address?.districtId) {
+      setAddress({
+        ...newAddress,
+        wardCode: null,
+      });
+      return;
+    }
+
+    // No cascading changes needed
+    setAddress(newAddress);
+  };
+
   return (
     <div className="space-y-4">
       <AddressSelector
         value={address}
-        onChange={setAddress}
+        onChange={handleAddressChange}
         disabled={loading}
       />
       <Button

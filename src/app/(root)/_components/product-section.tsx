@@ -22,7 +22,7 @@ export function ProductSection({ products = [] }: ProductSectionProps) {
   };
 
   return (
-    <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3">
+    <div className="grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3">
       <div className="bg-accent/80 flex flex-col justify-center rounded-xl p-6">
         <div className="mb-4">
           <span className="bg-primary inline-flex items-center rounded-full px-3 py-1 text-xs text-white">

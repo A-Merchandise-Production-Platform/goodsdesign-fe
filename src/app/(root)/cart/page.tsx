@@ -200,6 +200,7 @@ export default function CartPage() {
       );
 
       await Promise.all(deletePromises);
+      setSelectedVoucher(null);
       toast.success('Items removed from cart');
       refetch();
     } catch (error) {
@@ -215,6 +216,7 @@ export default function CartPage() {
           deleteCartItemId: itemId,
         },
       });
+      setSelectedVoucher(null);
       toast.success('Item removed from cart');
       refetch();
     } catch (error) {
@@ -281,6 +283,7 @@ export default function CartPage() {
         },
       },
     });
+    setSelectedVoucher(null);
   };
 
   // Handle item selection
@@ -289,6 +292,7 @@ export default function CartPage() {
       ...prev,
       [id]: isChecked,
     }));
+    setSelectedVoucher(null);
   };
 
   // Toggle all items
@@ -298,6 +302,7 @@ export default function CartPage() {
       newSelection[item.id] = check;
     });
     setSelectedItems(newSelection);
+    setSelectedVoucher(null);
   };
 
   // Check if all items are selected
@@ -319,6 +324,7 @@ export default function CartPage() {
         },
       },
     });
+    setSelectedVoucher(null);
   };
 
   // Handle selecting a voucher
