@@ -21,32 +21,27 @@ export default function Page() {
     }).length || 0;
   const activeUsers = data?.users?.filter(user => user.isActive).length || 0;
 
-  // Calculate fake changes (simulating increases/decreases)
-  const totalChange = Math.round(Math.random() * 12) + '%';
-  const newChange = Math.round(Math.random() * 20) + '%';
-  const activeChange = Math.round(Math.random() * 5) + '%';
-
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Total Users"
-          value={totalUsers.toString()}
-          change={totalChange}
+          value={totalUsers}
+          change={0}
           changeType="positive"
           icon={<UsersIcon className="h-5 w-5" />}
         />
         <StatCard
           title="New Users This Month"
-          value={newUsers.toString()}
-          change={newChange}
+          value={newUsers}
+          change={0}
           changeType="positive"
           icon={<UserPlusIcon className="h-5 w-5" />}
         />
         <StatCard
           title="Active Users"
-          value={activeUsers.toString()}
-          change={activeChange}
+          value={activeUsers}
+          change={0}
           changeType="positive"
           icon={<UserCheckIcon className="h-5 w-5" />}
         />

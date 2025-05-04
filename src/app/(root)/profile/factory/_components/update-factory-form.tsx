@@ -68,6 +68,9 @@ export default function UpdateFactoryForm() {
               districtId: data.getMyFactory.address.districtID ?? 1442,
               wardCode: data.getMyFactory.address.wardCode ?? '20102',
               street: data.getMyFactory.address.street ?? '123 Main St',
+              formattedAddress:
+                data.getMyFactory.address.formattedAddress ??
+                '123 Main St, HCM, Vietnam',
             }
           : undefined,
         maxPrintingCapacity: data.getMyFactory.maxPrintingCapacity ?? 0,

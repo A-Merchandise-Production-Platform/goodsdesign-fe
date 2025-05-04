@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils';
 
 export interface StatCardProps {
   title: string;
-  value: string;
-  change?: string;
+  value: number;
+  change?: number;
   changeType?: 'positive' | 'negative';
   icon: React.ReactNode;
 }

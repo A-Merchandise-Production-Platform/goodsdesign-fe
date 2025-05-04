@@ -121,11 +121,8 @@ export default function FactoryDetailPage() {
           <div className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <StatCard
               title="Total Orders"
-              value={
-                dashboardData?.getFactoryDetailDashboard.totalOrders?.toString() ||
-                '0'
-              }
-              change={`${Math.round(
+              value={dashboardData?.getFactoryDetailDashboard.totalOrders || 0}
+              change={Math.round(
                 (((dashboardData?.getFactoryDetailDashboard.totalOrders || 0) -
                   (dashboardData?.getFactoryDetailDashboard
                     .lastMonthTotalOrders || 0)) /
@@ -135,7 +132,7 @@ export default function FactoryDetailPage() {
                     1,
                   )) *
                   100,
-              )}%`}
+              )}
               changeType={
                 (dashboardData?.getFactoryDetailDashboard.totalOrders || 0) >=
                 (dashboardData?.getFactoryDetailDashboard
@@ -148,10 +145,9 @@ export default function FactoryDetailPage() {
             <StatCard
               title="Pending Orders"
               value={
-                dashboardData?.getFactoryDetailDashboard.pendingOrders?.toString() ||
-                '0'
+                dashboardData?.getFactoryDetailDashboard.pendingOrders || 0
               }
-              change={`${Math.round(
+              change={Math.round(
                 (((dashboardData?.getFactoryDetailDashboard.pendingOrders ||
                   0) -
                   (dashboardData?.getFactoryDetailDashboard
@@ -162,7 +158,7 @@ export default function FactoryDetailPage() {
                     1,
                   )) *
                   100,
-              )}%`}
+              )}
               changeType={
                 (dashboardData?.getFactoryDetailDashboard.pendingOrders || 0) <
                 (dashboardData?.getFactoryDetailDashboard
@@ -174,10 +170,8 @@ export default function FactoryDetailPage() {
             />
             <StatCard
               title="Total Revenue"
-              value={formatPrice(
-                dashboardData?.getFactoryDetailDashboard.totalRevenue || 0,
-              )}
-              change={`${Math.round(
+              value={dashboardData?.getFactoryDetailDashboard.totalRevenue || 0}
+              change={Math.round(
                 (((dashboardData?.getFactoryDetailDashboard.totalRevenue || 0) -
                   (dashboardData?.getFactoryDetailDashboard
                     .lastMonthTotalRevenue || 0)) /
@@ -187,7 +181,7 @@ export default function FactoryDetailPage() {
                     1,
                   )) *
                   100,
-              )}%`}
+              )}
               changeType={
                 (dashboardData?.getFactoryDetailDashboard.totalRevenue || 0) >=
                 (dashboardData?.getFactoryDetailDashboard
@@ -200,10 +194,9 @@ export default function FactoryDetailPage() {
             <StatCard
               title="In Production"
               value={
-                dashboardData?.getFactoryDetailDashboard.inProductionOrders?.toString() ||
-                '0'
+                dashboardData?.getFactoryDetailDashboard.inProductionOrders || 0
               }
-              change={`${Math.round(
+              change={Math.round(
                 (((dashboardData?.getFactoryDetailDashboard
                   .inProductionOrders || 0) -
                   (dashboardData?.getFactoryDetailDashboard
@@ -214,7 +207,7 @@ export default function FactoryDetailPage() {
                     1,
                   )) *
                   100,
-              )}%`}
+              )}
               changeType={
                 (dashboardData?.getFactoryDetailDashboard.inProductionOrders ||
                   0) >=

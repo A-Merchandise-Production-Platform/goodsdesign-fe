@@ -27,8 +27,8 @@ import { formatPrice } from '@/lib/utils';
 
 // Define types for all data structures
 type StatCardType = {
-  value: string;
-  change: string;
+  value: number;
+  change: number;
   changeType: 'positive' | 'negative';
 };
 
@@ -112,32 +112,32 @@ export default function AdminDashboard() {
   // Prepare dashboard stats from real data
   const dashboardStats: StatsDataType = {
     totalSales: {
-      value: formatPrice(dashboardData.totalSales),
-      change: formatPercentage(dashboardData.totalSalesChange),
+      value: Number(formatPrice(dashboardData.totalSales)),
+      change: Number(formatPercentage(dashboardData.totalSalesChange)),
       changeType:
         dashboardData.totalSalesChangeType === ChangeType.Positive
           ? 'positive'
           : 'negative',
     },
     activeUsers: {
-      value: dashboardData.activeUsers.toString(),
-      change: formatPercentage(dashboardData.activeUsersChange),
+      value: dashboardData.activeUsers,
+      change: Number(formatPercentage(dashboardData.activeUsersChange)),
       changeType:
         dashboardData.activeUsersChangeType === ChangeType.Positive
           ? 'positive'
           : 'negative',
     },
     totalProducts: {
-      value: dashboardData.totalProducts.toString(),
-      change: formatPercentage(dashboardData.totalProductsChange),
+      value: dashboardData.totalProducts,
+      change: Number(formatPercentage(dashboardData.totalProductsChange)),
       changeType:
         dashboardData.totalProductsChangeType === ChangeType.Positive
           ? 'positive'
           : 'negative',
     },
     pendingOrders: {
-      value: dashboardData.pendingOrders.toString(),
-      change: formatPercentage(dashboardData.pendingOrdersChange),
+      value: dashboardData.pendingOrders,
+      change: Number(formatPercentage(dashboardData.pendingOrdersChange)),
       changeType:
         dashboardData.pendingOrdersChangeType === ChangeType.Positive
           ? 'positive'
@@ -197,8 +197,8 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Sales"
-          value={dashboardStats.totalSales.value}
-          change={dashboardStats.totalSales.change}
+          value={Number(dashboardStats.totalSales.value)}
+          change={Number(dashboardStats.totalSales.change)}
           changeType={dashboardStats.totalSales.changeType}
           icon={<DollarSignIcon className="h-5 w-5" />}
         />

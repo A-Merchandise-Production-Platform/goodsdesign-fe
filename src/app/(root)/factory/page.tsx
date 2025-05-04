@@ -62,10 +62,8 @@ export default function FactoryDashboard() {
   const factoryStats = [
     {
       title: 'Total Orders',
-      value: stats.totalOrders.value.toLocaleString(),
-      change: stats.totalOrders.percentChange
-        ? `${stats.totalOrders.percentChange}%`
-        : undefined,
+      value: stats.totalOrders.value,
+      change: stats.totalOrders.percentChange,
       changeType: stats.totalOrders.isPositive
         ? ('positive' as const)
         : ('negative' as const),
@@ -73,10 +71,8 @@ export default function FactoryDashboard() {
     },
     {
       title: 'Monthly Revenue',
-      value: formatVND(stats.monthlyRevenue.value),
-      change: stats.monthlyRevenue.percentChange
-        ? `${stats.monthlyRevenue.percentChange}%`
-        : undefined,
+      value: Number(formatVND(stats.monthlyRevenue.value)),
+      change: stats.monthlyRevenue.percentChange,
       changeType: stats.monthlyRevenue.isPositive
         ? ('positive' as const)
         : ('negative' as const),
@@ -84,10 +80,8 @@ export default function FactoryDashboard() {
     },
     {
       title: 'Legit Points',
-      value: stats.legitPoints.value.toString(),
-      change: stats.legitPoints.percentChange
-        ? `${stats.legitPoints.percentChange}%`
-        : undefined,
+      value: stats.legitPoints.value,
+      change: stats.legitPoints.percentChange,
       changeType: stats.legitPoints.isPositive
         ? ('positive' as const)
         : ('negative' as const),
@@ -95,10 +89,8 @@ export default function FactoryDashboard() {
     },
     {
       title: 'Quality Score',
-      value: `${stats.qualityScore.value}%`,
-      change: stats.qualityScore.percentChange
-        ? `${stats.qualityScore.percentChange}%`
-        : undefined,
+      value: stats.qualityScore.value,
+      change: stats.qualityScore.percentChange,
       changeType: stats.qualityScore.isPositive
         ? ('positive' as const)
         : ('negative' as const),
@@ -123,8 +115,8 @@ export default function FactoryDashboard() {
           <StatCard
             key={index}
             title={stat.title}
-            value={stat.value}
-            change={stat.change}
+            value={Number(stat.value)}
+            change={Number(stat.change)}
             changeType={stat.changeType}
             icon={stat.icon}
           />

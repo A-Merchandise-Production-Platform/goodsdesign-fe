@@ -162,7 +162,10 @@ export function LegalInformation({ form, disabled }: LegalInformationProps) {
               </div>
               <FormControl>
                 <AddressSelector
-                  value={field.value}
+                  value={{
+                    ...field.value,
+                    formattedAddress: field.value.formattedAddress ?? '',
+                  }}
                   onChange={field.onChange}
                   disabled={disabled}
                 />

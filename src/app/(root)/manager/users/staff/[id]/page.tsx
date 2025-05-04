@@ -187,12 +187,8 @@ export default function StaffDetailPage() {
           <div className="grid grid-cols-2 gap-4">
             <StatCard
               title="Completed Tasks"
-              value={dashboardData.completedTasks.toString()}
-              change={
-                dashboardData.lastMonthCompletedTasks > 0
-                  ? `+${dashboardData.lastMonthCompletedTasks}`
-                  : dashboardData.lastMonthCompletedTasks.toString()
-              }
+              value={dashboardData.completedTasks}
+              change={dashboardData.lastMonthCompletedTasks}
               changeType={
                 dashboardData.lastMonthCompletedTasks >= 0
                   ? 'positive'
@@ -202,12 +198,8 @@ export default function StaffDetailPage() {
             />
             <StatCard
               title="Active Tasks"
-              value={dashboardData.totalActiveTasks.toString()}
-              change={
-                dashboardData.lastMonthActiveTasks > 0
-                  ? `+${dashboardData.lastMonthActiveTasks}`
-                  : dashboardData.lastMonthActiveTasks.toString()
-              }
+              value={dashboardData.totalActiveTasks}
+              change={dashboardData.lastMonthActiveTasks}
               changeType={
                 dashboardData.lastMonthActiveTasks >= 0
                   ? 'positive'

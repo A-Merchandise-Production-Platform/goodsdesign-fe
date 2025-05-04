@@ -73,29 +73,29 @@ export default function Page() {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="Total Users"
-            value={totalUsers.toString()}
-            change={totalChange.change}
+            value={totalUsers}
+            change={Number(totalChange.change)}
             changeType={totalChange.type}
             icon={<UsersIcon className="h-5 w-5" />}
           />
           <StatCard
             title="Active Users"
-            value={activeUsers.toString()}
-            change={activeChange.change}
+            value={activeUsers}
+            change={Number(activeChange.change)}
             changeType={activeChange.type}
             icon={<UserCheckIcon className="h-5 w-5" />}
           />
           <StatCard
             title="New This Month"
-            value={newUsersThisMonth.toString()}
-            change={newChange.change}
+            value={newUsersThisMonth}
+            change={Number(newChange.change)}
             changeType={newChange.type}
             icon={<UserPlusIcon className="h-5 w-5" />}
           />
           <StatCard
             title="Inactive Users"
-            value={inactiveUsers.toString()}
-            change={inactiveChange.change}
+            value={inactiveUsers}
+            change={Number(inactiveChange.change)}
             changeType={inactiveChange.type}
             icon={<UserXIcon className="h-5 w-5" />}
           />

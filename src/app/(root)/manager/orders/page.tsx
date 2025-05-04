@@ -112,41 +112,31 @@ export default function ManagerOrdersPage() {
       <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Orders"
-          value={
-            dashboardData?.getManagerOrderDashboard?.totalOrders?.toString() ||
-            '0'
-          }
-          change={totalChange.change}
+          value={dashboardData?.getManagerOrderDashboard?.totalOrders || 0}
+          change={Number(totalChange.change)}
           changeType={totalChange.type}
           icon={<ClipboardIcon className="h-5 w-5" />}
         />
         <StatCard
           title="Pending Orders"
-          value={
-            dashboardData?.getManagerOrderDashboard?.pendingOrders?.toString() ||
-            '0'
-          }
-          change={pendingChange.change}
+          value={dashboardData?.getManagerOrderDashboard?.pendingOrders || 0}
+          change={Number(pendingChange.change)}
           changeType={pendingChange.type}
           icon={<ClockIcon className="h-5 w-5" />}
         />
         <StatCard
           title="In Progress"
           value={
-            dashboardData?.getManagerOrderDashboard?.inProductionOrders?.toString() ||
-            '0'
+            dashboardData?.getManagerOrderDashboard?.inProductionOrders || 0
           }
-          change={inProgressChange.change}
+          change={Number(inProgressChange.change)}
           changeType={inProgressChange.type}
           icon={<PackageIcon className="h-5 w-5" />}
         />
         <StatCard
           title="Completed"
-          value={
-            dashboardData?.getManagerOrderDashboard?.completedOrders?.toString() ||
-            '0'
-          }
-          change={completedChange.change}
+          value={dashboardData?.getManagerOrderDashboard?.completedOrders || 0}
+          change={Number(completedChange.change)}
           changeType={completedChange.type}
           icon={<DollarSignIcon className="h-5 w-5" />}
         />
