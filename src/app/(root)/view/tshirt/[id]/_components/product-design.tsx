@@ -114,26 +114,6 @@ export default function ProductDesigner({
             CANVAS_SIZE * scaleFactor,
           );
 
-          // Draw the background texture for this view
-          if (fabricCanvasRef.current?.backgroundImage) {
-            const bgImage = fabricCanvasRef.current.backgroundImage as any;
-            const bgElement = bgImage._element as HTMLImageElement;
-            if (bgElement) {
-              const { left = 0, top = 0, scaleX = 1, scaleY = 1 } = bgImage;
-              tempCtx.drawImage(
-                bgElement,
-                0,
-                0,
-                bgElement.width,
-                bgElement.height,
-                left * scaleFactor,
-                top * scaleFactor,
-                bgElement.width * scaleX * scaleFactor,
-                bgElement.height * scaleY * scaleFactor,
-              );
-            }
-          }
-
           // Draw only the designs for this view
           const viewDesigns = designs[viewName] || [];
           const imagePromises: Promise<void>[] = [];
