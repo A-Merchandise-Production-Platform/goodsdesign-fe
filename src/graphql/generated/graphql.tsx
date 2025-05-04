@@ -170,6 +170,7 @@ export type CreateOrderDetailInput = {
 
 export type CreateOrderInput = {
   orderDetails: Array<CreateOrderDetailInput>;
+  voucherId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CreatePaymentTransactionInput = {
@@ -249,6 +250,16 @@ export type CreateUserDto = {
   password: Scalars['String']['input'];
   phoneNumber?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CreateVoucherInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  isPublic?: Scalars['Boolean']['input'];
+  limitedUsage?: InputMaybe<Scalars['Int']['input']>;
+  minOrderValue?: InputMaybe<Scalars['Int']['input']>;
+  type: VoucherType;
+  userId?: InputMaybe<Scalars['String']['input']>;
+  value: Scalars['Int']['input'];
 };
 
 export type CustomerInfo = {
@@ -590,6 +601,7 @@ export type Mutation = {
   createSystemConfigVariant: SystemConfigVariantEntity;
   createUser: UserEntity;
   createUserBank: UserBankEntity;
+  createVoucher: VoucherEntity;
   deleteAddress: AddressEntity;
   deleteCartItem: CartItemEntity;
   deleteCategory: CategoryEntity;
@@ -796,6 +808,11 @@ export type MutationCreateUserArgs = {
 
 export type MutationCreateUserBankArgs = {
   createUserBankInput: CreateUserBankInput;
+};
+
+
+export type MutationCreateVoucherArgs = {
+  input: CreateVoucherInput;
 };
 
 
@@ -1339,8 +1356,12 @@ export type Query = {
   __typename?: 'Query';
   address: AddressEntity;
   addresses: Array<AddressEntity>;
+  allPublicVouchers: Array<VoucherEntity>;
+  allSystemVouchers: Array<VoucherEntity>;
+  allVouchersOfUser: Array<VoucherEntity>;
   availableServices: Array<ShippingService>;
   availableStaffForFactory: Array<UserEntity>;
+  availableVouchers: Array<VoucherEntity>;
   categories: Array<CategoryEntity>;
   category: CategoryEntity;
   designPosition: DesignPositionEntity;
@@ -1409,6 +1430,7 @@ export type Query = {
   userBanksByUserId: Array<UserBankEntity>;
   userCartItems: Array<CartItemEntity>;
   users: Array<UserEntity>;
+  voucherById: VoucherEntity;
   ward: Ward;
   wards: Array<Ward>;
 };
@@ -1602,6 +1624,11 @@ export type QueryUserBanksByUserIdArgs = {
 };
 
 
+export type QueryVoucherByIdArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type QueryWardArgs = {
   wardCode: Scalars['String']['input'];
 };
@@ -1756,6 +1783,7 @@ export type SystemConfigOrderEntity = {
   shippingDays: Scalars['Int']['output'];
   specializationScoreWeight: Scalars['Float']['output'];
   type: Scalars['String']['output'];
+  voucherBaseValueForRefund: Scalars['Int']['output'];
 };
 
 export type SystemConfigVariantEntity = {
@@ -1938,6 +1966,7 @@ export type UpdateSystemConfigOrderDto = {
   reduceLegitPointIfReject?: InputMaybe<Scalars['Int']['input']>;
   shippingDays?: InputMaybe<Scalars['Int']['input']>;
   specializationScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  voucherBaseValueForRefund?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type UpdateSystemConfigVariantInput = {
@@ -2011,6 +2040,41 @@ export type VariantAttributes = {
   colors: Array<Scalars['String']['output']>;
   models: Array<Scalars['String']['output']>;
   sizes: Array<Scalars['String']['output']>;
+};
+
+export type VoucherEntity = {
+  __typename?: 'VoucherEntity';
+  code: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  isActive: Scalars['Boolean']['output'];
+  isDeleted: Scalars['Boolean']['output'];
+  isPublic: Scalars['Boolean']['output'];
+  limitedUsage?: Maybe<Scalars['Int']['output']>;
+  minOrderValue?: Maybe<Scalars['Int']['output']>;
+  type: VoucherType;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  usages?: Maybe<Array<VoucherUsageEntity>>;
+  user?: Maybe<UserEntity>;
+  userId?: Maybe<Scalars['String']['output']>;
+  value: Scalars['Int']['output'];
+};
+
+export enum VoucherType {
+  FixedValue = 'FIXED_VALUE',
+  Percentage = 'PERCENTAGE'
+}
+
+export type VoucherUsageEntity = {
+  __typename?: 'VoucherUsageEntity';
+  id: Scalars['ID']['output'];
+  orderId: Scalars['String']['output'];
+  usedAt: Scalars['DateTime']['output'];
+  user: UserEntity;
+  userId: Scalars['String']['output'];
+  voucher: VoucherEntity;
+  voucherId: Scalars['String']['output'];
 };
 
 export type Ward = {
@@ -2468,7 +2532,7 @@ export type GetAllDiscountByProductIdQuery = { __typename?: 'Query', getAllDisco
 export type GetAllProductsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllProductsQuery = { __typename?: 'Query', products: Array<{ __typename?: 'ProductEntity', id: string, imageUrl?: string | null, isActive: boolean, name: string, updatedAt?: any | null, createdAt: any, description?: string | null, category?: { __typename?: 'CategoryEntity', name: string } | null, variants?: Array<{ __typename?: 'SystemConfigVariantEntity', price?: number | null }> | null }> };
+export type GetAllProductsQuery = { __typename?: 'Query', products: Array<{ __typename?: 'ProductEntity', categoryId: string, id: string, imageUrl?: string | null, isActive: boolean, name: string, updatedAt?: any | null, createdAt: any, description?: string | null, category?: { __typename?: 'CategoryEntity', name: string } | null, variants?: Array<{ __typename?: 'SystemConfigVariantEntity', price?: number | null }> | null }> };
 
 export type GetProductByIdQueryVariables = Exact<{
   productId: Scalars['String']['input'];
@@ -2689,6 +2753,28 @@ export type UpdateProfileMutationVariables = Exact<{
 
 
 export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null } };
+
+export type AvailableVouchersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AvailableVouchersQuery = { __typename?: 'Query', availableVouchers: Array<{ __typename?: 'VoucherEntity', code: string, createdAt: any, description?: string | null, id: string, isActive: boolean, isPublic: boolean, limitedUsage?: number | null, minOrderValue?: number | null, type: VoucherType, value: number, userId?: string | null, updatedAt?: any | null }> };
+
+export type AllVouchersOfUserQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AllVouchersOfUserQuery = { __typename?: 'Query', allVouchersOfUser: Array<{ __typename?: 'VoucherEntity', code: string, createdAt: any, description?: string | null, id: string, isActive: boolean, isPublic: boolean, limitedUsage?: number | null, minOrderValue?: number | null, type: VoucherType, value: number, userId?: string | null, updatedAt?: any | null, usages?: Array<{ __typename?: 'VoucherUsageEntity', voucherId: string, usedAt: any, orderId: string, id: string, user: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, name?: string | null, email?: string | null } }> | null }> };
+
+export type AllVouchersOfSystemQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AllVouchersOfSystemQuery = { __typename?: 'Query', allSystemVouchers: Array<{ __typename?: 'VoucherEntity', code: string, createdAt: any, description?: string | null, id: string, isActive: boolean, isPublic: boolean, limitedUsage?: number | null, minOrderValue?: number | null, type: VoucherType, value: number, userId?: string | null, updatedAt?: any | null, usages?: Array<{ __typename?: 'VoucherUsageEntity', voucherId: string, usedAt: any, orderId: string, id: string, user: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, name?: string | null, email?: string | null } }> | null }> };
+
+export type CreateVoucherMutationVariables = Exact<{
+  input: CreateVoucherInput;
+}>;
+
+
+export type CreateVoucherMutation = { __typename?: 'Mutation', createVoucher: { __typename?: 'VoucherEntity', code: string, createdAt: any, description?: string | null, id: string, isActive: boolean, isPublic: boolean, limitedUsage?: number | null, minOrderValue?: number | null, type: VoucherType, value: number, userId?: string | null, updatedAt?: any | null, usages?: Array<{ __typename?: 'VoucherUsageEntity', voucherId: string, usedAt: any, orderId: string, id: string, user: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, name?: string | null, email?: string | null } }> | null } };
 
 
 export const AddressesDocument = gql`
@@ -7066,6 +7152,7 @@ export const GetAllProductsDocument = gql`
     category {
       name
     }
+    categoryId
     id
     imageUrl
     isActive
@@ -8591,3 +8678,233 @@ export function useUpdateProfileMutation(baseOptions?: Apollo.MutationHookOption
 export type UpdateProfileMutationHookResult = ReturnType<typeof useUpdateProfileMutation>;
 export type UpdateProfileMutationResult = Apollo.MutationResult<UpdateProfileMutation>;
 export type UpdateProfileMutationOptions = Apollo.BaseMutationOptions<UpdateProfileMutation, UpdateProfileMutationVariables>;
+export const AvailableVouchersDocument = gql`
+    query AvailableVouchers {
+  availableVouchers {
+    code
+    createdAt
+    description
+    id
+    isActive
+    isPublic
+    limitedUsage
+    minOrderValue
+    type
+    value
+    userId
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useAvailableVouchersQuery__
+ *
+ * To run a query within a React component, call `useAvailableVouchersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAvailableVouchersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAvailableVouchersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAvailableVouchersQuery(baseOptions?: Apollo.QueryHookOptions<AvailableVouchersQuery, AvailableVouchersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AvailableVouchersQuery, AvailableVouchersQueryVariables>(AvailableVouchersDocument, options);
+      }
+export function useAvailableVouchersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AvailableVouchersQuery, AvailableVouchersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AvailableVouchersQuery, AvailableVouchersQueryVariables>(AvailableVouchersDocument, options);
+        }
+export function useAvailableVouchersSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AvailableVouchersQuery, AvailableVouchersQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<AvailableVouchersQuery, AvailableVouchersQueryVariables>(AvailableVouchersDocument, options);
+        }
+export type AvailableVouchersQueryHookResult = ReturnType<typeof useAvailableVouchersQuery>;
+export type AvailableVouchersLazyQueryHookResult = ReturnType<typeof useAvailableVouchersLazyQuery>;
+export type AvailableVouchersSuspenseQueryHookResult = ReturnType<typeof useAvailableVouchersSuspenseQuery>;
+export type AvailableVouchersQueryResult = Apollo.QueryResult<AvailableVouchersQuery, AvailableVouchersQueryVariables>;
+export const AllVouchersOfUserDocument = gql`
+    query AllVouchersOfUser {
+  allVouchersOfUser {
+    code
+    createdAt
+    description
+    id
+    isActive
+    isPublic
+    limitedUsage
+    minOrderValue
+    type
+    value
+    userId
+    updatedAt
+    usages {
+      voucherId
+      usedAt
+      orderId
+      id
+      user {
+        id
+        imageUrl
+        name
+        email
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useAllVouchersOfUserQuery__
+ *
+ * To run a query within a React component, call `useAllVouchersOfUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllVouchersOfUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAllVouchersOfUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAllVouchersOfUserQuery(baseOptions?: Apollo.QueryHookOptions<AllVouchersOfUserQuery, AllVouchersOfUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AllVouchersOfUserQuery, AllVouchersOfUserQueryVariables>(AllVouchersOfUserDocument, options);
+      }
+export function useAllVouchersOfUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AllVouchersOfUserQuery, AllVouchersOfUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AllVouchersOfUserQuery, AllVouchersOfUserQueryVariables>(AllVouchersOfUserDocument, options);
+        }
+export function useAllVouchersOfUserSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AllVouchersOfUserQuery, AllVouchersOfUserQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<AllVouchersOfUserQuery, AllVouchersOfUserQueryVariables>(AllVouchersOfUserDocument, options);
+        }
+export type AllVouchersOfUserQueryHookResult = ReturnType<typeof useAllVouchersOfUserQuery>;
+export type AllVouchersOfUserLazyQueryHookResult = ReturnType<typeof useAllVouchersOfUserLazyQuery>;
+export type AllVouchersOfUserSuspenseQueryHookResult = ReturnType<typeof useAllVouchersOfUserSuspenseQuery>;
+export type AllVouchersOfUserQueryResult = Apollo.QueryResult<AllVouchersOfUserQuery, AllVouchersOfUserQueryVariables>;
+export const AllVouchersOfSystemDocument = gql`
+    query AllVouchersOfSystem {
+  allSystemVouchers {
+    code
+    createdAt
+    description
+    id
+    isActive
+    isPublic
+    limitedUsage
+    minOrderValue
+    type
+    value
+    userId
+    updatedAt
+    usages {
+      voucherId
+      usedAt
+      orderId
+      id
+      user {
+        id
+        imageUrl
+        name
+        email
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useAllVouchersOfSystemQuery__
+ *
+ * To run a query within a React component, call `useAllVouchersOfSystemQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllVouchersOfSystemQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAllVouchersOfSystemQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAllVouchersOfSystemQuery(baseOptions?: Apollo.QueryHookOptions<AllVouchersOfSystemQuery, AllVouchersOfSystemQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AllVouchersOfSystemQuery, AllVouchersOfSystemQueryVariables>(AllVouchersOfSystemDocument, options);
+      }
+export function useAllVouchersOfSystemLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AllVouchersOfSystemQuery, AllVouchersOfSystemQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AllVouchersOfSystemQuery, AllVouchersOfSystemQueryVariables>(AllVouchersOfSystemDocument, options);
+        }
+export function useAllVouchersOfSystemSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AllVouchersOfSystemQuery, AllVouchersOfSystemQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<AllVouchersOfSystemQuery, AllVouchersOfSystemQueryVariables>(AllVouchersOfSystemDocument, options);
+        }
+export type AllVouchersOfSystemQueryHookResult = ReturnType<typeof useAllVouchersOfSystemQuery>;
+export type AllVouchersOfSystemLazyQueryHookResult = ReturnType<typeof useAllVouchersOfSystemLazyQuery>;
+export type AllVouchersOfSystemSuspenseQueryHookResult = ReturnType<typeof useAllVouchersOfSystemSuspenseQuery>;
+export type AllVouchersOfSystemQueryResult = Apollo.QueryResult<AllVouchersOfSystemQuery, AllVouchersOfSystemQueryVariables>;
+export const CreateVoucherDocument = gql`
+    mutation CreateVoucher($input: CreateVoucherInput!) {
+  createVoucher(input: $input) {
+    code
+    createdAt
+    description
+    id
+    isActive
+    isPublic
+    limitedUsage
+    minOrderValue
+    type
+    value
+    userId
+    updatedAt
+    usages {
+      voucherId
+      usedAt
+      orderId
+      id
+      user {
+        id
+        imageUrl
+        name
+        email
+      }
+    }
+  }
+}
+    `;
+export type CreateVoucherMutationFn = Apollo.MutationFunction<CreateVoucherMutation, CreateVoucherMutationVariables>;
+
+/**
+ * __useCreateVoucherMutation__
+ *
+ * To run a mutation, you first call `useCreateVoucherMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateVoucherMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createVoucherMutation, { data, loading, error }] = useCreateVoucherMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateVoucherMutation(baseOptions?: Apollo.MutationHookOptions<CreateVoucherMutation, CreateVoucherMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateVoucherMutation, CreateVoucherMutationVariables>(CreateVoucherDocument, options);
+      }
+export type CreateVoucherMutationHookResult = ReturnType<typeof useCreateVoucherMutation>;
+export type CreateVoucherMutationResult = Apollo.MutationResult<CreateVoucherMutation>;
+export type CreateVoucherMutationOptions = Apollo.BaseMutationOptions<CreateVoucherMutation, CreateVoucherMutationVariables>;

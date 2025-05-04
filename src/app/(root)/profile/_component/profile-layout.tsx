@@ -6,6 +6,7 @@ import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 import { Roles } from '@/graphql/generated/graphql';
 import { useAuthStore } from '@/stores/auth.store';
 import { CreditCard, Ticket, User } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 export default function ProfileLayout({
   children,

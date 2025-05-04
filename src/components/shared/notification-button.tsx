@@ -129,6 +129,12 @@ function NotificationItem({
     }
   };
 
+  const handleClick = () => {
+    if (notification.url) {
+      window.location.href = notification.url;
+    }
+  };
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -137,8 +143,10 @@ function NotificationItem({
             className={cn(
               'flex cursor-pointer items-start gap-3 rounded-none border-b px-4 py-3',
               !notification.isRead && 'bg-accent/50',
+              notification.url && 'hover:bg-accent',
             )}
             onMouseEnter={handleMouseEnter}
+            onClick={handleClick}
             onSelect={e => {
               e.preventDefault();
             }}
@@ -169,6 +177,7 @@ function NotificationItem({
                 addSuffix: true,
               })}
             </p>
+            {notification.url && <p className="text-xs">Click to navigate</p>}
           </div>
         </TooltipContent>
       </Tooltip>

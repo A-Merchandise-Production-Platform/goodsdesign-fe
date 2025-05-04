@@ -15,6 +15,7 @@ export interface NavItem {
   label: string;
   icon?: React.ReactNode;
   isActive?: boolean;
+  subPrefix?: React.ReactNode;
 }
 
 export function MySidebar({ navItems, children }: MySidebarProps) {
@@ -39,7 +40,8 @@ export function MySidebar({ navItems, children }: MySidebarProps) {
             >
               <div className="flex w-full items-center gap-2">
                 {item.icon}
-                <div>{item.label}</div>
+                <div className="line-clamp-1 flex-1">{item.label}</div>
+                {item.subPrefix}
               </div>
             </Link>
           );
