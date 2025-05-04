@@ -1,6 +1,7 @@
 'use client';
 import {
   AlertTriangle,
+  BanIcon,
   Calendar,
   CheckCheck,
   CheckCircle2,
@@ -77,7 +78,7 @@ import {
 } from '@/graphql/generated/graphql';
 import { cn, formatDate } from '@/lib/utils';
 import { filesToBase64 } from '@/utils/handle-upload';
-
+import { RejectionHistory } from '@/app/(root)/_components/rejection-history';
 // Helper function to format time
 const formatTime = (dateString: string) => {
   return new Date(dateString).toLocaleTimeString('en-US', {
@@ -717,7 +718,7 @@ export default function FactoryOrderDetailsPage() {
         onValueChange={setActiveTab}
         className="mb-6"
       >
-        <TabsList className="mb-6 grid grid-cols-5">
+        <TabsList className="mb-6 grid grid-cols-6">
           <TabsTrigger value="overview">
             <FileText className="mr-2 h-4 w-4" />
             Overview
@@ -737,6 +738,10 @@ export default function FactoryOrderDetailsPage() {
           <TabsTrigger value="rating">
             <StarIcon className="mr-2 h-4 w-4" />
             Rating
+          </TabsTrigger>
+          <TabsTrigger value="rejectionHistory">
+            <BanIcon className="mr-2 h-4 w-4" />
+            Rejection History
           </TabsTrigger>
         </TabsList>
 
@@ -1337,6 +1342,10 @@ export default function FactoryOrderDetailsPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="rejectionHistory">
+          <RejectionHistory rejectedHistory={order.rejectedHistory} />
         </TabsContent>
       </Tabs>
 

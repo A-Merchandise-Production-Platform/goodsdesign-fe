@@ -17,6 +17,7 @@ import {
   Truck,
   XCircle,
   StarIcon,
+  BanIcon,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -79,6 +80,7 @@ import {
 // Import the new components
 import { OrderHeader } from '@/app/(root)/_components/order-header';
 import { OrderStatusTimeline } from '@/app/(root)/_components/order-status-timeline';
+import { RejectionHistory } from '../../_components/rejection-history';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -337,7 +339,7 @@ export default function OrderDetailsPage() {
         onValueChange={setActiveTab}
         className="mb-6"
       >
-        <TabsList className="mb-6 grid grid-cols-5">
+        <TabsList className="mb-6 grid grid-cols-6">
           <TabsTrigger value="overview">
             <FileText className="mr-2 h-4 w-4" />
             Overview
@@ -357,6 +359,10 @@ export default function OrderDetailsPage() {
           <TabsTrigger value="rating">
             <StarIcon className="mr-2 h-4 w-4" />
             Rating
+          </TabsTrigger>
+          <TabsTrigger value="rejectionHistory">
+            <BanIcon className="mr-2 h-4 w-4" />
+            Rejection History
           </TabsTrigger>
         </TabsList>
 
@@ -923,6 +929,10 @@ export default function OrderDetailsPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="rejectionHistory">
+          <RejectionHistory rejectedHistory={order.rejectedHistory} />
         </TabsContent>
       </Tabs>
 

@@ -14,6 +14,7 @@ import {
   XCircle,
   StarIcon,
   Star,
+  BanIcon,
 } from 'lucide-react';
 import React from 'react';
 import Image from 'next/image';
@@ -93,6 +94,7 @@ import { toast } from 'sonner';
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
 import { OrderHeader } from '@/app/(root)/_components/order-header';
 import { OrderStatusTimeline } from '@/app/(root)/_components/order-status-timeline';
+import { RejectionHistory } from '@/app/(root)/_components/rejection-history';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -600,7 +602,7 @@ export default function FactoryOrderDetailsPage() {
         onValueChange={setActiveTab}
         className="mb-6"
       >
-        <TabsList className="mb-6 grid grid-cols-5">
+        <TabsList className="mb-6 grid grid-cols-6">
           <TabsTrigger value="overview">
             <FileText className="mr-2 h-4 w-4" />
             Overview
@@ -620,6 +622,11 @@ export default function FactoryOrderDetailsPage() {
           <TabsTrigger value="rating">
             <StarIcon className="mr-2 h-4 w-4" />
             Rating
+          </TabsTrigger>
+          {/* reject factories */}
+          <TabsTrigger value="rejectFactories">
+            <BanIcon className="mr-2 h-4 w-4" />
+            Reject Factories
           </TabsTrigger>
         </TabsList>
 
@@ -1172,6 +1179,11 @@ export default function FactoryOrderDetailsPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Reject Factories */}
+        <TabsContent value="rejectFactories">
+          <RejectionHistory rejectedHistory={currentOrder.rejectedHistory} />
         </TabsContent>
       </Tabs>
 
