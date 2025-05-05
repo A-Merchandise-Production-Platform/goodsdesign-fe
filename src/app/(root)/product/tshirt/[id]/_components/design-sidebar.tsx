@@ -10,11 +10,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { DesignObject } from '@/types/design-object';
+import { useAuthStore } from '@/stores/auth.store';
+import { Roles } from '@/graphql/generated/graphql';
 
 import { LayersPanel } from './layers-panel';
 import { SHIRT_COLORS } from './shirt-colors';
-import { useAuthStore } from '@/stores/auth.store';
-import { Roles } from '@/graphql/generated/graphql';
 
 interface DesignSidebarProps {
   showColorDialog: boolean;

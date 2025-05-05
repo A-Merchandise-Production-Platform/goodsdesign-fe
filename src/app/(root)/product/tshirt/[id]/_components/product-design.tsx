@@ -1287,6 +1287,9 @@ export default function ProductDesigner({
     debounceTextureUpdate();
   };
 
+  // Add a ref for color change debouncing
+  const colorChangeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const handleColorChange = (texturePath: string) => {
     setCurrentTexture(texturePath);
     // Find matching color from SHIRT_COLORS and update selectedColor
@@ -1298,6 +1301,56 @@ export default function ProductDesigner({
     }
     setShowColorDialog(false);
   };
+
+  // Handle font change for selected text object
+  const handleFontChange = (fontFamily: string) => {
+    if (!fabricCanvasRef.current) return;
+
+    const activeObject = fabricCanvasRef.current.getActiveObject();
+    if (!activeObject || !(activeObject instanceof (fabric as any).IText))
+      return;
+
+    // Update the font family
+    activeObject.set('fontFamily', fontFamily);
+    fabricCanvasRef.current.renderAll();
+
+    // Save the design and update 3D model
+    saveCurrentDesign();
+    debounceTextureUpdate();
+  };
+
+  // Handle text color change for selected text object
+  const handleTextColorChange = (color: string) => {
+    if (!fabricCanvasRef.current) return;
+
+    const activeObject = fabricCanvasRef.current.getActiveObject();
+    if (!activeObject || !(activeObject instanceof (fabric as any).IText))
+      return;
+
+    // Update the text color immediately for visual feedback
+    activeObject.set('fill', color);
+    fabricCanvasRef.current.renderAll();
+
+    // Clear any existing timeout
+    if (colorChangeTimeoutRef.current) {
+      clearTimeout(colorChangeTimeoutRef.current);
+    }
+
+    // Debounce the save and texture update
+    colorChangeTimeoutRef.current = setTimeout(() => {
+      saveCurrentDesign();
+      debounceTextureUpdate();
+    }, 500); // Wait 500ms after the last color change
+  };
+
+  // Clean up the timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (colorChangeTimeoutRef.current) {
+        clearTimeout(colorChangeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleViewChange = (newView: string) => {
     // Just update the view, useEffect will handle loading the saved design
@@ -1349,6 +1402,8 @@ export default function ProductDesigner({
         }}
         onExport={handleExport}
         onDownload={handleDownload}
+        onFontChange={handleFontChange}
+        onColorChange={handleTextColorChange}
       />
 
       <div className="flex flex-1">
