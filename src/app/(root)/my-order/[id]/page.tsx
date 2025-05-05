@@ -804,7 +804,7 @@ export default function OrderDetailsPage() {
                         </div>
                       )}
 
-                      {payment.status === 'PENDING' && (
+                      {(payment.status === 'PENDING' && payment.type == "DEPOSIT") && (
                         <div className="mt-4 flex justify-between gap-2">
                           <div className="mb-4">
                             <Select

@@ -65,6 +65,7 @@ import {
 import { formatDate } from '@/lib/utils';
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
 import { DashboardShell } from '@/components/dashboard-shell';
+import { OrderHeader } from '@/app/(root)/_components/order-header';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -306,81 +307,43 @@ export default function StaffCheckQualityDetailsPage() {
 
   return (
     <div>
-      {/* Header */}
-      <Card className="mb-6">
-        <CardHeader>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <CardTitle className="text-2xl font-bold">
-                Order #{order.id}
-              </CardTitle>
-              <CardDescription className="mt-2">
-                <div className="flex items-center">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {formatDate(order.orderDate)} at {formatTime(order.orderDate)}
-                </div>
-              </CardDescription>
-            </div>
-            <div className="mt-4 flex flex-col md:mt-0 md:flex-row md:items-center md:gap-4">
-              <div>{getStatusBadge(order.status)}</div>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <div className="flex flex-col space-y-1">
-              <span className="text-muted-foreground text-sm font-medium">
-                Customer
-              </span>
-              <div className="flex items-center">
-                <div className="relative mr-2 h-8 w-8 overflow-hidden rounded-full">
-                  <Image
-                    src={
-                      order?.customer?.imageUrl ||
-                      '/placeholder.svg?height=32&width=32'
-                    }
-                    alt={order?.customer?.name || 'Customer'}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div>
-                  <p className="font-medium">{order?.customer?.name}</p>
-                  <p className="text-muted-foreground text-sm">
-                    {order?.customer?.email}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-muted-foreground text-sm font-medium">
-                Total Items
-              </span>
-              <span className="font-medium">{order.totalItems}</span>
-              <span className="text-muted-foreground text-sm">
-                {orderDetails.length} products
-              </span>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-muted-foreground text-sm font-medium">
-                Total Amount
-              </span>
-              <span className="font-medium">
-                {formatCurrency(order.totalPrice)}
-              </span>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-muted-foreground text-sm font-medium">
-                Factory
-              </span>
-              <span className="font-medium">{order.factory?.name}</span>
-              <span className="text-muted-foreground text-sm">
-                {order.factory?.owner?.name}
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Order Header */}
+      {order && (
+        <OrderHeader
+          order={{
+            id: order.id,
+            orderDate: order.orderDate || '',
+            status: order.status,
+            customer: order.customer
+              ? {
+                  name: order.customer.name || undefined,
+                  email: order.customer.email || undefined,
+                  imageUrl: order.customer.imageUrl || undefined,
+                }
+              : undefined,
+            totalPrice: order.totalPrice || 0,
+            totalItems: order.totalItems || 0,
+            estimatedCompletionAt: order.estimatedCompletionAt || '',
+            isDelayed: Boolean(order.isDelayed),
+            currentProgress: order.currentProgress || 0,
+            shippingPrice: order.shippingPrice || 0,
+            customerAddress: order.address?.formattedAddress || '',
+            factoryAddress: order.factory?.address?.formattedAddress || '',
+            factory: order.factory
+              ? {
+                  name: order.factory.name || undefined,
+                  owner: order.factory.owner
+                    ? {
+                        name: order.factory.owner.name || undefined,
+                        email: order.factory.owner.email || undefined,
+                        imageUrl: order.factory.owner.imageUrl || undefined,
+                      }
+                    : undefined,
+                }
+              : undefined,
+          }}
+        />
+      )}
 
       {/* Order Details Selection */}
       <Card className="mb-6">
