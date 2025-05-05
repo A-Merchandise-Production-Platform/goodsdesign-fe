@@ -1,7 +1,7 @@
 'use client';
 
 import { PlusCircleIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -35,175 +35,192 @@ import {
 } from '@/graphql/generated/graphql';
 import { useAuthStore } from '@/stores/auth.store';
 
+export interface OrderInformationRef {
+  validate: () => boolean;
+  getFormData: () => {
+    address: AddressEntity | null;
+    phone: string;
+  };
+}
+
 interface OrderInformationProps {
   onAddressChange: (address: AddressEntity) => void;
+  onValidityChange: (isValid: boolean) => void;
 }
 
-export default function OrderInformation({
-  onAddressChange,
-}: OrderInformationProps) {
-  const { isAuth } = useAuthStore();
-  const {
-    data: addressesData,
-    loading: addressesLoading,
-    refetch: refetchAddresses,
-  } = useAddressesQuery();
-  const { data: userData, loading: userLoading } = useGetMeQuery({
-    skip: !isAuth,
-  });
-
-  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
-    null,
-  );
-  const [phone, setPhone] = useState('');
-  const [debouncedPhone, setDebouncedPhone] = useState('');
-  const [isAddressFormOpen, setIsAddressFormOpen] = useState(false);
-
-  const [updatePhoneNumber, { loading: isUpdatingPhoneNumber }] =
-    useUpdatePhoneNumberMutation({
-      onCompleted: () => {
-        toast.success('Phone number updated successfully');
-      },
-      onError: () => {
-        toast.error('Failed to update phone number');
-      },
-      fetchPolicy: 'network-only',
+const OrderInformation = forwardRef<OrderInformationRef, OrderInformationProps>(
+  ({ onAddressChange, onValidityChange }, ref) => {
+    const { isAuth } = useAuthStore();
+    const {
+      data: addressesData,
+      loading: addressesLoading,
+      refetch: refetchAddresses,
+    } = useAddressesQuery();
+    const { data: userData, loading: userLoading } = useGetMeQuery({
+      skip: !isAuth,
     });
 
-  // Debounce phone updates
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedPhone(phone);
-    }, 500);
+    const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
+      null,
+    );
+    const [phone, setPhone] = useState('');
+    const [isAddressFormOpen, setIsAddressFormOpen] = useState(false);
 
-    return () => clearTimeout(timer);
-  }, [phone]);
+    // Set initial values
+    useEffect(() => {
+      if (
+        addressesData?.addresses &&
+        addressesData.addresses.length > 0 &&
+        !selectedAddressId
+      ) {
+        setSelectedAddressId(addressesData.addresses[0].id);
+      }
 
-  // Update phone number when debounced value changes
-  useEffect(() => {
-    if (debouncedPhone && debouncedPhone !== userData?.getMe?.phoneNumber) {
-      updatePhoneNumber({
-        variables: {
-          updatePhoneNumberInput: { phoneNumber: debouncedPhone },
-        },
+      if (userData?.getMe?.phoneNumber) {
+        setPhone(userData.getMe.phoneNumber);
+      }
+    }, [addressesData, userData, selectedAddressId]);
+
+    useEffect(() => {
+      if (selectedAddressId) {
+        const selectedAddress = addressesData?.addresses.find(
+          address => address.id === selectedAddressId,
+        );
+        if (selectedAddress) {
+          onAddressChange({
+            ...selectedAddress,
+            userId: userData?.getMe?.id || '',
+          });
+        }
+      }
+    }, [selectedAddressId, addressesData, onAddressChange]);
+
+    // Check form validity whenever relevant fields change
+    useEffect(() => {
+      const isValid = Boolean(selectedAddressId && phone);
+      onValidityChange(isValid);
+    }, [selectedAddressId, phone, onValidityChange]);
+
+    // Handle adding a new address and automatic selection
+    const handleAddressAdded = (id: string) => {
+      refetchAddresses().then(result => {
+        if (result.data?.addresses && result.data.addresses.length > 0) {
+          // Select the newly added address (should be the last one)
+          setSelectedAddressId(id);
+          setIsAddressFormOpen(false);
+          toast.success('Address added and selected');
+        }
       });
-    }
-  }, [debouncedPhone, updatePhoneNumber, userData?.getMe?.phoneNumber]);
+    };
 
-  // Set initial values
-  useEffect(() => {
-    if (
-      addressesData?.addresses &&
-      addressesData.addresses.length > 0 &&
-      !selectedAddressId
-    ) {
-      setSelectedAddressId(addressesData.addresses[0].id);
-    }
+    useImperativeHandle(ref, () => ({
+      validate: () => {
+        if (!selectedAddressId) {
+          toast.error('Please select a shipping address');
+          return false;
+        }
 
-    if (userData?.getMe?.phoneNumber) {
-      setPhone(userData.getMe.phoneNumber);
-      setDebouncedPhone(userData.getMe.phoneNumber);
-    }
-  }, [addressesData, userData, selectedAddressId]);
+        if (!phone) {
+          toast.error('Please enter a phone number');
+          return false;
+        }
 
-  useEffect(() => {
-    if (selectedAddressId) {
-      const selectedAddress = addressesData?.addresses.find(
-        address => address.id === selectedAddressId,
-      );
-      if (selectedAddress) {
-        onAddressChange({
-          ...selectedAddress,
-          userId: userData?.getMe?.id || '',
-        });
-      }
-    }
-  }, [selectedAddressId, addressesData, onAddressChange]);
+        return true;
+      },
+      getFormData: () => {
+        const selectedAddress = addressesData?.addresses.find(
+          address => address.id === selectedAddressId,
+        );
+        return {
+          address: selectedAddress
+            ? {
+                ...selectedAddress,
+                userId: userData?.getMe?.id || '',
+              }
+            : null,
+          phone,
+        };
+      },
+    }));
 
-  // Handle adding a new address and automatic selection
-  const handleAddressAdded = (id: string) => {
-    refetchAddresses().then(result => {
-      if (result.data?.addresses && result.data.addresses.length > 0) {
-        // Select the newly added address (should be the last one)
-        setSelectedAddressId(id);
-        setIsAddressFormOpen(false);
-        toast.success('Address added and selected');
-      }
-    });
-  };
+    return (
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label htmlFor="address">Shipping Address</Label>
+          <div className="flex w-full gap-2">
+            <div className="w-[calc(100%-2.75rem)]">
+              {addressesLoading ? (
+                <div>Loading...</div>
+              ) : addressesData?.addresses &&
+                addressesData.addresses.length > 0 ? (
+                <Select
+                  value={selectedAddressId || undefined}
+                  onValueChange={value => setSelectedAddressId(value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue
+                      placeholder="Select an address"
+                      className="w-[calc(100%-2.75rem)] truncate"
+                    />
+                  </SelectTrigger>
+                  <SelectContent className="w-full">
+                    {addressesData.addresses.map(address => (
+                      <SelectItem
+                        key={address.id}
+                        value={address.id}
+                        className="w-full"
+                      >
+                        <span className="block w-full truncate">
+                          {address.formattedAddress}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="text-muted-foreground flex h-9 w-[calc(100%-2.75rem)] items-center truncate rounded-lg border px-2">
+                  No addresses available
+                </div>
+              )}
+            </div>
 
-  return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="address">Shipping Address</Label>
-        <div className="flex w-full gap-2">
-          <div className="w-[calc(100%-2.75rem)]">
-            {addressesLoading ? (
-              <div>Loading...</div>
-            ) : addressesData?.addresses &&
-              addressesData.addresses.length > 0 ? (
-              <Select
-                value={selectedAddressId || undefined}
-                onValueChange={value => setSelectedAddressId(value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue
-                    placeholder="Select an address"
-                    className="w-[calc(100%-2.75rem)] truncate"
-                  />
-                </SelectTrigger>
-                <SelectContent className="w-full">
-                  {addressesData.addresses.map(address => (
-                    <SelectItem
-                      key={address.id}
-                      value={address.id}
-                      className="w-full"
-                    >
-                      <span className="block w-full truncate">
-                        {address.formattedAddress}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : (
-              <div className="text-muted-foreground w-[calc(100%-2.75rem)] truncate">
-                No addresses available
-              </div>
-            )}
+            <Dialog
+              open={isAddressFormOpen}
+              onOpenChange={setIsAddressFormOpen}
+            >
+              <DialogTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <PlusCircleIcon className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="min-w-[800px]">
+                <DialogHeader>
+                  <DialogTitle>Add New Address</DialogTitle>
+                  <DialogDescription>
+                    Add a new shipping address to your account
+                  </DialogDescription>
+                </DialogHeader>
+                <AddressForm onAddressAdded={handleAddressAdded} />
+              </DialogContent>
+            </Dialog>
           </div>
+        </div>
 
-          <Dialog open={isAddressFormOpen} onOpenChange={setIsAddressFormOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="icon">
-                <PlusCircleIcon className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="min-w-[800px]">
-              <DialogHeader>
-                <DialogTitle>Add New Address</DialogTitle>
-                <DialogDescription>
-                  Add a new shipping address to your account
-                </DialogDescription>
-              </DialogHeader>
-              <AddressForm onAddressAdded={handleAddressAdded} />
-            </DialogContent>
-          </Dialog>
+        <div className="space-y-2">
+          <Label htmlFor="phone">Phone Number</Label>
+          <PhoneInput
+            defaultCountry="VN"
+            placeholder="Enter your phone number"
+            value={phone}
+            onChange={e => {
+              setPhone(e);
+            }}
+          />
         </div>
       </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="phone">Phone Number</Label>
-        <PhoneInput
-          defaultCountry="VN"
-          placeholder="Enter your phone number"
-          value={phone}
-          onChange={e => setPhone(e)}
-        />
-      </div>
-    </div>
-  );
-}
+    );
+  },
+);
 
 function AddressForm({
   onAddressAdded,
@@ -279,3 +296,5 @@ function AddressForm({
     </div>
   );
 }
+
+export default OrderInformation;

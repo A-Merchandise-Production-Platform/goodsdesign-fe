@@ -1,0 +1,11 @@
+query GetExpiredTime($email: String!) {
+  getExpiredTime(email: $email)
+}
+
+mutation ResendOTP($email: String!) {
+  resendOTP(email: $email)
+}
+
+mutation VerifyOTP($verifyOtpInput: VerifyOtpInput!) {
+  verifyOTP(verifyOtpInput: $verifyOtpInput)
+}

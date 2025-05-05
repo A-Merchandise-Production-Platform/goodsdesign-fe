@@ -17,6 +17,7 @@ import ApolloClientProvider from '@/providers/apollo-client-provider';
 import AuthProvider from '@/providers/auth-provider';
 import SocketIOClientProvider from '@/providers/socket-io-client-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
+import EmailVerifiedProvider from '@/providers/email-verified-provider';
 
 // Primary font - Outfit
 const outfit = Outfit({
@@ -118,7 +119,7 @@ export default function RootLayout({
                 <ScrollArea className="h-screen">
                   <main className="container mx-auto pt-16">
                     <Header />
-                    {children}
+                    <EmailVerifiedProvider>{children}</EmailVerifiedProvider>
                     <Footer />
                   </main>
                 </ScrollArea>

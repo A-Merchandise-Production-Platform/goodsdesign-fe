@@ -2,16 +2,20 @@ import { toast } from 'sonner';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { UserEntity } from '@/graphql/generated/graphql';
+import { GetMeQuery, LoginMutation } from '@/graphql/generated/graphql';
 
 interface AuthStoreState {
   isAuth: boolean;
-  user: UserEntity | undefined;
+  user: GetMeQuery['getMe'] | undefined;
   accessToken: string | undefined;
   refreshToken: string | undefined;
-  login: (payload: any) => Promise<void>;
+  login: (payload: {
+    accessToken: string;
+    refreshToken: string;
+    user: LoginMutation['login']['user'];
+  }) => Promise<void>;
   logout: () => Promise<void>;
-  setUser: (user: UserEntity) => void;
+  setUser: (user: GetMeQuery['getMe']) => void;
 }
 
 export const defaultState: AuthStoreState = {
@@ -45,7 +49,7 @@ export const useAuthStore = create<AuthStoreState>()(
         });
         toast.success('Logged out successfully');
       },
-      setUser: (user: UserEntity) => {
+      setUser: (user: GetMeQuery['getMe']) => {
         set({ user });
       },
     }),

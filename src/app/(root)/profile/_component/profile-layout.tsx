@@ -5,7 +5,7 @@ import React, { useMemo } from 'react';
 import { MySidebar, NavItem } from '@/components/shared/my-sidebar';
 import { Roles } from '@/graphql/generated/graphql';
 import { useAuthStore } from '@/stores/auth.store';
-import { CreditCard, Ticket, User } from 'lucide-react';
+import { CreditCard, Factory, Ticket, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 export default function ProfileLayout({
@@ -31,7 +31,11 @@ export default function ProfileLayout({
     ];
 
     if (user?.role === Roles.Factoryowner) {
-      items.splice(1, 0, { href: '/profile/factory', label: 'Factory' });
+      items.splice(1, 0, {
+        href: '/profile/factory',
+        label: 'Factory',
+        icon: <Factory className="size-4" />,
+      });
     }
 
     return items;
