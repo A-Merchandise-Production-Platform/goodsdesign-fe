@@ -253,11 +253,11 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
           </div>
         </Button>
 
-        <LayersPanel
+        {/* <LayersPanel
           disabled={uploadLoading}
           designs={designs}
           onReorder={onReorderLayers}
-        />
+        /> */}
       </div>
     </div>
   );
