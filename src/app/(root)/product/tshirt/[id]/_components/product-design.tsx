@@ -823,7 +823,6 @@ export default function ProductDesigner({
       const base: DesignObject = {
         view: obj.get('data')?.view || view,
         type: obj.type || '',
-        layer: obj.layer || 1,
         left: obj.left || 0,
         top: obj.top || 0,
         width: obj.width || 0,
@@ -906,7 +905,7 @@ export default function ProductDesigner({
     });
 
     // Load saved objects for the CURRENT view only
-    savedDesign.forEach((objData: DesignObject) => {
+    savedDesign.forEach((objData: DesignObject, index: number) => {
       if (objData.type === 'textbox' && objData.text) {
         const text = new (fabric as any).IText(objData.text, {
           left: objData.left,
@@ -917,10 +916,11 @@ export default function ProductDesigner({
           scaleX: objData.scaleX,
           scaleY: objData.scaleY,
           angle: objData.angle,
-          layer: objData.layer || 1,
         });
         // Store the view with the object
         text.set('data', { view: objData.view || view });
+        // Set z-index based on array index (higher index = higher z-index)
+        text.set('zIndex', savedDesign.length - index);
 
         // Apply clip path for the CURRENT view
         applyClipPathToObject(text, view);
@@ -936,10 +936,11 @@ export default function ProductDesigner({
             scaleX: objData.scaleX,
             scaleY: objData.scaleY,
             angle: objData.angle,
-            layer: objData.layer || 1,
           });
           // Store the view with the object
           fabricImage.set('data', { view: objData.view || view });
+          // Set z-index based on array index (higher index = higher z-index)
+          fabricImage.set('zIndex', savedDesign.length - index);
 
           // Apply clip path for the CURRENT view
           applyClipPathToObject(fabricImage, view);
@@ -977,6 +978,50 @@ export default function ProductDesigner({
     fabricCanvasRef.current.on('object:moving', debounceTextureUpdate); // Update 3D model during movement
     fabricCanvasRef.current.on('object:scaling', debounceTextureUpdate); // Update 3D model during scaling
     fabricCanvasRef.current.on('object:rotating', debounceTextureUpdate); // Update 3D model during rotation
+
+    // Handle object reordering when moving
+    fabricCanvasRef.current.on('object:moving', (e: any) => {
+      const activeObject = e.target;
+      if (!activeObject) return;
+
+      const objects = fabricCanvasRef.current.getObjects();
+      const activeIndex = objects.indexOf(activeObject);
+
+      // Get the object's center point
+      const center = activeObject.getCenterPoint();
+
+      // Find the object that's being dragged over
+      const targetObject = objects.find((obj: any) => {
+        if (obj === activeObject || obj.get('data')?.type === 'designZone')
+          return false;
+        const objCenter = obj.getCenterPoint();
+        return Math.abs(objCenter.y - center.y) < 20; // 20px threshold for overlap
+      });
+
+      if (targetObject) {
+        const targetIndex = objects.indexOf(targetObject);
+
+        // Reorder the array
+        const currentDesigns = [...(designs[view] || [])];
+        const [movedDesign] = currentDesigns.splice(activeIndex, 1);
+        currentDesigns.splice(targetIndex, 0, movedDesign);
+
+        // Update state with new order
+        setDesigns(prev => ({
+          ...prev,
+          [view]: currentDesigns,
+        }));
+
+        // Update z-index for all objects
+        objects.forEach((obj: any, index: number) => {
+          if (obj.get('data')?.type !== 'designZone') {
+            obj.set('zIndex', objects.length - index);
+          }
+        });
+
+        fabricCanvasRef.current.renderAll();
+      }
+    });
 
     // Save design only when modification is complete
     fabricCanvasRef.current.on('mouse:up', () => {
@@ -1166,7 +1211,6 @@ export default function ProductDesigner({
         scaleY: scale,
         left: limits.minX + (maxWidth - (fabricImage.width ?? 0) * scale) / 2,
         top: limits.minY + (maxHeight - (fabricImage.height ?? 0) * scale) / 2,
-        layer: 1, // Initialize with default layer 1
       });
 
       // Store the current view with the image
@@ -1226,7 +1270,6 @@ export default function ProductDesigner({
       originY: 'top',
       selectable: true,
       evented: true,
-      layer: 1, // Initialize with default layer 1
     });
 
     // Store the current view with the text object
@@ -1341,7 +1384,7 @@ export default function ProductDesigner({
               [view]: currentDesigns,
             }));
 
-            // Re-render canvas with new order
+            // Get canvas and its objects
             const canvas = fabricCanvasRef.current;
             const objects = canvas
               .getObjects()
@@ -1350,8 +1393,8 @@ export default function ProductDesigner({
             // Clear canvas except design zone
             objects.forEach((obj: any) => canvas.remove(obj));
 
-            // Add objects in new order
-            currentDesigns.forEach(design => {
+            // Add objects in new order (from bottom to top)
+            currentDesigns.forEach((design, index) => {
               if (design.type === 'textbox' && design.text) {
                 const text = new (fabric as any).IText(design.text, {
                   left: design.left,
@@ -1362,7 +1405,6 @@ export default function ProductDesigner({
                   scaleX: design.scaleX,
                   scaleY: design.scaleY,
                   angle: design.angle,
-                  layer: design.layer || 1,
                 });
                 text.set('data', { view: design.view });
                 applyClipPathToObject(text, view);
@@ -1378,7 +1420,6 @@ export default function ProductDesigner({
                     scaleX: design.scaleX,
                     scaleY: design.scaleY,
                     angle: design.angle,
-                    layer: design.layer || 1,
                   });
                   fabricImage.set('data', { view: design.view });
                   applyClipPathToObject(fabricImage, view);
@@ -1389,6 +1430,7 @@ export default function ProductDesigner({
               }
             });
 
+            // Force canvas to update
             canvas.renderAll();
             debounceTextureUpdate();
 

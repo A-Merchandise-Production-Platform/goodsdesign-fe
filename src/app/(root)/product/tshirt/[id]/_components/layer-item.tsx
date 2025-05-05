@@ -24,7 +24,7 @@ export function LayerItem({ id, designObject }: LayerItemProps) {
 
   useEffect(() => {
     // Load image preview for image objects
-    if (designObject.type === 'image' && designObject.src) {
+    if (designObject?.type === 'image' && designObject?.src) {
       setImagePreview(designObject.src);
     }
   }, [designObject]);
@@ -34,6 +34,10 @@ export function LayerItem({ id, designObject }: LayerItemProps) {
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
+
+  if (!designObject) {
+    return null;
+  }
 
   return (
     <div

@@ -748,7 +748,6 @@ export default function ProductDesigner({
       const base: DesignObject = {
         view: obj.get('data')?.view || view,
         type: obj.type || '',
-        layer: obj.layer || 1,
         left: obj.left || 0,
         top: obj.top || 0,
         width: obj.width || 0,
@@ -809,7 +808,6 @@ export default function ProductDesigner({
           scaleX: objData.scaleX,
           scaleY: objData.scaleY,
           angle: objData.angle,
-          layer: objData.layer || 1,
         });
         // Store the view with the object
         text.set('data', { view: objData.view || view });
@@ -828,7 +826,6 @@ export default function ProductDesigner({
             scaleX: objData.scaleX,
             scaleY: objData.scaleY,
             angle: objData.angle,
-            layer: objData.layer || 1,
             lockMovementX: true,
             lockMovementY: true,
             lockRotation: true,
@@ -1030,7 +1027,6 @@ export default function ProductDesigner({
       originY: 'top',
       selectable: true,
       evented: true,
-      layer: 1, // Initialize with default layer 1
     });
 
     // Store the current view with the text object
