@@ -176,6 +176,10 @@ export type CreateOrderInput = {
   voucherId?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type CreateOtpInput = {
+  email: Scalars['String']['input'];
+};
+
 export type CreatePaymentTransactionInput = {
   amount: Scalars['Int']['input'];
   customerId: Scalars['String']['input'];
@@ -592,6 +596,7 @@ export type Mutation = {
   createNotification: NotificationEntity;
   createNotificationForManyUsers: Array<NotificationEntity>;
   createNotificationForUsersByRoles: Array<NotificationEntity>;
+  createOTP: Otp;
   createOrder: OrderEntity;
   createPayment: Scalars['String']['output'];
   createPaymentTransaction: PaymentTransactionEntity;
@@ -633,6 +638,7 @@ export type Mutation = {
   removeSystemConfigBank: SystemConfigBankEntity;
   removeSystemConfigDiscount: SystemConfigDiscountEntity;
   removeSystemConfigVariant: SystemConfigVariantEntity;
+  resendOTP: Scalars['Boolean']['output'];
   restoreCategory: CategoryEntity;
   restoreProduct: ProductEntity;
   sendEmail: Scalars['Boolean']['output'];
@@ -660,6 +666,7 @@ export type Mutation = {
   updateUser: UserEntity;
   updateUserBank: UserBankEntity;
   uploadFile: FileUploadResponse;
+  verifyOTP: Scalars['Boolean']['output'];
 };
 
 
@@ -747,6 +754,11 @@ export type MutationCreateNotificationForUsersByRolesArgs = {
   roles: Array<Scalars['String']['input']>;
   title: Scalars['String']['input'];
   url?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCreateOtpArgs = {
+  createOtpInput: CreateOtpInput;
 };
 
 
@@ -957,6 +969,11 @@ export type MutationRemoveSystemConfigVariantArgs = {
 };
 
 
+export type MutationResendOtpArgs = {
+  email: Scalars['String']['input'];
+};
+
+
 export type MutationRestoreCategoryArgs = {
   id: Scalars['String']['input'];
 };
@@ -1102,6 +1119,11 @@ export type MutationUploadFileArgs = {
   file?: InputMaybe<Scalars['Upload']['input']>;
 };
 
+
+export type MutationVerifyOtpArgs = {
+  verifyOtpInput: VerifyOtpInput;
+};
+
 export type MyStaffDashboardResponse = {
   __typename?: 'MyStaffDashboardResponse';
   currentFactory: FactoryDetails;
@@ -1228,6 +1250,7 @@ export enum OrderStatus {
   Completed = 'COMPLETED',
   InProduction = 'IN_PRODUCTION',
   NeedManagerHandle = 'NEED_MANAGER_HANDLE',
+  NeedManagerHandleRework = 'NEED_MANAGER_HANDLE_REWORK',
   PaymentReceived = 'PAYMENT_RECEIVED',
   Pending = 'PENDING',
   PendingAcceptance = 'PENDING_ACCEPTANCE',
@@ -1257,6 +1280,12 @@ export type OrderWithFactory = {
   orderDate: Scalars['DateTime']['output'];
   status: Scalars['String']['output'];
   totalPrice: Scalars['Int']['output'];
+};
+
+export type Otp = {
+  __typename?: 'Otp';
+  code: Scalars['String']['output'];
+  email: Scalars['String']['output'];
 };
 
 export type PaymentEntity = {
@@ -1392,6 +1421,7 @@ export type Query = {
   getCartItem: CartItemEntity;
   getCartItemCount: Scalars['Float']['output'];
   getEnhancedManagerDashboard: EnhancedManagerDashboardResponse;
+  getExpiredTime: Scalars['DateTime']['output'];
   getFactoryById: FactoryEntity;
   getFactoryDetailDashboard: FactoryDetailDashboardResponse;
   getManagerDashboard: ManagerDashboardResponse;
@@ -1521,6 +1551,11 @@ export type QueryGetApplicableDiscountArgs = {
 
 export type QueryGetCartItemArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type QueryGetExpiredTimeArgs = {
+  email: Scalars['String']['input'];
 };
 
 
@@ -2047,6 +2082,7 @@ export type UserEntity = {
   imageUrl?: Maybe<Scalars['String']['output']>;
   isActive: Scalars['Boolean']['output'];
   isDeleted: Scalars['Boolean']['output'];
+  isVerified: Scalars['Boolean']['output'];
   name?: Maybe<Scalars['String']['output']>;
   ownedFactory?: Maybe<FactoryEntity>;
   phoneNumber?: Maybe<Scalars['String']['output']>;
@@ -2061,6 +2097,11 @@ export type VariantAttributes = {
   colors: Array<Scalars['String']['output']>;
   models: Array<Scalars['String']['output']>;
   sizes: Array<Scalars['String']['output']>;
+};
+
+export type VerifyOtpInput = {
+  code: Scalars['String']['input'];
+  email: Scalars['String']['input'];
 };
 
 export type VoucherEntity = {
@@ -2146,21 +2187,21 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthResponseDto', accessToken: string, refreshToken: string, user: { __typename?: 'UserEntity', createdAt: any, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, ownedFactory?: { __typename?: 'FactoryEntity', name: string, factoryStatus?: FactoryStatus | null } | null } } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthResponseDto', accessToken: string, refreshToken: string, user: { __typename?: 'UserEntity', createdAt: any, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, isVerified: boolean, ownedFactory?: { __typename?: 'FactoryEntity', name: string, factoryStatus?: FactoryStatus | null } | null } } };
 
 export type RegisterMutationVariables = Exact<{
   registerInput: RegisterDto;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'AuthResponseDto', accessToken: string, refreshToken: string, user: { __typename?: 'UserEntity', createdAt: any, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, ownedFactory?: { __typename?: 'FactoryEntity', name: string, factoryStatus?: FactoryStatus | null } | null } } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'AuthResponseDto', accessToken: string, refreshToken: string, user: { __typename?: 'UserEntity', createdAt: any, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, isVerified: boolean, ownedFactory?: { __typename?: 'FactoryEntity', name: string, factoryStatus?: FactoryStatus | null } | null } } };
 
 export type RefreshTokenMutationVariables = Exact<{
   refreshTokenInput: RefreshTokenDto;
 }>;
 
 
-export type RefreshTokenMutation = { __typename?: 'Mutation', refreshToken: { __typename?: 'AuthResponseDto', accessToken: string, refreshToken: string, user: { __typename?: 'UserEntity', createdAt: any, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, ownedFactory?: { __typename?: 'FactoryEntity', name: string, factoryStatus?: FactoryStatus | null } | null } } };
+export type RefreshTokenMutation = { __typename?: 'Mutation', refreshToken: { __typename?: 'AuthResponseDto', accessToken: string, refreshToken: string, user: { __typename?: 'UserEntity', createdAt: any, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, isVerified: boolean, ownedFactory?: { __typename?: 'FactoryEntity', name: string, factoryStatus?: FactoryStatus | null } | null } } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -2170,7 +2211,7 @@ export type LogoutMutation = { __typename?: 'Mutation', logout: string };
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { __typename?: 'Query', getMe: { __typename?: 'UserEntity', createdAt: any, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, isDeleted: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, ownedFactory?: { __typename?: 'FactoryEntity', name: string, factoryStatus?: FactoryStatus | null } | null } };
+export type GetMeQuery = { __typename?: 'Query', getMe: { __typename?: 'UserEntity', createdAt: any, dateOfBirth?: any | null, email?: string | null, gender: boolean, id: string, imageUrl?: string | null, isActive: boolean, isDeleted: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, isVerified: boolean, ownedFactory?: { __typename?: 'FactoryEntity', name: string, factoryStatus?: FactoryStatus | null } | null } };
 
 export type GetUserCartItemsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2479,6 +2520,27 @@ export type AssignFactoryToOrderMutationVariables = Exact<{
 
 export type AssignFactoryToOrderMutation = { __typename?: 'Mutation', assignFactoryToOrder: { __typename?: 'OrderEntity', id: string } };
 
+export type GetExpiredTimeQueryVariables = Exact<{
+  email: Scalars['String']['input'];
+}>;
+
+
+export type GetExpiredTimeQuery = { __typename?: 'Query', getExpiredTime: any };
+
+export type ResendOtpMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+}>;
+
+
+export type ResendOtpMutation = { __typename?: 'Mutation', resendOTP: boolean };
+
+export type VerifyOtpMutationVariables = Exact<{
+  verifyOtpInput: VerifyOtpInput;
+}>;
+
+
+export type VerifyOtpMutation = { __typename?: 'Mutation', verifyOTP: boolean };
+
 export type ProductDesignsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -2733,21 +2795,21 @@ export type DeleteUserBankMutation = { __typename?: 'Mutation', deleteUserBank: 
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null }> };
+export type GetUsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, isVerified: boolean }> };
 
 export type GetUserQueryVariables = Exact<{
   userId: Scalars['String']['input'];
 }>;
 
 
-export type GetUserQuery = { __typename?: 'Query', user: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null } };
+export type GetUserQuery = { __typename?: 'Query', user: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, isVerified: boolean } };
 
 export type CreateUserMutationVariables = Exact<{
   createUserInput: CreateUserDto;
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null } };
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, isVerified: boolean } };
 
 export type UpdateUserMutationVariables = Exact<{
   updateUserInput: UpdateUserDto;
@@ -2755,14 +2817,14 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null } };
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, isVerified: boolean } };
 
 export type DeleteUserMutationVariables = Exact<{
   deleteUserId: Scalars['String']['input'];
 }>;
 
 
-export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null } };
+export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, isVerified: boolean } };
 
 export type GetAvailableStaffForFactoryQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2774,7 +2836,7 @@ export type UpdateProfileMutationVariables = Exact<{
 }>;
 
 
-export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null } };
+export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, gender: boolean, email?: string | null, dateOfBirth?: any | null, createdAt: any, isActive: boolean, name?: string | null, phoneNumber?: string | null, role: Roles, updatedAt?: any | null, isVerified: boolean } };
 
 export type UpdatePhoneNumberMutationVariables = Exact<{
   updatePhoneNumberInput: UpdatePhoneNumberDto;
@@ -3031,6 +3093,7 @@ export const LoginDocument = gql`
       phoneNumber
       role
       updatedAt
+      isVerified
       ownedFactory {
         name
         factoryStatus
@@ -3082,6 +3145,7 @@ export const RegisterDocument = gql`
       phoneNumber
       role
       updatedAt
+      isVerified
       ownedFactory {
         name
         factoryStatus
@@ -3133,6 +3197,7 @@ export const RefreshTokenDocument = gql`
       phoneNumber
       role
       updatedAt
+      isVerified
       ownedFactory {
         name
         factoryStatus
@@ -3212,6 +3277,7 @@ export const GetMeDocument = gql`
     phoneNumber
     role
     updatedAt
+    isVerified
     ownedFactory {
       name
       factoryStatus
@@ -6631,6 +6697,106 @@ export function useAssignFactoryToOrderMutation(baseOptions?: Apollo.MutationHoo
 export type AssignFactoryToOrderMutationHookResult = ReturnType<typeof useAssignFactoryToOrderMutation>;
 export type AssignFactoryToOrderMutationResult = Apollo.MutationResult<AssignFactoryToOrderMutation>;
 export type AssignFactoryToOrderMutationOptions = Apollo.BaseMutationOptions<AssignFactoryToOrderMutation, AssignFactoryToOrderMutationVariables>;
+export const GetExpiredTimeDocument = gql`
+    query GetExpiredTime($email: String!) {
+  getExpiredTime(email: $email)
+}
+    `;
+
+/**
+ * __useGetExpiredTimeQuery__
+ *
+ * To run a query within a React component, call `useGetExpiredTimeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetExpiredTimeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetExpiredTimeQuery({
+ *   variables: {
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useGetExpiredTimeQuery(baseOptions: Apollo.QueryHookOptions<GetExpiredTimeQuery, GetExpiredTimeQueryVariables> & ({ variables: GetExpiredTimeQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetExpiredTimeQuery, GetExpiredTimeQueryVariables>(GetExpiredTimeDocument, options);
+      }
+export function useGetExpiredTimeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetExpiredTimeQuery, GetExpiredTimeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetExpiredTimeQuery, GetExpiredTimeQueryVariables>(GetExpiredTimeDocument, options);
+        }
+export function useGetExpiredTimeSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetExpiredTimeQuery, GetExpiredTimeQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetExpiredTimeQuery, GetExpiredTimeQueryVariables>(GetExpiredTimeDocument, options);
+        }
+export type GetExpiredTimeQueryHookResult = ReturnType<typeof useGetExpiredTimeQuery>;
+export type GetExpiredTimeLazyQueryHookResult = ReturnType<typeof useGetExpiredTimeLazyQuery>;
+export type GetExpiredTimeSuspenseQueryHookResult = ReturnType<typeof useGetExpiredTimeSuspenseQuery>;
+export type GetExpiredTimeQueryResult = Apollo.QueryResult<GetExpiredTimeQuery, GetExpiredTimeQueryVariables>;
+export const ResendOtpDocument = gql`
+    mutation ResendOTP($email: String!) {
+  resendOTP(email: $email)
+}
+    `;
+export type ResendOtpMutationFn = Apollo.MutationFunction<ResendOtpMutation, ResendOtpMutationVariables>;
+
+/**
+ * __useResendOtpMutation__
+ *
+ * To run a mutation, you first call `useResendOtpMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useResendOtpMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [resendOtpMutation, { data, loading, error }] = useResendOtpMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useResendOtpMutation(baseOptions?: Apollo.MutationHookOptions<ResendOtpMutation, ResendOtpMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ResendOtpMutation, ResendOtpMutationVariables>(ResendOtpDocument, options);
+      }
+export type ResendOtpMutationHookResult = ReturnType<typeof useResendOtpMutation>;
+export type ResendOtpMutationResult = Apollo.MutationResult<ResendOtpMutation>;
+export type ResendOtpMutationOptions = Apollo.BaseMutationOptions<ResendOtpMutation, ResendOtpMutationVariables>;
+export const VerifyOtpDocument = gql`
+    mutation VerifyOTP($verifyOtpInput: VerifyOtpInput!) {
+  verifyOTP(verifyOtpInput: $verifyOtpInput)
+}
+    `;
+export type VerifyOtpMutationFn = Apollo.MutationFunction<VerifyOtpMutation, VerifyOtpMutationVariables>;
+
+/**
+ * __useVerifyOtpMutation__
+ *
+ * To run a mutation, you first call `useVerifyOtpMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useVerifyOtpMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [verifyOtpMutation, { data, loading, error }] = useVerifyOtpMutation({
+ *   variables: {
+ *      verifyOtpInput: // value for 'verifyOtpInput'
+ *   },
+ * });
+ */
+export function useVerifyOtpMutation(baseOptions?: Apollo.MutationHookOptions<VerifyOtpMutation, VerifyOtpMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<VerifyOtpMutation, VerifyOtpMutationVariables>(VerifyOtpDocument, options);
+      }
+export type VerifyOtpMutationHookResult = ReturnType<typeof useVerifyOtpMutation>;
+export type VerifyOtpMutationResult = Apollo.MutationResult<VerifyOtpMutation>;
+export type VerifyOtpMutationOptions = Apollo.BaseMutationOptions<VerifyOtpMutation, VerifyOtpMutationVariables>;
 export const ProductDesignsDocument = gql`
     query ProductDesigns {
   productDesigns {
@@ -8422,6 +8588,7 @@ export const GetUsersDocument = gql`
     phoneNumber
     role
     updatedAt
+    isVerified
   }
 }
     `;
@@ -8471,6 +8638,7 @@ export const GetUserDocument = gql`
     phoneNumber
     role
     updatedAt
+    isVerified
   }
 }
     `;
@@ -8521,6 +8689,7 @@ export const CreateUserDocument = gql`
     phoneNumber
     role
     updatedAt
+    isVerified
   }
 }
     `;
@@ -8564,6 +8733,7 @@ export const UpdateUserDocument = gql`
     phoneNumber
     role
     updatedAt
+    isVerified
   }
 }
     `;
@@ -8608,6 +8778,7 @@ export const DeleteUserDocument = gql`
     phoneNumber
     role
     updatedAt
+    isVerified
   }
 }
     `;
@@ -8695,6 +8866,7 @@ export const UpdateProfileDocument = gql`
     phoneNumber
     role
     updatedAt
+    isVerified
   }
 }
     `;

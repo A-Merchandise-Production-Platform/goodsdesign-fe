@@ -8,10 +8,14 @@ import {
   AvailableVouchersQuery,
   VoucherType,
   AddressEntity,
+  useUpdatePhoneNumberMutation,
 } from '@/graphql/generated/graphql';
 import { formatPrice } from '@/lib/utils';
 import { VoucherDialog } from './voucher-dialog';
-import OrderInformation from '@/app/(root)/cart/_components/order-infomation';
+import OrderInformation, {
+  OrderInformationRef,
+} from '@/app/(root)/cart/_components/order-infomation';
+import { useState, useRef } from 'react';
 
 type VoucherEntityType = AvailableVouchersQuery['availableVouchers'][0];
 
@@ -34,7 +38,14 @@ export function OrderSummary({
   onSelectVoucher,
   onSelectAddress,
 }: OrderSummaryProps) {
+  const orderInfoRef = useRef<OrderInformationRef>(null);
+  const [isFormValid, setIsFormValid] = useState(false);
   const { data: availableVouchers, loading } = useAvailableVouchersQuery();
+
+  const [updatePhoneNumber, { loading: isUpdatingPhoneNumber }] =
+    useUpdatePhoneNumberMutation({
+      fetchPolicy: 'network-only',
+    });
 
   // Calculate discount amount based on selected voucher
   const calculateDiscount = () => {
@@ -60,6 +71,21 @@ export function OrderSummary({
 
   const discount = calculateDiscount();
   const finalTotal = cartTotal - discount;
+
+  const handleCheckout = () => {
+    if (orderInfoRef.current?.validate()) {
+      const formData = orderInfoRef.current.getFormData();
+      console.log(formData);
+      if (formData.phone) {
+        updatePhoneNumber({
+          variables: {
+            updatePhoneNumberInput: { phoneNumber: formData.phone },
+          },
+        });
+      }
+      onCheckout();
+    }
+  };
 
   return (
     <div className="lg:col-span-1">
@@ -106,7 +132,11 @@ export function OrderSummary({
 
         <div>
           <div className="mb-6 font-semibold">Information</div>
-          <OrderInformation onAddressChange={onSelectAddress} />
+          <OrderInformation
+            ref={orderInfoRef}
+            onAddressChange={onSelectAddress}
+            onValidityChange={setIsFormValid}
+          />
         </div>
 
         <Separator />
@@ -119,8 +149,8 @@ export function OrderSummary({
         <Button
           className="w-full"
           size="lg"
-          onClick={onCheckout}
-          disabled={isProcessing || selectedItemCount === 0}
+          onClick={handleCheckout}
+          disabled={isProcessing || selectedItemCount === 0 || !isFormValid}
         >
           {isProcessing ? (
             <>

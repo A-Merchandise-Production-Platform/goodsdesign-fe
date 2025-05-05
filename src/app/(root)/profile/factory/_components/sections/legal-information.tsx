@@ -41,6 +41,8 @@ export function LegalInformation({ form, disabled }: LegalInformationProps) {
 
   const isRequired = (fieldName: string) => requiredFields.includes(fieldName);
 
+  console.log(form.getValues('addressInput'));
+
   return (
     <Card>
       <CardHeader>
@@ -162,10 +164,7 @@ export function LegalInformation({ form, disabled }: LegalInformationProps) {
               </div>
               <FormControl>
                 <AddressSelector
-                  value={{
-                    ...field.value,
-                    formattedAddress: field.value.formattedAddress ?? '',
-                  }}
+                  value={field.value}
                   onChange={field.onChange}
                   disabled={disabled}
                 />

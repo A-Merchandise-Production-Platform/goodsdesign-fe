@@ -13,6 +13,7 @@ import {
   useGetMyFactoryQuery,
   useUpdateFactoryInfoMutation,
 } from '@/graphql/generated/graphql';
+import { cn } from '@/lib/utils';
 
 import {
   defaultValues,
@@ -37,10 +38,23 @@ export const RequiredIndicator = () => (
   <span className="ml-1 text-red-500">*</span>
 );
 
+// Add this helper function to count errors in each section
+const getErrorsInSection = (
+  errors: Record<string, any>,
+  sectionFields: string[],
+): number => {
+  return sectionFields.reduce((count, field) => {
+    return count + (errors[field] ? 1 : 0);
+  }, 0);
+};
+
 export default function UpdateFactoryForm() {
   const [isNotificationOpen, setIsNotificationOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('basics');
-  const { data, loading, error } = useGetMyFactoryQuery();
+  const { data, loading, error } = useGetMyFactoryQuery({
+    fetchPolicy: 'no-cache',
+    nextFetchPolicy: 'no-cache',
+  });
   const isSubmitted = data?.getMyFactory?.isSubmitted ?? false;
 
   // Determine required fields based on schema
@@ -137,6 +151,25 @@ export default function UpdateFactoryForm() {
     else if (activeTab === 'legal') setActiveTab('basics');
   };
 
+  // Define fields for each section
+  const sections = {
+    basics: ['name', 'description', 'website'],
+    legal: ['businessLicenseUrl', 'taxIdentificationNumber', 'addressInput'],
+    product: ['systemConfigVariantIds'],
+    quality: ['qualityCertifications', 'printingMethods', 'specializations'],
+    operations: ['maxPrintingCapacity', 'leadTime'],
+    contact: ['contactPersonName', 'contactPersonPhone'],
+  };
+
+  // Get error counts for each section
+  const getTabErrorCount = (tabName: string) => {
+    if (!form.formState.errors) return 0;
+    return getErrorsInSection(
+      form.formState.errors,
+      sections[tabName as keyof typeof sections],
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-[300px] items-center justify-center">
@@ -209,14 +242,33 @@ export default function UpdateFactoryForm() {
                   className="w-full"
                 >
                   <TabsList className="grid w-full grid-cols-6">
-                    <TabsTrigger value="basics">Basic Information</TabsTrigger>
-                    <TabsTrigger value="legal">Legal</TabsTrigger>
-                    <TabsTrigger value="product">Product</TabsTrigger>
-                    <TabsTrigger value="quality">
-                      Quality & Expertise
-                    </TabsTrigger>
-                    <TabsTrigger value="operations">Operations</TabsTrigger>
-                    <TabsTrigger value="contact">Contact</TabsTrigger>
+                    {Object.entries({
+                      basics: 'Basic Information',
+                      legal: 'Legal',
+                      product: 'Product',
+                      quality: 'Quality & Expertise',
+                      operations: 'Operations',
+                      contact: 'Contact',
+                    }).map(([key, label]) => {
+                      const errorCount = getTabErrorCount(key);
+                      return (
+                        <TabsTrigger
+                          key={key}
+                          value={key}
+                          className={cn(
+                            'relative',
+                            errorCount > 0 && 'text-destructive',
+                          )}
+                        >
+                          {label}
+                          {errorCount > 0 && (
+                            <span className="bg-destructive text-destructive-foreground absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px]">
+                              {errorCount}
+                            </span>
+                          )}
+                        </TabsTrigger>
+                      );
+                    })}
                   </TabsList>
 
                   <TabsContent value="basics">

@@ -11,6 +11,7 @@ query GetUsers {
     phoneNumber
     role
     updatedAt
+    isVerified
   }
 }
 
@@ -27,6 +28,7 @@ query GetUser($userId: String!) {
     phoneNumber
     role
     updatedAt
+    isVerified
   }
 }
 
@@ -43,6 +45,7 @@ mutation CreateUser($createUserInput: CreateUserDto!) {
     phoneNumber
     role
     updatedAt
+    isVerified
   }
 }
 
@@ -59,6 +62,7 @@ mutation UpdateUser($updateUserInput: UpdateUserDto!, $updateUserId: String!) {
     phoneNumber
     role
     updatedAt
+    isVerified
   }
 }
 
@@ -75,6 +79,7 @@ mutation DeleteUser($deleteUserId: String!) {
     phoneNumber
     role
     updatedAt
+    isVerified
   }
 }
 
@@ -102,6 +107,7 @@ mutation UpdateProfile($updateProfileInput: UpdateProfileDto!) {
     phoneNumber
     role
     updatedAt
+    isVerified
   }
 }
 
