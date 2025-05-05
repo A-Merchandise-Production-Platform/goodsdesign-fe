@@ -982,6 +982,20 @@ export default function FactoryOrderDetailsPage() {
 
                         <div className="mt-2">
                           <h4 className="mb-1 text-sm font-medium">
+                            Rework:
+                          </h4>
+                          <div className="grid gap-2 md:grid-cols-2">
+                              <p className="text-muted-foreground text-xs">
+                                <span className="mr-2 text-green-600">
+                                  {item.isRework ? 'Yes' : 'No'}
+                                </span>
+                                {item.reworkTime} times
+                              </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-2">
+                          <h4 className="mb-1 text-sm font-medium">
                             Production Status:
                           </h4>
                           <div className="flex items-center gap-2">
