@@ -1,40 +1,39 @@
 'use client';
-import React from 'react';
-import { gql, useMutation } from '@apollo/client';
 import {
   AlertTriangle,
-  ArrowLeft,
+  BanIcon,
   Calendar,
   CheckCheck,
   CheckCircle2,
-  ClipboardList,
   Clock,
   CreditCard,
-  CreditCardIcon as PaymentIcon,
   FileText,
   History,
   Package,
+  CreditCardIcon as PaymentIcon,
   Play,
   ShoppingBag,
+  Star,
+  StarIcon,
   ThumbsDown,
   ThumbsUp,
   Truck,
   XCircle,
-  Star,
-  StarIcon,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
 
+import { OrderHeader } from '@/app/(root)/_components/order-header';
 import {
   getPaymentStatusBadge,
   getStatusBadge,
   orderStatusSteps,
-  refundStatusSteps,
 } from '@/app/(root)/_components/order-status';
+import { OrderStatusTimeline } from '@/app/(root)/_components/order-status-timeline';
+import { DashboardShell } from '@/components/dashboard-shell';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -53,7 +52,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import {
   Table,
@@ -80,10 +78,7 @@ import {
 } from '@/graphql/generated/graphql';
 import { cn, formatDate } from '@/lib/utils';
 import { filesToBase64 } from '@/utils/handle-upload';
-import { DashboardShell } from '@/components/dashboard-shell';
-import { OrderHeader } from '@/app/(root)/_components/order-header';
-import { OrderStatusTimeline } from '@/app/(root)/_components/order-status-timeline';
-
+import { RejectionHistory } from '@/app/(root)/_components/rejection-history';
 // Helper function to format time
 const formatTime = (dateString: string) => {
   return new Date(dateString).toLocaleTimeString('en-US', {
@@ -166,6 +161,7 @@ export default function FactoryOrderDetailsPage() {
       onCompleted: data => {
         refetch();
         toast.success('Order rejected successfully');
+        router.push(`/factory/orders`);
       },
       onError: error => {
         toast.error(error.message || 'Failed to reject order');
@@ -569,29 +565,45 @@ export default function FactoryOrderDetailsPage() {
     >
       {/* Order Header */}
       {order && (
-        <OrderHeader 
+        <OrderHeader
           order={{
             id: order.id,
             orderDate: order.orderDate || '',
             status: order.status,
-            customer: order.customer ? {
-              name: order.customer.name || undefined,
-              email: order.customer.email || undefined,
-              imageUrl: order.customer.imageUrl || undefined,
-            } : undefined,
+            customer: order.customer
+              ? {
+                  name: order.customer.name || undefined,
+                  email: order.customer.email || undefined,
+                  imageUrl: order.customer.imageUrl || undefined,
+                }
+              : undefined,
             totalPrice: order.totalPrice || 0,
             totalItems: order.totalItems || 0,
             estimatedCompletionAt: order.estimatedCompletionAt || '',
             isDelayed: Boolean(order.isDelayed),
             currentProgress: order.currentProgress || 0,
             shippingPrice: order.shippingPrice || 0,
-          }} 
+            customerAddress: order.address?.formattedAddress || '',
+            factoryAddress: order.factory?.address?.formattedAddress || '',
+            factory: order.factory
+              ? {
+                  name: order.factory.name || undefined,
+                  owner: order.factory.owner
+                    ? {
+                        name: order.factory.owner.name || undefined,
+                        email: order.factory.owner.email || undefined,
+                        imageUrl: order.factory.owner.imageUrl || undefined,
+                      }
+                    : undefined,
+                }
+              : undefined,
+          }}
         />
       )}
 
       {/* Factory Action Buttons */}
       {order.status === 'PENDING_ACCEPTANCE' && (
-        <Card className="mb-6 border-amber-200 bg-amber-50 dark:border-purple-900 dark:bg-purple-950">
+        <Card className="dark:bg-primary/30 dark:border-primary mb-6 border-amber-200 bg-amber-50">
           <CardContent className="pt-6">
             <div className="flex flex-col space-y-4">
               <Alert>
@@ -701,7 +713,10 @@ export default function FactoryOrderDetailsPage() {
       )}
 
       {/* Order Status Timeline */}
-      <OrderStatusTimeline status={order.status} currentStatusGroup={currentStatusGroup} />
+      <OrderStatusTimeline
+        status={order.status}
+        currentStatusGroup={currentStatusGroup}
+      />
 
       {/* Tabs */}
       <Tabs
@@ -710,7 +725,7 @@ export default function FactoryOrderDetailsPage() {
         onValueChange={setActiveTab}
         className="mb-6"
       >
-        <TabsList className="mb-6 grid grid-cols-5">
+        <TabsList className="mb-6 grid grid-cols-6">
           <TabsTrigger value="overview">
             <FileText className="mr-2 h-4 w-4" />
             Overview
@@ -730,6 +745,10 @@ export default function FactoryOrderDetailsPage() {
           <TabsTrigger value="rating">
             <StarIcon className="mr-2 h-4 w-4" />
             Rating
+          </TabsTrigger>
+          <TabsTrigger value="rejectionHistory">
+            <BanIcon className="mr-2 h-4 w-4" />
+            Rejection History
           </TabsTrigger>
         </TabsList>
 
@@ -1330,6 +1349,10 @@ export default function FactoryOrderDetailsPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="rejectionHistory">
+          <RejectionHistory rejectedHistory={order.rejectedHistory} />
         </TabsContent>
       </Tabs>
 

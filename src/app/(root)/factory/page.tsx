@@ -8,7 +8,7 @@ import {
   Truck,
   Users,
 } from 'lucide-react';
-import { StatCard } from '@/components/stat-card';
+import { StatCard, StatCardType } from '@/components/stat-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardShell } from '@/components/dashboard-shell';
 import { formatPrice } from '@/lib/utils';
@@ -58,6 +58,8 @@ export default function FactoryDashboard() {
 
   const { stats, revenueData } = data.getMyFactoryDashboard;
 
+  console.log(stats.monthlyRevenue.value);
+
   // Map the backend data to the format expected by StatCard component
   const factoryStats = [
     {
@@ -71,12 +73,13 @@ export default function FactoryDashboard() {
     },
     {
       title: 'Monthly Revenue',
-      value: Number(formatVND(stats.monthlyRevenue.value)),
+      value: stats.monthlyRevenue.value,
       change: stats.monthlyRevenue.percentChange,
       changeType: stats.monthlyRevenue.isPositive
         ? ('positive' as const)
         : ('negative' as const),
       icon: <Activity className="text-primary h-4 w-4" />,
+      type: StatCardType.CURRENCY,
     },
     {
       title: 'Legit Points',
@@ -119,6 +122,7 @@ export default function FactoryDashboard() {
             change={Number(stat.change)}
             changeType={stat.changeType}
             icon={stat.icon}
+            type={stat.type}
           />
         ))}
       </div>

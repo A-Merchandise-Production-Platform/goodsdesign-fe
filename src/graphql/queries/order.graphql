@@ -603,6 +603,7 @@ query GetOrder($orderId: String!) {
       provinceID
       street
       wardCode
+      formattedAddress
     }
     addressId
     assignedAt
@@ -627,6 +628,14 @@ query GetOrder($orderId: String!) {
         name
         imageUrl
         email
+      }
+      address {
+        districtID
+        street
+        id
+        provinceID
+        wardCode
+        formattedAddress
       }
     }
     id
@@ -1254,5 +1263,19 @@ mutation StartReworkByManager($orderId: String!) {
 mutation AssignFactoryToOrder($factoryId: String!, $orderId: String!) {
   assignFactoryToOrder(factoryId: $factoryId, orderId: $orderId) {
     id
+  }
+}
+
+mutation CalculateShippingCostAndFactoryForCart($input: CalculateShippingCostAndFactoryDto!) {
+  calculateShippingCostAndFactoryForCart(input: $input) {
+    shippingFee {
+      total
+    }
+    selectedFactory {
+      name
+      address {
+        formattedAddress
+      }
+    }
   }
 }

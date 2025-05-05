@@ -71,6 +71,11 @@ export type AuthResponseDto = {
   user: UserEntity;
 };
 
+export type CalculateShippingCostAndFactoryDto = {
+  addressId: Scalars['String']['input'];
+  cartIds: Array<Scalars['String']['input']>;
+};
+
 export type CalculateShippingFeeDto = {
   fromDistrictId: Scalars['Int']['input'];
   fromWardCode: Scalars['String']['input'];
@@ -580,6 +585,7 @@ export type Mutation = {
   addOrderProgressReport: OrderProgressReportEntity;
   assignFactoryToOrder: OrderEntity;
   assignStaffToFactory: FactoryEntity;
+  calculateShippingCostAndFactoryForCart: ShippingCostAndFactoryResponse;
   calculateShippingFee: ShippingFee;
   changeFactoryStaff: FactoryEntity;
   changeFactoryStatus: FactoryEntity;
@@ -682,6 +688,11 @@ export type MutationAssignFactoryToOrderArgs = {
 export type MutationAssignStaffToFactoryArgs = {
   factoryId: Scalars['String']['input'];
   staffId: Scalars['String']['input'];
+};
+
+
+export type MutationCalculateShippingCostAndFactoryForCartArgs = {
+  input: CalculateShippingCostAndFactoryDto;
 };
 
 
@@ -1695,6 +1706,12 @@ export enum Roles {
   Staff = 'STAFF'
 }
 
+export type ShippingCostAndFactoryResponse = {
+  __typename?: 'ShippingCostAndFactoryResponse';
+  selectedFactory?: Maybe<FactoryEntity>;
+  shippingFee: ShippingFee;
+};
+
 export type ShippingFee = {
   __typename?: 'ShippingFee';
   total: Scalars['Int']['output'];
@@ -1794,6 +1811,8 @@ export type SystemConfigOrderEntity = {
   shippingDays: Scalars['Int']['output'];
   specializationScoreWeight: Scalars['Float']['output'];
   type: Scalars['String']['output'];
+  voucherBaseLimitedUsage: Scalars['Int']['output'];
+  voucherBaseMaxDiscountValue: Scalars['Int']['output'];
   voucherBaseTypeForRefund: VoucherType;
   voucherBaseValueForRefund: Scalars['Int']['output'];
 };
@@ -1983,6 +2002,8 @@ export type UpdateSystemConfigOrderDto = {
   reduceLegitPointIfReject?: InputMaybe<Scalars['Int']['input']>;
   shippingDays?: InputMaybe<Scalars['Int']['input']>;
   specializationScoreWeight?: InputMaybe<Scalars['Float']['input']>;
+  voucherBaseLimitedUsage?: InputMaybe<Scalars['Int']['input']>;
+  voucherBaseMaxDiscountValue?: InputMaybe<Scalars['Int']['input']>;
   voucherBaseTypeForRefund?: InputMaybe<VoucherType>;
   voucherBaseValueForRefund?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -2113,7 +2134,7 @@ export type CreateAddressMutationVariables = Exact<{
 }>;
 
 
-export type CreateAddressMutation = { __typename?: 'Mutation', createAddress: { __typename?: 'AddressEntity', districtID: number, provinceID: number, street: string, wardCode: string, formattedAddress?: string | null } };
+export type CreateAddressMutation = { __typename?: 'Mutation', createAddress: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string, formattedAddress?: string | null } };
 
 export type DeleteAddressMutationVariables = Exact<{
   deleteAddressId: Scalars['String']['input'];
@@ -2361,7 +2382,7 @@ export type GetOrderQueryVariables = Exact<{
 }>;
 
 
-export type GetOrderQuery = { __typename?: 'Query', order: { __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId?: string | null, id: string, provinceID: number, street: string, wardCode: string } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', id: string, totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', imageUrls?: Array<string> | null, transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null } };
+export type GetOrderQuery = { __typename?: 'Query', order: { __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId?: string | null, id: string, provinceID: number, street: string, wardCode: string, formattedAddress?: string | null } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null, address?: { __typename?: 'AddressEntity', districtID: number, street: string, id: string, provinceID: number, wardCode: string, formattedAddress?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', id: string, totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', imageUrls?: Array<string> | null, transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null } };
 
 export type GetAllOrdersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2475,6 +2496,13 @@ export type AssignFactoryToOrderMutationVariables = Exact<{
 
 
 export type AssignFactoryToOrderMutation = { __typename?: 'Mutation', assignFactoryToOrder: { __typename?: 'OrderEntity', id: string } };
+
+export type CalculateShippingCostAndFactoryForCartMutationVariables = Exact<{
+  input: CalculateShippingCostAndFactoryDto;
+}>;
+
+
+export type CalculateShippingCostAndFactoryForCartMutation = { __typename?: 'Mutation', calculateShippingCostAndFactoryForCart: { __typename?: 'ShippingCostAndFactoryResponse', shippingFee: { __typename?: 'ShippingFee', total: number }, selectedFactory?: { __typename?: 'FactoryEntity', name: string, address?: { __typename?: 'AddressEntity', formattedAddress?: string | null } | null } | null } };
 
 export type ProductDesignsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2657,7 +2685,7 @@ export type RemoveSystemConfigBankMutation = { __typename?: 'Mutation', removeSy
 export type SystemConfigOrderQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type SystemConfigOrderQuery = { __typename?: 'Query', systemConfigOrder: { __typename?: 'SystemConfigOrderEntity', acceptHoursForFactory: number, capacityScoreWeight: number, checkQualityTimesDays: number, leadTimeScoreWeight: number, legitPointScoreWeight: number, legitPointToSuspend: number, limitFactoryRejectOrders: number, limitReworkTimes: number, maxLegitPoint: number, maxProductionCapacity: number, maxProductionTimeInMinutes: number, productionCapacityScoreWeight: number, reduceLegitPointIfReject: number, shippingDays: number, specializationScoreWeight: number, voucherBaseTypeForRefund: VoucherType, voucherBaseValueForRefund: number } };
+export type SystemConfigOrderQuery = { __typename?: 'Query', systemConfigOrder: { __typename?: 'SystemConfigOrderEntity', acceptHoursForFactory: number, capacityScoreWeight: number, checkQualityTimesDays: number, leadTimeScoreWeight: number, legitPointScoreWeight: number, legitPointToSuspend: number, limitFactoryRejectOrders: number, limitReworkTimes: number, maxLegitPoint: number, maxProductionCapacity: number, maxProductionTimeInMinutes: number, productionCapacityScoreWeight: number, reduceLegitPointIfReject: number, shippingDays: number, specializationScoreWeight: number, voucherBaseTypeForRefund: VoucherType, voucherBaseValueForRefund: number, voucherBaseLimitedUsage: number, voucherBaseMaxDiscountValue: number } };
 
 export type UpdateSystemConfigOrderMutationVariables = Exact<{
   updateConfigInput: UpdateSystemConfigOrderDto;
@@ -2850,6 +2878,7 @@ export type AddressesQueryResult = Apollo.QueryResult<AddressesQuery, AddressesQ
 export const CreateAddressDocument = gql`
     mutation CreateAddress($createAddressInput: CreateAddressInput!) {
   createAddress(createAddressInput: $createAddressInput) {
+    id
     districtID
     provinceID
     street
@@ -5475,6 +5504,7 @@ export const GetOrderDocument = gql`
       provinceID
       street
       wardCode
+      formattedAddress
     }
     addressId
     assignedAt
@@ -5499,6 +5529,14 @@ export const GetOrderDocument = gql`
         name
         imageUrl
         email
+      }
+      address {
+        districtID
+        street
+        id
+        provinceID
+        wardCode
+        formattedAddress
       }
     }
     id
@@ -6618,6 +6656,47 @@ export function useAssignFactoryToOrderMutation(baseOptions?: Apollo.MutationHoo
 export type AssignFactoryToOrderMutationHookResult = ReturnType<typeof useAssignFactoryToOrderMutation>;
 export type AssignFactoryToOrderMutationResult = Apollo.MutationResult<AssignFactoryToOrderMutation>;
 export type AssignFactoryToOrderMutationOptions = Apollo.BaseMutationOptions<AssignFactoryToOrderMutation, AssignFactoryToOrderMutationVariables>;
+export const CalculateShippingCostAndFactoryForCartDocument = gql`
+    mutation CalculateShippingCostAndFactoryForCart($input: CalculateShippingCostAndFactoryDto!) {
+  calculateShippingCostAndFactoryForCart(input: $input) {
+    shippingFee {
+      total
+    }
+    selectedFactory {
+      name
+      address {
+        formattedAddress
+      }
+    }
+  }
+}
+    `;
+export type CalculateShippingCostAndFactoryForCartMutationFn = Apollo.MutationFunction<CalculateShippingCostAndFactoryForCartMutation, CalculateShippingCostAndFactoryForCartMutationVariables>;
+
+/**
+ * __useCalculateShippingCostAndFactoryForCartMutation__
+ *
+ * To run a mutation, you first call `useCalculateShippingCostAndFactoryForCartMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCalculateShippingCostAndFactoryForCartMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [calculateShippingCostAndFactoryForCartMutation, { data, loading, error }] = useCalculateShippingCostAndFactoryForCartMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCalculateShippingCostAndFactoryForCartMutation(baseOptions?: Apollo.MutationHookOptions<CalculateShippingCostAndFactoryForCartMutation, CalculateShippingCostAndFactoryForCartMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CalculateShippingCostAndFactoryForCartMutation, CalculateShippingCostAndFactoryForCartMutationVariables>(CalculateShippingCostAndFactoryForCartDocument, options);
+      }
+export type CalculateShippingCostAndFactoryForCartMutationHookResult = ReturnType<typeof useCalculateShippingCostAndFactoryForCartMutation>;
+export type CalculateShippingCostAndFactoryForCartMutationResult = Apollo.MutationResult<CalculateShippingCostAndFactoryForCartMutation>;
+export type CalculateShippingCostAndFactoryForCartMutationOptions = Apollo.BaseMutationOptions<CalculateShippingCostAndFactoryForCartMutation, CalculateShippingCostAndFactoryForCartMutationVariables>;
 export const ProductDesignsDocument = gql`
     query ProductDesigns {
   productDesigns {
@@ -7904,6 +7983,8 @@ export const SystemConfigOrderDocument = gql`
     specializationScoreWeight
     voucherBaseTypeForRefund
     voucherBaseValueForRefund
+    voucherBaseLimitedUsage
+    voucherBaseMaxDiscountValue
   }
 }
     `;
