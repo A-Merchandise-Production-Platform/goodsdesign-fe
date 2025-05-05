@@ -985,7 +985,7 @@ export default function FactoryOrderDetailsPage() {
                             Rework:
                           </h4>
                           <div className="grid gap-2 md:grid-cols-2">
-                              <p className="text-muted-foreground text-xs">
+                              <p className="text-muted-foreground text-xs"> 
                                 <span className="mr-2 text-green-600">
                                   {item.isRework ? 'Yes' : 'No'}
                                 </span>
@@ -1114,7 +1114,7 @@ export default function FactoryOrderDetailsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {order?.orderProgressReports?.map((report, index) => (
+                {order?.orderProgressReports?.sort((a, b) => b.reportDate.localeCompare(a.reportDate))?.map((report, index) => (
                   <div key={report.id} className="relative pb-6 pl-6">
                     {index !==
                       (order?.orderProgressReports?.length || 0) - 1 && (

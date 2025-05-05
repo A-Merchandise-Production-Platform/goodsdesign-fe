@@ -921,7 +921,7 @@ export default function FactoryOrderDetailsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {currentOrder?.orderProgressReports?.map((report, index) => (
+                {currentOrder?.orderProgressReports?.sort((a, b) => b.reportDate.localeCompare(a.reportDate))?.map((report, index) => (
                   <div key={report.id} className="relative pb-6 pl-6">
                     {index !==
                       (currentOrder?.orderProgressReports?.length || 0) - 1 && (
