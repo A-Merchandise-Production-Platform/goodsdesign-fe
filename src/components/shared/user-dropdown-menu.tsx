@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   FactoryStatus,
+  GetMeQuery,
   Roles,
   useLogoutMutation,
   UserEntity,
@@ -33,7 +34,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useSocketStore } from '@/stores/socket-io-store';
 
 interface UserDropdownMenuProps {
-  user: UserEntity;
+  user: GetMeQuery['getMe'];
 }
 
 export function UserDropdownMenu({ user }: UserDropdownMenuProps) {
