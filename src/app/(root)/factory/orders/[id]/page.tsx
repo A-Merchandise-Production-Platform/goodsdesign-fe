@@ -1,6 +1,7 @@
 'use client';
 import {
   AlertTriangle,
+  BanIcon,
   Calendar,
   CheckCheck,
   CheckCircle2,
@@ -77,7 +78,7 @@ import {
 } from '@/graphql/generated/graphql';
 import { cn, formatDate } from '@/lib/utils';
 import { filesToBase64 } from '@/utils/handle-upload';
-
+import { RejectionHistory } from '@/app/(root)/_components/rejection-history';
 // Helper function to format time
 const formatTime = (dateString: string) => {
   return new Date(dateString).toLocaleTimeString('en-US', {
@@ -724,7 +725,7 @@ export default function FactoryOrderDetailsPage() {
         onValueChange={setActiveTab}
         className="mb-6"
       >
-        <TabsList className="mb-6 grid grid-cols-5">
+        <TabsList className="mb-6 grid grid-cols-6">
           <TabsTrigger value="overview">
             <FileText className="mr-2 h-4 w-4" />
             Overview
@@ -744,6 +745,10 @@ export default function FactoryOrderDetailsPage() {
           <TabsTrigger value="rating">
             <StarIcon className="mr-2 h-4 w-4" />
             Rating
+          </TabsTrigger>
+          <TabsTrigger value="rejectionHistory">
+            <BanIcon className="mr-2 h-4 w-4" />
+            Rejection History
           </TabsTrigger>
         </TabsList>
 
@@ -977,6 +982,20 @@ export default function FactoryOrderDetailsPage() {
 
                         <div className="mt-2">
                           <h4 className="mb-1 text-sm font-medium">
+                            Rework:
+                          </h4>
+                          <div className="grid gap-2 md:grid-cols-2">
+                              <p className="text-muted-foreground text-xs"> 
+                                <span className="mr-2 text-green-600">
+                                  {item.isRework ? 'Yes' : 'No'}
+                                </span>
+                                {item.reworkTime} times
+                              </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-2">
+                          <h4 className="mb-1 text-sm font-medium">
                             Production Status:
                           </h4>
                           <div className="flex items-center gap-2">
@@ -1094,8 +1113,17 @@ export default function FactoryOrderDetailsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+                <div className="mb-6">
+                  <Button
+                    onClick={() => setIsAddProgressDialogOpen(true)}
+                    className="w-full"
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    Add Progress Report
+                  </Button>
+                </div>
               <div className="space-y-6">
-                {order?.orderProgressReports?.map((report, index) => (
+                {order?.orderProgressReports?.sort((a, b) => b.reportDate.localeCompare(a.reportDate))?.map((report, index) => (
                   <div key={report.id} className="relative pb-6 pl-6">
                     {index !==
                       (order?.orderProgressReports?.length || 0) - 1 && (
@@ -1133,15 +1161,7 @@ export default function FactoryOrderDetailsPage() {
                 )}
 
                 {/* Add Progress Report Button */}
-                <div className="mt-6">
-                  <Button
-                    onClick={() => setIsAddProgressDialogOpen(true)}
-                    className="w-full"
-                  >
-                    <FileText className="mr-2 h-4 w-4" />
-                    Add Progress Report
-                  </Button>
-                </div>
+                
               </div>
             </CardContent>
           </Card>
@@ -1344,6 +1364,10 @@ export default function FactoryOrderDetailsPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="rejectionHistory">
+          <RejectionHistory rejectedHistory={order.rejectedHistory} />
         </TabsContent>
       </Tabs>
 

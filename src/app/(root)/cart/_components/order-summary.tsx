@@ -22,6 +22,7 @@ type VoucherEntityType = AvailableVouchersQuery['availableVouchers'][0];
 interface OrderSummaryProps {
   selectedItemCount: number;
   cartTotal: number;
+  shippingCost: number;
   onCheckout: () => void;
   isProcessing: boolean;
   selectedVoucher: VoucherEntityType | null;
@@ -32,6 +33,7 @@ interface OrderSummaryProps {
 export function OrderSummary({
   selectedItemCount,
   cartTotal,
+  shippingCost,
   onCheckout,
   isProcessing,
   selectedVoucher,
@@ -70,7 +72,7 @@ export function OrderSummary({
   };
 
   const discount = calculateDiscount();
-  const finalTotal = cartTotal - discount;
+  const finalTotal = (cartTotal - discount) + shippingCost;
 
   const handleCheckout = () => {
     if (orderInfoRef.current?.validate()) {
@@ -103,7 +105,7 @@ export function OrderSummary({
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Shipping Cost</span>
-            <span>Calculated when finished production</span>
+            <span>{formatPrice(shippingCost)}</span>
           </div>
         </div>
 

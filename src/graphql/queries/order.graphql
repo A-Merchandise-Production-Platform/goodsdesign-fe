@@ -1265,3 +1265,17 @@ mutation AssignFactoryToOrder($factoryId: String!, $orderId: String!) {
     id
   }
 }
+
+mutation CalculateShippingCostAndFactoryForCart($input: CalculateShippingCostAndFactoryDto!) {
+  calculateShippingCostAndFactoryForCart(input: $input) {
+    shippingFee {
+      total
+    }
+    selectedFactory {
+      name
+      address {
+        formattedAddress
+      }
+    }
+  }
+}

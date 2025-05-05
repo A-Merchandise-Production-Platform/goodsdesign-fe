@@ -1,7 +1,6 @@
 export interface DesignObject {
   view: string;
   type: string;
-  layer: number;
   left: number;
   top: number;
   width: number;
