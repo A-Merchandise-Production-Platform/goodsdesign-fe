@@ -1113,6 +1113,15 @@ export default function FactoryOrderDetailsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+                <div className="mb-6">
+                  <Button
+                    onClick={() => setIsAddProgressDialogOpen(true)}
+                    className="w-full"
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    Add Progress Report
+                  </Button>
+                </div>
               <div className="space-y-6">
                 {order?.orderProgressReports?.sort((a, b) => b.reportDate.localeCompare(a.reportDate))?.map((report, index) => (
                   <div key={report.id} className="relative pb-6 pl-6">
@@ -1152,15 +1161,7 @@ export default function FactoryOrderDetailsPage() {
                 )}
 
                 {/* Add Progress Report Button */}
-                <div className="mt-6">
-                  <Button
-                    onClick={() => setIsAddProgressDialogOpen(true)}
-                    className="w-full"
-                  >
-                    <FileText className="mr-2 h-4 w-4" />
-                    Add Progress Report
-                  </Button>
-                </div>
+                
               </div>
             </CardContent>
           </Card>
