@@ -1,6 +1,8 @@
+'use client';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { CalendarIcon, PencilIcon } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -40,14 +42,16 @@ import {
 } from '@/components/ui/select';
 import { Roles, useUpdateUserMutation } from '@/graphql/generated/graphql';
 import { cn } from '@/lib/utils';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
+
 const formSchema = z.object({
-  email: z.string().email(),
-  name: z.string().min(1),
-  password: z.string().min(6),
-  phoneNumber: z.string().min(10),
-  role: z.nativeEnum(Roles),
-  dateOfBirth: z.date(),
+  email: z.string().email().optional(),
+  name: z.string().min(1).optional(),
+  // password: z.string().min(6).optional(),
+  phoneNumber: z.string().min(10).optional(),
+  role: z.nativeEnum(Roles).optional(),
+  dateOfBirth: z.date().optional(),
 });
 
 const roles = [
@@ -65,7 +69,7 @@ interface EditUserFormProps {
     name?: string | null;
     phoneNumber?: string | null;
     role: Roles;
-    dateOfBirth?: string | null;
+    dateOfBirth?: Date | null;
   };
 }
 
@@ -76,56 +80,72 @@ export default function EditUserForm({ user }: EditUserFormProps) {
     defaultValues: {
       email: user.email || '',
       name: user.name || '',
-      password: '',
+      // password: '',
       phoneNumber: user.phoneNumber || '',
       role: user.role,
-      dateOfBirth: user.dateOfBirth
-        ? new Date(user.dateOfBirth)
-        : new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
+      dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : undefined,
     },
   });
 
-  const [updateUser, { loading }] = useUpdateUserMutation();
+  const [updateUser, { loading: updateUserLoading }] = useUpdateUserMutation({
+    onCompleted: () => {
+      toast.success('User updated successfully');
+      setIsOpen(false);
+      form.reset();
+    },
+    onError: error => {
+      toast.error(error.message);
+    },
+    fetchPolicy: 'no-cache',
+    refetchQueries: ['GetUsers'],
+  });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    // Create an object to store only changed values
+    const changedValues: Partial<z.infer<typeof formSchema>> = {};
 
-    updateUser({
-      variables: {
-        updateUserId: user.id,
-        updateUserInput: {
-          email: values.email,
-          name: values.name,
-          password: values.password,
-          phoneNumber: values.phoneNumber,
-          role: values.role,
-          dateOfBirth: values.dateOfBirth.toISOString(),
+    // Compare each field with original values and only include if changed
+    if (values.name !== user.name) changedValues.name = values.name;
+    if (values.phoneNumber !== user.phoneNumber)
+      changedValues.phoneNumber = values.phoneNumber;
+    if (values.role !== user.role) changedValues.role = values.role;
+    // if (values.password) changedValues.password = values.password;
+    if (
+      values.dateOfBirth &&
+      (!user.dateOfBirth ||
+        new Date(values.dateOfBirth).getTime() !==
+          new Date(user.dateOfBirth).getTime())
+    ) {
+      changedValues.dateOfBirth = values.dateOfBirth;
+    }
+
+    // Only proceed with update if there are changes
+    if (Object.keys(changedValues).length > 0) {
+      updateUser({
+        variables: {
+          updateUserInput: changedValues,
+          updateUserId: user.id,
         },
-      },
-      onCompleted: () => {
-        toast.success('User updated successfully');
-        setIsOpen(false);
-      },
-      onError: () => {
-        toast.error('Failed to update user');
-      },
-      refetchQueries: ['GetUsers'],
-    });
+      });
+    } else {
+      toast.info('No changes detected');
+    }
   }
 
   return (
     <Dialog
       open={isOpen}
-      onOpenChange={() => {
-        setIsOpen(!isOpen);
-        form.reset();
+      onOpenChange={open => {
+        setIsOpen(open);
+        if (!open) {
+          form.reset();
+        }
       }}
     >
-      <DialogTrigger asChild>
-        <Button variant="outline" onClick={() => setIsOpen(true)}>
-          <PencilIcon className="mr-2 h-4 w-4" />
+      <DialogTrigger asChild onClick={() => setIsOpen(true)}>
+        <DropdownMenuItem onSelect={e => e.preventDefault()}>
           Edit User
-        </Button>
+        </DropdownMenuItem>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -143,7 +163,7 @@ export default function EditUserForm({ user }: EditUserFormProps) {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="User Email" {...field} />
+                    <Input disabled placeholder="User Email" {...field} />
                   </FormControl>
                   {form.formState.errors.email ? (
                     <FormMessage />
@@ -172,7 +192,7 @@ export default function EditUserForm({ user }: EditUserFormProps) {
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
@@ -194,7 +214,7 @@ export default function EditUserForm({ user }: EditUserFormProps) {
                   )}
                 </FormItem>
               )}
-            />
+            /> */}
             <FormField
               control={form.control}
               name="phoneNumber"
@@ -209,7 +229,7 @@ export default function EditUserForm({ user }: EditUserFormProps) {
                       defaultCountry="VN"
                     />
                   </FormControl>
-                  {form.formState.errors.password ? (
+                  {form.formState.errors.phoneNumber ? (
                     <FormMessage />
                   ) : (
                     <FormDescription>

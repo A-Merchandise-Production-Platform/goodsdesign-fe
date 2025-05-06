@@ -37,6 +37,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useGetAllCategoriesQuery } from '@/graphql/generated/graphql';
 import { type Product } from './product-table';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -81,9 +82,9 @@ export default function EditProductForm({ product }: EditProductFormProps) {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost" className="w-full justify-start">
-          Edit product
-        </Button>
+        <DropdownMenuItem onSelect={e => e.preventDefault()}>
+          Edit Product
+        </DropdownMenuItem>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

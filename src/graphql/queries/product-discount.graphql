@@ -8,5 +8,56 @@ query GetAllDiscountByProductId($productId: String!) {
     minQuantity
     name
     updatedAt
+    productId
+  }
+}
+
+mutation CreateSystemConfigDiscount(
+  $createDiscountInput: CreateSystemConfigDiscountDto!
+) {
+  createSystemConfigDiscount(createDiscountInput: $createDiscountInput) {
+    createdAt
+    discountPercent
+    id
+    isActive
+    isDeleted
+    minQuantity
+    name
+    updatedAt
+    productId
+  }
+}
+
+mutation UpdateSystemConfigDiscount(
+  $updateSystemConfigDiscountId: String!
+  $updateDiscountInput: UpdateSystemConfigDiscountDto!
+) {
+  updateSystemConfigDiscount(
+    id: $updateSystemConfigDiscountId
+    updateDiscountInput: $updateDiscountInput
+  ) {
+    createdAt
+    discountPercent
+    id
+    isActive
+    isDeleted
+    minQuantity
+    name
+    updatedAt
+    productId
+  }
+}
+
+mutation RemoveSystemConfigDiscount($removeSystemConfigDiscountId: String!) {
+  removeSystemConfigDiscount(id: $removeSystemConfigDiscountId) {
+    createdAt
+    discountPercent
+    id
+    isActive
+    isDeleted
+    minQuantity
+    name
+    updatedAt
+    productId
   }
 }
