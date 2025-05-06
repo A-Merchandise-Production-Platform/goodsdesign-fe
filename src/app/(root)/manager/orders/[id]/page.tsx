@@ -78,6 +78,7 @@ import {
   OrderStatus,
   useAssignFactoryToOrderMutation,
   useCreateRefundForOrderMutation,
+  useFactoryScoresForOrderQuery,
   useGetFactoriesQuery,
   useGetOrderQuery,
   useGetUserBanksByUserIdQuery,
@@ -145,6 +146,12 @@ export default function FactoryOrderDetailsPage() {
   const [showWithdrawalDialog, setShowWithdrawalDialog] = useState(false);
   const [selectedPaymentId, setSelectedPaymentId] = useState<string>('');
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+
+  const { data: factoryScores } = useFactoryScoresForOrderQuery({
+    variables: {
+      orderId: id,
+    },
+  });
 
   // Forms
   const assignFactoryForm = useForm<z.infer<typeof assignFactorySchema>>({
@@ -254,6 +261,7 @@ export default function FactoryOrderDetailsPage() {
     createRefundForOrder({
       variables: {
         orderId: id,
+        reason: data.reason,
       },
     });
   };
@@ -1243,6 +1251,64 @@ export default function FactoryOrderDetailsPage() {
               </DialogFooter>
             </form>
           </Form>
+          
+          {factoryScores && (
+            <div className="mt-4">
+              <h3 className="text-lg font-medium">Factory Scores</h3>
+              <div className="grid gap-4">
+                {factoryScores.factoryScoresForOrder
+                  .filter(factory => factory.factoryId === assignFactoryForm.watch('factoryId'))
+                  .map((factory) => (
+                  <div key={factory.factoryId} className="rounded-lg border p-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <h4 className="font-medium">{factory.factoryName}</h4>
+                      <div className="text-sm">
+                        Total Score: <span className="font-semibold">{(factory.totalScore * 100).toFixed(1)}%</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Capacity</span>
+                          <span>{(factory.scores.capacityScore * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Lead Time</span>
+                          <span>{(factory.scores.leadTimeScore * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Legit Points</span>
+                          <span>{(factory.scores.legitPointScore * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Production Capacity</span>
+                          <span>{(factory.scores.productionCapacityScore * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Specialization</span>
+                          <span>{(factory.scores.specializationScore * 100).toFixed(1)}%</span>
+                        </div>
+                      </div>
+                      <div className="mt-2 text-xs text-muted-foreground">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>Capacity Weight: {factory.weights.capacity * 100}%</div>
+                          <div>Lead Time Weight: {factory.weights.leadTime * 100}%</div>
+                          <div>Legit Points Weight: {factory.weights.legitPoint * 100}%</div>
+                          <div>Production Capacity Weight: {factory.weights.productionCapacity * 100}%</div>
+                          <div>Specialization Weight: {factory.weights.specialization * 100}%</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {!assignFactoryForm.watch('factoryId') && (
+                  <div className="text-muted-foreground text-center py-4">
+                    Select a factory to view its scores
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
@@ -1330,8 +1396,7 @@ export default function FactoryOrderDetailsPage() {
                       <SelectContent>
                         {userBanks?.userBanksByUserId?.map(bank => (
                           <SelectItem key={bank.id} value={bank.id}>
-                            {bank.bank?.name} - {bank.accountNumber} -{' '}
-                            {bank.accountName}
+                            {bank.bank?.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -1340,6 +1405,43 @@ export default function FactoryOrderDetailsPage() {
                   </FormItem>
                 )}
               />
+
+              {/* Bank Account Details */}
+              {withdrawalForm.watch('userBankId') && (
+                <div className="rounded-lg border p-4">
+                  <h4 className="mb-2 font-medium">Bank Account Details</h4>
+                  {userBanks?.userBanksByUserId?.find(
+                    bank => bank.id === withdrawalForm.watch('userBankId')
+                  ) && (
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Bank Name:</span>
+                        <span className="font-medium">
+                          {userBanks.userBanksByUserId.find(
+                            bank => bank.id === withdrawalForm.watch('userBankId')
+                          )?.bank?.name}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Account Number:</span>
+                        <span className="font-medium">
+                          {userBanks.userBanksByUserId.find(
+                            bank => bank.id === withdrawalForm.watch('userBankId')
+                          )?.accountNumber}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Account Name:</span>
+                        <span className="font-medium">
+                          {userBanks.userBanksByUserId.find(
+                            bank => bank.id === withdrawalForm.watch('userBankId')
+                          )?.accountName}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <FormField
                 control={withdrawalForm.control}
