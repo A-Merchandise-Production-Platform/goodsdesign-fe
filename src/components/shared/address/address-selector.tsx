@@ -236,7 +236,7 @@ export interface AddressValue {
   districtId: number | null;
   wardCode: string | null;
   street: string;
-  formattedAddress: string;
+  formattedAddress?: string | undefined;
 }
 
 interface AddressSelectorProps {

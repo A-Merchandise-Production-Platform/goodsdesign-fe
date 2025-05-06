@@ -14,6 +14,7 @@ mutation Login($loginInput: LoginDto!) {
       phoneNumber
       role
       updatedAt
+      isVerified
       ownedFactory {
         name
         factoryStatus
@@ -38,6 +39,7 @@ mutation Register($registerInput: RegisterDto!) {
       phoneNumber
       role
       updatedAt
+      isVerified
       ownedFactory {
         name
         factoryStatus
@@ -62,6 +64,7 @@ mutation RefreshToken($refreshTokenInput: RefreshTokenDto!) {
       phoneNumber
       role
       updatedAt
+      isVerified
       ownedFactory {
         name
         factoryStatus
@@ -88,6 +91,7 @@ query GetMe {
     phoneNumber
     role
     updatedAt
+    isVerified
     ownedFactory {
       name
       factoryStatus

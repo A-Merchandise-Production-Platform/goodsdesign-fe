@@ -19,8 +19,8 @@ export default function AuthProvider({
   const [isLoading, setIsLoading] = useState(true);
   const { setUser, accessToken, isAuth } = useAuthStore();
   const [getMeQuery, { called, loading }] = useGetMeLazyQuery({
-    fetchPolicy: 'network-only',
-    nextFetchPolicy: 'network-only',
+    fetchPolicy: 'no-cache',
+    nextFetchPolicy: 'no-cache',
     onCompleted: data => {
       if (data && data.getMe) {
         setUser(data.getMe as UserEntity);
