@@ -33,3 +33,15 @@ query GetSystemConfigVariantsByProduct($productId: String!) {
     size
   }
 }
+
+mutation UpdateSystemConfigVariant($updateSystemConfigVariantInput: UpdateSystemConfigVariantInput!) {
+  updateSystemConfigVariant(updateSystemConfigVariantInput: $updateSystemConfigVariantInput) {
+    id
+  }
+}
+
+mutation CreateSystemConfigVariant($createSystemConfigVariantInput: CreateSystemConfigVariantInput!) {
+  createSystemConfigVariant(createSystemConfigVariantInput: $createSystemConfigVariantInput) {
+    id
+  }
+}

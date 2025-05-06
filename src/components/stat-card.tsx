@@ -34,7 +34,7 @@ export function StatCard({
             <h3 className="mt-1 text-2xl font-bold">
               {type === StatCardType.CURRENCY
                 ? formatPrice(value)
-                : value.toLocaleString()}
+                : isNaN(value) ? '0' : value.toLocaleString()}
             </h3>
           </div>
           <div className="bg-primary/10 rounded-full p-2">{icon}</div>

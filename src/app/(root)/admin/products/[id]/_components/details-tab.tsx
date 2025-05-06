@@ -33,7 +33,7 @@ export default function DetailsTab({
         <div>
           <h3 className="mb-1 font-medium">Lowest Price</h3>
           <p className="text-muted-foreground">
-            {formatPrice(product?.variants?.[0]?.price || 0)}
+            {formatPrice(product?.variants?.reduce((min, variant) => Math.min(min, variant.price || Infinity), Infinity) || 0)}
           </p>
         </div>
         <div>

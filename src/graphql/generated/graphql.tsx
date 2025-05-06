@@ -240,6 +240,7 @@ export type CreateSystemConfigDiscountDto = {
 export type CreateSystemConfigVariantInput = {
   color?: InputMaybe<Scalars['String']['input']>;
   model?: InputMaybe<Scalars['String']['input']>;
+  price?: InputMaybe<Scalars['Float']['input']>;
   productId: Scalars['String']['input'];
   size?: InputMaybe<Scalars['String']['input']>;
 };
@@ -2081,6 +2082,7 @@ export type UpdateSystemConfigVariantInput = {
   id: Scalars['String']['input'];
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   model?: InputMaybe<Scalars['String']['input']>;
+  price?: InputMaybe<Scalars['Float']['input']>;
   productId?: InputMaybe<Scalars['String']['input']>;
   size?: InputMaybe<Scalars['String']['input']>;
 };
@@ -2816,6 +2818,20 @@ export type GetSystemConfigVariantsByProductQueryVariables = Exact<{
 
 
 export type GetSystemConfigVariantsByProductQuery = { __typename?: 'Query', systemConfigVariantsByProduct: Array<{ __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, size?: string | null, product: { __typename?: 'ProductEntity', id: string, imageUrl?: string | null, name: string, description?: string | null } }> };
+
+export type UpdateSystemConfigVariantMutationVariables = Exact<{
+  updateSystemConfigVariantInput: UpdateSystemConfigVariantInput;
+}>;
+
+
+export type UpdateSystemConfigVariantMutation = { __typename?: 'Mutation', updateSystemConfigVariant: { __typename?: 'SystemConfigVariantEntity', id: string } };
+
+export type CreateSystemConfigVariantMutationVariables = Exact<{
+  createSystemConfigVariantInput: CreateSystemConfigVariantInput;
+}>;
+
+
+export type CreateSystemConfigVariantMutation = { __typename?: 'Mutation', createSystemConfigVariant: { __typename?: 'SystemConfigVariantEntity', id: string } };
 
 export type FindTasksByStaffIdQueryVariables = Exact<{
   staffId: Scalars['String']['input'];
@@ -8454,6 +8470,76 @@ export type GetSystemConfigVariantsByProductQueryHookResult = ReturnType<typeof 
 export type GetSystemConfigVariantsByProductLazyQueryHookResult = ReturnType<typeof useGetSystemConfigVariantsByProductLazyQuery>;
 export type GetSystemConfigVariantsByProductSuspenseQueryHookResult = ReturnType<typeof useGetSystemConfigVariantsByProductSuspenseQuery>;
 export type GetSystemConfigVariantsByProductQueryResult = Apollo.QueryResult<GetSystemConfigVariantsByProductQuery, GetSystemConfigVariantsByProductQueryVariables>;
+export const UpdateSystemConfigVariantDocument = gql`
+    mutation UpdateSystemConfigVariant($updateSystemConfigVariantInput: UpdateSystemConfigVariantInput!) {
+  updateSystemConfigVariant(
+    updateSystemConfigVariantInput: $updateSystemConfigVariantInput
+  ) {
+    id
+  }
+}
+    `;
+export type UpdateSystemConfigVariantMutationFn = Apollo.MutationFunction<UpdateSystemConfigVariantMutation, UpdateSystemConfigVariantMutationVariables>;
+
+/**
+ * __useUpdateSystemConfigVariantMutation__
+ *
+ * To run a mutation, you first call `useUpdateSystemConfigVariantMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSystemConfigVariantMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSystemConfigVariantMutation, { data, loading, error }] = useUpdateSystemConfigVariantMutation({
+ *   variables: {
+ *      updateSystemConfigVariantInput: // value for 'updateSystemConfigVariantInput'
+ *   },
+ * });
+ */
+export function useUpdateSystemConfigVariantMutation(baseOptions?: Apollo.MutationHookOptions<UpdateSystemConfigVariantMutation, UpdateSystemConfigVariantMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateSystemConfigVariantMutation, UpdateSystemConfigVariantMutationVariables>(UpdateSystemConfigVariantDocument, options);
+      }
+export type UpdateSystemConfigVariantMutationHookResult = ReturnType<typeof useUpdateSystemConfigVariantMutation>;
+export type UpdateSystemConfigVariantMutationResult = Apollo.MutationResult<UpdateSystemConfigVariantMutation>;
+export type UpdateSystemConfigVariantMutationOptions = Apollo.BaseMutationOptions<UpdateSystemConfigVariantMutation, UpdateSystemConfigVariantMutationVariables>;
+export const CreateSystemConfigVariantDocument = gql`
+    mutation CreateSystemConfigVariant($createSystemConfigVariantInput: CreateSystemConfigVariantInput!) {
+  createSystemConfigVariant(
+    createSystemConfigVariantInput: $createSystemConfigVariantInput
+  ) {
+    id
+  }
+}
+    `;
+export type CreateSystemConfigVariantMutationFn = Apollo.MutationFunction<CreateSystemConfigVariantMutation, CreateSystemConfigVariantMutationVariables>;
+
+/**
+ * __useCreateSystemConfigVariantMutation__
+ *
+ * To run a mutation, you first call `useCreateSystemConfigVariantMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateSystemConfigVariantMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createSystemConfigVariantMutation, { data, loading, error }] = useCreateSystemConfigVariantMutation({
+ *   variables: {
+ *      createSystemConfigVariantInput: // value for 'createSystemConfigVariantInput'
+ *   },
+ * });
+ */
+export function useCreateSystemConfigVariantMutation(baseOptions?: Apollo.MutationHookOptions<CreateSystemConfigVariantMutation, CreateSystemConfigVariantMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateSystemConfigVariantMutation, CreateSystemConfigVariantMutationVariables>(CreateSystemConfigVariantDocument, options);
+      }
+export type CreateSystemConfigVariantMutationHookResult = ReturnType<typeof useCreateSystemConfigVariantMutation>;
+export type CreateSystemConfigVariantMutationResult = Apollo.MutationResult<CreateSystemConfigVariantMutation>;
+export type CreateSystemConfigVariantMutationOptions = Apollo.BaseMutationOptions<CreateSystemConfigVariantMutation, CreateSystemConfigVariantMutationVariables>;
 export const FindTasksByStaffIdDocument = gql`
     query FindTasksByStaffId($staffId: String!) {
   findTasksByStaffId(staffId: $staffId) {

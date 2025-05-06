@@ -3,7 +3,6 @@ import { format } from 'date-fns';
 import { CalendarIcon, PencilIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -39,9 +38,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Roles } from '@/graphql/generated/graphql';
+import { Roles, useUpdateUserMutation } from '@/graphql/generated/graphql';
 import { cn } from '@/lib/utils';
-
+import { toast } from 'sonner';
 const formSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1),
@@ -86,8 +85,32 @@ export default function EditUserForm({ user }: EditUserFormProps) {
     },
   });
 
+  const [updateUser, { loading }] = useUpdateUserMutation();
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
+
+    updateUser({
+      variables: {
+        updateUserId: user.id,
+        updateUserInput: {
+          email: values.email,
+          name: values.name,
+          password: values.password,
+          phoneNumber: values.phoneNumber,
+          role: values.role,
+          dateOfBirth: values.dateOfBirth.toISOString(),
+        },
+      },
+      onCompleted: () => {
+        toast.success('User updated successfully');
+        setIsOpen(false);
+      },
+      onError: () => {
+        toast.error('Failed to update user');
+      },
+      refetchQueries: ['GetUsers'],
+    });
   }
 
   return (
