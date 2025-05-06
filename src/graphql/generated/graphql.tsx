@@ -1364,6 +1364,17 @@ export type OrderLogDto = {
   updated_date: Scalars['String']['output'];
 };
 
+export type OrderPriceDetailsResponse = {
+  __typename?: 'OrderPriceDetailsResponse';
+  basePrice: Scalars['Int']['output'];
+  discountPercentage: Scalars['Float']['output'];
+  finalPrice: Scalars['Int']['output'];
+  priceAfterDiscount: Scalars['Int']['output'];
+  priceAfterVoucher: Scalars['Int']['output'];
+  shippingPrice: Scalars['Int']['output'];
+  voucher?: Maybe<VoucherEntity>;
+};
+
 export type OrderProgressReportEntity = {
   __typename?: 'OrderProgressReportEntity';
   id: Scalars['ID']['output'];
@@ -1569,6 +1580,7 @@ export type Query = {
   notifications: Array<NotificationEntity>;
   notificationsByUserId: Array<NotificationEntity>;
   order: OrderEntity;
+  orderPriceDetails: OrderPriceDetailsResponse;
   orders: Array<OrderEntity>;
   ordersByFactoryId: Array<OrderEntity>;
   paymentTransaction?: Maybe<PaymentTransactionEntity>;
@@ -1727,6 +1739,11 @@ export type QueryNotificationsByUserIdArgs = {
 
 export type QueryOrderArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type QueryOrderPriceDetailsArgs = {
+  orderId: Scalars['String']['input'];
 };
 
 
@@ -2690,6 +2707,13 @@ export type SpeedUpOrderMutationVariables = Exact<{
 
 
 export type SpeedUpOrderMutation = { __typename?: 'Mutation', speedUpOrder: { __typename?: 'OrderEntity', id: string } };
+
+export type OrderPriceDetailsQueryVariables = Exact<{
+  orderId: Scalars['String']['input'];
+}>;
+
+
+export type OrderPriceDetailsQuery = { __typename?: 'Query', orderPriceDetails: { __typename?: 'OrderPriceDetailsResponse', basePrice: number, discountPercentage: number, finalPrice: number, priceAfterDiscount: number, priceAfterVoucher: number, shippingPrice: number, voucher?: { __typename?: 'VoucherEntity', code: string, createdAt: any, description?: string | null, id: string, isPublic: boolean, limitedUsage?: number | null, maxDiscountValue?: number | null, minOrderValue?: number | null, type: VoucherType, updatedAt?: any | null, userId?: string | null, value: number } | null } };
 
 export type GetGiaoHangNhanhOrderInfoQueryVariables = Exact<{
   orderCode: Scalars['String']['input'];
@@ -7057,6 +7081,65 @@ export function useSpeedUpOrderMutation(baseOptions?: Apollo.MutationHookOptions
 export type SpeedUpOrderMutationHookResult = ReturnType<typeof useSpeedUpOrderMutation>;
 export type SpeedUpOrderMutationResult = Apollo.MutationResult<SpeedUpOrderMutation>;
 export type SpeedUpOrderMutationOptions = Apollo.BaseMutationOptions<SpeedUpOrderMutation, SpeedUpOrderMutationVariables>;
+export const OrderPriceDetailsDocument = gql`
+    query OrderPriceDetails($orderId: String!) {
+  orderPriceDetails(orderId: $orderId) {
+    basePrice
+    discountPercentage
+    finalPrice
+    priceAfterDiscount
+    priceAfterVoucher
+    shippingPrice
+    voucher {
+      code
+      createdAt
+      description
+      id
+      isPublic
+      limitedUsage
+      maxDiscountValue
+      minOrderValue
+      type
+      updatedAt
+      userId
+      value
+    }
+  }
+}
+    `;
+
+/**
+ * __useOrderPriceDetailsQuery__
+ *
+ * To run a query within a React component, call `useOrderPriceDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrderPriceDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrderPriceDetailsQuery({
+ *   variables: {
+ *      orderId: // value for 'orderId'
+ *   },
+ * });
+ */
+export function useOrderPriceDetailsQuery(baseOptions: Apollo.QueryHookOptions<OrderPriceDetailsQuery, OrderPriceDetailsQueryVariables> & ({ variables: OrderPriceDetailsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OrderPriceDetailsQuery, OrderPriceDetailsQueryVariables>(OrderPriceDetailsDocument, options);
+      }
+export function useOrderPriceDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OrderPriceDetailsQuery, OrderPriceDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OrderPriceDetailsQuery, OrderPriceDetailsQueryVariables>(OrderPriceDetailsDocument, options);
+        }
+export function useOrderPriceDetailsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OrderPriceDetailsQuery, OrderPriceDetailsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OrderPriceDetailsQuery, OrderPriceDetailsQueryVariables>(OrderPriceDetailsDocument, options);
+        }
+export type OrderPriceDetailsQueryHookResult = ReturnType<typeof useOrderPriceDetailsQuery>;
+export type OrderPriceDetailsLazyQueryHookResult = ReturnType<typeof useOrderPriceDetailsLazyQuery>;
+export type OrderPriceDetailsSuspenseQueryHookResult = ReturnType<typeof useOrderPriceDetailsSuspenseQuery>;
+export type OrderPriceDetailsQueryResult = Apollo.QueryResult<OrderPriceDetailsQuery, OrderPriceDetailsQueryVariables>;
 export const GetGiaoHangNhanhOrderInfoDocument = gql`
     query GetGiaoHangNhanhOrderInfo($orderCode: String!) {
   getGiaoHangNhanhOrderInfo(orderCode: $orderCode) {

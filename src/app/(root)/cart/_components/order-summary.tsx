@@ -28,6 +28,8 @@ interface OrderSummaryProps {
   selectedVoucher: VoucherEntityType | null;
   onSelectVoucher: (voucher: VoucherEntityType | null) => void;
   onSelectAddress: (address: AddressEntity) => void;
+  isCalculatingShipping: boolean;
+  shippingCostError: string | null;
 }
 
 export function OrderSummary({
@@ -39,6 +41,8 @@ export function OrderSummary({
   selectedVoucher,
   onSelectVoucher,
   onSelectAddress,
+  isCalculatingShipping,
+  shippingCostError,
 }: OrderSummaryProps) {
   const orderInfoRef = useRef<OrderInformationRef>(null);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -72,12 +76,11 @@ export function OrderSummary({
   };
 
   const discount = calculateDiscount();
-  const finalTotal = (cartTotal - discount) + shippingCost;
+  const finalTotal = cartTotal - discount + shippingCost;
 
   const handleCheckout = () => {
     if (orderInfoRef.current?.validate()) {
       const formData = orderInfoRef.current.getFormData();
-      console.log(formData);
       if (formData.phone) {
         updatePhoneNumber({
           variables: {
@@ -105,7 +108,22 @@ export function OrderSummary({
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Shipping Cost</span>
-            <span>{formatPrice(shippingCost)}</span>
+            <div className="flex items-center">
+              {isCalculatingShipping ? (
+                <div className="flex items-center">
+                  <div className="border-primary mr-2 h-4 w-4 animate-spin rounded-full border-b-2"></div>
+                  <span className="text-muted-foreground text-sm">
+                    Calculating...
+                  </span>
+                </div>
+              ) : shippingCostError ? (
+                <span className="text-destructive text-sm">
+                  {shippingCostError}
+                </span>
+              ) : (
+                <span>{formatPrice(shippingCost)}</span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -152,7 +170,14 @@ export function OrderSummary({
           className="w-full"
           size="lg"
           onClick={handleCheckout}
-          disabled={isProcessing || selectedItemCount === 0 || !isFormValid}
+          disabled={
+            isProcessing ||
+            selectedItemCount === 0 ||
+            !isFormValid ||
+            isCalculatingShipping ||
+            Boolean(shippingCostError) ||
+            shippingCost <= 0
+          }
         >
           {isProcessing ? (
             <>

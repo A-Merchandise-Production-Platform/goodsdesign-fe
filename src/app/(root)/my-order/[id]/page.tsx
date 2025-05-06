@@ -24,6 +24,8 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -67,6 +69,7 @@ import {
   useCreatePaymentGatewayUrlMutation,
   useFeedbackOrderMutation,
   useGetOrderQuery,
+  useOrderPriceDetailsQuery,
 } from '@/graphql/generated/graphql';
 import { cn, formatDate } from '@/lib/utils';
 
@@ -81,6 +84,8 @@ import {
 import { OrderHeader } from '@/app/(root)/_components/order-header';
 import { OrderStatusTimeline } from '@/app/(root)/_components/order-status-timeline';
 import { RejectionHistory } from '../../_components/rejection-history';
+import { DownloadBillButtonWithPreview } from '@/app/(root)/my-order/[id]/_components/download-bill-button-with-preview';
+import { Badge } from '@/components/ui/badge';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -112,6 +117,13 @@ export default function OrderDetailsPage() {
   const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
   const [rating, setRating] = useState(5);
   const [ratingComment, setRatingComment] = useState('');
+
+  const { data: orderPriceDetails, loading: orderPriceDetailsLoading } =
+    useOrderPriceDetailsQuery({
+      variables: {
+        orderId: id,
+      },
+    });
 
   const [createPaymentGatewayUrl, { loading: createPaymentGatewayUrlLoading }] =
     useCreatePaymentGatewayUrlMutation({
@@ -208,7 +220,7 @@ export default function OrderDetailsPage() {
   // Error or empty order state
   if (error || !order) {
     return (
-      <div className="container mx-auto px-4 py-10">
+      <div className="container mx-auto pt-4 pb-16">
         <BackButton />
         <Card className="text-center">
           <CardContent className="flex flex-col items-center justify-center py-16">
@@ -245,7 +257,7 @@ export default function OrderDetailsPage() {
   // Empty order details
   if (order.orderDetails && order.orderDetails.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-10">
+      <div className="container mx-auto py-4">
         <BackButton />
 
         {/* Order Header */}
@@ -294,21 +306,23 @@ export default function OrderDetailsPage() {
   const currentStatusGroup = getCurrentStatusGroup(order.status);
 
   return (
-    <div className="container mx-auto px-4 py-10">
+    <div className="container mx-auto py-4">
       <BackButton />
 
       {/* Order Header */}
       {order && (
-        <OrderHeader 
+        <OrderHeader
           order={{
             id: order.id,
             orderDate: order.orderDate || '',
             status: order.status,
-            customer: order.customer ? {
-              name: order.customer.name || undefined,
-              email: order.customer.email || undefined,
-              imageUrl: order.customer.imageUrl || undefined,
-            } : undefined,
+            customer: order.customer
+              ? {
+                  name: order.customer.name || undefined,
+                  email: order.customer.email || undefined,
+                  imageUrl: order.customer.imageUrl || undefined,
+                }
+              : undefined,
             totalPrice: order.totalPrice || 0,
             totalItems: order.totalItems || 0,
             estimatedCompletionAt: order.estimatedCompletionAt || '',
@@ -317,30 +331,37 @@ export default function OrderDetailsPage() {
             shippingPrice: order.shippingPrice || 0,
             customerAddress: order.address?.formattedAddress || '',
             factoryAddress: order.factory?.address?.formattedAddress || '',
-            factory: order.factory ? {
-              name: order.factory.name || undefined,
-              owner: order.factory.owner ? {
-                name: order.factory.owner.name || undefined,
-                email: order.factory.owner.email || undefined,
-                imageUrl: order.factory.owner.imageUrl || undefined,
-              } : undefined
-            } : undefined,
+            factory: order.factory
+              ? {
+                  name: order.factory.name || undefined,
+                  owner: order.factory.owner
+                    ? {
+                        name: order.factory.owner.name || undefined,
+                        email: order.factory.owner.email || undefined,
+                        imageUrl: order.factory.owner.imageUrl || undefined,
+                      }
+                    : undefined,
+                }
+              : undefined,
             orderCode: order.orderCode || '',
-          }} 
+          }}
         />
       )}
 
       {/* Order Status Timeline */}
-      <OrderStatusTimeline status={order.status} currentStatusGroup={currentStatusGroup} />
+      <OrderStatusTimeline
+        status={order.status}
+        currentStatusGroup={currentStatusGroup}
+      />
 
       {/* Tabs */}
       <Tabs
         defaultValue="overview"
         value={activeTab}
         onValueChange={setActiveTab}
-        className="mb-6"
+        className="mb-2 pb-16"
       >
-        <TabsList className="mb-6 grid grid-cols-6">
+        <TabsList className="mb-2 grid grid-cols-6">
           <TabsTrigger value="overview">
             <FileText className="mr-2 h-4 w-4" />
             Overview
@@ -486,24 +507,153 @@ export default function OrderDetailsPage() {
                     </div>
                   </div>
                 </div>
+                {/* <div className="flex justify-end">
+                  <DownloadBillButtonWithPreview
+                    order={order}
+                    companyName="Goods Design"
+                    companyLogo="/logo.png"
+                    companyAddress="Ho Chi Minh City, Vietnam"
+                    companyPhone="+84 123 456 789"
+                    companyEmail="contact@goodsdesign.uydev.id.vn"
+                    companyWebsite="goodsdesign.uydev.id.vn"
+                  />
+                </div> */}
               </div>
             </CardContent>
             <CardFooter className="border-t pt-6">
-              <div className="flex w-full flex-col space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span>
-                    {formatCurrency(order.totalPrice - order.shippingPrice)}
+              <div className="flex w-full flex-col space-y-4">
+                {/* Base Price */}
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Base Price</span>
+                  <span className="font-medium text-rose-500">
+                    {formatCurrency(
+                      orderPriceDetails?.orderPriceDetails?.basePrice || 0,
+                    )}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span>{formatCurrency(order.shippingPrice)}</span>
+
+                {/* Discount Section */}
+                {(orderPriceDetails?.orderPriceDetails?.discountPercentage ||
+                  0) > 0 && (
+                  <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-3 dark:border-emerald-900 dark:bg-emerald-950/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-700 dark:text-emerald-400">
+                          Volume Discount
+                        </span>
+                        <Badge
+                          variant="secondary"
+                          className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
+                        >
+                          {
+                            orderPriceDetails?.orderPriceDetails
+                              ?.discountPercentage
+                          }
+                          % OFF
+                        </Badge>
+                      </div>
+                      <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                        -
+                        {formatCurrency(
+                          (orderPriceDetails?.orderPriceDetails?.basePrice ||
+                            0) -
+                            (orderPriceDetails?.orderPriceDetails
+                              ?.priceAfterDiscount || 0),
+                        )}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">
+                      Price after discount:{' '}
+                      {formatCurrency(
+                        orderPriceDetails?.orderPriceDetails
+                          ?.priceAfterDiscount || 0,
+                      )}
+                    </p>
+                  </div>
+                )}
+
+                {/* Voucher Section */}
+                {orderPriceDetails?.orderPriceDetails?.voucher && (
+                  <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-3 dark:border-emerald-900 dark:bg-emerald-950/50">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-emerald-700 dark:text-emerald-400">
+                            Voucher Applied
+                          </span>
+                          <Badge
+                            variant="secondary"
+                            className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
+                          >
+                            {orderPriceDetails.orderPriceDetails.voucher.code}
+                          </Badge>
+                        </div>
+                        {orderPriceDetails.orderPriceDetails.voucher
+                          .description && (
+                          <p className="text-sm text-emerald-600 dark:text-emerald-400">
+                            {
+                              orderPriceDetails.orderPriceDetails.voucher
+                                .description
+                            }
+                          </p>
+                        )}
+                      </div>
+                      <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                        -
+                        {formatCurrency(
+                          (orderPriceDetails?.orderPriceDetails
+                            ?.priceAfterDiscount || 0) -
+                            (orderPriceDetails?.orderPriceDetails
+                              ?.priceAfterVoucher || 0),
+                        )}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">
+                      Price after voucher:{' '}
+                      {formatCurrency(
+                        orderPriceDetails?.orderPriceDetails
+                          ?.priceAfterVoucher || 0,
+                      )}
+                    </p>
+                  </div>
+                )}
+
+                {/* Shipping Fee */}
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Shipping Fee</span>
+                  <span className="font-medium text-rose-500">
+                    +
+                    {formatCurrency(
+                      orderPriceDetails?.orderPriceDetails?.shippingPrice || 0,
+                    )}
+                  </span>
                 </div>
+
                 <Separator className="my-2" />
-                <div className="flex justify-between text-lg font-medium">
-                  <span>Total</span>
-                  <span>{formatCurrency(order.totalPrice)}</span>
+
+                {/* Final Total */}
+                <div className="flex items-center justify-between text-lg font-medium">
+                  <span>Total Payment</span>
+                  <div className="flex flex-col items-end">
+                    <span className="text-xl">
+                      {formatCurrency(
+                        orderPriceDetails?.orderPriceDetails?.finalPrice || 0,
+                      )}
+                    </span>
+                    {(orderPriceDetails?.orderPriceDetails?.basePrice || 0) >
+                      (orderPriceDetails?.orderPriceDetails?.finalPrice ||
+                        0) && (
+                      <span className="text-sm text-emerald-600">
+                        You saved{' '}
+                        {formatCurrency(
+                          (orderPriceDetails?.orderPriceDetails?.basePrice ||
+                            0) -
+                            (orderPriceDetails?.orderPriceDetails?.finalPrice ||
+                              0),
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </CardFooter>
@@ -656,37 +806,39 @@ export default function OrderDetailsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {order?.orderProgressReports?.sort((a, b) => b.reportDate.localeCompare(a.reportDate))?.map((report, index) => (
-                  <div key={report.id} className="relative pb-6 pl-6">
-                    {index !==
-                      (order?.orderProgressReports?.length || 0) - 1 && (
-                      <div className="bg-border absolute top-0 left-2 h-full w-px"></div>
-                    )}
-                    <div className="border-primary bg-background absolute top-0 left-0 h-4 w-4 rounded-full border-2"></div>
-                    <div className="mb-1 text-sm font-medium">
-                      {formatDate(report.reportDate)} at{' '}
-                      {formatTime(report.reportDate)}
-                    </div>
-                    <div className="text-sm">{report.note}</div>
-                    {report.imageUrls && report.imageUrls.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {report.imageUrls.map((url, idx) => (
-                          <div
-                            key={idx}
-                            className="relative h-16 w-16 overflow-hidden rounded-md"
-                          >
-                            <Image
-                              src={url || '/placeholder.svg'}
-                              alt={`Progress image ${idx + 1}`}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                        ))}
+                {order?.orderProgressReports
+                  ?.sort((a, b) => b.reportDate.localeCompare(a.reportDate))
+                  ?.map((report, index) => (
+                    <div key={report.id} className="relative pb-6 pl-6">
+                      {index !==
+                        (order?.orderProgressReports?.length || 0) - 1 && (
+                        <div className="bg-border absolute top-0 left-2 h-full w-px"></div>
+                      )}
+                      <div className="border-primary bg-background absolute top-0 left-0 h-4 w-4 rounded-full border-2"></div>
+                      <div className="mb-1 text-sm font-medium">
+                        {formatDate(report.reportDate)} at{' '}
+                        {formatTime(report.reportDate)}
                       </div>
-                    )}
-                  </div>
-                ))}
+                      <div className="text-sm">{report.note}</div>
+                      {report.imageUrls && report.imageUrls.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {report.imageUrls.map((url, idx) => (
+                            <div
+                              key={idx}
+                              className="relative h-16 w-16 overflow-hidden rounded-md"
+                            >
+                              <Image
+                                src={url || '/placeholder.svg'}
+                                alt={`Progress image ${idx + 1}`}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 {!order?.orderProgressReports?.length && (
                   <div className="text-muted-foreground py-6 text-center">
                     No progress updates available yet.
@@ -805,41 +957,42 @@ export default function OrderDetailsPage() {
                         </div>
                       )}
 
-                      {(payment.status === 'PENDING' && payment.type == "DEPOSIT") && (
-                        <div className="mt-4 flex justify-between gap-2">
-                          <div className="mb-4">
-                            <Select
-                              value={selectedPaymentGateway}
-                              onValueChange={value =>
-                                setSelectedPaymentGateway(
-                                  value as 'VNPAY' | 'PAYOS',
-                                )
-                              }
+                      {payment.status === 'PENDING' &&
+                        payment.type == 'DEPOSIT' && (
+                          <div className="mt-4 flex justify-between gap-2">
+                            <div className="mb-4">
+                              <Select
+                                value={selectedPaymentGateway}
+                                onValueChange={value =>
+                                  setSelectedPaymentGateway(
+                                    value as 'VNPAY' | 'PAYOS',
+                                  )
+                                }
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select payment method" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="VNPAY">VNPAY</SelectItem>
+                                  <SelectItem value="PAYOS">PayOS</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <Button
+                              onClick={() => {
+                                // Handle payment logic here
+                                handlePayBalance(
+                                  payment.id,
+                                  selectedPaymentGateway,
+                                );
+                              }}
+                              className="flex-1"
                             >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select payment method" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="VNPAY">VNPAY</SelectItem>
-                                <SelectItem value="PAYOS">PayOS</SelectItem>
-                              </SelectContent>
-                            </Select>
+                              <DollarSign className="mr-2 h-4 w-4" />
+                              Pay Now
+                            </Button>
                           </div>
-                          <Button
-                            onClick={() => {
-                              // Handle payment logic here
-                              handlePayBalance(
-                                payment.id,
-                                selectedPaymentGateway,
-                              );
-                            }}
-                            className="flex-1"
-                          >
-                            <DollarSign className="mr-2 h-4 w-4" />
-                            Pay Now
-                          </Button>
-                        </div>
-                      )}
+                        )}
                     </div>
                   ))}
                 </div>
@@ -850,21 +1003,139 @@ export default function OrderDetailsPage() {
               )}
             </CardContent>
             <CardFooter className="border-t pt-6">
-              <div className="flex w-full flex-col space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span>
-                    {formatCurrency(order.totalPrice - order.shippingPrice)}
+              <div className="flex w-full flex-col space-y-4">
+                {/* Base Price */}
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Base Price</span>
+                  <span className="font-medium text-rose-500">
+                    {formatCurrency(
+                      orderPriceDetails?.orderPriceDetails?.basePrice || 0,
+                    )}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span>{formatCurrency(order.shippingPrice)}</span>
+
+                {/* Discount Section */}
+                {(orderPriceDetails?.orderPriceDetails?.discountPercentage ||
+                  0) > 0 && (
+                  <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-3 dark:border-emerald-900 dark:bg-emerald-950/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-700 dark:text-emerald-400">
+                          Volume Discount
+                        </span>
+                        <Badge
+                          variant="secondary"
+                          className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
+                        >
+                          {
+                            orderPriceDetails?.orderPriceDetails
+                              ?.discountPercentage
+                          }
+                          % OFF
+                        </Badge>
+                      </div>
+                      <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                        -
+                        {formatCurrency(
+                          (orderPriceDetails?.orderPriceDetails?.basePrice ||
+                            0) -
+                            (orderPriceDetails?.orderPriceDetails
+                              ?.priceAfterDiscount || 0),
+                        )}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">
+                      Price after discount:{' '}
+                      {formatCurrency(
+                        orderPriceDetails?.orderPriceDetails
+                          ?.priceAfterDiscount || 0,
+                      )}
+                    </p>
+                  </div>
+                )}
+
+                {/* Voucher Section */}
+                {orderPriceDetails?.orderPriceDetails?.voucher && (
+                  <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-3 dark:border-emerald-900 dark:bg-emerald-950/50">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-emerald-700 dark:text-emerald-400">
+                            Voucher Applied
+                          </span>
+                          <Badge
+                            variant="secondary"
+                            className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
+                          >
+                            {orderPriceDetails.orderPriceDetails.voucher.code}
+                          </Badge>
+                        </div>
+                        {orderPriceDetails.orderPriceDetails.voucher
+                          .description && (
+                          <p className="text-sm text-emerald-600 dark:text-emerald-400">
+                            {
+                              orderPriceDetails.orderPriceDetails.voucher
+                                .description
+                            }
+                          </p>
+                        )}
+                      </div>
+                      <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                        -
+                        {formatCurrency(
+                          (orderPriceDetails?.orderPriceDetails
+                            ?.priceAfterDiscount || 0) -
+                            (orderPriceDetails?.orderPriceDetails
+                              ?.priceAfterVoucher || 0),
+                        )}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">
+                      Price after voucher:{' '}
+                      {formatCurrency(
+                        orderPriceDetails?.orderPriceDetails
+                          ?.priceAfterVoucher || 0,
+                      )}
+                    </p>
+                  </div>
+                )}
+
+                {/* Shipping Fee */}
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Shipping Fee</span>
+                  <span className="font-medium text-rose-500">
+                    +
+                    {formatCurrency(
+                      orderPriceDetails?.orderPriceDetails?.shippingPrice || 0,
+                    )}
+                  </span>
                 </div>
+
                 <Separator className="my-2" />
-                <div className="flex justify-between text-lg font-medium">
-                  <span>Total</span>
-                  <span>{formatCurrency(order.totalPrice)}</span>
+
+                {/* Final Total */}
+                <div className="flex items-center justify-between text-lg font-medium">
+                  <span>Total Payment</span>
+                  <div className="flex flex-col items-end">
+                    <span className="text-xl">
+                      {formatCurrency(
+                        orderPriceDetails?.orderPriceDetails?.finalPrice || 0,
+                      )}
+                    </span>
+                    {(orderPriceDetails?.orderPriceDetails?.basePrice || 0) >
+                      (orderPriceDetails?.orderPriceDetails?.finalPrice ||
+                        0) && (
+                      <span className="text-sm text-emerald-600">
+                        You saved{' '}
+                        {formatCurrency(
+                          (orderPriceDetails?.orderPriceDetails?.basePrice ||
+                            0) -
+                            (orderPriceDetails?.orderPriceDetails?.finalPrice ||
+                              0),
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </CardFooter>
