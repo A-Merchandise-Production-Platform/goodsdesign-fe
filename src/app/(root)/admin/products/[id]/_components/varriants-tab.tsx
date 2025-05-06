@@ -10,7 +10,6 @@ import type { GetProductByIdQuery } from '@/graphql/generated/graphql';
 import { cn, formatPrice } from '@/lib/utils';
 import { AddVariantBtn } from '@/app/(root)/admin/products/[id]/_components/add-variant-btn';
 import { EditVariantBtn } from './edit-variant-btn';
-import { DeleteVariantBtn } from './delete-variant-btn';
 
 export default function VariantsTab({
   product,

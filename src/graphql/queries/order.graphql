@@ -1244,8 +1244,8 @@ mutation AddOrderProgressReport($input: AddOrderProgressReportInput!) {
   }
 }
 
-mutation CreateRefundForOrder($orderId: String!) {
-  createRefundForOrder(orderId: $orderId) {
+mutation CreateRefundForOrder($orderId: String!, $reason: String!) {
+  createRefundForOrder(orderId: $orderId, reason: $reason) {
   id  
   }
 }
@@ -1277,5 +1277,33 @@ mutation CalculateShippingCostAndFactoryForCart($input: CalculateShippingCostAnd
         formattedAddress
       }
     }
+  }
+}
+
+query FactoryScoresForOrder($orderId: String!) {
+  factoryScoresForOrder(orderId: $orderId) {
+    factoryId
+    factoryName
+    scores {
+      capacityScore
+      leadTimeScore
+      legitPointScore
+      productionCapacityScore
+      specializationScore
+    }
+    totalScore
+    weights {
+      capacity
+      leadTime
+      legitPoint
+      productionCapacity
+      specialization
+    }
+  }
+}
+
+mutation SpeedUpOrder($orderId: String!) {
+  speedUpOrder(orderId: $orderId) {
+    id
   }
 }
