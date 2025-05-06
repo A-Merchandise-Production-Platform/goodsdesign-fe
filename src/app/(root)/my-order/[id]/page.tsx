@@ -343,6 +343,7 @@ export default function OrderDetailsPage() {
                     : undefined,
                 }
               : undefined,
+            orderCode: order.orderCode || '',
           }}
         />
       )}

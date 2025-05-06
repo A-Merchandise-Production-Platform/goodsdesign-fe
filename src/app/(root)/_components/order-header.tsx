@@ -1,11 +1,12 @@
 "use client"
-import { Calendar, Clock, MapPin, Package, User } from "lucide-react"
+import { Calendar, Clock, MapPin, Package, Truck, User } from "lucide-react"
 import Image from "next/image"
 
 import { getStatusBadge } from "@/app/(root)/_components/order-status"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { cn, formatDate } from "@/lib/utils"
+import Link from "next/link"
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -49,6 +50,7 @@ interface OrderHeaderProps {
     }
     customerAddress?: string
     factoryAddress?: string
+    orderCode?: string
   }
 }
 
@@ -87,7 +89,17 @@ export function OrderHeader({ order }: OrderHeaderProps) {
             <CardDescription className="mt-2 flex items-center text-slate-600 dark:text-slate-400">
               <Calendar className="mr-2 h-4 w-4" />
               {formatDate(order.orderDate)} at {formatTime(order.orderDate)}
+
+              {/* link to shipping page */}
+              
             </CardDescription>
+            {
+                order.orderCode && (
+                  <Link href={`/shipping/${order.orderCode}`} className="text-blue-500 hover:text-blue-600 flex items-center gap-1 mt-2">
+                    <Truck className="h-4 w-4" /> Shipping Info - GiaoHangNhanh
+                  </Link>
+                )
+              }
           </div>
           <div className="flex items-center gap-3">
             <div className="scale-105">{getStatusBadge(order.status)}</div>

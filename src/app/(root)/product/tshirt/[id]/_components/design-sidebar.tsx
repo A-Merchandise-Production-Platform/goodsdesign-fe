@@ -1,5 +1,5 @@
-import { ShirtIcon as TShirt, Type, Upload } from 'lucide-react';
-import React, { useState } from 'react';
+import { ShirtIcon as TShirt, Type, Upload, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -9,12 +9,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { DesignObject } from '@/types/design-object';
 import { useAuthStore } from '@/stores/auth.store';
-import { Roles } from '@/graphql/generated/graphql';
+import { Roles, useGenerateAndUploadImageMutation } from '@/graphql/generated/graphql';
 
 import { LayersPanel } from './layers-panel';
 import { SHIRT_COLORS } from './shirt-colors';
+import { PulsatingButton } from '@/components/magicui/pulsating-button';
+import { ShimmerButton } from '@/components/magicui/shimmer-button';
 
 interface DesignSidebarProps {
   showColorDialog: boolean;
@@ -60,7 +63,31 @@ interface DesignSidebarProps {
   }) => void;
   designId?: string;
   uploadLoading?: boolean;
+  onGenAIUpload?: (imageUrl: string) => void;
 }
+
+const EXAMPLE_PROMPTS = [
+  "A minimalist geometric pattern in pastel colors",
+  "Abstract watercolor splashes with vibrant colors",
+  "Vintage retro wave design with neon elements",
+  "Japanese-inspired cherry blossom pattern",
+  "Modern tech circuit board pattern",
+  "Tropical palm leaves in monochrome",
+  "Abstract marble texture with gold veins",
+  "Space-themed galaxy with stars and planets",
+  "Geometric mandala with sacred geometry",
+  "Abstract brush strokes in primary colors",
+  "Minimalist line art of mountains",
+  "Vintage comic book style illustration",
+  "Abstract splatter paint in rainbow colors",
+  "Modern minimalist logo design",
+  "Abstract geometric shapes in gradient colors",
+  "Vintage postage stamp design",
+  "Abstract wave pattern in ocean colors",
+  "Minimalist animal silhouette",
+  "Abstract dot pattern in pastel colors",
+  "Modern typography art piece"
+];
 
 const DesignSidebar: React.FC<DesignSidebarProps> = ({
   showColorDialog,
@@ -79,15 +106,71 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
   onUpdateVariant,
   designId,
   uploadLoading,
+  onGenAIUpload,
 }) => {
   const { user } = useAuthStore();
 
   const [tempColor, setTempColor] = useState<
     { path: string; color: string } | undefined
   >();
+  const [showGenAIDialog, setShowGenAIDialog] = useState(false);
+  const [prompt, setPrompt] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [randomPrompts, setRandomPrompts] = useState<string[]>([]);
+
+  const [generateAndUploadImage, { loading: generateAndUploadImageLoading }] = useGenerateAndUploadImageMutation();
+  // generateAndUploadImage({
+  //   variables: {
+  //     prompt: prompt,
+  //   },
+  // });
+
+  useEffect(() => {
+    // Get 3 random prompts when dialog opens
+    if (showGenAIDialog) {
+      const shuffled = [...EXAMPLE_PROMPTS].sort(() => 0.5 - Math.random());
+      setRandomPrompts(shuffled.slice(0, 3));
+    }
+  }, [showGenAIDialog]);
+
   const handleUploadClick = () => {
     const input = document.querySelector('#image-upload') as HTMLInputElement;
     input?.click();
+  };
+
+  const handleGenAI = async () => {
+    if (!prompt.trim()) {
+      toast.error('Please enter a prompt');
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      const result = await generateAndUploadImage({
+        variables: {
+          prompt: prompt,
+        },
+      });
+
+      if (!result.data?.generateAndUploadImage?.url) {
+        throw new Error('Failed to generate image');
+      }
+
+      const imageUrl = result.data.generateAndUploadImage.url;
+      
+      // Pass the image URL to the parent component for handling
+      if (onGenAIUpload) {
+        onGenAIUpload(imageUrl);
+      }
+
+      setShowGenAIDialog(false);
+      setPrompt('');
+      toast.success('Image generated successfully');
+    } catch (error) {
+      console.error('Error generating image:', error);
+      toast.error('Failed to generate image');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -252,6 +335,67 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
             <div>Text</div>
           </div>
         </Button>
+
+        <ShimmerButton className="shadow-2xl mt-4"
+          onClick={() => setShowGenAIDialog(true)}
+          disabled={uploadLoading}
+        >
+          <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
+          <div className="flex w-full items-center gap-2">
+            <Sparkles className="size-4" />
+            <div>Gen AI</div>
+          </div>  
+        </span>
+      </ShimmerButton>
+
+        <Dialog open={showGenAIDialog} onOpenChange={setShowGenAIDialog}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold">Generate Image with AI</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6 py-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Enter your prompt</label>
+                <Input
+                  placeholder="Describe what you want to generate..."
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Try these examples</label>
+                <div className="grid gap-2">
+                  {randomPrompts.map((examplePrompt, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setPrompt(examplePrompt)}
+                      className="text-left p-2 rounded-md hover:bg-accent transition-colors text-sm text-muted-foreground hover:text-foreground"
+                    >
+                      {examplePrompt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <Button
+                onClick={handleGenAI}
+                className="w-full"
+                disabled={isGenerating || !prompt.trim()}
+              >
+                {isGenerating ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Generating...
+                  </div>
+                ) : (
+                  'Generate Image'
+                )}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* <LayersPanel
           disabled={uploadLoading}
