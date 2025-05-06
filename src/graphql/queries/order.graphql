@@ -58,9 +58,9 @@ query GetMyOrders {
         size
         model
         product {
-            name
-            imageUrl
-          }
+          name
+          imageUrl
+        }
       }
       checkQualities {
         totalChecked
@@ -252,9 +252,9 @@ query GetMyFactoryOrders {
         size
         model
         product {
-            name
-            imageUrl
-          }
+          name
+          imageUrl
+        }
       }
       checkQualities {
         totalChecked
@@ -447,9 +447,9 @@ query GetOrdersByFactoryId($factoryId: String!) {
         size
         model
         product {
-            name
-            imageUrl
-          }
+          name
+          imageUrl
+        }
       }
       checkQualities {
         totalChecked
@@ -651,9 +651,9 @@ query GetOrder($orderId: String!) {
         size
         model
         product {
-            name
-            imageUrl
-          }
+          name
+          imageUrl
+        }
       }
       checkQualities {
         id
@@ -846,9 +846,9 @@ query GetAllOrders {
         size
         model
         product {
-            name
-            imageUrl
-          }
+          name
+          imageUrl
+        }
       }
       checkQualities {
         totalChecked
@@ -1040,9 +1040,9 @@ query GetMyStaffOrders {
         size
         model
         product {
-            name
-            imageUrl
-          }
+          name
+          imageUrl
+        }
       }
       checkQualities {
         totalChecked
@@ -1246,17 +1246,25 @@ mutation AddOrderProgressReport($input: AddOrderProgressReportInput!) {
 
 mutation CreateRefundForOrder($orderId: String!, $reason: String!) {
   createRefundForOrder(orderId: $orderId, reason: $reason) {
-  id  
+    id
   }
 }
 
-mutation ProcessWithdrawal($imageUrls: [String!]!, $paymentId: String!, $userBankId: String!) {
-  processWithdrawal(imageUrls: $imageUrls, paymentId: $paymentId, userBankId: $userBankId)
+mutation ProcessWithdrawal(
+  $imageUrls: [String!]!
+  $paymentId: String!
+  $userBankId: String!
+) {
+  processWithdrawal(
+    imageUrls: $imageUrls
+    paymentId: $paymentId
+    userBankId: $userBankId
+  )
 }
 
 mutation StartReworkByManager($orderId: String!) {
   startReworkByManager(orderId: $orderId) {
-  id  
+    id
   }
 }
 
@@ -1266,7 +1274,9 @@ mutation AssignFactoryToOrder($factoryId: String!, $orderId: String!) {
   }
 }
 
-mutation CalculateShippingCostAndFactoryForCart($input: CalculateShippingCostAndFactoryDto!) {
+mutation CalculateShippingCostAndFactoryForCart(
+  $input: CalculateShippingCostAndFactoryDto!
+) {
   calculateShippingCostAndFactoryForCart(input: $input) {
     shippingFee {
       total
@@ -1305,5 +1315,30 @@ query FactoryScoresForOrder($orderId: String!) {
 mutation SpeedUpOrder($orderId: String!) {
   speedUpOrder(orderId: $orderId) {
     id
+  }
+}
+
+query OrderPriceDetails($orderId: String!) {
+  orderPriceDetails(orderId: $orderId) {
+    basePrice
+    discountPercentage
+    finalPrice
+    priceAfterDiscount
+    priceAfterVoucher
+    shippingPrice
+    voucher {
+      code
+      createdAt
+      description
+      id
+      isPublic
+      limitedUsage
+      maxDiscountValue
+      minOrderValue
+      type
+      updatedAt
+      userId
+      value
+    }
   }
 }

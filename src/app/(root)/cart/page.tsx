@@ -54,8 +54,13 @@ export default function CartPage() {
     null,
   );
   const [shippingCost, setShippingCost] = useState<number>(0);
+  const [shippingCostError, setShippingCostError] = useState<string | null>(
+    null,
+  );
+  const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
 
-  const [calculateShippingCostAndFactoryForCart, { loading: calculateShippingCostAndFactoryForCartLoading }] = useCalculateShippingCostAndFactoryForCartMutation();
+  const [calculateShippingCostAndFactoryForCart] =
+    useCalculateShippingCostAndFactoryForCartMutation();
 
   const [getProductVariants] = useGetProductVariantByIdLazyQuery();
 
@@ -266,34 +271,49 @@ export default function CartPage() {
   }, [cartItems, getProductVariants]);
 
   // Get only selected cart items
-  const selectedCartItems = useMemo(() => 
-    cartItems.filter(item => selectedItems[item.id]),
-    [cartItems, selectedItems]
+  const selectedCartItems = useMemo(
+    () => cartItems.filter(item => selectedItems[item.id]),
+    [cartItems, selectedItems],
   );
 
   // Calculate shipping cost when address or selected items change
   useEffect(() => {
     if (selectedAddress?.id && selectedCartItems.length > 0) {
+      setIsCalculatingShipping(true);
+      setShippingCostError(null);
+
       calculateShippingCostAndFactoryForCart({
         variables: {
           input: {
             addressId: selectedAddress.id,
             cartIds: selectedCartItems.map(item => item.id),
-          }
-        }
-      }).then(response => {
-        const shippingCostResponse = response.data?.calculateShippingCostAndFactoryForCart?.shippingFee?.total || 0;
-        if (shippingCostResponse != 0) {
+          },
+        },
+      })
+        .then(response => {
+          const shippingCostResponse =
+            response.data?.calculateShippingCostAndFactoryForCart?.shippingFee
+              ?.total || 0;
           setShippingCost(shippingCostResponse);
-        }
-      }).catch(error => {
-        toast.error('Failed to calculate shipping cost');
-        console.error('Shipping calculation error:', error);
-      });
+          setIsCalculatingShipping(false);
+        })
+        .catch(error => {
+          setShippingCostError(
+            'Failed to calculate shipping cost. Please refresh the page and try again.',
+          );
+          console.error('Shipping calculation error:', error);
+          setIsCalculatingShipping(false);
+        });
     } else {
       setShippingCost(0);
+      setShippingCostError(null);
+      setIsCalculatingShipping(false);
     }
-  }, [selectedAddress, selectedCartItems, calculateShippingCostAndFactoryForCart]);
+  }, [
+    selectedAddress,
+    selectedCartItems,
+    calculateShippingCostAndFactoryForCart,
+  ]);
 
   // Calculate cart totals for selected items only
   const cartTotal = selectedCartItems.reduce(
@@ -374,6 +394,25 @@ export default function CartPage() {
       return;
     }
 
+    if (isCalculatingShipping) {
+      toast.error('Please wait while we calculate shipping cost');
+      return;
+    }
+
+    if (shippingCostError) {
+      toast.error(
+        'Unable to proceed due to shipping cost calculation error. Please refresh the page and try again.',
+      );
+      return;
+    }
+
+    if (shippingCost <= 0) {
+      toast.error(
+        'Invalid shipping cost. Please try selecting your address again or refresh the page.',
+      );
+      return;
+    }
+
     setIsCheckingOut(true);
     createOrder({
       variables: {
@@ -437,6 +476,8 @@ export default function CartPage() {
           selectedVoucher={selectedVoucher}
           onSelectVoucher={handleSelectVoucher}
           onSelectAddress={setSelectedAddress}
+          isCalculatingShipping={isCalculatingShipping}
+          shippingCostError={shippingCostError}
         />
       </div>
     </div>
