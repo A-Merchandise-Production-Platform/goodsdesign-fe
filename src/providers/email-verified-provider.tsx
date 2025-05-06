@@ -36,7 +36,7 @@ export default function EmailVerifiedProvider({
   children: React.ReactNode;
 }) {
   const { user, isAuth } = useAuthStore();
-  const [open, setOpen] = useState(!user?.isVerified);
+  const [open, setOpen] = useState(!!user && !user.isVerified);
   const [verificationCode, setVerificationCode] = useState([
     '',
     '',
