@@ -341,6 +341,7 @@ export default function StaffCheckQualityDetailsPage() {
                     : undefined,
                 }
               : undefined,
+            orderCode: order.orderCode || '',
           }}
         />
       )}

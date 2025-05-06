@@ -597,6 +597,7 @@ export default function FactoryOrderDetailsPage() {
                     : undefined,
                 }
               : undefined,
+            orderCode: order.orderCode || '',
           }}
         />
       )}

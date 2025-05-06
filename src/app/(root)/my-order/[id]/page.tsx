@@ -325,6 +325,7 @@ export default function OrderDetailsPage() {
                 imageUrl: order.factory.owner.imageUrl || undefined,
               } : undefined
             } : undefined,
+            orderCode: order.orderCode || '',
           }} 
         />
       )}

@@ -1262,6 +1262,7 @@ export type OrderEntity = {
   factoryId?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   isDelayed: Scalars['Boolean']['output'];
+  orderCode?: Maybe<Scalars['String']['output']>;
   orderDate: Scalars['DateTime']['output'];
   orderDetails?: Maybe<Array<OrderDetailEntity>>;
   orderProgressReports?: Maybe<Array<OrderProgressReportEntity>>;
@@ -1279,6 +1280,82 @@ export type OrderEntity = {
   totalPrice: Scalars['Int']['output'];
   totalProductionCost?: Maybe<Scalars['Int']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type OrderInfoDto = {
+  __typename?: 'OrderInfoDto';
+  client_id: Scalars['Float']['output'];
+  client_order_code?: Maybe<Scalars['String']['output']>;
+  cod_amount: Scalars['Float']['output'];
+  cod_collect_date?: Maybe<Scalars['String']['output']>;
+  cod_failed_amount: Scalars['Float']['output'];
+  cod_failed_collect_date?: Maybe<Scalars['String']['output']>;
+  cod_transfer_date?: Maybe<Scalars['String']['output']>;
+  content: Scalars['String']['output'];
+  converted_weight: Scalars['Float']['output'];
+  coupon?: Maybe<Scalars['String']['output']>;
+  created_client: Scalars['Float']['output'];
+  created_date: Scalars['String']['output'];
+  created_employee: Scalars['Float']['output'];
+  created_ip: Scalars['String']['output'];
+  created_source: Scalars['String']['output'];
+  current_warehouse_id: Scalars['Float']['output'];
+  custom_service_fee: Scalars['Float']['output'];
+  deliver_station_id?: Maybe<Scalars['Float']['output']>;
+  deliver_warehouse_id: Scalars['Float']['output'];
+  employee_note?: Maybe<Scalars['String']['output']>;
+  finish_date?: Maybe<Scalars['String']['output']>;
+  from_address: Scalars['String']['output'];
+  from_district_id: Scalars['Float']['output'];
+  from_name: Scalars['String']['output'];
+  from_phone: Scalars['String']['output'];
+  from_ward_code: Scalars['String']['output'];
+  height: Scalars['Float']['output'];
+  insurance_value: Scalars['Float']['output'];
+  is_cod_collected: Scalars['Boolean']['output'];
+  is_cod_transferred: Scalars['Boolean']['output'];
+  leadtime?: Maybe<Scalars['String']['output']>;
+  length: Scalars['Float']['output'];
+  log?: Maybe<Array<OrderLogDto>>;
+  next_warehouse_id: Scalars['Float']['output'];
+  note?: Maybe<Scalars['String']['output']>;
+  order_code: Scalars['String']['output'];
+  order_date: Scalars['String']['output'];
+  order_value: Scalars['Float']['output'];
+  payment_type_id: Scalars['Float']['output'];
+  pick_station_id?: Maybe<Scalars['Float']['output']>;
+  pick_warehouse_id: Scalars['Float']['output'];
+  required_note: Scalars['String']['output'];
+  return_address?: Maybe<Scalars['String']['output']>;
+  return_district_id?: Maybe<Scalars['Float']['output']>;
+  return_name?: Maybe<Scalars['String']['output']>;
+  return_phone?: Maybe<Scalars['String']['output']>;
+  return_ward_code?: Maybe<Scalars['String']['output']>;
+  return_warehouse_id: Scalars['Float']['output'];
+  service_id: Scalars['Float']['output'];
+  service_type_id: Scalars['Float']['output'];
+  shop_id: Scalars['Float']['output'];
+  status: Scalars['String']['output'];
+  tag?: Maybe<Array<Scalars['String']['output']>>;
+  to_address: Scalars['String']['output'];
+  to_district_id: Scalars['Float']['output'];
+  to_name: Scalars['String']['output'];
+  to_phone: Scalars['String']['output'];
+  to_ward_code: Scalars['String']['output'];
+  updated_client: Scalars['Float']['output'];
+  updated_date: Scalars['String']['output'];
+  updated_employee: Scalars['Float']['output'];
+  updated_ip: Scalars['String']['output'];
+  updated_source: Scalars['String']['output'];
+  updated_warehouse: Scalars['Float']['output'];
+  weight: Scalars['Float']['output'];
+  width: Scalars['Float']['output'];
+};
+
+export type OrderLogDto = {
+  __typename?: 'OrderLogDto';
+  status: Scalars['String']['output'];
+  updated_date: Scalars['String']['output'];
 };
 
 export type OrderProgressReportEntity = {
@@ -1471,6 +1548,7 @@ export type Query = {
   getExpiredTime: Scalars['DateTime']['output'];
   getFactoryById: FactoryEntity;
   getFactoryDetailDashboard: FactoryDetailDashboardResponse;
+  getGiaoHangNhanhOrderInfo: OrderInfoDto;
   getManagerDashboard: ManagerDashboardResponse;
   getManagerOrderDashboard: ManagerOrderDashboardEntity;
   getMe: UserEntity;
@@ -1618,6 +1696,11 @@ export type QueryGetFactoryByIdArgs = {
 
 export type QueryGetFactoryDetailDashboardArgs = {
   factoryId: Scalars['String']['input'];
+};
+
+
+export type QueryGetGiaoHangNhanhOrderInfoArgs = {
+  orderCode: Scalars['String']['input'];
 };
 
 
@@ -2464,7 +2547,7 @@ export type GetOrderQueryVariables = Exact<{
 }>;
 
 
-export type GetOrderQuery = { __typename?: 'Query', order: { __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId?: string | null, id: string, provinceID: number, street: string, wardCode: string, formattedAddress?: string | null } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null, address?: { __typename?: 'AddressEntity', districtID: number, street: string, id: string, provinceID: number, wardCode: string, formattedAddress?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', id: string, totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', imageUrls?: Array<string> | null, transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null } };
+export type GetOrderQuery = { __typename?: 'Query', order: { __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, orderCode?: string | null, addressId?: string | null, assignedAt?: any | null, completedAt?: any | null, currentProgress?: number | null, customerId: string, delayReason?: string | null, doneCheckQualityAt?: any | null, doneProductionAt?: any | null, estimatedCheckQualityAt: any, estimatedCompletionAt: any, estimatedDoneProductionAt: any, estimatedShippingAt: any, id: string, isDelayed: boolean, orderDate: any, ratedAt?: any | null, ratedBy?: string | null, rating?: number | null, ratingComment?: string | null, shippedAt?: any | null, shippingPrice: number, status: OrderStatus, totalItems: number, totalPrice: number, totalProductionCost?: number | null, updatedAt?: any | null, address?: { __typename?: 'AddressEntity', districtID: number, factoryId?: string | null, id: string, provinceID: number, street: string, wardCode: string, formattedAddress?: string | null } | null, customer?: { __typename?: 'UserEntity', imageUrl?: string | null, name?: string | null, email?: string | null } | null, factory?: { __typename?: 'FactoryEntity', name: string, owner?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null, address?: { __typename?: 'AddressEntity', districtID: number, street: string, id: string, provinceID: number, wardCode: string, formattedAddress?: string | null } | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', completedQty: number, createdAt: any, id: string, isRework: boolean, price: number, productionCost?: number | null, quantity: number, rejectedQty: number, reworkTime: number, status: OrderDetailStatus, updatedAt?: any | null, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', id: string, isActive: boolean, isDeleted: boolean, price?: number | null, color?: string | null, size?: string | null, model?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, checkQualities?: Array<{ __typename?: 'CheckQualityEntity', id: string, totalChecked: number, status: string, passedQuantity: number, orderDetailId: string, task?: { __typename?: 'TaskEntity', taskname: string, taskType: string, status: string, startDate: any, note?: string | null, id: string, expiredTime: any, description: string, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null, id: string } | null } | null }> | null, design?: { __typename?: 'ProductDesignEntity', thumbnailUrl?: string | null, systemConfigVariantId: string, isTemplate: boolean, isPublic: boolean, isFinalized: boolean, id: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null, product: { __typename?: 'ProductEntity', name: string, imageUrl?: string | null } } | null, designPositions?: Array<{ __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null }> | null } | null }> | null, orderProgressReports?: Array<{ __typename?: 'OrderProgressReportEntity', reportDate: any, note?: string | null, imageUrls?: Array<string> | null, id: string }> | null, payments?: Array<{ __typename?: 'PaymentEntity', id: string, type: string, paymentLog: string, amount: number, status: string, transactions?: Array<{ __typename?: 'PaymentTransactionEntity', imageUrls?: Array<string> | null, transactionLog: string, status: TransactionStatus, paymentMethod: PaymentMethod, createdAt: any, amount: number, id: string, type: TransactionType }> | null }> | null, rejectedHistory?: Array<{ __typename?: 'RejectedOrderEntity', rejectedAt: any, reassignedTo?: string | null, reassignedAt?: any | null, reason: string, id: string, factory?: { __typename?: 'FactoryEntity', name: string, contractUrl?: string | null, address?: { __typename?: 'AddressEntity', wardCode: string, street: string, districtID: number, provinceID: number } | null, owner?: { __typename?: 'UserEntity', name?: string | null, email?: string | null, imageUrl?: string | null } | null } | null }> | null, tasks?: Array<{ __typename?: 'TaskEntity', taskname: string, taskType: string, id: string, status: string, startDate: any, note?: string | null, description: string, expiredTime: any, completedDate?: any | null, assignedDate: any, assignee?: { __typename?: 'UserEntity', name?: string | null, imageUrl?: string | null, email?: string | null } | null }> | null } };
 
 export type GetAllOrdersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2600,6 +2683,13 @@ export type SpeedUpOrderMutationVariables = Exact<{
 
 
 export type SpeedUpOrderMutation = { __typename?: 'Mutation', speedUpOrder: { __typename?: 'OrderEntity', id: string } };
+
+export type GetGiaoHangNhanhOrderInfoQueryVariables = Exact<{
+  orderCode: Scalars['String']['input'];
+}>;
+
+
+export type GetGiaoHangNhanhOrderInfoQuery = { __typename?: 'Query', getGiaoHangNhanhOrderInfo: { __typename?: 'OrderInfoDto', client_id: number, client_order_code?: string | null, cod_amount: number, cod_collect_date?: string | null, cod_failed_amount: number, cod_failed_collect_date?: string | null, cod_transfer_date?: string | null, content: string, converted_weight: number, coupon?: string | null, created_client: number, created_date: string, created_employee: number, created_ip: string, created_source: string, current_warehouse_id: number, custom_service_fee: number, deliver_station_id?: number | null, deliver_warehouse_id: number, employee_note?: string | null, finish_date?: string | null, from_address: string, from_district_id: number, from_name: string, from_phone: string, from_ward_code: string, height: number, insurance_value: number, is_cod_collected: boolean, is_cod_transferred: boolean, leadtime?: string | null, length: number, next_warehouse_id: number, note?: string | null, order_code: string, order_date: string, order_value: number, payment_type_id: number, pick_station_id?: number | null, pick_warehouse_id: number, required_note: string, return_address?: string | null, return_district_id?: number | null, return_name?: string | null, return_phone?: string | null, return_ward_code?: string | null, return_warehouse_id: number, service_id: number, service_type_id: number, shop_id: number, status: string, tag?: Array<string> | null, to_address: string, to_district_id: number, to_name: string, to_phone: string, to_ward_code: string, updated_client: number, updated_date: string, updated_employee: number, updated_ip: string, updated_source: string, updated_warehouse: number, weight: number, width: number, log?: Array<{ __typename?: 'OrderLogDto', status: string, updated_date: string }> | null } };
 
 export type GetExpiredTimeQueryVariables = Exact<{
   email: Scalars['String']['input'];
@@ -5633,6 +5723,7 @@ export const GetOrderDocument = gql`
   order(id: $orderId) {
     acceptanceDeadline
     acceptedAt
+    orderCode
     address {
       districtID
       factoryId
@@ -6923,6 +7014,114 @@ export function useSpeedUpOrderMutation(baseOptions?: Apollo.MutationHookOptions
 export type SpeedUpOrderMutationHookResult = ReturnType<typeof useSpeedUpOrderMutation>;
 export type SpeedUpOrderMutationResult = Apollo.MutationResult<SpeedUpOrderMutation>;
 export type SpeedUpOrderMutationOptions = Apollo.BaseMutationOptions<SpeedUpOrderMutation, SpeedUpOrderMutationVariables>;
+export const GetGiaoHangNhanhOrderInfoDocument = gql`
+    query GetGiaoHangNhanhOrderInfo($orderCode: String!) {
+  getGiaoHangNhanhOrderInfo(orderCode: $orderCode) {
+    client_id
+    client_order_code
+    cod_amount
+    cod_collect_date
+    cod_failed_amount
+    cod_failed_collect_date
+    cod_transfer_date
+    content
+    converted_weight
+    coupon
+    created_client
+    created_date
+    created_employee
+    created_ip
+    created_source
+    current_warehouse_id
+    custom_service_fee
+    deliver_station_id
+    deliver_warehouse_id
+    employee_note
+    finish_date
+    from_address
+    from_district_id
+    from_name
+    from_phone
+    from_ward_code
+    height
+    insurance_value
+    is_cod_collected
+    is_cod_transferred
+    leadtime
+    length
+    log {
+      status
+      updated_date
+    }
+    next_warehouse_id
+    note
+    order_code
+    order_date
+    order_value
+    payment_type_id
+    pick_station_id
+    pick_warehouse_id
+    required_note
+    return_address
+    return_district_id
+    return_name
+    return_phone
+    return_ward_code
+    return_warehouse_id
+    service_id
+    service_type_id
+    shop_id
+    status
+    tag
+    to_address
+    to_district_id
+    to_name
+    to_phone
+    to_ward_code
+    updated_client
+    updated_date
+    updated_employee
+    updated_ip
+    updated_source
+    updated_warehouse
+    weight
+    width
+  }
+}
+    `;
+
+/**
+ * __useGetGiaoHangNhanhOrderInfoQuery__
+ *
+ * To run a query within a React component, call `useGetGiaoHangNhanhOrderInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetGiaoHangNhanhOrderInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetGiaoHangNhanhOrderInfoQuery({
+ *   variables: {
+ *      orderCode: // value for 'orderCode'
+ *   },
+ * });
+ */
+export function useGetGiaoHangNhanhOrderInfoQuery(baseOptions: Apollo.QueryHookOptions<GetGiaoHangNhanhOrderInfoQuery, GetGiaoHangNhanhOrderInfoQueryVariables> & ({ variables: GetGiaoHangNhanhOrderInfoQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetGiaoHangNhanhOrderInfoQuery, GetGiaoHangNhanhOrderInfoQueryVariables>(GetGiaoHangNhanhOrderInfoDocument, options);
+      }
+export function useGetGiaoHangNhanhOrderInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetGiaoHangNhanhOrderInfoQuery, GetGiaoHangNhanhOrderInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetGiaoHangNhanhOrderInfoQuery, GetGiaoHangNhanhOrderInfoQueryVariables>(GetGiaoHangNhanhOrderInfoDocument, options);
+        }
+export function useGetGiaoHangNhanhOrderInfoSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetGiaoHangNhanhOrderInfoQuery, GetGiaoHangNhanhOrderInfoQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetGiaoHangNhanhOrderInfoQuery, GetGiaoHangNhanhOrderInfoQueryVariables>(GetGiaoHangNhanhOrderInfoDocument, options);
+        }
+export type GetGiaoHangNhanhOrderInfoQueryHookResult = ReturnType<typeof useGetGiaoHangNhanhOrderInfoQuery>;
+export type GetGiaoHangNhanhOrderInfoLazyQueryHookResult = ReturnType<typeof useGetGiaoHangNhanhOrderInfoLazyQuery>;
+export type GetGiaoHangNhanhOrderInfoSuspenseQueryHookResult = ReturnType<typeof useGetGiaoHangNhanhOrderInfoSuspenseQuery>;
+export type GetGiaoHangNhanhOrderInfoQueryResult = Apollo.QueryResult<GetGiaoHangNhanhOrderInfoQuery, GetGiaoHangNhanhOrderInfoQueryVariables>;
 export const GetExpiredTimeDocument = gql`
     query GetExpiredTime($email: String!) {
   getExpiredTime(email: $email)

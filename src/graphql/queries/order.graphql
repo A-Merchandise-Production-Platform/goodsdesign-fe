@@ -596,6 +596,7 @@ query GetOrder($orderId: String!) {
   order(id: $orderId) {
     acceptanceDeadline
     acceptedAt
+    orderCode
     address {
       districtID
       factoryId
@@ -1305,5 +1306,79 @@ query FactoryScoresForOrder($orderId: String!) {
 mutation SpeedUpOrder($orderId: String!) {
   speedUpOrder(orderId: $orderId) {
     id
+  }
+}
+
+query GetGiaoHangNhanhOrderInfo($orderCode: String!) {
+  getGiaoHangNhanhOrderInfo(orderCode: $orderCode) {
+    client_id
+    client_order_code
+    cod_amount
+    cod_collect_date
+    cod_failed_amount
+    cod_failed_collect_date
+    cod_transfer_date
+    content
+    converted_weight
+    coupon
+    created_client
+    created_date
+    created_employee
+    created_ip
+    created_source
+    current_warehouse_id
+    custom_service_fee
+    deliver_station_id
+    deliver_warehouse_id
+    employee_note
+    finish_date
+    from_address
+    from_district_id
+    from_name
+    from_phone
+    from_ward_code
+    height
+    insurance_value
+    is_cod_collected
+    is_cod_transferred
+    leadtime
+    length
+    log {
+      status
+      updated_date
+    }
+    next_warehouse_id
+    note
+    order_code
+    order_date
+    order_value
+    payment_type_id
+    pick_station_id
+    pick_warehouse_id
+    required_note
+    return_address
+    return_district_id
+    return_name
+    return_phone
+    return_ward_code
+    return_warehouse_id
+    service_id
+    service_type_id
+    shop_id
+    status
+    tag
+    to_address
+    to_district_id
+    to_name
+    to_phone
+    to_ward_code
+    updated_client
+    updated_date
+    updated_employee
+    updated_ip
+    updated_source
+    updated_warehouse
+    weight
+    width
   }
 }
