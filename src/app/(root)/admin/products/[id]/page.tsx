@@ -74,32 +74,18 @@ export default function ProductDetailPage() {
             </Badge>
           )}
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline">
-            <Edit className="mr-2 h-4 w-4" />
-            Edit
-          </Button>
-          <Button variant="destructive">
-            <Trash className="mr-2 h-4 w-4" />
-            Delete
-          </Button>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {/* Product Image */}
-        <Card className="h-fit md:col-span-1">
-          <CardContent>
-            <div className="relative aspect-square overflow-hidden rounded-md border">
-              <Image
-                src={product.imageUrl || '/placeholder.svg'}
-                alt={product.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="relative aspect-square overflow-hidden rounded-md border">
+          <Image
+            src={product.imageUrl || '/placeholder.svg'}
+            alt={product.name}
+            fill
+            className="object-cover"
+          />
+        </div>
 
         {/* Product Details */}
         <Card className="md:col-span-2">
