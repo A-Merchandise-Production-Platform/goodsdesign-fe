@@ -240,13 +240,6 @@ export default function FactoryOrderDetailsPage() {
       },
     });
 
-  // Check if order has exceeded rework limit
-  const exceededReworkLimit = order?.order?.orderDetails?.some(
-    detail =>
-      (detail.reworkTime || 0) >=
-      (systemConfigOrder?.systemConfigOrder?.limitReworkTimes || 3),
-  );
-
   // Handle form submissions
   const onAssignFactorySubmit = (data: z.infer<typeof assignFactorySchema>) => {
     assignFactoryToOrder({
@@ -431,20 +424,20 @@ export default function FactoryOrderDetailsPage() {
 
   // Render manager action buttons based on order status
   const renderManagerActions = () => {
-    if (currentOrder.status === OrderStatus.NeedManagerHandle) {
+    if (currentOrder.status === OrderStatus.NeedManagerHandle || currentOrder.status === OrderStatus.NeedManagerHandleRework) {
       return (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>Manager Actions Required</CardTitle>
             <CardDescription>
-              {exceededReworkLimit
+              {order.order.status === OrderStatus.NeedManagerHandleRework
                 ? 'This order has exceeded the rework limit and needs your decision'
                 : 'This order needs to be assigned to a factory or refunded'}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {exceededReworkLimit ? (
+              {currentOrder.status === OrderStatus.NeedManagerHandleRework ? (
                 <Alert className="mb-4">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Rework Limit Exceeded</AlertTitle>
@@ -468,7 +461,7 @@ export default function FactoryOrderDetailsPage() {
               )}
 
               <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
-                {exceededReworkLimit ? (
+                {currentOrder.status === OrderStatus.NeedManagerHandleRework ? (
                   <Button
                     onClick={handleStartRework}
                     disabled={startReworkByManagerLoading}
