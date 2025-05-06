@@ -15,13 +15,20 @@ export default function DetailsTab({
   return (
     <div>
       <div>
-        <h3 className="mb-1 font-medium">Description</h3>
+        <h2 className="text-2xl font-bold">{product.name}</h2>
         <p className="text-muted-foreground">
           {product.description || 'No description provided'}
         </p>
       </div>
 
       <Separator className="my-4" />
+
+      {/* <div>
+        <h3 className="mb-1 font-medium">Description</h3>
+        <p className="text-muted-foreground">
+          {product.description || 'No description provided'}
+        </p>
+      </div> */}
 
       <div className="grid grid-cols-2 gap-4">
         <div>

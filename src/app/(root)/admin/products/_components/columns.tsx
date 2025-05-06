@@ -79,9 +79,9 @@ export const columns: ColumnDef<Product>[] = [
               Copy product ID
             </DropdownMenuItem>
             <EditProductForm product={product} />
-            <DropdownMenuItem className="text-destructive">
+            {/* <DropdownMenuItem className="text-destructive">
               Delete product
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
       );

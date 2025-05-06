@@ -240,7 +240,7 @@ export type CreateSystemConfigDiscountDto = {
 export type CreateSystemConfigVariantInput = {
   color?: InputMaybe<Scalars['String']['input']>;
   model?: InputMaybe<Scalars['String']['input']>;
-  price?: InputMaybe<Scalars['Float']['input']>;
+  price?: InputMaybe<Scalars['Int']['input']>;
   productId: Scalars['String']['input'];
   size?: InputMaybe<Scalars['String']['input']>;
 };
@@ -255,7 +255,7 @@ export type CreateUserBankInput = {
 
 /** Create user input */
 export type CreateUserDto = {
-  dateOfBirth?: InputMaybe<Scalars['String']['input']>;
+  dateOfBirth?: InputMaybe<Scalars['DateTime']['input']>;
   email: Scalars['String']['input'];
   gender?: InputMaybe<Scalars['Boolean']['input']>;
   imageUrl?: InputMaybe<Scalars['String']['input']>;
@@ -1947,6 +1947,7 @@ export type SystemConfigDiscountEntity = {
   minQuantity: Scalars['Float']['output'];
   name: Scalars['String']['output'];
   product: ProductEntity;
+  productId: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
 };
 
@@ -2171,7 +2172,7 @@ export type UpdateSystemConfigVariantInput = {
   id: Scalars['String']['input'];
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   model?: InputMaybe<Scalars['String']['input']>;
-  price?: InputMaybe<Scalars['Float']['input']>;
+  price?: InputMaybe<Scalars['Int']['input']>;
   productId?: InputMaybe<Scalars['String']['input']>;
   size?: InputMaybe<Scalars['String']['input']>;
 };
@@ -2185,7 +2186,7 @@ export type UpdateUserBankInput = {
 
 /** Update user input */
 export type UpdateUserDto = {
-  dateOfBirth?: InputMaybe<Scalars['String']['input']>;
+  dateOfBirth?: InputMaybe<Scalars['DateTime']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
   gender?: InputMaybe<Scalars['Boolean']['input']>;
   imageUrl?: InputMaybe<Scalars['String']['input']>;
@@ -2782,7 +2783,29 @@ export type GetAllDiscountByProductIdQueryVariables = Exact<{
 }>;
 
 
-export type GetAllDiscountByProductIdQuery = { __typename?: 'Query', getAllDiscountByProductId: Array<{ __typename?: 'SystemConfigDiscountEntity', createdAt: any, discountPercent: number, id: string, isActive: boolean, isDeleted: boolean, minQuantity: number, name: string, updatedAt: any }> };
+export type GetAllDiscountByProductIdQuery = { __typename?: 'Query', getAllDiscountByProductId: Array<{ __typename?: 'SystemConfigDiscountEntity', createdAt: any, discountPercent: number, id: string, isActive: boolean, isDeleted: boolean, minQuantity: number, name: string, updatedAt: any, productId: string }> };
+
+export type CreateSystemConfigDiscountMutationVariables = Exact<{
+  createDiscountInput: CreateSystemConfigDiscountDto;
+}>;
+
+
+export type CreateSystemConfigDiscountMutation = { __typename?: 'Mutation', createSystemConfigDiscount: { __typename?: 'SystemConfigDiscountEntity', createdAt: any, discountPercent: number, id: string, isActive: boolean, isDeleted: boolean, minQuantity: number, name: string, updatedAt: any, productId: string } };
+
+export type UpdateSystemConfigDiscountMutationVariables = Exact<{
+  updateSystemConfigDiscountId: Scalars['String']['input'];
+  updateDiscountInput: UpdateSystemConfigDiscountDto;
+}>;
+
+
+export type UpdateSystemConfigDiscountMutation = { __typename?: 'Mutation', updateSystemConfigDiscount: { __typename?: 'SystemConfigDiscountEntity', createdAt: any, discountPercent: number, id: string, isActive: boolean, isDeleted: boolean, minQuantity: number, name: string, updatedAt: any, productId: string } };
+
+export type RemoveSystemConfigDiscountMutationVariables = Exact<{
+  removeSystemConfigDiscountId: Scalars['String']['input'];
+}>;
+
+
+export type RemoveSystemConfigDiscountMutation = { __typename?: 'Mutation', removeSystemConfigDiscount: { __typename?: 'SystemConfigDiscountEntity', createdAt: any, discountPercent: number, id: string, isActive: boolean, isDeleted: boolean, minQuantity: number, name: string, updatedAt: any, productId: string } };
 
 export type GetAllProductsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2922,19 +2945,26 @@ export type GetSystemConfigVariantsByProductQueryVariables = Exact<{
 
 export type GetSystemConfigVariantsByProductQuery = { __typename?: 'Query', systemConfigVariantsByProduct: Array<{ __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, size?: string | null, product: { __typename?: 'ProductEntity', id: string, imageUrl?: string | null, name: string, description?: string | null } }> };
 
-export type UpdateSystemConfigVariantMutationVariables = Exact<{
-  updateSystemConfigVariantInput: UpdateSystemConfigVariantInput;
-}>;
-
-
-export type UpdateSystemConfigVariantMutation = { __typename?: 'Mutation', updateSystemConfigVariant: { __typename?: 'SystemConfigVariantEntity', id: string } };
-
 export type CreateSystemConfigVariantMutationVariables = Exact<{
   createSystemConfigVariantInput: CreateSystemConfigVariantInput;
 }>;
 
 
-export type CreateSystemConfigVariantMutation = { __typename?: 'Mutation', createSystemConfigVariant: { __typename?: 'SystemConfigVariantEntity', id: string } };
+export type CreateSystemConfigVariantMutation = { __typename?: 'Mutation', createSystemConfigVariant: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } };
+
+export type UpdateSystemConfigVariantMutationVariables = Exact<{
+  updateSystemConfigVariantInput: UpdateSystemConfigVariantInput;
+}>;
+
+
+export type UpdateSystemConfigVariantMutation = { __typename?: 'Mutation', updateSystemConfigVariant: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } };
+
+export type RemoveSystemConfigVariantMutationVariables = Exact<{
+  removeSystemConfigVariantId: Scalars['String']['input'];
+}>;
+
+
+export type RemoveSystemConfigVariantMutation = { __typename?: 'Mutation', removeSystemConfigVariant: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, isDeleted: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } };
 
 export type FindTasksByStaffIdQueryVariables = Exact<{
   staffId: Scalars['String']['input'];
@@ -7743,6 +7773,7 @@ export const GetAllDiscountByProductIdDocument = gql`
     minQuantity
     name
     updatedAt
+    productId
   }
 }
     `;
@@ -7779,6 +7810,133 @@ export type GetAllDiscountByProductIdQueryHookResult = ReturnType<typeof useGetA
 export type GetAllDiscountByProductIdLazyQueryHookResult = ReturnType<typeof useGetAllDiscountByProductIdLazyQuery>;
 export type GetAllDiscountByProductIdSuspenseQueryHookResult = ReturnType<typeof useGetAllDiscountByProductIdSuspenseQuery>;
 export type GetAllDiscountByProductIdQueryResult = Apollo.QueryResult<GetAllDiscountByProductIdQuery, GetAllDiscountByProductIdQueryVariables>;
+export const CreateSystemConfigDiscountDocument = gql`
+    mutation CreateSystemConfigDiscount($createDiscountInput: CreateSystemConfigDiscountDto!) {
+  createSystemConfigDiscount(createDiscountInput: $createDiscountInput) {
+    createdAt
+    discountPercent
+    id
+    isActive
+    isDeleted
+    minQuantity
+    name
+    updatedAt
+    productId
+  }
+}
+    `;
+export type CreateSystemConfigDiscountMutationFn = Apollo.MutationFunction<CreateSystemConfigDiscountMutation, CreateSystemConfigDiscountMutationVariables>;
+
+/**
+ * __useCreateSystemConfigDiscountMutation__
+ *
+ * To run a mutation, you first call `useCreateSystemConfigDiscountMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateSystemConfigDiscountMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createSystemConfigDiscountMutation, { data, loading, error }] = useCreateSystemConfigDiscountMutation({
+ *   variables: {
+ *      createDiscountInput: // value for 'createDiscountInput'
+ *   },
+ * });
+ */
+export function useCreateSystemConfigDiscountMutation(baseOptions?: Apollo.MutationHookOptions<CreateSystemConfigDiscountMutation, CreateSystemConfigDiscountMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateSystemConfigDiscountMutation, CreateSystemConfigDiscountMutationVariables>(CreateSystemConfigDiscountDocument, options);
+      }
+export type CreateSystemConfigDiscountMutationHookResult = ReturnType<typeof useCreateSystemConfigDiscountMutation>;
+export type CreateSystemConfigDiscountMutationResult = Apollo.MutationResult<CreateSystemConfigDiscountMutation>;
+export type CreateSystemConfigDiscountMutationOptions = Apollo.BaseMutationOptions<CreateSystemConfigDiscountMutation, CreateSystemConfigDiscountMutationVariables>;
+export const UpdateSystemConfigDiscountDocument = gql`
+    mutation UpdateSystemConfigDiscount($updateSystemConfigDiscountId: String!, $updateDiscountInput: UpdateSystemConfigDiscountDto!) {
+  updateSystemConfigDiscount(
+    id: $updateSystemConfigDiscountId
+    updateDiscountInput: $updateDiscountInput
+  ) {
+    createdAt
+    discountPercent
+    id
+    isActive
+    isDeleted
+    minQuantity
+    name
+    updatedAt
+    productId
+  }
+}
+    `;
+export type UpdateSystemConfigDiscountMutationFn = Apollo.MutationFunction<UpdateSystemConfigDiscountMutation, UpdateSystemConfigDiscountMutationVariables>;
+
+/**
+ * __useUpdateSystemConfigDiscountMutation__
+ *
+ * To run a mutation, you first call `useUpdateSystemConfigDiscountMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSystemConfigDiscountMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSystemConfigDiscountMutation, { data, loading, error }] = useUpdateSystemConfigDiscountMutation({
+ *   variables: {
+ *      updateSystemConfigDiscountId: // value for 'updateSystemConfigDiscountId'
+ *      updateDiscountInput: // value for 'updateDiscountInput'
+ *   },
+ * });
+ */
+export function useUpdateSystemConfigDiscountMutation(baseOptions?: Apollo.MutationHookOptions<UpdateSystemConfigDiscountMutation, UpdateSystemConfigDiscountMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateSystemConfigDiscountMutation, UpdateSystemConfigDiscountMutationVariables>(UpdateSystemConfigDiscountDocument, options);
+      }
+export type UpdateSystemConfigDiscountMutationHookResult = ReturnType<typeof useUpdateSystemConfigDiscountMutation>;
+export type UpdateSystemConfigDiscountMutationResult = Apollo.MutationResult<UpdateSystemConfigDiscountMutation>;
+export type UpdateSystemConfigDiscountMutationOptions = Apollo.BaseMutationOptions<UpdateSystemConfigDiscountMutation, UpdateSystemConfigDiscountMutationVariables>;
+export const RemoveSystemConfigDiscountDocument = gql`
+    mutation RemoveSystemConfigDiscount($removeSystemConfigDiscountId: String!) {
+  removeSystemConfigDiscount(id: $removeSystemConfigDiscountId) {
+    createdAt
+    discountPercent
+    id
+    isActive
+    isDeleted
+    minQuantity
+    name
+    updatedAt
+    productId
+  }
+}
+    `;
+export type RemoveSystemConfigDiscountMutationFn = Apollo.MutationFunction<RemoveSystemConfigDiscountMutation, RemoveSystemConfigDiscountMutationVariables>;
+
+/**
+ * __useRemoveSystemConfigDiscountMutation__
+ *
+ * To run a mutation, you first call `useRemoveSystemConfigDiscountMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveSystemConfigDiscountMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeSystemConfigDiscountMutation, { data, loading, error }] = useRemoveSystemConfigDiscountMutation({
+ *   variables: {
+ *      removeSystemConfigDiscountId: // value for 'removeSystemConfigDiscountId'
+ *   },
+ * });
+ */
+export function useRemoveSystemConfigDiscountMutation(baseOptions?: Apollo.MutationHookOptions<RemoveSystemConfigDiscountMutation, RemoveSystemConfigDiscountMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveSystemConfigDiscountMutation, RemoveSystemConfigDiscountMutationVariables>(RemoveSystemConfigDiscountDocument, options);
+      }
+export type RemoveSystemConfigDiscountMutationHookResult = ReturnType<typeof useRemoveSystemConfigDiscountMutation>;
+export type RemoveSystemConfigDiscountMutationResult = Apollo.MutationResult<RemoveSystemConfigDiscountMutation>;
+export type RemoveSystemConfigDiscountMutationOptions = Apollo.BaseMutationOptions<RemoveSystemConfigDiscountMutation, RemoveSystemConfigDiscountMutationVariables>;
 export const GetAllProductsDocument = gql`
     query GetAllProducts {
   products {
@@ -8715,47 +8873,19 @@ export type GetSystemConfigVariantsByProductQueryHookResult = ReturnType<typeof 
 export type GetSystemConfigVariantsByProductLazyQueryHookResult = ReturnType<typeof useGetSystemConfigVariantsByProductLazyQuery>;
 export type GetSystemConfigVariantsByProductSuspenseQueryHookResult = ReturnType<typeof useGetSystemConfigVariantsByProductSuspenseQuery>;
 export type GetSystemConfigVariantsByProductQueryResult = Apollo.QueryResult<GetSystemConfigVariantsByProductQuery, GetSystemConfigVariantsByProductQueryVariables>;
-export const UpdateSystemConfigVariantDocument = gql`
-    mutation UpdateSystemConfigVariant($updateSystemConfigVariantInput: UpdateSystemConfigVariantInput!) {
-  updateSystemConfigVariant(
-    updateSystemConfigVariantInput: $updateSystemConfigVariantInput
-  ) {
-    id
-  }
-}
-    `;
-export type UpdateSystemConfigVariantMutationFn = Apollo.MutationFunction<UpdateSystemConfigVariantMutation, UpdateSystemConfigVariantMutationVariables>;
-
-/**
- * __useUpdateSystemConfigVariantMutation__
- *
- * To run a mutation, you first call `useUpdateSystemConfigVariantMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateSystemConfigVariantMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateSystemConfigVariantMutation, { data, loading, error }] = useUpdateSystemConfigVariantMutation({
- *   variables: {
- *      updateSystemConfigVariantInput: // value for 'updateSystemConfigVariantInput'
- *   },
- * });
- */
-export function useUpdateSystemConfigVariantMutation(baseOptions?: Apollo.MutationHookOptions<UpdateSystemConfigVariantMutation, UpdateSystemConfigVariantMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateSystemConfigVariantMutation, UpdateSystemConfigVariantMutationVariables>(UpdateSystemConfigVariantDocument, options);
-      }
-export type UpdateSystemConfigVariantMutationHookResult = ReturnType<typeof useUpdateSystemConfigVariantMutation>;
-export type UpdateSystemConfigVariantMutationResult = Apollo.MutationResult<UpdateSystemConfigVariantMutation>;
-export type UpdateSystemConfigVariantMutationOptions = Apollo.BaseMutationOptions<UpdateSystemConfigVariantMutation, UpdateSystemConfigVariantMutationVariables>;
 export const CreateSystemConfigVariantDocument = gql`
     mutation CreateSystemConfigVariant($createSystemConfigVariantInput: CreateSystemConfigVariantInput!) {
   createSystemConfigVariant(
     createSystemConfigVariantInput: $createSystemConfigVariantInput
   ) {
+    color
     id
+    isActive
+    isDeleted
+    model
+    price
+    productId
+    size
   }
 }
     `;
@@ -8785,6 +8915,88 @@ export function useCreateSystemConfigVariantMutation(baseOptions?: Apollo.Mutati
 export type CreateSystemConfigVariantMutationHookResult = ReturnType<typeof useCreateSystemConfigVariantMutation>;
 export type CreateSystemConfigVariantMutationResult = Apollo.MutationResult<CreateSystemConfigVariantMutation>;
 export type CreateSystemConfigVariantMutationOptions = Apollo.BaseMutationOptions<CreateSystemConfigVariantMutation, CreateSystemConfigVariantMutationVariables>;
+export const UpdateSystemConfigVariantDocument = gql`
+    mutation UpdateSystemConfigVariant($updateSystemConfigVariantInput: UpdateSystemConfigVariantInput!) {
+  updateSystemConfigVariant(
+    updateSystemConfigVariantInput: $updateSystemConfigVariantInput
+  ) {
+    color
+    id
+    isActive
+    isDeleted
+    model
+    price
+    productId
+    size
+  }
+}
+    `;
+export type UpdateSystemConfigVariantMutationFn = Apollo.MutationFunction<UpdateSystemConfigVariantMutation, UpdateSystemConfigVariantMutationVariables>;
+
+/**
+ * __useUpdateSystemConfigVariantMutation__
+ *
+ * To run a mutation, you first call `useUpdateSystemConfigVariantMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSystemConfigVariantMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSystemConfigVariantMutation, { data, loading, error }] = useUpdateSystemConfigVariantMutation({
+ *   variables: {
+ *      updateSystemConfigVariantInput: // value for 'updateSystemConfigVariantInput'
+ *   },
+ * });
+ */
+export function useUpdateSystemConfigVariantMutation(baseOptions?: Apollo.MutationHookOptions<UpdateSystemConfigVariantMutation, UpdateSystemConfigVariantMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateSystemConfigVariantMutation, UpdateSystemConfigVariantMutationVariables>(UpdateSystemConfigVariantDocument, options);
+      }
+export type UpdateSystemConfigVariantMutationHookResult = ReturnType<typeof useUpdateSystemConfigVariantMutation>;
+export type UpdateSystemConfigVariantMutationResult = Apollo.MutationResult<UpdateSystemConfigVariantMutation>;
+export type UpdateSystemConfigVariantMutationOptions = Apollo.BaseMutationOptions<UpdateSystemConfigVariantMutation, UpdateSystemConfigVariantMutationVariables>;
+export const RemoveSystemConfigVariantDocument = gql`
+    mutation RemoveSystemConfigVariant($removeSystemConfigVariantId: String!) {
+  removeSystemConfigVariant(id: $removeSystemConfigVariantId) {
+    color
+    id
+    isActive
+    isDeleted
+    model
+    price
+    productId
+    size
+  }
+}
+    `;
+export type RemoveSystemConfigVariantMutationFn = Apollo.MutationFunction<RemoveSystemConfigVariantMutation, RemoveSystemConfigVariantMutationVariables>;
+
+/**
+ * __useRemoveSystemConfigVariantMutation__
+ *
+ * To run a mutation, you first call `useRemoveSystemConfigVariantMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveSystemConfigVariantMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeSystemConfigVariantMutation, { data, loading, error }] = useRemoveSystemConfigVariantMutation({
+ *   variables: {
+ *      removeSystemConfigVariantId: // value for 'removeSystemConfigVariantId'
+ *   },
+ * });
+ */
+export function useRemoveSystemConfigVariantMutation(baseOptions?: Apollo.MutationHookOptions<RemoveSystemConfigVariantMutation, RemoveSystemConfigVariantMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveSystemConfigVariantMutation, RemoveSystemConfigVariantMutationVariables>(RemoveSystemConfigVariantDocument, options);
+      }
+export type RemoveSystemConfigVariantMutationHookResult = ReturnType<typeof useRemoveSystemConfigVariantMutation>;
+export type RemoveSystemConfigVariantMutationResult = Apollo.MutationResult<RemoveSystemConfigVariantMutation>;
+export type RemoveSystemConfigVariantMutationOptions = Apollo.BaseMutationOptions<RemoveSystemConfigVariantMutation, RemoveSystemConfigVariantMutationVariables>;
 export const FindTasksByStaffIdDocument = gql`
     query FindTasksByStaffId($staffId: String!) {
   findTasksByStaffId(staffId: $staffId) {
