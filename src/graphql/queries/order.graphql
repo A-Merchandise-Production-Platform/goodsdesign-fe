@@ -1301,3 +1301,9 @@ query FactoryScoresForOrder($orderId: String!) {
     }
   }
 }
+
+mutation SpeedUpOrder($orderId: String!) {
+  speedUpOrder(orderId: $orderId) {
+    id
+  }
+}

@@ -677,6 +677,7 @@ export type Mutation = {
   restoreProduct: ProductEntity;
   sendEmail: Scalars['Boolean']['output'];
   shippedOrder: OrderEntity;
+  speedUpOrder: OrderEntity;
   startRework: OrderEntity;
   startReworkByManager: OrderEntity;
   toggleActiveCategory: CategoryEntity;
@@ -1030,6 +1031,11 @@ export type MutationSendEmailArgs = {
 
 
 export type MutationShippedOrderArgs = {
+  orderId: Scalars['String']['input'];
+};
+
+
+export type MutationSpeedUpOrderArgs = {
   orderId: Scalars['String']['input'];
 };
 
@@ -2587,6 +2593,13 @@ export type FactoryScoresForOrderQueryVariables = Exact<{
 
 
 export type FactoryScoresForOrderQuery = { __typename?: 'Query', factoryScoresForOrder: Array<{ __typename?: 'FactoryScoreResponse', factoryId: string, factoryName: string, totalScore: number, scores: { __typename?: 'FactoryScores', capacityScore: number, leadTimeScore: number, legitPointScore: number, productionCapacityScore: number, specializationScore: number }, weights: { __typename?: 'FactoryScoreWeights', capacity: number, leadTime: number, legitPoint: number, productionCapacity: number, specialization: number } }> };
+
+export type SpeedUpOrderMutationVariables = Exact<{
+  orderId: Scalars['String']['input'];
+}>;
+
+
+export type SpeedUpOrderMutation = { __typename?: 'Mutation', speedUpOrder: { __typename?: 'OrderEntity', id: string } };
 
 export type GetExpiredTimeQueryVariables = Exact<{
   email: Scalars['String']['input'];
@@ -6877,6 +6890,39 @@ export type FactoryScoresForOrderQueryHookResult = ReturnType<typeof useFactoryS
 export type FactoryScoresForOrderLazyQueryHookResult = ReturnType<typeof useFactoryScoresForOrderLazyQuery>;
 export type FactoryScoresForOrderSuspenseQueryHookResult = ReturnType<typeof useFactoryScoresForOrderSuspenseQuery>;
 export type FactoryScoresForOrderQueryResult = Apollo.QueryResult<FactoryScoresForOrderQuery, FactoryScoresForOrderQueryVariables>;
+export const SpeedUpOrderDocument = gql`
+    mutation SpeedUpOrder($orderId: String!) {
+  speedUpOrder(orderId: $orderId) {
+    id
+  }
+}
+    `;
+export type SpeedUpOrderMutationFn = Apollo.MutationFunction<SpeedUpOrderMutation, SpeedUpOrderMutationVariables>;
+
+/**
+ * __useSpeedUpOrderMutation__
+ *
+ * To run a mutation, you first call `useSpeedUpOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSpeedUpOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [speedUpOrderMutation, { data, loading, error }] = useSpeedUpOrderMutation({
+ *   variables: {
+ *      orderId: // value for 'orderId'
+ *   },
+ * });
+ */
+export function useSpeedUpOrderMutation(baseOptions?: Apollo.MutationHookOptions<SpeedUpOrderMutation, SpeedUpOrderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SpeedUpOrderMutation, SpeedUpOrderMutationVariables>(SpeedUpOrderDocument, options);
+      }
+export type SpeedUpOrderMutationHookResult = ReturnType<typeof useSpeedUpOrderMutation>;
+export type SpeedUpOrderMutationResult = Apollo.MutationResult<SpeedUpOrderMutation>;
+export type SpeedUpOrderMutationOptions = Apollo.BaseMutationOptions<SpeedUpOrderMutation, SpeedUpOrderMutationVariables>;
 export const GetExpiredTimeDocument = gql`
     query GetExpiredTime($email: String!) {
   getExpiredTime(email: $email)

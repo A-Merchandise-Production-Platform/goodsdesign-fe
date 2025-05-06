@@ -14,6 +14,7 @@ import {
   Star,
   StarIcon,
   Truck,
+  Wrench,
   XCircle,
 } from 'lucide-react';
 import Image from 'next/image';
@@ -83,6 +84,7 @@ import {
   useGetOrderQuery,
   useGetUserBanksByUserIdQuery,
   useProcessWithdrawalMutation,
+  useSpeedUpOrderMutation,
   useStartReworkByManagerMutation,
   useSystemConfigOrderQuery,
 } from '@/graphql/generated/graphql';
@@ -146,6 +148,13 @@ export default function FactoryOrderDetailsPage() {
   const [showWithdrawalDialog, setShowWithdrawalDialog] = useState(false);
   const [selectedPaymentId, setSelectedPaymentId] = useState<string>('');
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+
+  const [speedUpOrder, { loading: speedUpOrderLoading }] = useSpeedUpOrderMutation({
+    onCompleted: () => {
+      toast.success('Order speed up successfully');
+      refetch();
+    },
+  });
 
   const { data: factoryScores } = useFactoryScoresForOrderQuery({
     variables: {
@@ -557,7 +566,6 @@ export default function FactoryOrderDetailsPage() {
 
       {/* Manager Actions */}
       {renderManagerActions()}
-
       {/* Order Header */}
       {currentOrder && (
         <OrderHeader 
@@ -600,7 +608,7 @@ export default function FactoryOrderDetailsPage() {
         onValueChange={setActiveTab}
         className="mb-6"
       >
-        <TabsList className="mb-6 grid grid-cols-6">
+        <TabsList className="mb-6 grid grid-cols-7">
           <TabsTrigger value="overview">
             <FileText className="mr-2 h-4 w-4" />
             Overview
@@ -625,6 +633,11 @@ export default function FactoryOrderDetailsPage() {
           <TabsTrigger value="rejectFactories">
             <BanIcon className="mr-2 h-4 w-4" />
             Reject Factories
+          </TabsTrigger>
+          {/* action buttons */}
+          <TabsTrigger value="actionButtons">
+            <Wrench className="mr-2 h-4 w-4" />
+            Action Buttons
           </TabsTrigger>
         </TabsList>
 
@@ -1182,6 +1195,87 @@ export default function FactoryOrderDetailsPage() {
         {/* Reject Factories */}
         <TabsContent value="rejectFactories">
           <RejectionHistory rejectedHistory={currentOrder.rejectedHistory} />
+        </TabsContent>
+
+        {/* Action Buttons */}
+        <TabsContent value="actionButtons">
+          <div className="space-y-6">
+            {/* Danger Zone Card */}
+            <Card className="border-destructive/20">
+              <CardHeader className="border-b border-destructive/20">
+                <CardTitle className="flex items-center gap-2 text-destructive">
+                  <AlertCircle className="h-5 w-5" />
+                  Danger Zone
+                </CardTitle>
+                <CardDescription className="text-destructive/80">
+                  These actions are irreversible and should be used with caution
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  {/* Speed Up Order Button */}
+                  <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
+                    <div className="mb-4">
+                      <h3 className="mb-1 font-medium text-destructive">Speed Up Order</h3>
+                      <p className="text-sm text-destructive/80">
+                        Speed up the order deadline acception from factory for testing purposes
+                      </p>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      onClick={() => speedUpOrder({ variables: { orderId: currentOrder.id } })}
+                      disabled={speedUpOrderLoading}
+                      className="w-full"
+                    >
+                      {speedUpOrderLoading ? (
+                        <>
+                          <Clock className="mr-2 h-4 w-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <Clock className="mr-2 h-4 w-4" />
+                          Speed Up Order
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Process Refund Button */}
+                  <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
+                    <div className="mb-4">
+                      <h3 className="mb-1 font-medium text-destructive">Process Refund</h3>
+                      <p className="text-sm text-destructive/80">
+                        Initiate a refund process for the customer
+                      </p>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      onClick={() => setShowRefundDialog(true)}
+                      className="w-full"
+                    >
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      Process Refund
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Warning Message */}
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-800">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="mt-0.5 h-4 w-4" />
+                    <div>
+                      <p className="font-medium">Warning</p>
+                      <p className="mt-1 text-sm">
+                        These actions will affect the order status and may have financial implications. 
+                        Please ensure you have the necessary permissions and have reviewed all details before proceeding.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
 
