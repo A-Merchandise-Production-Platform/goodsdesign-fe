@@ -1382,3 +1382,9 @@ query GetGiaoHangNhanhOrderInfo($orderCode: String!) {
     width
   }
 }
+
+mutation GenerateAndUploadImage($prompt: String!) {
+  generateAndUploadImage(prompt: $prompt) {
+    url
+  }
+}

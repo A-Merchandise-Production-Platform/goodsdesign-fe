@@ -658,6 +658,7 @@ export type Mutation = {
   doneReworkForOrderDetails: OrderDetailEntity;
   duplicateProductDesign: ProductDesignEntity;
   feedbackOrder: OrderEntity;
+  generateAndUploadImage: FileUploadResponse;
   login: AuthResponseDto;
   logout: Scalars['String']['output'];
   markNotificationAsRead: NotificationEntity;
@@ -938,6 +939,11 @@ export type MutationDuplicateProductDesignArgs = {
 export type MutationFeedbackOrderArgs = {
   input: FeedbackOrderInput;
   orderId: Scalars['String']['input'];
+};
+
+
+export type MutationGenerateAndUploadImageArgs = {
+  prompt: Scalars['String']['input'];
 };
 
 
@@ -2691,6 +2697,13 @@ export type GetGiaoHangNhanhOrderInfoQueryVariables = Exact<{
 
 
 export type GetGiaoHangNhanhOrderInfoQuery = { __typename?: 'Query', getGiaoHangNhanhOrderInfo: { __typename?: 'OrderInfoDto', client_id: number, client_order_code?: string | null, cod_amount: number, cod_collect_date?: string | null, cod_failed_amount: number, cod_failed_collect_date?: string | null, cod_transfer_date?: string | null, content: string, converted_weight: number, coupon?: string | null, created_client: number, created_date: string, created_employee: number, created_ip: string, created_source: string, current_warehouse_id: number, custom_service_fee: number, deliver_station_id?: number | null, deliver_warehouse_id: number, employee_note?: string | null, finish_date?: string | null, from_address: string, from_district_id: number, from_name: string, from_phone: string, from_ward_code: string, height: number, insurance_value: number, is_cod_collected: boolean, is_cod_transferred: boolean, leadtime?: string | null, length: number, next_warehouse_id: number, note?: string | null, order_code: string, order_date: string, order_value: number, payment_type_id: number, pick_station_id?: number | null, pick_warehouse_id: number, required_note: string, return_address?: string | null, return_district_id?: number | null, return_name?: string | null, return_phone?: string | null, return_ward_code?: string | null, return_warehouse_id: number, service_id: number, service_type_id: number, shop_id: number, status: string, tag?: Array<string> | null, to_address: string, to_district_id: number, to_name: string, to_phone: string, to_ward_code: string, updated_client: number, updated_date: string, updated_employee: number, updated_ip: string, updated_source: string, updated_warehouse: number, weight: number, width: number, log?: Array<{ __typename?: 'OrderLogDto', status: string, updated_date: string }> | null } };
+
+export type GenerateAndUploadImageMutationVariables = Exact<{
+  prompt: Scalars['String']['input'];
+}>;
+
+
+export type GenerateAndUploadImageMutation = { __typename?: 'Mutation', generateAndUploadImage: { __typename?: 'FileUploadResponse', url: string } };
 
 export type GetExpiredTimeQueryVariables = Exact<{
   email: Scalars['String']['input'];
@@ -7152,6 +7165,39 @@ export type GetGiaoHangNhanhOrderInfoQueryHookResult = ReturnType<typeof useGetG
 export type GetGiaoHangNhanhOrderInfoLazyQueryHookResult = ReturnType<typeof useGetGiaoHangNhanhOrderInfoLazyQuery>;
 export type GetGiaoHangNhanhOrderInfoSuspenseQueryHookResult = ReturnType<typeof useGetGiaoHangNhanhOrderInfoSuspenseQuery>;
 export type GetGiaoHangNhanhOrderInfoQueryResult = Apollo.QueryResult<GetGiaoHangNhanhOrderInfoQuery, GetGiaoHangNhanhOrderInfoQueryVariables>;
+export const GenerateAndUploadImageDocument = gql`
+    mutation GenerateAndUploadImage($prompt: String!) {
+  generateAndUploadImage(prompt: $prompt) {
+    url
+  }
+}
+    `;
+export type GenerateAndUploadImageMutationFn = Apollo.MutationFunction<GenerateAndUploadImageMutation, GenerateAndUploadImageMutationVariables>;
+
+/**
+ * __useGenerateAndUploadImageMutation__
+ *
+ * To run a mutation, you first call `useGenerateAndUploadImageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGenerateAndUploadImageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [generateAndUploadImageMutation, { data, loading, error }] = useGenerateAndUploadImageMutation({
+ *   variables: {
+ *      prompt: // value for 'prompt'
+ *   },
+ * });
+ */
+export function useGenerateAndUploadImageMutation(baseOptions?: Apollo.MutationHookOptions<GenerateAndUploadImageMutation, GenerateAndUploadImageMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<GenerateAndUploadImageMutation, GenerateAndUploadImageMutationVariables>(GenerateAndUploadImageDocument, options);
+      }
+export type GenerateAndUploadImageMutationHookResult = ReturnType<typeof useGenerateAndUploadImageMutation>;
+export type GenerateAndUploadImageMutationResult = Apollo.MutationResult<GenerateAndUploadImageMutation>;
+export type GenerateAndUploadImageMutationOptions = Apollo.BaseMutationOptions<GenerateAndUploadImageMutation, GenerateAndUploadImageMutationVariables>;
 export const GetExpiredTimeDocument = gql`
     query GetExpiredTime($email: String!) {
   getExpiredTime(email: $email)

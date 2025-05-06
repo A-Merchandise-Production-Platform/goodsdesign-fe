@@ -1357,6 +1357,55 @@ export default function ProductDesigner({
     setView(newView);
   };
 
+  const handleGenAIUpload = async (imageUrl: string) => {
+    if (!fabricCanvasRef.current) return;
+
+    const imageElement = new Image();
+    imageElement.crossOrigin = 'anonymous';
+    imageElement.src = imageUrl;
+
+    imageElement.onload = () => {
+      const fabricImage = new (fabric as any).Image(imageElement);
+      const limits = getDesignZoneLimits(view);
+      const maxWidth = limits.maxX - limits.minX;
+      const maxHeight = limits.maxY - limits.minY;
+
+      // Scale image to fit the design zone while maintaining aspect ratio
+      const scale = Math.min(
+        maxWidth / (fabricImage.width ?? 1),
+        maxHeight / (fabricImage.height ?? 1),
+      );
+
+      fabricImage.set({
+        scaleX: scale,
+        scaleY: scale,
+        left: limits.minX + (maxWidth - (fabricImage.width ?? 0) * scale) / 2,
+        top: limits.minY + (maxHeight - (fabricImage.height ?? 0) * scale) / 2,
+      });
+
+      // Store the current view with the image
+      fabricImage.set('data', { view: view });
+
+      // Apply Clipping Path
+      applyClipPathToObject(fabricImage, view);
+
+      // If object is fully outside, remove it
+      if (isObjectFullyOutside(fabricImage, view)) {
+        return;
+      }
+
+      // Add image to canvas
+      fabricCanvasRef.current?.add(fabricImage);
+      fabricCanvasRef.current?.setActiveObject(fabricImage);
+      fabricCanvasRef.current?.renderAll();
+      
+      // Update texture for live preview
+      debounceTextureUpdate();
+      // Save design and trigger API update
+      saveCurrentDesign();
+    };
+  };
+
   return (
     <div className="flex h-screen flex-col">
       <DesignHeader
@@ -1513,6 +1562,7 @@ export default function ProductDesigner({
               });
             }
           }}
+          onGenAIUpload={handleGenAIUpload}
         />
 
         <div className="flex flex-1 flex-col">
