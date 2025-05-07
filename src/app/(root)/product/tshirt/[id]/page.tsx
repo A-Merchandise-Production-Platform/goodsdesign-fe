@@ -18,6 +18,7 @@ import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook'
 import ProductDesigner from './_components/product-design';
 import { useAuthStore } from '@/stores/auth.store';
 import NotFound from '@/app/not-found';
+import { toast } from 'sonner';
 
 export default function Page() {
   const params = useParams();
@@ -30,7 +31,7 @@ export default function Page() {
         productDesignId: id,
       },
     });
-  const [uploadFile, { loading: uploadFileloading }] = useUploadFileMutation();
+  const [uploadFile, { loading: uploadFileLoading }] = useUploadFileMutation();
   const [updateDesignPosition] = useUpdateDesignPositionMutation();
   const [createCartItem, { loading: cartLoading }] =
     useCreateCartItemMutation();
@@ -104,6 +105,7 @@ export default function Page() {
       // Check if the upload was successful
       if (result.data?.uploadFile?.url) {
         const fileUrl = result.data.uploadFile.url;
+        toast.success('Image uploaded successfully');
         return fileUrl;
       }
       return null;
@@ -168,7 +170,7 @@ export default function Page() {
         }}
         cartLoading={cartLoading}
         designId={id}
-        uploadLoading={uploadFileloading}
+        uploadLoading={uploadFileLoading}
         thumbnailUrl={proDesData?.productDesign?.thumbnailUrl}
         isInCart={isInCart}
       />
