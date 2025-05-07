@@ -99,8 +99,7 @@ export default function CartPage() {
       router.push(`/my-order/${orderId}`);
     },
     onError: error => {
-      // toast.error(error.message);
-      console.log(error);
+      toast.error(error.message);
       setIsCheckingOut(false);
     },
     refetchQueries: ['GetCartItemCount'],
