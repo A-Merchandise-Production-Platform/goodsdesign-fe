@@ -174,7 +174,6 @@ export function OrderSummary({
             isProcessing ||
             selectedItemCount === 0 ||
             !isFormValid ||
-            isCalculatingShipping ||
             Boolean(shippingCostError) ||
             shippingCost <= 0
           }
