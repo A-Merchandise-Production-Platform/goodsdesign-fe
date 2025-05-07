@@ -45,6 +45,7 @@ export const factoryFormSchema = z.object({
 
   // Product Variants
   systemConfigVariantIds: z.array(z.string()).optional(),
+  productionTimeInMinutes: z.number().int().positive(),
 });
 
 export type FactoryFormValues = z.infer<typeof factoryFormSchema>;
@@ -72,4 +73,5 @@ export const defaultValues: Partial<FactoryFormValues> = {
   contactPersonPhone: '',
   leadTime: undefined,
   systemConfigVariantIds: [],
+  productionTimeInMinutes: undefined,
 };

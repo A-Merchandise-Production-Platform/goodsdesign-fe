@@ -1,37 +1,58 @@
-query GetEnhancedManagerDashboard {
-  getEnhancedManagerDashboard {
-    stats {
-      factories {
-        total
-        change
-        changeType
-      }
-      orders {
-        active
-        change
-        changeType
-      }
-      staff {
-        total
-        change
-        changeType
-      }
-      revenue {
-        monthly
-        change
-        changeType
-      }
-    }
-    factoryPerformance {
-      factoryId
-      factoryName
-      orderCount
-      totalRevenue
-    }
-    orderStatus {
-      status
+query GetManagerDashboard {
+  getManagerDashboard {
+    factoryOrdersByStatus {
       count
+      status
     }
+    pendingFactoryOrders
+    qualityIssues {
+      description
+      factoryOrder {
+        factory {
+          id
+          name
+        }
+      }
+      id
+      issueType
+      reportedAt
+      status
+    }
+    recentFactoryOrders {
+      createdAt
+      customerOrder {
+        status
+        totalPrice
+        id
+        customer {
+          email
+          id
+          name
+        }
+      }
+    }
+    stats {
+      monthlyRevenue
+      revenueByMonth {
+        month
+        revenue
+      }
+      totalFactories
+      totalStaffs
+    }
+    topFactories {
+      id
+      legitPoint
+      name
+      owner {
+        id
+        email
+        name
+        imageUrl
+      }
+    }
+    totalOrders
+    totalRevenue
   }
 }
 
@@ -152,39 +173,22 @@ query GetStaffDashboard($userId: String!) {
 
 query GetAdminDashboard {
   getAdminDashboard {
-    activeFactories
-    activeUsers
-    activeUsersChange
-    activeUsersChangeType
-    factoryPerformance {
-      factoryId
-      orderCount
-      totalRevenue
-    }
-    pendingOrders
-    pendingOrdersChange
-    pendingOrdersChangeType
-    recentOrders {
+    currentMonthRevenue
+    recentUsers {
+      createdAt
+      email
       id
-      orderDate
-      status
-      totalPrice
-      factory {
-        id
-        name
-        factoryStatus
-      }
+      imageUrl
+      name
+      role
     }
-    totalCustomers
-    totalFactories
-    totalOrders
-    totalProducts
-    totalProductsChange
-    totalProductsChangeType
+    revenueByMonth {
+      revenue
+      month
+    }
+    totalActiveUsers
     totalRevenue
-    totalSales
-    totalSalesChange
-    totalSalesChangeType
+    totalTemplates
   }
 }
 
@@ -193,52 +197,29 @@ query GetMyFactoryDashboard {
     inProductionOrders
     pendingOrders
     productionProgress {
-      id
-      status
-
       createdAt
+      customerOrder {
+        customer {
+          email
+          id
+          name
+        }
+        id
+        status
+        totalPrice
+      }
+      id
+      progressReports {
+        estimatedCompletion
+        factoryOrderId
+        id
+        notes
+        photoUrls
+        reportDate
+      }
+      status
       totalProductionCost
     }
-    qualityIssues {
-      id
-      reportedAt
-      status
-      description
-    }
-    recentOrders {
-      id
-      status
-      totalProductionCost
-      createdAt
-    }
-    revenueData {
-      month
-      revenue
-    }
-    stats {
-      legitPoints {
-        percentChange
-        isPositive
-        value
-      }
-      monthlyRevenue {
-        isPositive
-        percentChange
-        value
-      }
-      qualityScore {
-        isPositive
-        percentChange
-        value
-      }
-      totalOrders {
-        isPositive
-        percentChange
-        value
-      }
-    }
-    totalOrders
-    totalRevenue
   }
 }
 

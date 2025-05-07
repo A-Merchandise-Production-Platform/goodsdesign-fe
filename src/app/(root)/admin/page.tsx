@@ -2,7 +2,7 @@
 
 import {
   DollarSignIcon,
-  LineChart,
+  FileTextIcon,
   PackageIcon,
   PercentIcon,
   ShoppingCartIcon,
@@ -22,31 +22,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  ChangeType,
-  useGetAdminDashboardQuery,
-} from '@/graphql/generated/graphql';
+import { Roles, useGetAdminDashboardQuery } from '@/graphql/generated/graphql';
 import { formatPrice } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
-// Define types for all data structures
-type StatCardType = {
-  value: number;
-  change: number;
-  changeType: 'positive' | 'negative';
-};
-
-type StatsDataType = {
-  totalSales: StatCardType;
-  activeUsers: StatCardType;
-  totalProducts: StatCardType;
-  pendingOrders: StatCardType;
-};
-
-type RevenueDataPoint = {
-  month: string;
-  revenue: number;
-};
-
+// Define types for metric data
 type PerformanceMetric = {
   title: string;
   subtitle: string;
@@ -56,46 +38,110 @@ type PerformanceMetric = {
   icon: React.ReactNode;
 };
 
+// Define types for metric data
+type QuickAction = {
+  title: string;
+  subtitle: string;
+  value: string;
+  change: string;
+  changeType: 'positive' | 'negative';
+  icon: React.ReactNode;
+  action: () => void;
+};
+
 // Helper function to format percentage
 const formatPercentage = (value: number): string => {
   return `${Math.abs(value)}%`;
 };
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const { data, loading, error } = useGetAdminDashboardQuery();
-
-  // Generate monthly revenue data based on totalRevenue divided into months
-  const generateMonthlyRevenue = (): RevenueDataPoint[] => {
-    if (!data?.getAdminDashboard) {
-      return [];
-    }
-
-    const totalRevenue = data.getAdminDashboard.totalRevenue;
-    const currentMonth = new Date().getMonth();
-    const monthsCount = currentMonth + 1;
-
-    // Create a trend that increases over time to reach the total revenue
-    return Array.from({ length: monthsCount }, (_, index) => {
-      // Weight later months to have more revenue
-      const weight = (index + 1) / ((monthsCount * (monthsCount + 1)) / 2);
-      // Distribute total revenue across months with increasing weights
-      const monthRevenue = Math.round(totalRevenue * weight);
-
-      return {
-        month: new Date(2024, index, 1).toLocaleString('default', {
-          month: 'short',
-        }),
-        revenue: monthRevenue,
-      };
-    });
-  };
 
   // If loading, return a loading state
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">Loading dashboard data...</p>
-      </div>
+      <DashboardShell
+        title="Admin Dashboard"
+        subtitle="Welcome to your admin dashboard overview"
+      >
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-[120px] w-full" />
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-[200px]" />
+              <Skeleton className="h-4 w-[300px]" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-[300px] w-full" />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-[200px]" />
+              <Skeleton className="h-4 w-[300px]" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[...Array(4)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="hover:bg-accent w-full justify-between rounded-lg p-4 py-6 pl-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                        <div className="ml-4 space-y-2">
+                          <Skeleton className="h-4 w-[150px]" />
+                          <Skeleton className="h-3 w-[100px]" />
+                        </div>
+                      </div>
+                      <Skeleton className="h-4 w-[80px]" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <Card className="lg:col-span-3">
+            <CardHeader>
+              <Skeleton className="h-6 w-[200px]" />
+              <Skeleton className="h-4 w-[300px]" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Skeleton className="h-10 w-10 rounded-full" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-[150px]" />
+                        <Skeleton className="h-3 w-[100px]" />
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end space-y-2">
+                      <Skeleton className="h-4 w-[80px]" />
+                      <Skeleton className="h-3 w-[100px]" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </DashboardShell>
     );
   }
 
@@ -110,89 +156,58 @@ export default function AdminDashboard() {
     );
   }
 
-  const dashboardData = data.getAdminDashboard;
-
-  // Prepare dashboard stats from real data
-  const dashboardStats: StatsDataType = {
-    totalSales: {
-      value: Number(formatPrice(dashboardData.totalSales)),
-      change: Number(formatPercentage(dashboardData.totalSalesChange)),
-      changeType:
-        dashboardData.totalSalesChangeType === ChangeType.Positive
-          ? 'positive'
-          : 'negative',
-    },
-    activeUsers: {
-      value: dashboardData.activeUsers,
-      change: Number(formatPercentage(dashboardData.activeUsersChange)),
-      changeType:
-        dashboardData.activeUsersChangeType === ChangeType.Positive
-          ? 'positive'
-          : 'negative',
-    },
-    totalProducts: {
-      value: dashboardData.totalProducts,
-      change: Number(formatPercentage(dashboardData.totalProductsChange)),
-      changeType:
-        dashboardData.totalProductsChangeType === ChangeType.Positive
-          ? 'positive'
-          : 'negative',
-    },
-    pendingOrders: {
-      value: dashboardData.pendingOrders,
-      change: Number(formatPercentage(dashboardData.pendingOrdersChange)),
-      changeType:
-        dashboardData.pendingOrdersChangeType === ChangeType.Positive
-          ? 'positive'
-          : 'negative',
-    },
+  const dashboardData = data?.getAdminDashboard || {
+    totalActiveUsers: 0,
+    currentMonthRevenue: 0,
+    totalTemplates: 0,
+    systemUptime: 0,
   };
 
-  // Generate monthly revenue data
-  const monthlyRevenue = generateMonthlyRevenue();
-
   // Calculate max revenue for chart scaling
-  const maxRevenue = Math.max(...monthlyRevenue.map(item => item.revenue), 1);
+  const maxRevenue = Math.max(
+    ...dashboardData.revenueByMonth.map(item => item.revenue),
+    1,
+  );
 
-  // Create performance metrics based on real data
-  const performanceMetrics: PerformanceMetric[] = [
+  // Create quick actions
+  const quickActions: QuickAction[] = [
     {
-      title: 'Conversion Rate',
-      subtitle: 'Based on total orders and customers',
-      value: `${((dashboardData.totalOrders / Math.max(dashboardData.totalCustomers, 1)) * 100).toFixed(1)}%`,
-      change: '+0.4%', // This is hardcoded as it's not available in the API
-      changeType: 'positive',
-      icon: <TrendingUpIcon className="h-5 w-5" />,
-    },
-    {
-      title: 'User Retention',
-      subtitle: 'Active users vs total customers',
-      value: `${((dashboardData.activeUsers / Math.max(dashboardData.totalCustomers, 1)) * 100).toFixed(0)}%`,
-      change: '+5%', // This is hardcoded as it's not available in the API
+      title: 'Manage Users',
+      subtitle: 'View and manage user accounts',
+      value: `${dashboardData.totalActiveUsers} users`,
+      change: '+5%',
       changeType: 'positive',
       icon: <UsersIcon className="h-5 w-5" />,
+      action: () => router.push('/admin/users'),
     },
     {
-      title: 'Average Order Value',
-      subtitle: 'Total sales divided by orders',
-      value: formatPrice(
-        dashboardData.totalSales / Math.max(dashboardData.totalOrders, 1),
-      ),
-      change: '+$3.25', // This is hardcoded as it's not available in the API
+      title: 'Revenue Overview',
+      subtitle: 'View detailed revenue reports',
+      value: formatPrice(dashboardData.currentMonthRevenue),
+      change: '+8%',
       changeType: 'positive',
-      icon: <ShoppingCartIcon className="h-5 w-5" />,
+      icon: <TrendingUpIcon className="h-5 w-5" />,
+      action: () => router.push('/admin/revenue'),
     },
     {
-      title: 'Factory Utilization',
-      subtitle: 'Active factories vs total',
-      value: `${((dashboardData.activeFactories / Math.max(dashboardData.totalFactories, 1)) * 100).toFixed(0)}%`,
-      change: '+2%', // This is hardcoded as it's not available in the API
+      title: 'Template Management',
+      subtitle: 'Manage design templates',
+      value: `${dashboardData.totalTemplates} templates`,
+      change: '+3%',
+      changeType: 'positive',
+      icon: <FileTextIcon className="h-5 w-5" />,
+      action: () => router.push('/admin/templates'),
+    },
+    {
+      title: 'System Status',
+      subtitle: 'View system health and logs',
+      value: '99.8%',
+      change: '+0.2%',
       changeType: 'positive',
       icon: <PercentIcon className="h-5 w-5" />,
+      action: () => router.push('/admin/system'),
     },
   ];
-
-  console.log(dashboardData.totalRevenue);
 
   return (
     <DashboardShell
@@ -202,30 +217,25 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title={`Revenue (${new Date().toLocaleString('default', { month: 'long' })})`}
-          value={dashboardData.totalRevenue}
+          value={dashboardData.currentMonthRevenue}
           icon={<DollarSignIcon className="h-5 w-5" />}
           type={StatCardDisplay.CURRENCY}
         />
         <StatCard
           title="Active Users"
-          value={dashboardStats.activeUsers.value}
-          change={dashboardStats.activeUsers.change}
-          changeType={dashboardStats.activeUsers.changeType}
+          value={dashboardData.totalActiveUsers}
           icon={<UsersIcon className="h-5 w-5" />}
         />
         <StatCard
-          title="Total Products"
-          value={dashboardStats.totalProducts.value}
-          change={dashboardStats.totalProducts.change}
-          changeType={dashboardStats.totalProducts.changeType}
+          title="Total Templates"
+          value={dashboardData.totalTemplates}
           icon={<PackageIcon className="h-5 w-5" />}
         />
         <StatCard
-          title="Pending Orders"
-          value={dashboardStats.pendingOrders.value}
-          change={dashboardStats.pendingOrders.change}
-          changeType={dashboardStats.pendingOrders.changeType}
+          title="Total Revenue"
+          value={dashboardData.totalRevenue}
           icon={<ShoppingCartIcon className="h-5 w-5" />}
+          type={StatCardDisplay.CURRENCY}
         />
       </div>
 
@@ -265,9 +275,12 @@ export default function AdminDashboard() {
                 />
 
                 {/* X-axis labels (months) */}
-                {monthlyRevenue.map((data, i) => {
+                {dashboardData.revenueByMonth.map((data, i) => {
                   const x =
-                    40 + (440 / Math.max(1, monthlyRevenue.length - 1)) * i;
+                    40 +
+                    (440 /
+                      Math.max(1, dashboardData.revenueByMonth.length - 1)) *
+                      i;
                   return (
                     <text
                       key={`month-${i}`}
@@ -317,10 +330,16 @@ export default function AdminDashboard() {
 
                 {/* Revenue line */}
                 <polyline
-                  points={monthlyRevenue
+                  points={dashboardData.revenueByMonth
                     .map((data, i) => {
                       const x =
-                        40 + (440 / Math.max(1, monthlyRevenue.length - 1)) * i;
+                        40 +
+                        (440 /
+                          Math.max(
+                            1,
+                            dashboardData.revenueByMonth.length - 1,
+                          )) *
+                          i;
                       const y = 180 - (160 / maxRevenue) * data.revenue;
                       return `${x},${y}`;
                     })
@@ -331,9 +350,12 @@ export default function AdminDashboard() {
                 />
 
                 {/* Data points */}
-                {monthlyRevenue.map((data, i) => {
+                {dashboardData.revenueByMonth.map((data, i) => {
                   const x =
-                    40 + (440 / Math.max(1, monthlyRevenue.length - 1)) * i;
+                    40 +
+                    (440 /
+                      Math.max(1, dashboardData.revenueByMonth.length - 1)) *
+                      i;
                   const y = 180 - (160 / maxRevenue) * data.revenue;
                   return (
                     <circle
@@ -354,33 +376,33 @@ export default function AdminDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Performance Metrics</CardTitle>
-            <CardDescription>Key business indicators</CardDescription>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Common administrative tasks</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-              {performanceMetrics.map((metric, index) => (
-                <div key={index} className="flex items-center justify-between">
+            <div className="space-y-4">
+              {quickActions.map((action, index) => (
+                <Button
+                  key={index}
+                  variant="ghost"
+                  className="hover:bg-accent w-full justify-between rounded-lg p-4 py-6 pl-2"
+                  onClick={action.action}
+                >
                   <div className="flex items-center">
                     <div className="bg-primary/10 mr-4 rounded-full p-2">
-                      {metric.icon}
+                      {action.icon}
                     </div>
-                    <div>
-                      <p className="text-sm font-medium">{metric.title}</p>
+                    <div className="text-left">
+                      <p className="text-sm font-medium">{action.title}</p>
                       <p className="text-muted-foreground text-xs">
-                        {metric.subtitle}
+                        {action.subtitle}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <span className="font-semibold">{metric.value}</span>
-                    <span
-                      className={`ml-2 text-xs ${metric.changeType === 'positive' ? 'text-green-600' : 'text-red-600'}`}
-                    >
-                      {metric.change}
-                    </span>
+                    <span className="font-semibold">{action.value}</span>
                   </div>
-                </div>
+                </Button>
               ))}
             </div>
           </CardContent>
@@ -388,158 +410,62 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Recent Orders</CardTitle>
-            <CardDescription>Most recent orders in the system</CardDescription>
+            <CardTitle>Recent Users</CardTitle>
+            <CardDescription>Most recent users in the system</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {dashboardData.recentOrders.slice(0, 5).map(order => (
+              {dashboardData.recentUsers.slice(0, 5).map(user => (
                 <div
-                  key={order.id}
+                  key={user.id}
                   className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
                 >
-                  <div className="space-y-1">
-                    <p className="font-medium">
-                      Order #{order.id.substring(0, 8)}
-                    </p>
-                    <div className="text-muted-foreground flex items-center text-sm">
-                      <span className="mr-2">
-                        {new Date(order.orderDate).toLocaleDateString()}
-                      </span>
-                      <span className="mr-2">•</span>
-                      <span
-                        className={`inline-flex items-center rounded-full px-2 py-1 text-xs ${
-                          order.status === 'COMPLETED'
-                            ? 'bg-green-100 text-green-800'
-                            : order.status === 'PENDING'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : order.status === 'CANCELLED'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-blue-100 text-blue-800'
-                        }`}
-                      >
-                        {order.status}
-                      </span>
+                  <div className="flex items-center space-x-3">
+                    {user.imageUrl ? (
+                      <img
+                        src={user.imageUrl}
+                        alt={user.name || 'User'}
+                        className="h-10 w-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-full">
+                        <span className="text-primary font-medium">
+                          {user.name ? user.name.charAt(0) : 'U'}
+                        </span>
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-medium">
+                        {user.name || 'Unnamed User'}
+                      </p>
+                      <p className="text-muted-foreground text-sm">
+                        {user.email}
+                      </p>
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="font-semibold">
-                      {formatPrice(order.totalPrice)}
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-1 text-xs ${
+                        user.role === Roles.Factoryowner
+                          ? 'bg-blue-100 text-blue-800'
+                          : user.role === Roles.Admin
+                            ? 'bg-purple-100 text-purple-800'
+                            : 'bg-green-100 text-green-800'
+                      }`}
+                    >
+                      {user.role}
                     </span>
-                    {order.factory && (
-                      <span className="text-muted-foreground text-sm">
-                        {order.factory.name}
-                      </span>
-                    )}
+                    <span className="text-muted-foreground text-sm">
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Order Status</CardTitle>
-            <CardDescription>Distribution of order statuses</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* Calculate order status distribution from recentOrders */}
-              {(() => {
-                // Group orders by status
-                const statusCounts = dashboardData.recentOrders.reduce(
-                  (acc, order) => {
-                    if (!acc[order.status]) {
-                      acc[order.status] = 0;
-                    }
-                    acc[order.status]++;
-                    return acc;
-                  },
-                  {} as Record<string, number>,
-                );
-
-                // Convert to array for easier rendering
-                return Object.entries(statusCounts)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([status, count]) => (
-                    <div
-                      key={status}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex items-center">
-                        <div
-                          className={`mr-3 h-3 w-3 rounded-full ${
-                            status === 'COMPLETED'
-                              ? 'bg-green-500'
-                              : status === 'PENDING'
-                                ? 'bg-yellow-500'
-                                : status === 'CANCELLED'
-                                  ? 'bg-red-500'
-                                  : 'bg-blue-500'
-                          }`}
-                        />
-                        <span className="font-medium">{status}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <span className="font-semibold">{count}</span>
-                        <span className="text-muted-foreground ml-2 text-sm">
-                          (
-                          {Math.round(
-                            (count / dashboardData.recentOrders.length) * 100,
-                          )}
-                          %)
-                        </span>
-                      </div>
-                    </div>
-                  ));
-              })()}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Top Factories</CardTitle>
-            <CardDescription>
-              Factories with highest order count and revenue
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {dashboardData.factoryPerformance
-                .sort((a, b) => b.totalRevenue - a.totalRevenue)
-                .slice(0, 6)
-                .map((factory, index) => (
-                  <div
-                    key={factory.factoryId}
-                    className="flex items-center justify-between rounded-lg border p-4"
-                  >
-                    <div className="flex items-center">
-                      <div className="bg-primary/10 mr-3 flex h-8 w-8 items-center justify-center rounded-full">
-                        <span className="text-xs font-semibold">
-                          {index + 1}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-medium">
-                          Factory #{factory.factoryId.substring(0, 8)}
-                        </p>
-                        <p className="text-muted-foreground text-sm">
-                          {factory.orderCount} orders
-                        </p>
-                      </div>
-                    </div>
-                    <div className="font-semibold">
-                      {formatPrice(factory.totalRevenue)}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </CardContent>
-        </Card> */}
       </div>
     </DashboardShell>
   );

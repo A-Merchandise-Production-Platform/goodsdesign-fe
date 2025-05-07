@@ -29,6 +29,7 @@ import {
   ProductSelection,
   QualitySpecialization,
 } from './sections';
+import { useAuthStore } from '@/stores/auth.store';
 
 // Create a context to share required field info with form components
 export const RequiredFieldsContext = createContext<string[]>([]);
@@ -50,6 +51,7 @@ const getErrorsInSection = (
 
 export default function UpdateFactoryForm() {
   const [isNotificationOpen, setIsNotificationOpen] = useState(true);
+  const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState('basics');
   const { data, loading, error } = useGetMyFactoryQuery({
     fetchPolicy: 'no-cache',
@@ -93,11 +95,14 @@ export default function UpdateFactoryForm() {
         printingMethods: data.getMyFactory.printingMethods ?? [],
         specializations: data.getMyFactory.specializations ?? [],
         contactPersonName: data.getMyFactory.contactPersonName ?? '',
-        contactPersonPhone: data.getMyFactory.contactPersonPhone ?? '',
+        contactPersonPhone:
+          data.getMyFactory.contactPersonPhone ?? user?.phoneNumber ?? '',
         systemConfigVariantIds:
           data.getMyFactory.products?.map(
             product => product.systemConfigVariantId,
           ) ?? [],
+        contactPersonRole: data.getMyFactory.contactPersonRole ?? '',
+        productionTimeInMinutes: 0,
       });
     }
   }, [data, form]);
@@ -126,6 +131,7 @@ export default function UpdateFactoryForm() {
             street: data.addressInput.street,
           },
           systemConfigVariantIds: data.systemConfigVariantIds,
+          productionTimeInMinutes: data.productionTimeInMinutes,
         },
       },
     });

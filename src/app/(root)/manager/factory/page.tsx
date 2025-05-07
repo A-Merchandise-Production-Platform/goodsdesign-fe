@@ -10,7 +10,6 @@ import {
   XCircleIcon,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import { DashboardShell } from '@/components/dashboard-shell';
 import { StatCard } from '@/components/stat-card';
@@ -122,9 +121,12 @@ export default function Page() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>{factory.name}</CardTitle>
-                <Badge variant={getStatusVariant(factory.factoryStatus)}>
-                  {factory.factoryStatus}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">{factory.legitPoint} points</Badge>
+                  <Badge variant={getStatusVariant(factory.factoryStatus)}>
+                    {factory.factoryStatus}
+                  </Badge>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="flex-1 space-y-2">
@@ -135,7 +137,9 @@ export default function Page() {
               )}
               <div className="flex items-center text-sm">
                 <MapPin className="text-muted-foreground mr-1 h-4 w-4" />
-                <span className="line-clamp-2">{factory.formattedAddress}</span>
+                <span className="line-clamp-2">
+                  {factory.address?.formattedAddress}
+                </span>
               </div>
               {factory.totalEmployees && (
                 <div className="flex items-center text-sm">
@@ -237,6 +241,7 @@ export default function Page() {
           <TabsTrigger value="all">Active Factories</TabsTrigger>
           <TabsTrigger value="pending">Pending Approval</TabsTrigger>
           <TabsTrigger value="rejected">Rejected</TabsTrigger>
+          <TabsTrigger value="all-factories">All Factories</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all">
@@ -247,6 +252,9 @@ export default function Page() {
         </TabsContent>
         <TabsContent value="rejected">
           {renderFactoryGrid(rejectedFactories)}
+        </TabsContent>
+        <TabsContent value="all-factories">
+          {renderFactoryGrid(factories)}
         </TabsContent>
       </Tabs>
     </DashboardShell>
