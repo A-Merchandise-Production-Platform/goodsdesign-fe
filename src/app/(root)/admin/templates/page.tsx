@@ -38,6 +38,7 @@ import { Info, MoreVertical, Pencil, Trash2, PlusCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { formatPrice } from '@/lib/utils';
 import { toast } from 'sonner';
+import { DashboardShell } from '@/components/dashboard-shell';
 
 // Define types for our data
 interface PositionType {
@@ -213,245 +214,259 @@ export default function Page() {
   }
 
   return (
-    <div className="bg-background container mx-auto rounded-lg py-6">
-      <div className="mb-6 flex items-center justify-between">
-        <Tabs
-          defaultValue="all"
-          value={filter}
-          onValueChange={value => setFilter(value as FilterType)}
-          className="w-auto"
-        >
-          <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="public">Public</TabsTrigger>
-            <TabsTrigger value="private">Private</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        <Button onClick={handleCreateNew}>
-          <PlusCircle className="h-4 w-4" />
-          Create New Template
-        </Button>
-      </div>
-
-      {loading ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[...Array(6)].map((_, index) => (
-            <Card key={index} className="overflow-hidden">
-              <div className="relative aspect-square w-full">
-                <Skeleton className="h-full w-full" />
-              </div>
-              <CardContent className="p-4">
-                <Skeleton className="mb-2 h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-              </CardContent>
-            </Card>
-          ))}
+    <DashboardShell title="Templates" subtitle="Manage your templates">
+      <div className="bg-background container mx-auto rounded-lg">
+        <div className="mb-6 flex items-center justify-between">
+          <Tabs
+            defaultValue="all"
+            value={filter}
+            onValueChange={value => setFilter(value as FilterType)}
+            className="w-auto"
+          >
+            <TabsList>
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="public">Public</TabsTrigger>
+              <TabsTrigger value="private">Private</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          {/* <Button onClick={handleCreateNew}>
+            <PlusCircle className="h-4 w-4" />
+            Create New Template
+          </Button> */}
         </div>
-      ) : filteredDesigns.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="bg-muted mb-4 rounded-full p-3">
-            <PlusCircle className="text-muted-foreground h-10 w-10" />
+
+        {loading ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, index) => (
+              <Card key={index} className="overflow-hidden">
+                <div className="relative aspect-square w-full">
+                  <Skeleton className="h-full w-full" />
+                </div>
+                <CardContent className="p-4">
+                  <Skeleton className="mb-2 h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                </CardContent>
+              </Card>
+            ))}
           </div>
-          <h3 className="mb-2 text-xl font-semibold">No designs found</h3>
-          <p className="text-muted-foreground mb-6 max-w-md">
-            {filter !== 'all'
-              ? `There are no ${filter} designs available. Try changing your filter or create a new design.`
-              : "You don't have any template product designs yet. Create your first design to get started."}
-          </p>
-          <Button onClick={handleCreateNew}>Create New Design</Button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {filteredDesigns.map(design => (
-            <Card
-              key={design.id}
-              className="relative cursor-pointer overflow-hidden transition-shadow hover:shadow-lg pt-2"
-              onClick={() => handleCardClick(design.id)}
+        ) : filteredDesigns.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="bg-muted mb-4 rounded-full p-3">
+              <PlusCircle className="text-muted-foreground h-10 w-10" />
+            </div>
+            <h3 className="mb-2 text-xl font-semibold">No designs found</h3>
+            <p className="text-muted-foreground mb-6 max-w-md">
+              {filter !== 'all'
+                ? `There are no ${filter} designs available. Try changing your filter or create a new design.`
+                : "You don't have any template product designs yet. Create your first design to get started."}
+            </p>
+            <Button onClick={handleCreateNew}>Create New Design</Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <Button
+              onClick={handleCreateNew}
+              variant="outline"
+              className="text-primary hover:bg-card relative h-full cursor-pointer overflow-hidden pt-2 transition-shadow hover:shadow-lg"
             >
-              <div className="relative aspect-square w-full">
-                {design.thumbnailUrl ? (
-                  <Image
-                    src={design.thumbnailUrl || '/placeholder.svg'}
-                    alt="Design thumbnail"
-                    fill
-                    className="object-contain p-2"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center">
-                    <p className="text-muted-foreground">No thumbnail</p>
-                  </div>
-                )}
-
-                {/* Position badges */}
-                <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                  {design.designPositions.map(position =>
-                    position.designJSON.length > 0 ? (
-                      <Badge
-                        key={position.positionType.id}
-                        variant="secondary"
-                        className="backdrop-blur-sm"
-                      >
-                        {position.positionType.positionName}
-                      </Badge>
-                    ) : null,
-                  )}
-                </div>
-
-                {/* Action dropdown */}
-                <div className="absolute top-2 right-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      asChild
-                      onClick={e => e.stopPropagation()}
-                    >
-                      <button className="hover:bg-muted flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-sm">
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={e => handleEdit(e, design.id)}>
-                        <Pencil className="mr-4 h-4 w-4" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="flex items-center"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleTogglePublic(e, design.id, design.isPublic);
-                        }}
-                      >
-                        <Switch
-                          checked={design.isPublic}
-                          onCheckedChange={() => {}}
-                        />
-                        <span>Public</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-destructive focus:text-destructive"
-                        onClick={e => openDeleteDialog(e, design.id)}
-                      >
-                        <Trash2 className="text-destructive focus:text-destructive mr-4 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-              <CardContent className="">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="h-5 w-5 rounded-full border"
-                      style={{
-                        backgroundColor:
-                          design.systemConfigVariant?.color || '#cccccc',
-                      }}
-                      title={design.systemConfigVariant?.color}
+              <PlusCircle className="h-4 w-4" />
+              Create New Template
+            </Button>
+            {filteredDesigns.map(design => (
+              <Card
+                key={design.id}
+                className="text-primary-foreground relative cursor-pointer overflow-hidden pt-2 transition-shadow hover:shadow-lg"
+                onClick={() => handleCardClick(design.id)}
+              >
+                <div className="relative aspect-square w-full">
+                  {design.thumbnailUrl ? (
+                    <Image
+                      src={design.thumbnailUrl || '/placeholder.svg'}
+                      alt="Design thumbnail"
+                      fill
+                      className="object-contain p-2"
                     />
-                    {design.isPublic ? (
-                      <Badge
-                        variant="outline"
-                        className="border-green-200 bg-green-50 text-green-700"
-                      >
-                        Public
-                      </Badge>
-                    ) : (
-                      <Badge
-                        variant="outline"
-                        className="border-gray-200 bg-gray-50 text-gray-700"
-                      >
-                        Private
-                      </Badge>
-                    )}
-                    {design.isFinalized && (
-                      <Badge variant="outline">Finalized</Badge>
-                    )}
-                  </div>
-
-                  {design.systemConfigVariant && (
-                    <div className="flex items-center gap-2">
-                      <Popover>
-                        <PopoverTrigger
-                          asChild
-                          onClick={e => e.stopPropagation()}
-                        >
-                          <button className="hover:text-primary">
-                            <Info className="h-4 w-4" />
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent
-                          className="w-64"
-                          onClick={e => e.stopPropagation()}
-                        >
-                          <div className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="font-medium">Base Price:</span>
-                              <span>
-                                {formatPrice(design.systemConfigVariant.price)}
-                              </span>
-                            </div>
-                            {design.designPositions.map(position =>
-                              position.designJSON.length > 0 ? (
-                                <div
-                                  key={position.positionType.id}
-                                  className="flex justify-between"
-                                >
-                                  <span>
-                                    {position.positionType.positionName}:
-                                  </span>
-                                  <span>
-                                    +
-                                    {formatPrice(
-                                      position.positionType.basePrice,
-                                    )}
-                                  </span>
-                                </div>
-                              ) : null,
-                            )}
-                            <div className="mt-2 flex justify-between border-t pt-2 font-bold">
-                              <span>Total:</span>
-                              <span>
-                                {formatPrice(calculateTotalPrice(design))}
-                              </span>
-                            </div>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                      <p className="text-lg font-medium">
-                        {formatPrice(calculateTotalPrice(design))}
-                      </p>
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <p className="text-muted-foreground">No thumbnail</p>
                     </div>
                   )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this design? This action cannot be
-              undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={confirmDelete}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+                  {/* Position badges */}
+                  <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                    {design.designPositions.map(position =>
+                      position.designJSON.length > 0 ? (
+                        <Badge
+                          key={position.positionType.id}
+                          variant="secondary"
+                          className="backdrop-blur-sm"
+                        >
+                          {position.positionType.positionName}
+                        </Badge>
+                      ) : null,
+                    )}
+                  </div>
+
+                  {/* Action dropdown */}
+                  <div className="absolute top-2 right-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        asChild
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <button className="hover:bg-muted flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-sm">
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={e => handleEdit(e, design.id)}
+                        >
+                          <Pencil className="mr-4 h-4 w-4" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="flex items-center"
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleTogglePublic(e, design.id, design.isPublic);
+                          }}
+                        >
+                          <Switch
+                            checked={design.isPublic}
+                            onCheckedChange={() => {}}
+                          />
+                          <span>Public</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={e => openDeleteDialog(e, design.id)}
+                        >
+                          <Trash2 className="text-destructive focus:text-destructive mr-4 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+                <CardContent className="">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="h-5 w-5 rounded-full border"
+                        style={{
+                          backgroundColor:
+                            design.systemConfigVariant?.color || '#cccccc',
+                        }}
+                        title={design.systemConfigVariant?.color}
+                      />
+                      {design.isPublic ? (
+                        <Badge
+                          variant="outline"
+                          className="border-green-200 bg-green-50 text-green-700"
+                        >
+                          Public
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="border-gray-200 bg-gray-50 text-gray-700"
+                        >
+                          Private
+                        </Badge>
+                      )}
+                      {design.isFinalized && (
+                        <Badge variant="outline">Finalized</Badge>
+                      )}
+                    </div>
+
+                    {design.systemConfigVariant && (
+                      <div className="flex items-center gap-2">
+                        <Popover>
+                          <PopoverTrigger
+                            asChild
+                            onClick={e => e.stopPropagation()}
+                          >
+                            <button className="hover:text-primary">
+                              <Info className="h-4 w-4" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-64"
+                            onClick={e => e.stopPropagation()}
+                          >
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="font-medium">Base Price:</span>
+                                <span>
+                                  {formatPrice(
+                                    design.systemConfigVariant.price,
+                                  )}
+                                </span>
+                              </div>
+                              {design.designPositions.map(position =>
+                                position.designJSON.length > 0 ? (
+                                  <div
+                                    key={position.positionType.id}
+                                    className="flex justify-between"
+                                  >
+                                    <span>
+                                      {position.positionType.positionName}:
+                                    </span>
+                                    <span>
+                                      +
+                                      {formatPrice(
+                                        position.positionType.basePrice,
+                                      )}
+                                    </span>
+                                  </div>
+                                ) : null,
+                              )}
+                              <div className="mt-2 flex justify-between border-t pt-2 font-bold">
+                                <span>Total:</span>
+                                <span>
+                                  {formatPrice(calculateTotalPrice(design))}
+                                </span>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                        <p className="text-lg font-medium">
+                          {formatPrice(calculateTotalPrice(design))}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm Deletion</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this design? This action cannot
+                be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={confirmDelete}>
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </DashboardShell>
   );
 }

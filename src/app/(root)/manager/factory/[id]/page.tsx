@@ -9,6 +9,16 @@ import { DashboardShell } from '@/components/dashboard-shell';
 import { StatCard } from '@/components/stat-card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import {
   FactoryStatus,
   useChangeFactoryStatusMutation,
@@ -27,15 +37,87 @@ import {
   FactoryStaffTab,
 } from './components';
 
+// Factory detail page skeleton component
+function FactoryDetailSkeleton() {
+  return (
+    <DashboardShell
+      title="Factory Details"
+      subtitle="Loading factory details..."
+    >
+      {/* Stats cards skeleton */}
+      <div className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {Array(4)
+          .fill(0)
+          .map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Skeleton className="mb-2 h-4 w-24" />
+                    <Skeleton className="h-8 w-16" />
+                  </div>
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                </div>
+                <div className="mt-4">
+                  <Skeleton className="h-4 w-20" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+      </div>
+
+      {/* Tabs skeleton */}
+      <div className="space-y-4">
+        <Skeleton className="h-10 w-64" />
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-32" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {Array(5)
+                .fill(0)
+                .map((_, i) => (
+                  <div key={i}>
+                    <Skeleton className="mb-2 h-4 w-24" />
+                    <Skeleton className="h-6 w-full" />
+                  </div>
+                ))}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-40" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {Array(5)
+                .fill(0)
+                .map((_, i) => (
+                  <div key={i}>
+                    <Skeleton className="mb-2 h-4 w-24" />
+                    <Skeleton className="h-6 w-full" />
+                  </div>
+                ))}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </DashboardShell>
+  );
+}
+
 export default function FactoryDetailPage() {
   const { id } = useParams<{ id: string }>();
 
   const router = useRouter();
-  const { data: factoriesData } = useGetFactoryByIdQuery({
-    variables: {
-      factoryId: id,
-    },
-  });
+  const { data: factoriesData, loading: factoryLoading } =
+    useGetFactoryByIdQuery({
+      variables: {
+        factoryId: id,
+      },
+    });
 
   const { data: staffs } = useGetAvailableStaffForFactoryQuery();
   const [changeFactoryStatus, { loading }] = useChangeFactoryStatusMutation({
@@ -59,6 +141,11 @@ export default function FactoryDetailPage() {
 
   const [selectedStaffId, setSelectedStaffId] = useState<string>('');
   const [isStaffSelected, setIsStaffSelected] = useState(false);
+  const [statusNote, setStatusNote] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<
+    'approve' | 'reject' | null
+  >(null);
 
   useEffect(() => {
     if (selectedStaffId) {
@@ -69,28 +156,40 @@ export default function FactoryDetailPage() {
   }, [selectedStaffId]);
 
   const handleApproveFactory = () => {
-    changeFactoryStatus({
-      variables: {
-        data: {
-          status: FactoryStatus.Approved,
-          factoryOwnerId: factory?.owner?.id || '',
-          staffId: selectedStaffId,
-        },
-      },
-    });
+    setPendingAction('approve');
+    setIsDialogOpen(true);
   };
 
   const handleRejectFactory = () => {
+    setPendingAction('reject');
+    setIsDialogOpen(true);
+  };
+
+  const handleConfirmAction = () => {
+    if (!pendingAction) return;
+
     changeFactoryStatus({
       variables: {
         data: {
-          status: FactoryStatus.Rejected,
+          status:
+            pendingAction === 'approve'
+              ? FactoryStatus.Approved
+              : FactoryStatus.Rejected,
           factoryOwnerId: factory?.owner?.id || '',
-          staffId: '',
+          staffId: pendingAction === 'approve' ? selectedStaffId : '',
+          statusNote: statusNote,
         },
       },
     });
+    setIsDialogOpen(false);
+    setStatusNote('');
+    setPendingAction(null);
   };
+
+  // Show skeleton loading state when factory data is loading
+  if (factoryLoading) {
+    return <FactoryDetailSkeleton />;
+  }
 
   if (!factory) {
     return (
@@ -297,6 +396,47 @@ export default function FactoryDetailPage() {
               Approve Factory
             </Button>
           </div>
+
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  {pendingAction === 'approve'
+                    ? 'Approve Factory'
+                    : 'Reject Factory'}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="py-4">
+                <Textarea
+                  placeholder="Enter status note..."
+                  value={statusNote}
+                  onChange={e => setStatusNote(e.target.value)}
+                  className="min-h-32"
+                />
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsDialogOpen(false);
+                    setStatusNote('');
+                    setPendingAction(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant={
+                    pendingAction === 'approve' ? 'default' : 'destructive'
+                  }
+                  onClick={handleConfirmAction}
+                  disabled={loading}
+                >
+                  {pendingAction === 'approve' ? 'Approve' : 'Reject'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </>
       ) : null}
     </DashboardShell>

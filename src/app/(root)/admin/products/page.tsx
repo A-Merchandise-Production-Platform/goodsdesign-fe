@@ -5,6 +5,7 @@ import { PackageIcon, PackagePlusIcon, TagIcon } from 'lucide-react';
 import ProductTable from '@/app/(root)/admin/products/_components/product-table';
 import { StatCard } from '@/components/stat-card';
 import { useGetAllProductsQuery } from '@/graphql/generated/graphql';
+import { DashboardShell } from '@/components/dashboard-shell';
 
 export default function ProductsPage() {
   const { data, loading, refetch } = useGetAllProductsQuery();
@@ -28,7 +29,7 @@ export default function ProductsPage() {
   const activeChange = Math.round(Math.random() * 8) + '%';
 
   return (
-    <div className="space-y-4">
+    <DashboardShell title="Products" subtitle="Manage your products">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Total Products"
@@ -61,6 +62,6 @@ export default function ProductsPage() {
           data={data?.products}
         />
       </div>
-    </div>
+    </DashboardShell>
   );
 }

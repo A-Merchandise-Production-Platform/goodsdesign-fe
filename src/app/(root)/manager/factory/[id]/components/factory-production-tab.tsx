@@ -155,7 +155,7 @@ export function FactoryProductionTab({ factory }: FactoryProductionTabProps) {
               </CardContent>
             </Card>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               <Card className="bg-muted/30">
                 <CardContent className="p-4">
                   <h4 className="text-sm font-medium">Total Variants</h4>
@@ -193,15 +193,6 @@ export function FactoryProductionTab({ factory }: FactoryProductionTabProps) {
                         ),
                       ).size
                     }
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-muted/30">
-                <CardContent className="p-4">
-                  <h4 className="text-sm font-medium">Avg Production Time</h4>
-                  <p className="mt-1 text-2xl font-bold">
-                    {/* Average calculation will go here */}h
                   </p>
                 </CardContent>
               </Card>

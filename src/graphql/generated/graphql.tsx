@@ -42,25 +42,12 @@ export type AddressEntity = {
 
 export type AdminDashboardResponse = {
   __typename?: 'AdminDashboardResponse';
-  activeFactories: Scalars['Int']['output'];
-  activeUsers: Scalars['Int']['output'];
-  activeUsersChange: Scalars['Int']['output'];
-  activeUsersChangeType: ChangeType;
-  factoryPerformance: Array<FactoryPerformance>;
-  pendingOrders: Scalars['Int']['output'];
-  pendingOrdersChange: Scalars['Int']['output'];
-  pendingOrdersChangeType: ChangeType;
-  recentOrders: Array<OrderWithFactory>;
-  totalCustomers: Scalars['Int']['output'];
-  totalFactories: Scalars['Int']['output'];
-  totalOrders: Scalars['Int']['output'];
-  totalProducts: Scalars['Int']['output'];
-  totalProductsChange: Scalars['Int']['output'];
-  totalProductsChangeType: ChangeType;
+  currentMonthRevenue: Scalars['Int']['output'];
+  recentUsers: Array<RecentUser>;
+  revenueByMonth: Array<MonthlyRevenue>;
+  totalActiveUsers: Scalars['Int']['output'];
   totalRevenue: Scalars['Int']['output'];
-  totalSales: Scalars['Int']['output'];
-  totalSalesChange: Scalars['Int']['output'];
-  totalSalesChangeType: ChangeType;
+  totalTemplates: Scalars['Int']['output'];
 };
 
 /** Authentication response */
@@ -291,14 +278,6 @@ export type CustomerOrderInfo = {
   totalPrice: Scalars['Int']['output'];
 };
 
-export type DashboardStats = {
-  __typename?: 'DashboardStats';
-  factories: EnhancedFactoryStats;
-  orders: EnhancedOrderStats;
-  revenue: EnhancedRevenueStats;
-  staff: EnhancedStaffStats;
-};
-
 export type DesignPositionEntity = {
   __typename?: 'DesignPositionEntity';
   design?: Maybe<ProductDesignEntity>;
@@ -323,26 +302,11 @@ export type DoneCheckQualityInput = {
   passedQuantity: Scalars['Int']['input'];
 };
 
-export type EnhancedFactoryPerformance = {
-  __typename?: 'EnhancedFactoryPerformance';
-  factoryId: Scalars['String']['output'];
-  factoryName: Scalars['String']['output'];
-  orderCount: Scalars['Int']['output'];
-  totalRevenue: Scalars['Int']['output'];
-};
-
 export type EnhancedFactoryStats = {
   __typename?: 'EnhancedFactoryStats';
   change: Scalars['Int']['output'];
   changeType: ChangeType;
   total: Scalars['Int']['output'];
-};
-
-export type EnhancedManagerDashboardResponse = {
-  __typename?: 'EnhancedManagerDashboardResponse';
-  factoryPerformance: Array<EnhancedFactoryPerformance>;
-  orderStatus: Array<OrderStatusDetail>;
-  stats: DashboardStats;
 };
 
 export type EnhancedOrderStats = {
@@ -354,7 +318,7 @@ export type EnhancedOrderStats = {
 
 export type EnhancedRevenueStats = {
   __typename?: 'EnhancedRevenueStats';
-  change: Scalars['Int']['output'];
+  change: Scalars['Float']['output'];
   changeType: ChangeType;
   monthly: Scalars['Int']['output'];
 };
@@ -381,11 +345,13 @@ export type FactoryDashboardResponse = {
 
 export type FactoryDetailDashboardResponse = {
   __typename?: 'FactoryDetailDashboardResponse';
+  factoryInfo?: Maybe<FactoryInfo>;
   inProductionOrders: Scalars['Int']['output'];
   lastMonthInProductionOrders: Scalars['Int']['output'];
   lastMonthPendingOrders: Scalars['Int']['output'];
   lastMonthTotalOrders: Scalars['Int']['output'];
   lastMonthTotalRevenue: Scalars['Int']['output'];
+  ordersByMonth: Array<OrdersByMonth>;
   pendingOrders: Scalars['Int']['output'];
   productionProgress: Array<FactoryOrderWithProgress>;
   qualityIssues: Array<QualityIssueWithFactory>;
@@ -442,9 +408,14 @@ export type FactoryEntity = {
 
 export type FactoryInfo = {
   __typename?: 'FactoryInfo';
-  factoryStatus: Scalars['String']['output'];
+  description?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
+  leadTime: Scalars['Int']['output'];
+  legitPoint: Scalars['Int']['output'];
+  maxPrintingCapacity: Scalars['Int']['output'];
   name: Scalars['String']['output'];
+  owner: UserEntity;
+  status: Scalars['String']['output'];
 };
 
 export type FactoryOrderInfo = {
@@ -477,13 +448,6 @@ export type FactoryOrdersByStatus = {
   __typename?: 'FactoryOrdersByStatus';
   count: Scalars['Int']['output'];
   status: Scalars['String']['output'];
-};
-
-export type FactoryPerformance = {
-  __typename?: 'FactoryPerformance';
-  factoryId: Scalars['String']['output'];
-  orderCount: Scalars['Int']['output'];
-  totalRevenue: Scalars['Int']['output'];
 };
 
 export type FactoryProductEntity = {
@@ -589,8 +553,18 @@ export type ManagerDashboardResponse = {
   pendingFactoryOrders: Scalars['Int']['output'];
   qualityIssues: Array<QualityIssueWithFactory>;
   recentFactoryOrders: Array<FactoryOrderWithCustomer>;
+  stats: ManagerDashboardStats;
+  topFactories: Array<TopFactory>;
   totalOrders: Scalars['Int']['output'];
   totalRevenue: Scalars['Int']['output'];
+};
+
+export type ManagerDashboardStats = {
+  __typename?: 'ManagerDashboardStats';
+  monthlyRevenue: Scalars['Int']['output'];
+  revenueByMonth: Array<MonthlyRevenue>;
+  totalFactories: Scalars['Int']['output'];
+  totalStaffs: Scalars['Int']['output'];
 };
 
 export type ManagerOrderDashboardEntity = {
@@ -1414,19 +1388,10 @@ export enum OrderStatus {
   WaitingPayment = 'WAITING_PAYMENT'
 }
 
-export type OrderStatusDetail = {
-  __typename?: 'OrderStatusDetail';
+export type OrdersByMonth = {
+  __typename?: 'OrdersByMonth';
   count: Scalars['Int']['output'];
-  status: Scalars['String']['output'];
-};
-
-export type OrderWithFactory = {
-  __typename?: 'OrderWithFactory';
-  factory?: Maybe<FactoryInfo>;
-  id: Scalars['String']['output'];
-  orderDate: Scalars['DateTime']['output'];
-  status: Scalars['String']['output'];
-  totalPrice: Scalars['Int']['output'];
+  month: Scalars['String']['output'];
 };
 
 export type Otp = {
@@ -1568,7 +1533,6 @@ export type Query = {
   getApplicableDiscount: Scalars['Float']['output'];
   getCartItem: CartItemEntity;
   getCartItemCount: Scalars['Float']['output'];
-  getEnhancedManagerDashboard: EnhancedManagerDashboardResponse;
   getExpiredTime: Scalars['DateTime']['output'];
   getFactoryById: FactoryEntity;
   getFactoryDetailDashboard: FactoryDetailDashboardResponse;
@@ -1858,6 +1822,16 @@ export type RecentOrderInfo = {
   total: Scalars['Int']['output'];
 };
 
+export type RecentUser = {
+  __typename?: 'RecentUser';
+  createdAt: Scalars['DateTime']['output'];
+  email?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  role: Roles;
+};
+
 /** Refresh token input */
 export type RefreshTokenDto = {
   refreshToken: Scalars['String']['input'];
@@ -2038,6 +2012,14 @@ export type TaskEntity = {
   userId?: Maybe<Scalars['String']['output']>;
 };
 
+export type TopFactory = {
+  __typename?: 'TopFactory';
+  id: Scalars['String']['output'];
+  legitPoint: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  owner: UserEntity;
+};
+
 /** Status of transaction */
 export enum TransactionStatus {
   Completed = 'COMPLETED',
@@ -2090,6 +2072,7 @@ export type UpdateFactoryInfoDto = {
   maxPrintingCapacity?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   printingMethods?: InputMaybe<Array<Scalars['String']['input']>>;
+  productionTimeInMinutes?: InputMaybe<Scalars['Int']['input']>;
   qualityCertifications?: InputMaybe<Scalars['String']['input']>;
   specializations?: InputMaybe<Array<Scalars['String']['input']>>;
   systemConfigVariantIds?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -2108,6 +2091,7 @@ export type UpdateFactoryStatusDto = {
   factoryOwnerId: Scalars['String']['input'];
   staffId: Scalars['String']['input'];
   status: FactoryStatus;
+  statusNote?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdatePaymentTransactionInput = {
@@ -2444,10 +2428,10 @@ export type DeleteCategoryMutationVariables = Exact<{
 
 export type DeleteCategoryMutation = { __typename?: 'Mutation', deleteCategory: { __typename?: 'CategoryEntity', createdAt: any, description?: string | null, id: string, imageUrl?: string | null, isActive: boolean, name: string, totalProducts?: number | null, updatedAt?: any | null } };
 
-export type GetEnhancedManagerDashboardQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetManagerDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetEnhancedManagerDashboardQuery = { __typename?: 'Query', getEnhancedManagerDashboard: { __typename?: 'EnhancedManagerDashboardResponse', stats: { __typename?: 'DashboardStats', factories: { __typename?: 'EnhancedFactoryStats', total: number, change: number, changeType: ChangeType }, orders: { __typename?: 'EnhancedOrderStats', active: number, change: number, changeType: ChangeType }, staff: { __typename?: 'EnhancedStaffStats', total: number, change: number, changeType: ChangeType }, revenue: { __typename?: 'EnhancedRevenueStats', monthly: number, change: number, changeType: ChangeType } }, factoryPerformance: Array<{ __typename?: 'EnhancedFactoryPerformance', factoryId: string, factoryName: string, orderCount: number, totalRevenue: number }>, orderStatus: Array<{ __typename?: 'OrderStatusDetail', status: string, count: number }> } };
+export type GetManagerDashboardQuery = { __typename?: 'Query', getManagerDashboard: { __typename?: 'ManagerDashboardResponse', pendingFactoryOrders: number, totalOrders: number, totalRevenue: number, factoryOrdersByStatus: Array<{ __typename?: 'FactoryOrdersByStatus', count: number, status: string }>, qualityIssues: Array<{ __typename?: 'QualityIssueWithFactory', description: string, id: string, issueType: string, reportedAt: any, status: string, factoryOrder: { __typename?: 'FactoryOrderInfo', factory: { __typename?: 'FactoryInfo', id: string, name: string } } }>, recentFactoryOrders: Array<{ __typename?: 'FactoryOrderWithCustomer', createdAt: any, customerOrder: { __typename?: 'CustomerOrderInfo', status: string, totalPrice: number, id: string, customer: { __typename?: 'CustomerInfo', email: string, id: string, name: string } } }>, stats: { __typename?: 'ManagerDashboardStats', monthlyRevenue: number, totalFactories: number, totalStaffs: number, revenueByMonth: Array<{ __typename?: 'MonthlyRevenue', month: string, revenue: number }> }, topFactories: Array<{ __typename?: 'TopFactory', id: string, legitPoint: number, name: string, owner: { __typename?: 'UserEntity', id: string, email?: string | null, name?: string | null, imageUrl?: string | null } }> } };
 
 export type GetManagerOrderDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2471,12 +2455,12 @@ export type GetStaffDashboardQuery = { __typename?: 'Query', getStaffDashboard: 
 export type GetAdminDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAdminDashboardQuery = { __typename?: 'Query', getAdminDashboard: { __typename?: 'AdminDashboardResponse', activeFactories: number, activeUsers: number, activeUsersChange: number, activeUsersChangeType: ChangeType, pendingOrders: number, pendingOrdersChange: number, pendingOrdersChangeType: ChangeType, totalCustomers: number, totalFactories: number, totalOrders: number, totalProducts: number, totalProductsChange: number, totalProductsChangeType: ChangeType, totalRevenue: number, totalSales: number, totalSalesChange: number, totalSalesChangeType: ChangeType, factoryPerformance: Array<{ __typename?: 'FactoryPerformance', factoryId: string, orderCount: number, totalRevenue: number }>, recentOrders: Array<{ __typename?: 'OrderWithFactory', id: string, orderDate: any, status: string, totalPrice: number, factory?: { __typename?: 'FactoryInfo', id: string, name: string, factoryStatus: string } | null }> } };
+export type GetAdminDashboardQuery = { __typename?: 'Query', getAdminDashboard: { __typename?: 'AdminDashboardResponse', currentMonthRevenue: number, totalActiveUsers: number, totalRevenue: number, totalTemplates: number, recentUsers: Array<{ __typename?: 'RecentUser', createdAt: any, email?: string | null, id: string, imageUrl?: string | null, name?: string | null, role: Roles }>, revenueByMonth: Array<{ __typename?: 'MonthlyRevenue', revenue: number, month: string }> } };
 
 export type GetMyFactoryDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMyFactoryDashboardQuery = { __typename?: 'Query', getMyFactoryDashboard: { __typename?: 'FactoryDashboardResponse', inProductionOrders: number, pendingOrders: number, totalOrders: number, totalRevenue: number, productionProgress: Array<{ __typename?: 'FactoryOrderWithProgress', id: string, status: string, createdAt: any, totalProductionCost: number }>, qualityIssues: Array<{ __typename?: 'QualityIssueWithFactory', id: string, reportedAt: any, status: string, description: string }>, recentOrders: Array<{ __typename?: 'FactoryOrderWithCustomer', id: string, status: string, totalProductionCost: number, createdAt: any }>, revenueData: Array<{ __typename?: 'MonthlyRevenue', month: string, revenue: number }>, stats: { __typename?: 'FactoryStats', legitPoints: { __typename?: 'StatValue', percentChange?: number | null, isPositive?: boolean | null, value: number }, monthlyRevenue: { __typename?: 'StatValue', isPositive?: boolean | null, percentChange?: number | null, value: number }, qualityScore: { __typename?: 'StatValue', isPositive?: boolean | null, percentChange?: number | null, value: number }, totalOrders: { __typename?: 'StatValue', isPositive?: boolean | null, percentChange?: number | null, value: number } } } };
+export type GetMyFactoryDashboardQuery = { __typename?: 'Query', getMyFactoryDashboard: { __typename?: 'FactoryDashboardResponse', inProductionOrders: number, pendingOrders: number, productionProgress: Array<{ __typename?: 'FactoryOrderWithProgress', createdAt: any, id: string, status: string, totalProductionCost: number, customerOrder: { __typename?: 'CustomerOrderInfo', id: string, status: string, totalPrice: number, customer: { __typename?: 'CustomerInfo', email: string, id: string, name: string } }, progressReports: Array<{ __typename?: 'FactoryProgressReportType', estimatedCompletion: any, factoryOrderId: string, id: string, notes: string, photoUrls: Array<string>, reportDate: any }> }> } };
 
 export type GetMyStaffDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2493,26 +2477,26 @@ export type UpdateDesignPositionMutation = { __typename?: 'Mutation', updateDesi
 export type GetMyFactoryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMyFactoryQuery = { __typename?: 'Query', getMyFactory: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, formattedAddress?: string | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string, formattedAddress?: string | null } | null, owner?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null } | null, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null } };
+export type GetMyFactoryQuery = { __typename?: 'Query', getMyFactory: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, legitPoint?: number | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string, formattedAddress?: string | null } | null, owner?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null } | null, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null } };
 
 export type GetFactoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetFactoriesQuery = { __typename?: 'Query', getAllFactories: Array<{ __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, formattedAddress?: string | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null } | null, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null }> };
+export type GetFactoriesQuery = { __typename?: 'Query', getAllFactories: Array<{ __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, legitPoint?: number | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string, formattedAddress?: string | null } | null, owner?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null } | null, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null }> };
 
 export type GetFactoryByIdQueryVariables = Exact<{
   factoryId: Scalars['String']['input'];
 }>;
 
 
-export type GetFactoryByIdQuery = { __typename?: 'Query', getFactoryById: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, formattedAddress?: string | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner?: { __typename?: 'UserEntity', id: string, email?: string | null, name?: string | null, imageUrl?: string | null } | null, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, productionTimeInMinutes: number, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null } };
+export type GetFactoryByIdQuery = { __typename?: 'Query', getFactoryById: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, legitPoint?: number | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner?: { __typename?: 'UserEntity', id: string, email?: string | null, name?: string | null, imageUrl?: string | null } | null, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, productionTimeInMinutes: number, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null } };
 
 export type UpdateFactoryInfoMutationVariables = Exact<{
   updateFactoryInfoInput: UpdateFactoryInfoDto;
 }>;
 
 
-export type UpdateFactoryInfoMutation = { __typename?: 'Mutation', updateFactoryInfo: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, formattedAddress?: string | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null } | null, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null } };
+export type UpdateFactoryInfoMutation = { __typename?: 'Mutation', updateFactoryInfo: { __typename?: 'FactoryEntity', businessLicenseUrl?: string | null, contactPersonName?: string | null, contactPersonPhone?: string | null, contractUrl?: string | null, description?: string | null, establishedDate?: any | null, factoryStatus?: FactoryStatus | null, isSubmitted?: boolean | null, leadTime?: number | null, maxPrintingCapacity?: number | null, minimumOrderQuantity?: number | null, name: string, operationalHours?: string | null, printingMethods: Array<string>, qualityCertifications?: string | null, specializations: Array<string>, taxIdentificationNumber?: string | null, totalEmployees?: number | null, website?: string | null, contactPersonRole?: string | null, contractAccepted?: boolean | null, reviewedBy?: string | null, reviewedAt?: any | null, contractAcceptedAt?: any | null, factoryOwnerId: string, legitPoint?: number | null, address?: { __typename?: 'AddressEntity', id: string, districtID: number, provinceID: number, street: string, wardCode: string } | null, owner?: { __typename?: 'UserEntity', email?: string | null, name?: string | null, imageUrl?: string | null } | null, products?: Array<{ __typename?: 'FactoryProductEntity', productionCapacity: number, systemConfigVariantId: string, factoryId: string, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', color?: string | null, id: string, isActive: boolean, model?: string | null, price?: number | null, productId: string, size?: string | null } | null }> | null, staff?: { __typename?: 'UserEntity', id: string, imageUrl?: string | null, email?: string | null, name?: string | null } | null } };
 
 export type ChangeFactoryStatusMutationVariables = Exact<{
   data: UpdateFactoryStatusDto;
@@ -2764,6 +2748,13 @@ export type VerifyOtpMutationVariables = Exact<{
 
 
 export type VerifyOtpMutation = { __typename?: 'Mutation', verifyOTP: boolean };
+
+export type OrderInvoiceQueryVariables = Exact<{
+  orderId: Scalars['String']['input'];
+}>;
+
+
+export type OrderInvoiceQuery = { __typename?: 'Query', order: { __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, completedAt?: any | null, totalItems: number, address?: { __typename?: 'AddressEntity', formattedAddress?: string | null } | null, customer?: { __typename?: 'UserEntity', id: string, name?: string | null, imageUrl?: string | null, email?: string | null, phoneNumber?: string | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', quantity: number, createdAt: any, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', size?: string | null, color?: string | null, id: string, price?: number | null } | null }> | null }, orderPriceDetails: { __typename?: 'OrderPriceDetailsResponse', basePrice: number, discountPercentage: number, finalPrice: number, priceAfterDiscount: number, priceAfterVoucher: number, shippingPrice: number, voucher?: { __typename?: 'VoucherEntity', code: string, createdAt: any, description?: string | null, id: string, isPublic: boolean, limitedUsage?: number | null, maxDiscountValue?: number | null, minOrderValue?: number | null, type: VoucherType, updatedAt?: any | null, userId?: string | null, value: number } | null } };
 
 export type ProductDesignsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3955,76 +3946,97 @@ export function useDeleteCategoryMutation(baseOptions?: Apollo.MutationHookOptio
 export type DeleteCategoryMutationHookResult = ReturnType<typeof useDeleteCategoryMutation>;
 export type DeleteCategoryMutationResult = Apollo.MutationResult<DeleteCategoryMutation>;
 export type DeleteCategoryMutationOptions = Apollo.BaseMutationOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
-export const GetEnhancedManagerDashboardDocument = gql`
-    query GetEnhancedManagerDashboard {
-  getEnhancedManagerDashboard {
-    stats {
-      factories {
-        total
-        change
-        changeType
-      }
-      orders {
-        active
-        change
-        changeType
-      }
-      staff {
-        total
-        change
-        changeType
-      }
-      revenue {
-        monthly
-        change
-        changeType
-      }
-    }
-    factoryPerformance {
-      factoryId
-      factoryName
-      orderCount
-      totalRevenue
-    }
-    orderStatus {
-      status
+export const GetManagerDashboardDocument = gql`
+    query GetManagerDashboard {
+  getManagerDashboard {
+    factoryOrdersByStatus {
       count
+      status
     }
+    pendingFactoryOrders
+    qualityIssues {
+      description
+      factoryOrder {
+        factory {
+          id
+          name
+        }
+      }
+      id
+      issueType
+      reportedAt
+      status
+    }
+    recentFactoryOrders {
+      createdAt
+      customerOrder {
+        status
+        totalPrice
+        id
+        customer {
+          email
+          id
+          name
+        }
+      }
+    }
+    stats {
+      monthlyRevenue
+      revenueByMonth {
+        month
+        revenue
+      }
+      totalFactories
+      totalStaffs
+    }
+    topFactories {
+      id
+      legitPoint
+      name
+      owner {
+        id
+        email
+        name
+        imageUrl
+      }
+    }
+    totalOrders
+    totalRevenue
   }
 }
     `;
 
 /**
- * __useGetEnhancedManagerDashboardQuery__
+ * __useGetManagerDashboardQuery__
  *
- * To run a query within a React component, call `useGetEnhancedManagerDashboardQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetEnhancedManagerDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetManagerDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetManagerDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetEnhancedManagerDashboardQuery({
+ * const { data, loading, error } = useGetManagerDashboardQuery({
  *   variables: {
  *   },
  * });
  */
-export function useGetEnhancedManagerDashboardQuery(baseOptions?: Apollo.QueryHookOptions<GetEnhancedManagerDashboardQuery, GetEnhancedManagerDashboardQueryVariables>) {
+export function useGetManagerDashboardQuery(baseOptions?: Apollo.QueryHookOptions<GetManagerDashboardQuery, GetManagerDashboardQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetEnhancedManagerDashboardQuery, GetEnhancedManagerDashboardQueryVariables>(GetEnhancedManagerDashboardDocument, options);
+        return Apollo.useQuery<GetManagerDashboardQuery, GetManagerDashboardQueryVariables>(GetManagerDashboardDocument, options);
       }
-export function useGetEnhancedManagerDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetEnhancedManagerDashboardQuery, GetEnhancedManagerDashboardQueryVariables>) {
+export function useGetManagerDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetManagerDashboardQuery, GetManagerDashboardQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetEnhancedManagerDashboardQuery, GetEnhancedManagerDashboardQueryVariables>(GetEnhancedManagerDashboardDocument, options);
+          return Apollo.useLazyQuery<GetManagerDashboardQuery, GetManagerDashboardQueryVariables>(GetManagerDashboardDocument, options);
         }
-export function useGetEnhancedManagerDashboardSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetEnhancedManagerDashboardQuery, GetEnhancedManagerDashboardQueryVariables>) {
+export function useGetManagerDashboardSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetManagerDashboardQuery, GetManagerDashboardQueryVariables>) {
           const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetEnhancedManagerDashboardQuery, GetEnhancedManagerDashboardQueryVariables>(GetEnhancedManagerDashboardDocument, options);
+          return Apollo.useSuspenseQuery<GetManagerDashboardQuery, GetManagerDashboardQueryVariables>(GetManagerDashboardDocument, options);
         }
-export type GetEnhancedManagerDashboardQueryHookResult = ReturnType<typeof useGetEnhancedManagerDashboardQuery>;
-export type GetEnhancedManagerDashboardLazyQueryHookResult = ReturnType<typeof useGetEnhancedManagerDashboardLazyQuery>;
-export type GetEnhancedManagerDashboardSuspenseQueryHookResult = ReturnType<typeof useGetEnhancedManagerDashboardSuspenseQuery>;
-export type GetEnhancedManagerDashboardQueryResult = Apollo.QueryResult<GetEnhancedManagerDashboardQuery, GetEnhancedManagerDashboardQueryVariables>;
+export type GetManagerDashboardQueryHookResult = ReturnType<typeof useGetManagerDashboardQuery>;
+export type GetManagerDashboardLazyQueryHookResult = ReturnType<typeof useGetManagerDashboardLazyQuery>;
+export type GetManagerDashboardSuspenseQueryHookResult = ReturnType<typeof useGetManagerDashboardSuspenseQuery>;
+export type GetManagerDashboardQueryResult = Apollo.QueryResult<GetManagerDashboardQuery, GetManagerDashboardQueryVariables>;
 export const GetManagerOrderDashboardDocument = gql`
     query GetManagerOrderDashboard {
   getManagerOrderDashboard {
@@ -4244,39 +4256,22 @@ export type GetStaffDashboardQueryResult = Apollo.QueryResult<GetStaffDashboardQ
 export const GetAdminDashboardDocument = gql`
     query GetAdminDashboard {
   getAdminDashboard {
-    activeFactories
-    activeUsers
-    activeUsersChange
-    activeUsersChangeType
-    factoryPerformance {
-      factoryId
-      orderCount
-      totalRevenue
-    }
-    pendingOrders
-    pendingOrdersChange
-    pendingOrdersChangeType
-    recentOrders {
+    currentMonthRevenue
+    recentUsers {
+      createdAt
+      email
       id
-      orderDate
-      status
-      totalPrice
-      factory {
-        id
-        name
-        factoryStatus
-      }
+      imageUrl
+      name
+      role
     }
-    totalCustomers
-    totalFactories
-    totalOrders
-    totalProducts
-    totalProductsChange
-    totalProductsChangeType
+    revenueByMonth {
+      revenue
+      month
+    }
+    totalActiveUsers
     totalRevenue
-    totalSales
-    totalSalesChange
-    totalSalesChangeType
+    totalTemplates
   }
 }
     `;
@@ -4318,51 +4313,29 @@ export const GetMyFactoryDashboardDocument = gql`
     inProductionOrders
     pendingOrders
     productionProgress {
-      id
-      status
       createdAt
+      customerOrder {
+        customer {
+          email
+          id
+          name
+        }
+        id
+        status
+        totalPrice
+      }
+      id
+      progressReports {
+        estimatedCompletion
+        factoryOrderId
+        id
+        notes
+        photoUrls
+        reportDate
+      }
+      status
       totalProductionCost
     }
-    qualityIssues {
-      id
-      reportedAt
-      status
-      description
-    }
-    recentOrders {
-      id
-      status
-      totalProductionCost
-      createdAt
-    }
-    revenueData {
-      month
-      revenue
-    }
-    stats {
-      legitPoints {
-        percentChange
-        isPositive
-        value
-      }
-      monthlyRevenue {
-        isPositive
-        percentChange
-        value
-      }
-      qualityScore {
-        isPositive
-        percentChange
-        value
-      }
-      totalOrders {
-        isPositive
-        percentChange
-        value
-      }
-    }
-    totalOrders
-    totalRevenue
   }
 }
     `;
@@ -4572,7 +4545,7 @@ export const GetMyFactoryDocument = gql`
     }
     contractAcceptedAt
     factoryOwnerId
-    formattedAddress
+    legitPoint
   }
 }
     `;
@@ -4617,6 +4590,7 @@ export const GetFactoriesDocument = gql`
       provinceID
       street
       wardCode
+      formattedAddress
     }
     businessLicenseUrl
     contactPersonName
@@ -4668,7 +4642,7 @@ export const GetFactoriesDocument = gql`
     }
     contractAcceptedAt
     factoryOwnerId
-    formattedAddress
+    legitPoint
   }
 }
     `;
@@ -4766,7 +4740,7 @@ export const GetFactoryByIdDocument = gql`
     }
     contractAcceptedAt
     factoryOwnerId
-    formattedAddress
+    legitPoint
   }
 }
     `;
@@ -4863,7 +4837,7 @@ export const UpdateFactoryInfoDocument = gql`
     }
     contractAcceptedAt
     factoryOwnerId
-    formattedAddress
+    legitPoint
   }
 }
     `;
@@ -7430,6 +7404,91 @@ export function useVerifyOtpMutation(baseOptions?: Apollo.MutationHookOptions<Ve
 export type VerifyOtpMutationHookResult = ReturnType<typeof useVerifyOtpMutation>;
 export type VerifyOtpMutationResult = Apollo.MutationResult<VerifyOtpMutation>;
 export type VerifyOtpMutationOptions = Apollo.BaseMutationOptions<VerifyOtpMutation, VerifyOtpMutationVariables>;
+export const OrderInvoiceDocument = gql`
+    query OrderInvoice($orderId: String!) {
+  order(id: $orderId) {
+    acceptanceDeadline
+    acceptedAt
+    address {
+      formattedAddress
+    }
+    completedAt
+    customer {
+      id
+      name
+      imageUrl
+      email
+      phoneNumber
+    }
+    orderDetails {
+      quantity
+      systemConfigVariant {
+        size
+        color
+        id
+        price
+      }
+      createdAt
+    }
+    totalItems
+  }
+  orderPriceDetails(orderId: $orderId) {
+    basePrice
+    discountPercentage
+    finalPrice
+    priceAfterDiscount
+    priceAfterVoucher
+    shippingPrice
+    voucher {
+      code
+      createdAt
+      description
+      id
+      isPublic
+      limitedUsage
+      maxDiscountValue
+      minOrderValue
+      type
+      updatedAt
+      userId
+      value
+    }
+  }
+}
+    `;
+
+/**
+ * __useOrderInvoiceQuery__
+ *
+ * To run a query within a React component, call `useOrderInvoiceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrderInvoiceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrderInvoiceQuery({
+ *   variables: {
+ *      orderId: // value for 'orderId'
+ *   },
+ * });
+ */
+export function useOrderInvoiceQuery(baseOptions: Apollo.QueryHookOptions<OrderInvoiceQuery, OrderInvoiceQueryVariables> & ({ variables: OrderInvoiceQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OrderInvoiceQuery, OrderInvoiceQueryVariables>(OrderInvoiceDocument, options);
+      }
+export function useOrderInvoiceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OrderInvoiceQuery, OrderInvoiceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OrderInvoiceQuery, OrderInvoiceQueryVariables>(OrderInvoiceDocument, options);
+        }
+export function useOrderInvoiceSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OrderInvoiceQuery, OrderInvoiceQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OrderInvoiceQuery, OrderInvoiceQueryVariables>(OrderInvoiceDocument, options);
+        }
+export type OrderInvoiceQueryHookResult = ReturnType<typeof useOrderInvoiceQuery>;
+export type OrderInvoiceLazyQueryHookResult = ReturnType<typeof useOrderInvoiceLazyQuery>;
+export type OrderInvoiceSuspenseQueryHookResult = ReturnType<typeof useOrderInvoiceSuspenseQuery>;
+export type OrderInvoiceQueryResult = Apollo.QueryResult<OrderInvoiceQuery, OrderInvoiceQueryVariables>;
 export const ProductDesignsDocument = gql`
     query ProductDesigns {
   productDesigns {

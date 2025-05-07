@@ -28,6 +28,11 @@ import {
   RequiredFieldsContext,
   RequiredIndicator,
 } from '../update-factory-form';
+import { FormDescription, FormItem, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { FormControl } from '@/components/ui/form';
+import { FormLabel } from '@/components/ui/form';
+import { FormField } from '@/components/ui/form';
 
 interface ProductSelectionProps {
   form: UseFormReturn<FactoryFormValues>;
@@ -137,8 +142,6 @@ export function ProductSelection({ form }: ProductSelectionProps) {
       const newSelected = prev.includes(variantId)
         ? prev.filter(id => id !== variantId)
         : [...prev, variantId];
-
-      console.log('Selected variant IDs:', newSelected);
       return newSelected;
     });
   };
@@ -153,12 +156,10 @@ export function ProductSelection({ form }: ProductSelectionProps) {
       if (allSelected) {
         // If all are selected, unselect them
         const newSelected = prev.filter(id => !variantIds.includes(id));
-        console.log('Selected variant IDs:', newSelected);
         return newSelected;
       } else {
         // If not all are selected, select all missing ones
         const newSelected = [...new Set([...prev, ...variantIds])];
-        console.log('Selected variant IDs:', newSelected);
         return newSelected;
       }
     });
@@ -201,6 +202,38 @@ export function ProductSelection({ form }: ProductSelectionProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
+          {/* add here for all prodts */}
+
+          <FormField
+            control={form.control}
+            name="productionTimeInMinutes"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Production Time (minutes)</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Production Time"
+                    type="number"
+                    {...field}
+                    disabled={isSubmitted}
+                    onChange={e => {
+                      const value = parseInt(e.target.value);
+                      if (value > 0) {
+                        field.onChange(value);
+                      }
+                    }}
+                  />
+                </FormControl>
+                {form.formState.errors.productionTimeInMinutes ? (
+                  <FormMessage />
+                ) : (
+                  <FormDescription>
+                    This is the production time for all products
+                  </FormDescription>
+                )}
+              </FormItem>
+            )}
+          />
           {variantsByProductAndColor &&
             Object.entries(variantsByProductAndColor).map(
               ([productId, { product, colors }]) => (
@@ -305,6 +338,11 @@ export function ProductSelection({ form }: ProductSelectionProps) {
                 </Collapsible>
               ),
             )}
+          {form.formState.errors.systemConfigVariantIds && (
+            <FormMessage className="mt-2">
+              {form.formState.errors.systemConfigVariantIds.message}
+            </FormMessage>
+          )}
         </div>
       </CardContent>
     </Card>

@@ -106,6 +106,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${outfit.variable} ${onest.variable} ${satoshi.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable} ${plusJakartaSans.variable} antialiased`}
+        suppressHydrationWarning
       >
         <ApolloClientProvider>
           <SocketIOClientProvider>

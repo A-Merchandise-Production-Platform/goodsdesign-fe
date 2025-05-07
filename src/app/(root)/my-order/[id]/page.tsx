@@ -84,8 +84,8 @@ import {
 import { OrderHeader } from '@/app/(root)/_components/order-header';
 import { OrderStatusTimeline } from '@/app/(root)/_components/order-status-timeline';
 import { RejectionHistory } from '../../_components/rejection-history';
-import { DownloadBillButtonWithPreview } from '@/app/(root)/my-order/[id]/_components/download-bill-button-with-preview';
 import { Badge } from '@/components/ui/badge';
+import DownloadBillButtonWithPreview from './_components/download-bill-button-with-preview';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -105,7 +105,8 @@ const formatCurrency = (amount: number) => {
 
 export default function OrderDetailsPage() {
   const router = useRouter();
-  const { id } = useParams<{ id: string }>();
+  const params = useParams();
+  const orderId = params.id as string;
   const [expandedPayments, setExpandedPayments] = useState<
     Record<string, boolean>
   >({});
@@ -121,22 +122,19 @@ export default function OrderDetailsPage() {
   const { data: orderPriceDetails, loading: orderPriceDetailsLoading } =
     useOrderPriceDetailsQuery({
       variables: {
-        orderId: id,
+        orderId: orderId,
       },
     });
 
   const [createPaymentGatewayUrl, { loading: createPaymentGatewayUrlLoading }] =
     useCreatePaymentGatewayUrlMutation({
-      onCompleted: (data: CreatePaymentGatewayUrlMutation) => {
-        if (data?.createPayment) {
-          // Redirect to payment gateway URL
+      onCompleted: data => {
+        if (data.createPayment) {
           window.location.href = data.createPayment;
-        } else {
-          toast.error('Failed to create payment link. Please try again.');
         }
       },
-      onError: (error: Error) => {
-        toast.error(error.message || 'Failed to create payment link');
+      onError: error => {
+        toast.error(error.message);
       },
     });
 
@@ -154,7 +152,7 @@ export default function OrderDetailsPage() {
   const handleFeedbackSubmit = () => {
     feedbackOrder({
       variables: {
-        orderId: id,
+        orderId: orderId,
         input: {
           rating: rating,
           ratingComment: ratingComment,
@@ -167,7 +165,7 @@ export default function OrderDetailsPage() {
   // Use the query hook
   const { data, loading, error, refetch } = useGetOrderQuery({
     variables: {
-      orderId: id,
+      orderId: orderId,
     },
   });
 
@@ -853,10 +851,15 @@ export default function OrderDetailsPage() {
         <TabsContent value="payment">
           <Card>
             <CardHeader>
-              <CardTitle>Payment Information</CardTitle>
-              <CardDescription>
-                Payment status and transaction history
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Payment Information</CardTitle>
+                  <CardDescription>
+                    Payment details and transaction history
+                  </CardDescription>
+                </div>
+                <DownloadBillButtonWithPreview orderId={orderId} />
+              </div>
             </CardHeader>
             <CardContent>
               {order.payments && order.payments.length > 0 ? (
