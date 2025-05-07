@@ -1618,12 +1618,12 @@ export default function FactoryOrderDetailsPage() {
             <Button
               onClick={handleAddProgressReport}
               disabled={
-                imageUploading ||
+                uploadFileLoading ||
                 addProgressReportLoading ||
                 !progressNote.trim()
               }
             >
-              {(imageUploading || addProgressReportLoading) && (
+              {(uploadFileLoading || addProgressReportLoading) && (
                 <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               )}
               Add Progress Report
