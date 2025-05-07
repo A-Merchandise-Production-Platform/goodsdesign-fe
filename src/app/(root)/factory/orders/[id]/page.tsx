@@ -79,6 +79,7 @@ import {
 import { cn, formatDate } from '@/lib/utils';
 import { filesToBase64 } from '@/utils/handle-upload';
 import { RejectionHistory } from '@/app/(root)/_components/rejection-history';
+import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
 // Helper function to format time
 const formatTime = (dateString: string) => {
   return new Date(dateString).toLocaleTimeString('en-US', {
@@ -224,6 +225,32 @@ export default function FactoryOrderDetailsPage() {
         toast.error(error.message || 'Failed to complete shipping');
       },
     });
+
+  const [uploadFile, { loading: uploadFileLoading }] = useUploadFileMutation();
+
+  const handleUploadFile = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return null;
+
+    try {
+      const result = await uploadFile({
+        variables: { file },
+      });
+
+      // Check if the upload was successful
+      if (result.data?.uploadFile?.url) {
+        const fileUrl = result.data.uploadFile.url;
+        toast.success('Image uploaded successfully');
+        return fileUrl;
+      }
+      return null;
+    } catch (error) {
+      console.error('Upload error:', error);
+      return null;
+    }
+  };
 
   const order = data?.order;
 
@@ -448,16 +475,44 @@ export default function FactoryOrderDetailsPage() {
     }
 
     try {
-      // Convert images to base64
-      const base64Images = await convertImagesToBase64();
+      // Upload each image and collect URLs
+      const uploadedUrls = await Promise.all(
+        images.map(async file => {
+          // Create a synthetic event object with proper typing
+          const event = {
+            target: {
+              files: [file],
+            },
+            currentTarget: null,
+            nativeEvent: null,
+            bubbles: false,
+            cancelable: false,
+            defaultPrevented: false,
+            eventPhase: 0,
+            isTrusted: false,
+            preventDefault: () => {},
+            stopImmediatePropagation: () => {},
+            stopPropagation: () => {},
+            timeStamp: 0,
+            type: 'change',
+          } as unknown as React.ChangeEvent<HTMLInputElement>;
 
-      // Add progress report with base64 images
+          return handleUploadFile(event);
+        }),
+      );
+
+      // Filter out any failed uploads (null values)
+      const validUrls = uploadedUrls.filter(
+        (url): url is string => url !== null,
+      );
+
+      // Add progress report with uploaded image URLs
       addProgressReport({
         variables: {
           input: {
             orderId: id,
             note: progressNote,
-            imageUrls: base64Images,
+            imageUrls: validUrls,
           },
         },
       });
@@ -982,16 +1037,14 @@ export default function FactoryOrderDetailsPage() {
                         </div>
 
                         <div className="mt-2">
-                          <h4 className="mb-1 text-sm font-medium">
-                            Rework:
-                          </h4>
+                          <h4 className="mb-1 text-sm font-medium">Rework:</h4>
                           <div className="grid gap-2 md:grid-cols-2">
-                              <p className="text-muted-foreground text-xs"> 
-                                <span className="mr-2 text-green-600">
-                                  {item.isRework ? 'Yes' : 'No'}
-                                </span>
-                                {item.reworkTime} times
-                              </p>
+                            <p className="text-muted-foreground text-xs">
+                              <span className="mr-2 text-green-600">
+                                {item.isRework ? 'Yes' : 'No'}
+                              </span>
+                              {item.reworkTime} times
+                            </p>
                           </div>
                         </div>
 
@@ -1114,47 +1167,49 @@ export default function FactoryOrderDetailsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="mb-6">
-                  <Button
-                    onClick={() => setIsAddProgressDialogOpen(true)}
-                    className="w-full"
-                  >
-                    <FileText className="mr-2 h-4 w-4" />
-                    Add Progress Report
-                  </Button>
-                </div>
+              <div className="mb-6">
+                <Button
+                  onClick={() => setIsAddProgressDialogOpen(true)}
+                  className="w-full"
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Add Progress Report
+                </Button>
+              </div>
               <div className="space-y-6">
-                {order?.orderProgressReports?.sort((a, b) => b.reportDate.localeCompare(a.reportDate))?.map((report, index) => (
-                  <div key={report.id} className="relative pb-6 pl-6">
-                    {index !==
-                      (order?.orderProgressReports?.length || 0) - 1 && (
-                      <div className="bg-border absolute top-0 left-2 h-full w-px"></div>
-                    )}
-                    <div className="border-primary bg-background absolute top-0 left-0 h-4 w-4 rounded-full border-2"></div>
-                    <div className="mb-1 text-sm font-medium">
-                      {formatDate(report.reportDate)} at{' '}
-                      {formatTime(report.reportDate)}
-                    </div>
-                    <div className="text-sm">{report.note}</div>
-                    {report.imageUrls && report.imageUrls.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {report.imageUrls.map((url, idx) => (
-                          <div
-                            key={idx}
-                            className="relative h-16 w-16 overflow-hidden rounded-md"
-                          >
-                            <Image
-                              src={url || '/placeholder.svg'}
-                              alt={`Progress image ${idx + 1}`}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                        ))}
+                {order?.orderProgressReports
+                  ?.sort((a, b) => b.reportDate.localeCompare(a.reportDate))
+                  ?.map((report, index) => (
+                    <div key={report.id} className="relative pb-6 pl-6">
+                      {index !==
+                        (order?.orderProgressReports?.length || 0) - 1 && (
+                        <div className="bg-border absolute top-0 left-2 h-full w-px"></div>
+                      )}
+                      <div className="border-primary bg-background absolute top-0 left-0 h-4 w-4 rounded-full border-2"></div>
+                      <div className="mb-1 text-sm font-medium">
+                        {formatDate(report.reportDate)} at{' '}
+                        {formatTime(report.reportDate)}
                       </div>
-                    )}
-                  </div>
-                ))}
+                      <div className="text-sm">{report.note}</div>
+                      {report.imageUrls && report.imageUrls.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {report.imageUrls.map((url, idx) => (
+                            <div
+                              key={idx}
+                              className="relative h-16 w-16 overflow-hidden rounded-md"
+                            >
+                              <Image
+                                src={url || '/placeholder.svg'}
+                                alt={`Progress image ${idx + 1}`}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 {!order?.orderProgressReports?.length && (
                   <div className="text-muted-foreground py-6 text-center">
                     No progress updates available yet.
@@ -1162,7 +1217,6 @@ export default function FactoryOrderDetailsPage() {
                 )}
 
                 {/* Add Progress Report Button */}
-                
               </div>
             </CardContent>
           </Card>
