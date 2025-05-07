@@ -17,7 +17,7 @@ export function DashboardShell({
   const pathname = usePathname();
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pb-8">
       <div>
         <h1 className="text-lg font-semibold">{title}</h1>
         {subtitle && (

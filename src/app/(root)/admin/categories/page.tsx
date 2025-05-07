@@ -5,6 +5,7 @@ import { FolderCheckIcon, FolderIcon, FolderPlusIcon } from 'lucide-react';
 import CategoryTable from '@/app/(root)/admin/categories/_components/category-table';
 import { StatCard } from '@/components/stat-card';
 import { useGetAllCategoriesQuery } from '@/graphql/generated/graphql';
+import { DashboardShell } from '@/components/dashboard-shell';
 
 export default function CategoriesPage() {
   const { data, loading, refetch } = useGetAllCategoriesQuery();
@@ -28,7 +29,7 @@ export default function CategoriesPage() {
   const activeChange = Math.round(Math.random() * 5) + '%';
 
   return (
-    <div className="space-y-4">
+    <DashboardShell title="Categories" subtitle="Manage your categories">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Total Categories"
@@ -59,6 +60,6 @@ export default function CategoriesPage() {
           data={data?.categories}
         />
       </div>
-    </div>
+    </DashboardShell>
   );
 }

@@ -11,7 +11,10 @@ import {
 } from 'lucide-react';
 
 import { DashboardShell } from '@/components/dashboard-shell';
-import { StatCard } from '@/components/stat-card';
+import {
+  StatCard,
+  StatCardType as StatCardDisplay,
+} from '@/components/stat-card';
 import {
   Card,
   CardContent,
@@ -189,6 +192,8 @@ export default function AdminDashboard() {
     },
   ];
 
+  console.log(dashboardData.totalRevenue);
+
   return (
     <DashboardShell
       title="Admin Dashboard"
@@ -196,11 +201,10 @@ export default function AdminDashboard() {
     >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Total Sales"
-          value={Number(dashboardStats.totalSales.value)}
-          change={Number(dashboardStats.totalSales.change)}
-          changeType={dashboardStats.totalSales.changeType}
+          title={`Revenue (${new Date().toLocaleString('default', { month: 'long' })})`}
+          value={dashboardData.totalRevenue}
           icon={<DollarSignIcon className="h-5 w-5" />}
+          type={StatCardDisplay.CURRENCY}
         />
         <StatCard
           title="Active Users"
@@ -296,7 +300,7 @@ export default function AdminDashboard() {
                         fontSize="10"
                         fill="#64748b"
                       >
-                        ${Math.round(value).toLocaleString()}
+                        {formatPrice(Math.round(value))}
                       </text>
                       <line
                         x1="40"
@@ -381,6 +385,161 @@ export default function AdminDashboard() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Recent Orders</CardTitle>
+            <CardDescription>Most recent orders in the system</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {dashboardData.recentOrders.slice(0, 5).map(order => (
+                <div
+                  key={order.id}
+                  className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
+                >
+                  <div className="space-y-1">
+                    <p className="font-medium">
+                      Order #{order.id.substring(0, 8)}
+                    </p>
+                    <div className="text-muted-foreground flex items-center text-sm">
+                      <span className="mr-2">
+                        {new Date(order.orderDate).toLocaleDateString()}
+                      </span>
+                      <span className="mr-2">•</span>
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-1 text-xs ${
+                          order.status === 'COMPLETED'
+                            ? 'bg-green-100 text-green-800'
+                            : order.status === 'PENDING'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : order.status === 'CANCELLED'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-blue-100 text-blue-800'
+                        }`}
+                      >
+                        {order.status}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="font-semibold">
+                      {formatPrice(order.totalPrice)}
+                    </span>
+                    {order.factory && (
+                      <span className="text-muted-foreground text-sm">
+                        {order.factory.name}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Order Status</CardTitle>
+            <CardDescription>Distribution of order statuses</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Calculate order status distribution from recentOrders */}
+              {(() => {
+                // Group orders by status
+                const statusCounts = dashboardData.recentOrders.reduce(
+                  (acc, order) => {
+                    if (!acc[order.status]) {
+                      acc[order.status] = 0;
+                    }
+                    acc[order.status]++;
+                    return acc;
+                  },
+                  {} as Record<string, number>,
+                );
+
+                // Convert to array for easier rendering
+                return Object.entries(statusCounts)
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([status, count]) => (
+                    <div
+                      key={status}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center">
+                        <div
+                          className={`mr-3 h-3 w-3 rounded-full ${
+                            status === 'COMPLETED'
+                              ? 'bg-green-500'
+                              : status === 'PENDING'
+                                ? 'bg-yellow-500'
+                                : status === 'CANCELLED'
+                                  ? 'bg-red-500'
+                                  : 'bg-blue-500'
+                          }`}
+                        />
+                        <span className="font-medium">{status}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="font-semibold">{count}</span>
+                        <span className="text-muted-foreground ml-2 text-sm">
+                          (
+                          {Math.round(
+                            (count / dashboardData.recentOrders.length) * 100,
+                          )}
+                          %)
+                        </span>
+                      </div>
+                    </div>
+                  ));
+              })()}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle>Top Factories</CardTitle>
+            <CardDescription>
+              Factories with highest order count and revenue
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {dashboardData.factoryPerformance
+                .sort((a, b) => b.totalRevenue - a.totalRevenue)
+                .slice(0, 6)
+                .map((factory, index) => (
+                  <div
+                    key={factory.factoryId}
+                    className="flex items-center justify-between rounded-lg border p-4"
+                  >
+                    <div className="flex items-center">
+                      <div className="bg-primary/10 mr-3 flex h-8 w-8 items-center justify-center rounded-full">
+                        <span className="text-xs font-semibold">
+                          {index + 1}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="font-medium">
+                          Factory #{factory.factoryId.substring(0, 8)}
+                        </p>
+                        <p className="text-muted-foreground text-sm">
+                          {factory.orderCount} orders
+                        </p>
+                      </div>
+                    </div>
+                    <div className="font-semibold">
+                      {formatPrice(factory.totalRevenue)}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </CardContent>
+        </Card> */}
       </div>
     </DashboardShell>
   );

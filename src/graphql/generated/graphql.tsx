@@ -2750,6 +2750,13 @@ export type VerifyOtpMutationVariables = Exact<{
 
 export type VerifyOtpMutation = { __typename?: 'Mutation', verifyOTP: boolean };
 
+export type OrderInvoiceQueryVariables = Exact<{
+  orderId: Scalars['String']['input'];
+}>;
+
+
+export type OrderInvoiceQuery = { __typename?: 'Query', order: { __typename?: 'OrderEntity', acceptanceDeadline?: any | null, acceptedAt?: any | null, completedAt?: any | null, totalItems: number, address?: { __typename?: 'AddressEntity', formattedAddress?: string | null } | null, customer?: { __typename?: 'UserEntity', id: string, name?: string | null, imageUrl?: string | null, email?: string | null, phoneNumber?: string | null } | null, orderDetails?: Array<{ __typename?: 'OrderDetailEntity', quantity: number, createdAt: any, systemConfigVariant?: { __typename?: 'SystemConfigVariantEntity', size?: string | null, color?: string | null, id: string, price?: number | null } | null }> | null }, orderPriceDetails: { __typename?: 'OrderPriceDetailsResponse', basePrice: number, discountPercentage: number, finalPrice: number, priceAfterDiscount: number, priceAfterVoucher: number, shippingPrice: number, voucher?: { __typename?: 'VoucherEntity', code: string, createdAt: any, description?: string | null, id: string, isPublic: boolean, limitedUsage?: number | null, maxDiscountValue?: number | null, minOrderValue?: number | null, type: VoucherType, updatedAt?: any | null, userId?: string | null, value: number } | null } };
+
 export type ProductDesignsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -7381,6 +7388,91 @@ export function useVerifyOtpMutation(baseOptions?: Apollo.MutationHookOptions<Ve
 export type VerifyOtpMutationHookResult = ReturnType<typeof useVerifyOtpMutation>;
 export type VerifyOtpMutationResult = Apollo.MutationResult<VerifyOtpMutation>;
 export type VerifyOtpMutationOptions = Apollo.BaseMutationOptions<VerifyOtpMutation, VerifyOtpMutationVariables>;
+export const OrderInvoiceDocument = gql`
+    query OrderInvoice($orderId: String!) {
+  order(id: $orderId) {
+    acceptanceDeadline
+    acceptedAt
+    address {
+      formattedAddress
+    }
+    completedAt
+    customer {
+      id
+      name
+      imageUrl
+      email
+      phoneNumber
+    }
+    orderDetails {
+      quantity
+      systemConfigVariant {
+        size
+        color
+        id
+        price
+      }
+      createdAt
+    }
+    totalItems
+  }
+  orderPriceDetails(orderId: $orderId) {
+    basePrice
+    discountPercentage
+    finalPrice
+    priceAfterDiscount
+    priceAfterVoucher
+    shippingPrice
+    voucher {
+      code
+      createdAt
+      description
+      id
+      isPublic
+      limitedUsage
+      maxDiscountValue
+      minOrderValue
+      type
+      updatedAt
+      userId
+      value
+    }
+  }
+}
+    `;
+
+/**
+ * __useOrderInvoiceQuery__
+ *
+ * To run a query within a React component, call `useOrderInvoiceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrderInvoiceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrderInvoiceQuery({
+ *   variables: {
+ *      orderId: // value for 'orderId'
+ *   },
+ * });
+ */
+export function useOrderInvoiceQuery(baseOptions: Apollo.QueryHookOptions<OrderInvoiceQuery, OrderInvoiceQueryVariables> & ({ variables: OrderInvoiceQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OrderInvoiceQuery, OrderInvoiceQueryVariables>(OrderInvoiceDocument, options);
+      }
+export function useOrderInvoiceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OrderInvoiceQuery, OrderInvoiceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OrderInvoiceQuery, OrderInvoiceQueryVariables>(OrderInvoiceDocument, options);
+        }
+export function useOrderInvoiceSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OrderInvoiceQuery, OrderInvoiceQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OrderInvoiceQuery, OrderInvoiceQueryVariables>(OrderInvoiceDocument, options);
+        }
+export type OrderInvoiceQueryHookResult = ReturnType<typeof useOrderInvoiceQuery>;
+export type OrderInvoiceLazyQueryHookResult = ReturnType<typeof useOrderInvoiceLazyQuery>;
+export type OrderInvoiceSuspenseQueryHookResult = ReturnType<typeof useOrderInvoiceSuspenseQuery>;
+export type OrderInvoiceQueryResult = Apollo.QueryResult<OrderInvoiceQuery, OrderInvoiceQueryVariables>;
 export const ProductDesignsDocument = gql`
     query ProductDesigns {
   productDesigns {

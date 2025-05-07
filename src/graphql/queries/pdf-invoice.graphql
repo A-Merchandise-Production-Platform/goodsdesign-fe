@@ -1,0 +1,52 @@
+query OrderInvoice($orderId: String!) {
+  order(id: $orderId) {
+    acceptanceDeadline
+    acceptedAt
+    address {
+      formattedAddress
+    }
+    completedAt
+    customer {
+      id
+      name
+      imageUrl
+      email
+      phoneNumber
+    }
+
+    orderDetails {
+      quantity
+      systemConfigVariant {
+        size
+        color
+        id
+        price
+      }
+      createdAt
+    }
+    totalItems
+  }
+
+  orderPriceDetails(orderId: $orderId) {
+    basePrice
+    discountPercentage
+    finalPrice
+    priceAfterDiscount
+    priceAfterVoucher
+    shippingPrice
+    voucher {
+      code
+      createdAt
+      description
+      id
+      isPublic
+      limitedUsage
+      maxDiscountValue
+      minOrderValue
+      type
+      updatedAt
+      userId
+      value
+    }
+  }
+}

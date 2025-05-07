@@ -5,6 +5,7 @@ import { UserCheckIcon, UserPlusIcon, UsersIcon } from 'lucide-react';
 import UserTable from '@/app/(root)/admin/users/_components/user-table';
 import { StatCard } from '@/components/stat-card';
 import { Roles, useGetUsersQuery } from '@/graphql/generated/graphql';
+import { DashboardShell } from '@/components/dashboard-shell';
 
 export default function Page() {
   const { data, loading, refetch } = useGetUsersQuery();
@@ -22,7 +23,7 @@ export default function Page() {
   const activeUsers = data?.users?.filter(user => user.isActive).length || 0;
 
   return (
-    <div className="space-y-4">
+    <DashboardShell title="Users" subtitle="Manage your users">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Total Users"
@@ -49,6 +50,6 @@ export default function Page() {
       <div className="bg-background col-span-3 row-span-3 rounded-lg">
         <UserTable refetch={refetch} loading={loading} data={data?.users} />
       </div>
-    </div>
+    </DashboardShell>
   );
 }
