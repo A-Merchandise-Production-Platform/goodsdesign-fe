@@ -1388,3 +1388,9 @@ mutation GenerateAndUploadImage($prompt: String!) {
     url
   }
 }
+
+mutation TransferOrderToFactory($newFactoryId: String!, $orderId: String!) {
+  transferOrderToFactory(newFactoryId: $newFactoryId, orderId: $orderId) {
+  id  
+  }
+}

@@ -683,6 +683,7 @@ export type Mutation = {
   startReworkByManager: OrderEntity;
   toggleActiveCategory: CategoryEntity;
   toggleActiveProduct: ProductEntity;
+  transferOrderToFactory: OrderEntity;
   updateAddress: AddressEntity;
   updateCartItem: CartItemEntity;
   updateCategory: CategoryEntity;
@@ -1066,6 +1067,12 @@ export type MutationToggleActiveProductArgs = {
 };
 
 
+export type MutationTransferOrderToFactoryArgs = {
+  newFactoryId: Scalars['String']['input'];
+  orderId: Scalars['String']['input'];
+};
+
+
 export type MutationUpdateAddressArgs = {
   id: Scalars['String']['input'];
   updateAddressInput: UpdateAddressInput;
@@ -1364,6 +1371,17 @@ export type OrderLogDto = {
   updated_date: Scalars['String']['output'];
 };
 
+export type OrderPriceDetailsResponse = {
+  __typename?: 'OrderPriceDetailsResponse';
+  basePrice: Scalars['Int']['output'];
+  discountPercentage: Scalars['Float']['output'];
+  finalPrice: Scalars['Int']['output'];
+  priceAfterDiscount: Scalars['Int']['output'];
+  priceAfterVoucher: Scalars['Int']['output'];
+  shippingPrice: Scalars['Int']['output'];
+  voucher?: Maybe<VoucherEntity>;
+};
+
 export type OrderProgressReportEntity = {
   __typename?: 'OrderProgressReportEntity';
   id: Scalars['ID']['output'];
@@ -1569,6 +1587,7 @@ export type Query = {
   notifications: Array<NotificationEntity>;
   notificationsByUserId: Array<NotificationEntity>;
   order: OrderEntity;
+  orderPriceDetails: OrderPriceDetailsResponse;
   orders: Array<OrderEntity>;
   ordersByFactoryId: Array<OrderEntity>;
   paymentTransaction?: Maybe<PaymentTransactionEntity>;
@@ -1727,6 +1746,11 @@ export type QueryNotificationsByUserIdArgs = {
 
 export type QueryOrderArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type QueryOrderPriceDetailsArgs = {
+  orderId: Scalars['String']['input'];
 };
 
 
@@ -2704,6 +2728,14 @@ export type GenerateAndUploadImageMutationVariables = Exact<{
 
 
 export type GenerateAndUploadImageMutation = { __typename?: 'Mutation', generateAndUploadImage: { __typename?: 'FileUploadResponse', url: string } };
+
+export type TransferOrderToFactoryMutationVariables = Exact<{
+  newFactoryId: Scalars['String']['input'];
+  orderId: Scalars['String']['input'];
+}>;
+
+
+export type TransferOrderToFactoryMutation = { __typename?: 'Mutation', transferOrderToFactory: { __typename?: 'OrderEntity', id: string } };
 
 export type GetExpiredTimeQueryVariables = Exact<{
   email: Scalars['String']['input'];
@@ -7198,6 +7230,40 @@ export function useGenerateAndUploadImageMutation(baseOptions?: Apollo.MutationH
 export type GenerateAndUploadImageMutationHookResult = ReturnType<typeof useGenerateAndUploadImageMutation>;
 export type GenerateAndUploadImageMutationResult = Apollo.MutationResult<GenerateAndUploadImageMutation>;
 export type GenerateAndUploadImageMutationOptions = Apollo.BaseMutationOptions<GenerateAndUploadImageMutation, GenerateAndUploadImageMutationVariables>;
+export const TransferOrderToFactoryDocument = gql`
+    mutation TransferOrderToFactory($newFactoryId: String!, $orderId: String!) {
+  transferOrderToFactory(newFactoryId: $newFactoryId, orderId: $orderId) {
+    id
+  }
+}
+    `;
+export type TransferOrderToFactoryMutationFn = Apollo.MutationFunction<TransferOrderToFactoryMutation, TransferOrderToFactoryMutationVariables>;
+
+/**
+ * __useTransferOrderToFactoryMutation__
+ *
+ * To run a mutation, you first call `useTransferOrderToFactoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTransferOrderToFactoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [transferOrderToFactoryMutation, { data, loading, error }] = useTransferOrderToFactoryMutation({
+ *   variables: {
+ *      newFactoryId: // value for 'newFactoryId'
+ *      orderId: // value for 'orderId'
+ *   },
+ * });
+ */
+export function useTransferOrderToFactoryMutation(baseOptions?: Apollo.MutationHookOptions<TransferOrderToFactoryMutation, TransferOrderToFactoryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<TransferOrderToFactoryMutation, TransferOrderToFactoryMutationVariables>(TransferOrderToFactoryDocument, options);
+      }
+export type TransferOrderToFactoryMutationHookResult = ReturnType<typeof useTransferOrderToFactoryMutation>;
+export type TransferOrderToFactoryMutationResult = Apollo.MutationResult<TransferOrderToFactoryMutation>;
+export type TransferOrderToFactoryMutationOptions = Apollo.BaseMutationOptions<TransferOrderToFactoryMutation, TransferOrderToFactoryMutationVariables>;
 export const GetExpiredTimeDocument = gql`
     query GetExpiredTime($email: String!) {
   getExpiredTime(email: $email)

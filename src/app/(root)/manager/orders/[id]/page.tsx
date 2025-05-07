@@ -87,6 +87,7 @@ import {
   useSpeedUpOrderMutation,
   useStartReworkByManagerMutation,
   useSystemConfigOrderQuery,
+  useTransferOrderToFactoryMutation,
 } from '@/graphql/generated/graphql';
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
 import { cn, formatDate } from '@/lib/utils';
@@ -146,6 +147,7 @@ export default function FactoryOrderDetailsPage() {
   const [showAssignFactoryDialog, setShowAssignFactoryDialog] = useState(false);
   const [showRefundDialog, setShowRefundDialog] = useState(false);
   const [showWithdrawalDialog, setShowWithdrawalDialog] = useState(false);
+  const [showTransferFactoryDialog, setShowTransferFactoryDialog] = useState(false);
   const [selectedPaymentId, setSelectedPaymentId] = useState<string>('');
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
 
@@ -154,6 +156,21 @@ export default function FactoryOrderDetailsPage() {
       toast.success('Order speed up successfully');
       refetch();
     },
+    onError: error => {
+      toast.error(error.message);
+    },
+  });
+
+  const [transferOrderToFactory, { loading: transferOrderToFactoryLoading }] = useTransferOrderToFactoryMutation({
+    onCompleted: () => {
+      toast.success('Order transferred to factory successfully');
+      refetch();
+      setShowTransferFactoryDialog(false);
+    },
+    onError: error => {
+      toast.error(error.message);
+    },
+    refetchQueries: ['GetOrder'],
   });
 
   const { data: factoryScores } = useFactoryScoresForOrderQuery({
@@ -558,6 +575,15 @@ export default function FactoryOrderDetailsPage() {
     }
 
     return null;
+  };
+
+  const handleTransferFactory = (newFactoryId: string) => {
+    transferOrderToFactory({
+      variables: {
+        orderId: id,
+        newFactoryId,
+      }
+    });
   };
 
   return (
@@ -1272,6 +1298,24 @@ export default function FactoryOrderDetailsPage() {
                       Process Refund
                     </Button>
                   </div>
+
+                  {/* Transfer Factory Button */}
+                  <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
+                    <div className="mb-4">
+                      <h3 className="mb-1 font-medium text-destructive">Transfer to Different Factory</h3>
+                      <p className="text-sm text-destructive/80">
+                        Transfer this order to a different factory
+                      </p>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      onClick={() => setShowTransferFactoryDialog(true)}
+                      className="w-full"
+                    >
+                      <Truck className="mr-2 h-4 w-4" />
+                      Transfer Factory
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Warning Message */}
@@ -1608,6 +1652,47 @@ export default function FactoryOrderDetailsPage() {
               </DialogFooter>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Transfer Factory Dialog */}
+      <Dialog
+        open={showTransferFactoryDialog}
+        onOpenChange={setShowTransferFactoryDialog}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Transfer to Different Factory</DialogTitle>
+            <DialogDescription>
+              Select a new factory to handle this order's production
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid gap-4">
+              {factories?.getAllFactories?.map(factory => (
+                <div
+                  key={factory.factoryOwnerId}
+                  className="flex cursor-pointer items-center justify-between rounded-lg border p-4 hover:bg-muted/50"
+                  onClick={() => handleTransferFactory(factory.factoryOwnerId)}
+                >
+                  <div>
+                    <h4 className="font-medium">{factory.name}</h4>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={transferOrderToFactoryLoading}
+                  >
+                    {transferOrderToFactoryLoading ? (
+                      <Clock className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Truck className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
