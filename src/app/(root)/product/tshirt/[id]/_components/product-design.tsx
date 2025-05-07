@@ -1398,7 +1398,7 @@ export default function ProductDesigner({
       fabricCanvasRef.current?.add(fabricImage);
       fabricCanvasRef.current?.setActiveObject(fabricImage);
       fabricCanvasRef.current?.renderAll();
-      
+
       // Update texture for live preview
       debounceTextureUpdate();
       // Save design and trigger API update

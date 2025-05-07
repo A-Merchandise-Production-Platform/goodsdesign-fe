@@ -281,7 +281,7 @@ export default function MyStaffTasksPage() {
                                       '/placeholder.svg?height=64&width=64'
                                     }
                                     alt={
-                                      item.systemConfigVariant?.product?.name ||
+                                      item.design.systemConfigVariant?.product?.name ||
                                       'Product'
                                     }
                                     fill
@@ -290,23 +290,23 @@ export default function MyStaffTasksPage() {
                                 </div>
                                 <div>
                                   <h3 className="font-medium">
-                                    {item.systemConfigVariant?.product?.name}
+                                    {item.design.systemConfigVariant?.product?.name}
                                   </h3>
                                   <p className="text-muted-foreground text-sm">
                                     Quantity: {item.quantity} • Size:{' '}
-                                    {item.systemConfigVariant?.size}
+                                    {item.design.systemConfigVariant?.size}
                                   </p>
                                   <div className="mt-1 flex items-center gap-1">
                                     <span
                                       className="inline-block h-3 w-3 rounded-full"
                                       style={{
                                         backgroundColor:
-                                          item.systemConfigVariant?.color ||
-                                          'transparent',
+                                          item.design.systemConfigVariant
+                                            ?.color || 'transparent',
                                       }}
                                     ></span>
                                     <span className="text-xs">
-                                      {item.systemConfigVariant?.color}
+                                      {item.design.systemConfigVariant?.color}
                                     </span>
                                   </div>
                                 </div>
