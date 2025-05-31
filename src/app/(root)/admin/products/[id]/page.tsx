@@ -22,6 +22,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGetProductByIdQuery } from '@/graphql/generated/graphql';
 import { formatPrice } from '@/lib/utils';
+import EvaluationCriteriaTab from '@/app/(root)/admin/products/[id]/_components/evaluation-criteria-tab';
 
 export default function ProductDetailPage() {
   const router = useRouter();
@@ -101,6 +102,9 @@ export default function ProductDetailPage() {
                 <TabsTrigger value="details">Details</TabsTrigger>
                 <TabsTrigger value="variants">Variants</TabsTrigger>
                 <TabsTrigger value="discount">Discount</TabsTrigger>
+                <TabsTrigger value="evaluation-criteria">
+                  Evaluation Criteria
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="details" className="space-y-4">
@@ -113,6 +117,10 @@ export default function ProductDetailPage() {
 
               <TabsContent value="discount">
                 <DiscountTab />
+              </TabsContent>
+
+              <TabsContent value="evaluation-criteria">
+                <EvaluationCriteriaTab productId={id as string} />
               </TabsContent>
             </Tabs>
           </CardContent>

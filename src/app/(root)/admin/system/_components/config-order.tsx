@@ -41,6 +41,8 @@ export default function SystemConfigOrder() {
   console.log(configValues);
   const [editedFields, setEditedFields] = useState<Set<string>>(new Set());
 
+  console.log(data?.systemConfigOrder);
+
   // Scoring weight fields
   const scoringWeightFields = [
     'capacityScoreWeight',
@@ -463,6 +465,22 @@ export default function SystemConfigOrder() {
             step="1"
             min="0"
           />
+
+          <ConfigField
+            label="Max Evaluation Criteria"
+            name="maxEvaluationCriteria"
+            value={configValues.maxEvaluationCriteria}
+            description="Maximum number of evaluation criteria allowed in the system"
+            onChange={value =>
+              handleInputChange('maxEvaluationCriteria', value)
+            }
+            onSave={() => handleUpdateConfig('maxEvaluationCriteria')}
+            isEdited={editedFields.has('maxEvaluationCriteria')}
+            isLoading={updateConfigOrderLoading}
+            isValid={true}
+            step="1"
+            min="1"
+          />
         </CardContent>
       </Card>
 
@@ -571,7 +589,7 @@ export default function SystemConfigOrder() {
               <Input
                 id="voucherBaseValueForRefund"
                 type="number"
-                value={configValues.voucherBaseValueForRefund}
+                value={configValues.voucherBaseValueForRefund ?? ''}
                 onChange={e =>
                   handleInputChange('voucherBaseValueForRefund', e.target.value)
                 }
@@ -605,7 +623,7 @@ export default function SystemConfigOrder() {
               <Input
                 id="voucherBaseMaxDiscountValue"
                 type="number"
-                value={configValues.voucherBaseMaxDiscountValue}
+                value={configValues.voucherBaseMaxDiscountValue ?? ''}
                 onChange={e =>
                   handleInputChange(
                     'voucherBaseMaxDiscountValue',
@@ -629,7 +647,7 @@ export default function SystemConfigOrder() {
               <Input
                 id="voucherBaseLimitedUsage"
                 type="number"
-                value={configValues.voucherBaseLimitedUsage}
+                value={configValues.voucherBaseLimitedUsage ?? ''}
                 onChange={e =>
                   handleInputChange('voucherBaseLimitedUsage', e.target.value)
                 }
@@ -730,7 +748,7 @@ function ConfigField({
         <Input
           id={name}
           type="number"
-          value={value}
+          value={value ?? ''}
           onChange={e => onChange(e.target.value)}
           step={step}
           min={min}
