@@ -1,0 +1,37 @@
+query EvaluationCriteriaByProduct($productId: ID!) {
+  evaluationCriteriaByProduct(productId: $productId) {
+    createdAt
+    description
+    id
+    isActive
+    isDeleted
+    name
+    updatedAt
+  }
+}
+
+mutation CreateEvaluationCriteria(
+  $createEvaluationCriteriaInput: CreateEvaluationCriteriaInput!
+) {
+  createEvaluationCriteria(
+    createEvaluationCriteriaInput: $createEvaluationCriteriaInput
+  ) {
+    id
+  }
+}
+
+mutation UpdateEvaluationCriteria(
+  $updateEvaluationCriteriaInput: UpdateEvaluationCriteriaInput!
+) {
+  updateEvaluationCriteria(
+    updateEvaluationCriteriaInput: $updateEvaluationCriteriaInput
+  ) {
+    id
+  }
+}
+
+mutation RemoveEvaluationCriteria($removeEvaluationCriteriaId: ID!) {
+  removeEvaluationCriteria(id: $removeEvaluationCriteriaId) {
+    id
+  }
+}

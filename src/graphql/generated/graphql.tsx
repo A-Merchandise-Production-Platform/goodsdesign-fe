@@ -151,6 +151,13 @@ export type CreateCategoryDto = {
   name: Scalars['String']['input'];
 };
 
+export type CreateEvaluationCriteriaInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  isActive?: Scalars['Boolean']['input'];
+  name: Scalars['String']['input'];
+  productId: Scalars['String']['input'];
+};
+
 export type CreateFactoryProductInput = {
   factoryId: Scalars['String']['input'];
   productionCapacity: Scalars['Int']['input'];
@@ -164,6 +171,7 @@ export type CreateOrderDetailInput = {
 
 export type CreateOrderInput = {
   addressId: Scalars['String']['input'];
+  evaluationCriteriaIds?: InputMaybe<Array<Scalars['String']['input']>>;
   orderDetails: Array<CreateOrderDetailInput>;
   voucherId?: InputMaybe<Scalars['String']['input']>;
 };
@@ -328,6 +336,19 @@ export type EnhancedStaffStats = {
   change: Scalars['Int']['output'];
   changeType: ChangeType;
   total: Scalars['Int']['output'];
+};
+
+export type EvaluationCriteriaEntity = {
+  __typename?: 'EvaluationCriteriaEntity';
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  isDeleted: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  product: ProductEntity;
+  productId: Scalars['ID']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type FactoryDashboardResponse = {
@@ -600,6 +621,7 @@ export type Mutation = {
   createAddress: AddressEntity;
   createCartItem: CartItemEntity;
   createCategory: CategoryEntity;
+  createEvaluationCriteria: EvaluationCriteriaEntity;
   createFactoryProduct: FactoryProductEntity;
   createNotification: NotificationEntity;
   createNotificationForManyUsers: Array<NotificationEntity>;
@@ -641,6 +663,7 @@ export type Mutation = {
   refreshToken: AuthResponseDto;
   register: AuthResponseDto;
   rejectOrder: OrderEntity;
+  removeEvaluationCriteria: EvaluationCriteriaEntity;
   removePaymentTransaction: PaymentTransactionEntity;
   removeProductDesign: ProductDesignEntity;
   removeProductPositionType: ProductPositionTypeEntity;
@@ -662,6 +685,7 @@ export type Mutation = {
   updateCartItem: CartItemEntity;
   updateCategory: CategoryEntity;
   updateDesignPosition: DesignPositionEntity;
+  updateEvaluationCriteria: EvaluationCriteriaEntity;
   updateFactoryInfo: FactoryEntity;
   updateFactoryProduct: FactoryProductEntity;
   updatePaymentTransaction: PaymentTransactionEntity;
@@ -741,6 +765,11 @@ export type MutationCreateCartItemArgs = {
 
 export type MutationCreateCategoryArgs = {
   createCategoryInput: CreateCategoryDto;
+};
+
+
+export type MutationCreateEvaluationCriteriaArgs = {
+  createEvaluationCriteriaInput: CreateEvaluationCriteriaInput;
 };
 
 
@@ -961,6 +990,11 @@ export type MutationRejectOrderArgs = {
 };
 
 
+export type MutationRemoveEvaluationCriteriaArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationRemovePaymentTransactionArgs = {
   id: Scalars['ID']['input'];
 };
@@ -1067,6 +1101,11 @@ export type MutationUpdateCategoryArgs = {
 
 export type MutationUpdateDesignPositionArgs = {
   input: UpdateDesignPositionDto;
+};
+
+
+export type MutationUpdateEvaluationCriteriaArgs = {
+  updateEvaluationCriteriaInput: UpdateEvaluationCriteriaInput;
 };
 
 
@@ -1252,6 +1291,7 @@ export type OrderEntity = {
   orderCode?: Maybe<Scalars['String']['output']>;
   orderDate: Scalars['DateTime']['output'];
   orderDetails?: Maybe<Array<OrderDetailEntity>>;
+  orderEvaluationCriteria?: Maybe<Array<OrderEvaluationCriteriaEntity>>;
   orderProgressReports?: Maybe<Array<OrderProgressReportEntity>>;
   payments?: Maybe<Array<PaymentEntity>>;
   ratedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -1266,6 +1306,16 @@ export type OrderEntity = {
   totalItems: Scalars['Int']['output'];
   totalPrice: Scalars['Int']['output'];
   totalProductionCost?: Maybe<Scalars['Int']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type OrderEvaluationCriteriaEntity = {
+  __typename?: 'OrderEvaluationCriteriaEntity';
+  createdAt: Scalars['DateTime']['output'];
+  evaluationCriteria: EvaluationCriteriaEntity;
+  evaluationCriteriaId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  orderId: Scalars['ID']['output'];
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
@@ -1519,6 +1569,8 @@ export type Query = {
   distinctVariantAttributes: VariantAttributes;
   district: District;
   districts: Array<District>;
+  evaluationCriteria: EvaluationCriteriaEntity;
+  evaluationCriteriaByProduct: Array<EvaluationCriteriaEntity>;
   factoryOrders: Array<OrderEntity>;
   factoryProduct: FactoryProductEntity;
   factoryProducts: Array<FactoryProductEntity>;
@@ -1623,6 +1675,16 @@ export type QueryDistrictArgs = {
 
 export type QueryDistrictsArgs = {
   provinceId: Scalars['Int']['input'];
+};
+
+
+export type QueryEvaluationCriteriaArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryEvaluationCriteriaByProductArgs = {
+  productId: Scalars['ID']['input'];
 };
 
 
@@ -1966,6 +2028,7 @@ export type SystemConfigOrderEntity = {
   legitPointToSuspend: Scalars['Int']['output'];
   limitFactoryRejectOrders: Scalars['Int']['output'];
   limitReworkTimes: Scalars['Int']['output'];
+  maxEvaluationCriteria: Scalars['Int']['output'];
   maxLegitPoint: Scalars['Int']['output'];
   maxProductionCapacity: Scalars['Int']['output'];
   maxProductionTimeInMinutes: Scalars['Int']['output'];
@@ -2057,6 +2120,14 @@ export type UpdateDesignPositionDto = {
   designId: Scalars['String']['input'];
   designJSON?: InputMaybe<Scalars['JSON']['input']>;
   productPositionTypeId: Scalars['String']['input'];
+};
+
+export type UpdateEvaluationCriteriaInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  productId?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Update factory information input */
@@ -2168,6 +2239,7 @@ export type UpdateSystemConfigOrderDto = {
   legitPointToSuspend?: InputMaybe<Scalars['Int']['input']>;
   limitFactoryRejectOrders?: InputMaybe<Scalars['Int']['input']>;
   limitReworkTimes?: InputMaybe<Scalars['Int']['input']>;
+  maxEvaluationCriteria?: InputMaybe<Scalars['Int']['input']>;
   maxLegitPoint?: InputMaybe<Scalars['Int']['input']>;
   maxProductionCapacity?: InputMaybe<Scalars['Int']['input']>;
   maxProductionTimeInMinutes?: InputMaybe<Scalars['Int']['input']>;
@@ -2473,6 +2545,34 @@ export type UpdateDesignPositionMutationVariables = Exact<{
 
 
 export type UpdateDesignPositionMutation = { __typename?: 'Mutation', updateDesignPosition: { __typename?: 'DesignPositionEntity', designJSON?: any | null, positionType?: { __typename?: 'ProductPositionTypeEntity', positionName: string, basePrice: number } | null } };
+
+export type EvaluationCriteriaByProductQueryVariables = Exact<{
+  productId: Scalars['ID']['input'];
+}>;
+
+
+export type EvaluationCriteriaByProductQuery = { __typename?: 'Query', evaluationCriteriaByProduct: Array<{ __typename?: 'EvaluationCriteriaEntity', createdAt: any, description?: string | null, id: string, isActive: boolean, isDeleted: boolean, name: string, updatedAt?: any | null }> };
+
+export type CreateEvaluationCriteriaMutationVariables = Exact<{
+  createEvaluationCriteriaInput: CreateEvaluationCriteriaInput;
+}>;
+
+
+export type CreateEvaluationCriteriaMutation = { __typename?: 'Mutation', createEvaluationCriteria: { __typename?: 'EvaluationCriteriaEntity', id: string } };
+
+export type UpdateEvaluationCriteriaMutationVariables = Exact<{
+  updateEvaluationCriteriaInput: UpdateEvaluationCriteriaInput;
+}>;
+
+
+export type UpdateEvaluationCriteriaMutation = { __typename?: 'Mutation', updateEvaluationCriteria: { __typename?: 'EvaluationCriteriaEntity', id: string } };
+
+export type RemoveEvaluationCriteriaMutationVariables = Exact<{
+  removeEvaluationCriteriaId: Scalars['ID']['input'];
+}>;
+
+
+export type RemoveEvaluationCriteriaMutation = { __typename?: 'Mutation', removeEvaluationCriteria: { __typename?: 'EvaluationCriteriaEntity', id: string } };
 
 export type GetMyFactoryQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2959,7 +3059,7 @@ export type RemoveSystemConfigBankMutation = { __typename?: 'Mutation', removeSy
 export type SystemConfigOrderQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type SystemConfigOrderQuery = { __typename?: 'Query', systemConfigOrder: { __typename?: 'SystemConfigOrderEntity', acceptHoursForFactory: number, capacityScoreWeight: number, checkQualityTimesDays: number, leadTimeScoreWeight: number, legitPointScoreWeight: number, legitPointToSuspend: number, limitFactoryRejectOrders: number, limitReworkTimes: number, maxLegitPoint: number, maxProductionCapacity: number, maxProductionTimeInMinutes: number, productionCapacityScoreWeight: number, reduceLegitPointIfReject: number, shippingDays: number, specializationScoreWeight: number, voucherBaseTypeForRefund: VoucherType, voucherBaseValueForRefund: number, voucherBaseLimitedUsage: number, voucherBaseMaxDiscountValue: number } };
+export type SystemConfigOrderQuery = { __typename?: 'Query', systemConfigOrder: { __typename?: 'SystemConfigOrderEntity', acceptHoursForFactory: number, capacityScoreWeight: number, checkQualityTimesDays: number, leadTimeScoreWeight: number, legitPointScoreWeight: number, legitPointToSuspend: number, limitFactoryRejectOrders: number, limitReworkTimes: number, maxLegitPoint: number, maxProductionCapacity: number, maxProductionTimeInMinutes: number, productionCapacityScoreWeight: number, reduceLegitPointIfReject: number, shippingDays: number, specializationScoreWeight: number, voucherBaseTypeForRefund: VoucherType, voucherBaseValueForRefund: number, voucherBaseLimitedUsage: number, voucherBaseMaxDiscountValue: number, maxEvaluationCriteria: number } };
 
 export type UpdateSystemConfigOrderMutationVariables = Exact<{
   updateConfigInput: UpdateSystemConfigOrderDto;
@@ -4484,6 +4584,155 @@ export function useUpdateDesignPositionMutation(baseOptions?: Apollo.MutationHoo
 export type UpdateDesignPositionMutationHookResult = ReturnType<typeof useUpdateDesignPositionMutation>;
 export type UpdateDesignPositionMutationResult = Apollo.MutationResult<UpdateDesignPositionMutation>;
 export type UpdateDesignPositionMutationOptions = Apollo.BaseMutationOptions<UpdateDesignPositionMutation, UpdateDesignPositionMutationVariables>;
+export const EvaluationCriteriaByProductDocument = gql`
+    query EvaluationCriteriaByProduct($productId: ID!) {
+  evaluationCriteriaByProduct(productId: $productId) {
+    createdAt
+    description
+    id
+    isActive
+    isDeleted
+    name
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useEvaluationCriteriaByProductQuery__
+ *
+ * To run a query within a React component, call `useEvaluationCriteriaByProductQuery` and pass it any options that fit your needs.
+ * When your component renders, `useEvaluationCriteriaByProductQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useEvaluationCriteriaByProductQuery({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *   },
+ * });
+ */
+export function useEvaluationCriteriaByProductQuery(baseOptions: Apollo.QueryHookOptions<EvaluationCriteriaByProductQuery, EvaluationCriteriaByProductQueryVariables> & ({ variables: EvaluationCriteriaByProductQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<EvaluationCriteriaByProductQuery, EvaluationCriteriaByProductQueryVariables>(EvaluationCriteriaByProductDocument, options);
+      }
+export function useEvaluationCriteriaByProductLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<EvaluationCriteriaByProductQuery, EvaluationCriteriaByProductQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<EvaluationCriteriaByProductQuery, EvaluationCriteriaByProductQueryVariables>(EvaluationCriteriaByProductDocument, options);
+        }
+export function useEvaluationCriteriaByProductSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<EvaluationCriteriaByProductQuery, EvaluationCriteriaByProductQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<EvaluationCriteriaByProductQuery, EvaluationCriteriaByProductQueryVariables>(EvaluationCriteriaByProductDocument, options);
+        }
+export type EvaluationCriteriaByProductQueryHookResult = ReturnType<typeof useEvaluationCriteriaByProductQuery>;
+export type EvaluationCriteriaByProductLazyQueryHookResult = ReturnType<typeof useEvaluationCriteriaByProductLazyQuery>;
+export type EvaluationCriteriaByProductSuspenseQueryHookResult = ReturnType<typeof useEvaluationCriteriaByProductSuspenseQuery>;
+export type EvaluationCriteriaByProductQueryResult = Apollo.QueryResult<EvaluationCriteriaByProductQuery, EvaluationCriteriaByProductQueryVariables>;
+export const CreateEvaluationCriteriaDocument = gql`
+    mutation CreateEvaluationCriteria($createEvaluationCriteriaInput: CreateEvaluationCriteriaInput!) {
+  createEvaluationCriteria(
+    createEvaluationCriteriaInput: $createEvaluationCriteriaInput
+  ) {
+    id
+  }
+}
+    `;
+export type CreateEvaluationCriteriaMutationFn = Apollo.MutationFunction<CreateEvaluationCriteriaMutation, CreateEvaluationCriteriaMutationVariables>;
+
+/**
+ * __useCreateEvaluationCriteriaMutation__
+ *
+ * To run a mutation, you first call `useCreateEvaluationCriteriaMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateEvaluationCriteriaMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createEvaluationCriteriaMutation, { data, loading, error }] = useCreateEvaluationCriteriaMutation({
+ *   variables: {
+ *      createEvaluationCriteriaInput: // value for 'createEvaluationCriteriaInput'
+ *   },
+ * });
+ */
+export function useCreateEvaluationCriteriaMutation(baseOptions?: Apollo.MutationHookOptions<CreateEvaluationCriteriaMutation, CreateEvaluationCriteriaMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateEvaluationCriteriaMutation, CreateEvaluationCriteriaMutationVariables>(CreateEvaluationCriteriaDocument, options);
+      }
+export type CreateEvaluationCriteriaMutationHookResult = ReturnType<typeof useCreateEvaluationCriteriaMutation>;
+export type CreateEvaluationCriteriaMutationResult = Apollo.MutationResult<CreateEvaluationCriteriaMutation>;
+export type CreateEvaluationCriteriaMutationOptions = Apollo.BaseMutationOptions<CreateEvaluationCriteriaMutation, CreateEvaluationCriteriaMutationVariables>;
+export const UpdateEvaluationCriteriaDocument = gql`
+    mutation UpdateEvaluationCriteria($updateEvaluationCriteriaInput: UpdateEvaluationCriteriaInput!) {
+  updateEvaluationCriteria(
+    updateEvaluationCriteriaInput: $updateEvaluationCriteriaInput
+  ) {
+    id
+  }
+}
+    `;
+export type UpdateEvaluationCriteriaMutationFn = Apollo.MutationFunction<UpdateEvaluationCriteriaMutation, UpdateEvaluationCriteriaMutationVariables>;
+
+/**
+ * __useUpdateEvaluationCriteriaMutation__
+ *
+ * To run a mutation, you first call `useUpdateEvaluationCriteriaMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateEvaluationCriteriaMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateEvaluationCriteriaMutation, { data, loading, error }] = useUpdateEvaluationCriteriaMutation({
+ *   variables: {
+ *      updateEvaluationCriteriaInput: // value for 'updateEvaluationCriteriaInput'
+ *   },
+ * });
+ */
+export function useUpdateEvaluationCriteriaMutation(baseOptions?: Apollo.MutationHookOptions<UpdateEvaluationCriteriaMutation, UpdateEvaluationCriteriaMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateEvaluationCriteriaMutation, UpdateEvaluationCriteriaMutationVariables>(UpdateEvaluationCriteriaDocument, options);
+      }
+export type UpdateEvaluationCriteriaMutationHookResult = ReturnType<typeof useUpdateEvaluationCriteriaMutation>;
+export type UpdateEvaluationCriteriaMutationResult = Apollo.MutationResult<UpdateEvaluationCriteriaMutation>;
+export type UpdateEvaluationCriteriaMutationOptions = Apollo.BaseMutationOptions<UpdateEvaluationCriteriaMutation, UpdateEvaluationCriteriaMutationVariables>;
+export const RemoveEvaluationCriteriaDocument = gql`
+    mutation RemoveEvaluationCriteria($removeEvaluationCriteriaId: ID!) {
+  removeEvaluationCriteria(id: $removeEvaluationCriteriaId) {
+    id
+  }
+}
+    `;
+export type RemoveEvaluationCriteriaMutationFn = Apollo.MutationFunction<RemoveEvaluationCriteriaMutation, RemoveEvaluationCriteriaMutationVariables>;
+
+/**
+ * __useRemoveEvaluationCriteriaMutation__
+ *
+ * To run a mutation, you first call `useRemoveEvaluationCriteriaMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveEvaluationCriteriaMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeEvaluationCriteriaMutation, { data, loading, error }] = useRemoveEvaluationCriteriaMutation({
+ *   variables: {
+ *      removeEvaluationCriteriaId: // value for 'removeEvaluationCriteriaId'
+ *   },
+ * });
+ */
+export function useRemoveEvaluationCriteriaMutation(baseOptions?: Apollo.MutationHookOptions<RemoveEvaluationCriteriaMutation, RemoveEvaluationCriteriaMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveEvaluationCriteriaMutation, RemoveEvaluationCriteriaMutationVariables>(RemoveEvaluationCriteriaDocument, options);
+      }
+export type RemoveEvaluationCriteriaMutationHookResult = ReturnType<typeof useRemoveEvaluationCriteriaMutation>;
+export type RemoveEvaluationCriteriaMutationResult = Apollo.MutationResult<RemoveEvaluationCriteriaMutation>;
+export type RemoveEvaluationCriteriaMutationOptions = Apollo.BaseMutationOptions<RemoveEvaluationCriteriaMutation, RemoveEvaluationCriteriaMutationVariables>;
 export const GetMyFactoryDocument = gql`
     query GetMyFactory {
   getMyFactory {
@@ -8905,6 +9154,7 @@ export const SystemConfigOrderDocument = gql`
     voucherBaseValueForRefund
     voucherBaseLimitedUsage
     voucherBaseMaxDiscountValue
+    maxEvaluationCriteria
   }
 }
     `;
