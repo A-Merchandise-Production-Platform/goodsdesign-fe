@@ -696,27 +696,136 @@ export default function FactoryOrderDetailsPage() {
       )}
 
       {order.status === 'REWORK_REQUIRED' && (
-        <Card className="mb-6 border-amber-200 bg-amber-50 dark:border-purple-900 dark:bg-purple-950">
-          <CardContent className="pt-6">
-            <div className="flex flex-col space-y-4">
-              <Alert>
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Rework Required</AlertTitle>
-                <AlertDescription>
-                  This order requires rework. Please review the quality check
-                  notes and start the rework process.
-                </AlertDescription>
-              </Alert>
-              <Button
-                onClick={() => showConfirmDialog('startRework')}
-                disabled={updateStatusLoading}
-              >
-                <Play className="mr-2 h-4 w-4" />
-                Start Rework
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="relative mb-6 overflow-hidden rounded-xl border border-red-200/50 bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 p-1 shadow-lg dark:border-red-900/30 dark:from-red-950/20 dark:via-orange-950/20 dark:to-yellow-950/20">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 bg-gradient-to-r from-red-400/10 via-orange-400/10 to-yellow-400/10 opacity-50"></div>
+          <div className="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-gradient-to-br from-red-400/20 to-orange-400/20 blur-xl"></div>
+          <div className="absolute -bottom-4 -left-4 h-32 w-32 rounded-full bg-gradient-to-tr from-orange-400/20 to-yellow-400/20 blur-xl"></div>
+
+          <Card className="relative border-0 bg-white/80 backdrop-blur-sm dark:bg-gray-900/80">
+            <CardContent className="p-6">
+              <div className="flex flex-col space-y-6">
+                {/* Header Section */}
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0">
+                    <div className="relative">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-orange-500 shadow-lg">
+                        <AlertTriangle className="h-8 w-8 animate-pulse text-white" />
+                      </div>
+                      <div className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500">
+                        <XCircle className="h-4 w-4 text-white" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-2 flex items-center space-x-2">
+                      <h3 className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-2xl font-bold text-transparent">
+                        Quality Check Failed
+                      </h3>
+                      <div className="rounded-full border border-red-200 bg-red-100 px-3 py-1 text-xs font-semibold text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-300">
+                        REWORK REQUIRED
+                      </div>
+                    </div>
+
+                    <p className="leading-relaxed text-gray-600 dark:text-gray-300">
+                      This order has failed quality inspection and requires
+                      immediate attention. Please review the failed criteria
+                      below and initiate the rework process to meet quality
+                      standards.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Failed Criteria Section */}
+                {order.orderDetails?.some(item =>
+                  item.checkQualities?.some(
+                    check =>
+                      check.failedEvaluationCriteria &&
+                      check.failedEvaluationCriteria.length > 0,
+                  ),
+                ) && (
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="h-1 w-8 rounded-full bg-gradient-to-r from-red-500 to-orange-500"></div>
+                      <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                        Failed Quality Criteria
+                      </h4>
+                    </div>
+
+                    <div className="grid gap-3">
+                      {order.orderDetails?.map(item =>
+                        item.checkQualities?.map(check =>
+                          check.failedEvaluationCriteria?.map(failed => (
+                            <div
+                              key={failed.id}
+                              className="group relative overflow-hidden rounded-lg border border-red-200/60 bg-gradient-to-r from-red-50/80 to-orange-50/80 p-4 transition-all duration-200 hover:border-red-300/80 hover:shadow-md dark:border-red-800/60 dark:from-red-950/40 dark:to-orange-950/40"
+                            >
+                              <div className="flex items-start space-x-3">
+                                <div className="mt-1 flex-shrink-0">
+                                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-red-200 bg-red-100 transition-colors group-hover:bg-red-200 dark:border-red-800 dark:bg-red-900/50">
+                                    <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                                  </div>
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <h5 className="mb-1 font-semibold text-red-800 dark:text-red-200">
+                                    {failed.evaluationCriteria?.name}
+                                  </h5>
+                                  <p className="text-sm leading-relaxed text-red-700/80 dark:text-red-300/80">
+                                    {failed.evaluationCriteria?.description}
+                                  </p>
+                                </div>
+                                <div className="flex-shrink-0">
+                                  <div className="rounded bg-red-200 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-800/50 dark:text-red-200">
+                                    Failed
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Subtle gradient overlay for hover effect */}
+                              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-red-400/0 via-red-400/5 to-orange-400/0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div>
+                            </div>
+                          )),
+                        ),
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Section */}
+                <div className="flex flex-col items-stretch gap-4 border-t border-red-200/50 pt-4 sm:flex-row sm:items-center dark:border-red-800/50">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-400">
+                      <Clock className="h-4 w-4" />
+                      <span>
+                        Immediate action required to maintain production
+                        schedule
+                      </span>
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => showConfirmDialog('startRework')}
+                    disabled={updateStatusLoading}
+                    className="relative rounded-lg bg-gradient-to-r from-red-600 to-orange-600 px-8 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] hover:from-red-700 hover:to-orange-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Play className="h-5 w-5" />
+                      <span>Start Rework Process</span>
+                    </div>
+
+                    {/* Loading spinner overlay */}
+                    {updateStatusLoading && (
+                      <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/10">
+                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
+                      </div>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {order.status === OrderStatus.ReadyForShipping && (
