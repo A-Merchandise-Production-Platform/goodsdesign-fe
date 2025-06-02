@@ -35,3 +35,18 @@ mutation RemoveEvaluationCriteria($removeEvaluationCriteriaId: ID!) {
     id
   }
 }
+
+query OrderEvaluationCriteria($productId: ID!) {
+  evaluationCriteriaByProduct(productId: $productId) {
+    createdAt
+    description
+    id
+    isActive
+    isDeleted
+    name
+    updatedAt
+  }
+  systemConfigOrder {
+    maxEvaluationCriteria
+  }
+}

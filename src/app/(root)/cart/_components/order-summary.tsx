@@ -9,15 +9,19 @@ import {
   VoucherType,
   AddressEntity,
   useUpdatePhoneNumberMutation,
+  OrderEvaluationCriteriaQuery,
 } from '@/graphql/generated/graphql';
 import { formatPrice } from '@/lib/utils';
 import { VoucherDialog } from './voucher-dialog';
+import { EvaluationCriteriaDialog } from './evaluation-criteria-dialog';
 import OrderInformation, {
   OrderInformationRef,
 } from '@/app/(root)/cart/_components/order-infomation';
 import { useState, useRef } from 'react';
 
 type VoucherEntityType = AvailableVouchersQuery['availableVouchers'][0];
+type EvaluationCriteriaType =
+  OrderEvaluationCriteriaQuery['evaluationCriteriaByProduct'][0];
 
 interface OrderSummaryProps {
   selectedItemCount: number;
@@ -30,6 +34,11 @@ interface OrderSummaryProps {
   onSelectAddress: (address: AddressEntity) => void;
   isCalculatingShipping: boolean;
   shippingCostError: string | null;
+  evaluationCriteria: EvaluationCriteriaType[];
+  maxEvaluationCriteria: number;
+  selectedEvaluationCriteriaIds: string[];
+  onSelectEvaluationCriteria: (criteriaIds: string[]) => void;
+  evaluationCriteriaLoading: boolean;
 }
 
 export function OrderSummary({
@@ -43,6 +52,11 @@ export function OrderSummary({
   onSelectAddress,
   isCalculatingShipping,
   shippingCostError,
+  evaluationCriteria,
+  maxEvaluationCriteria,
+  selectedEvaluationCriteriaIds,
+  onSelectEvaluationCriteria,
+  evaluationCriteriaLoading,
 }: OrderSummaryProps) {
   const orderInfoRef = useRef<OrderInformationRef>(null);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -149,6 +163,29 @@ export function OrderSummary({
         </div>
 
         <Separator />
+
+        {selectedItemCount > 0 && maxEvaluationCriteria > 0 && (
+          <>
+            <div className="space-y-2">
+              <div className="font-semibold">Evaluation Criteria</div>
+              <EvaluationCriteriaDialog
+                criteria={evaluationCriteria}
+                selectedCriteriaIds={selectedEvaluationCriteriaIds}
+                onSelectCriteria={onSelectEvaluationCriteria}
+                maxSelection={maxEvaluationCriteria}
+                loading={evaluationCriteriaLoading}
+              />
+              {selectedEvaluationCriteriaIds.length > 0 && (
+                <div className="text-muted-foreground text-sm">
+                  {selectedEvaluationCriteriaIds.length} criteria selected for
+                  order evaluation
+                </div>
+              )}
+            </div>
+
+            <Separator />
+          </>
+        )}
 
         <div>
           <div className="mb-6 font-semibold">Information</div>

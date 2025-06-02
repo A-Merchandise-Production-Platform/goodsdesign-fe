@@ -80,6 +80,7 @@ import { cn, formatDate } from '@/lib/utils';
 import { filesToBase64 } from '@/utils/handle-upload';
 import { RejectionHistory } from '@/app/(root)/_components/rejection-history';
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
+import { OrderEvaluationCriteria } from '@/components/shared/order/order-evaluation-criteria';
 // Helper function to format time
 const formatTime = (dateString: string) => {
   return new Date(dateString).toLocaleTimeString('en-US', {
@@ -927,6 +928,22 @@ export default function FactoryOrderDetailsPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Evaluation Criteria Section */}
+                {order?.orderEvaluationCriteria &&
+                  order?.orderEvaluationCriteria?.length > 0 && (
+                    <OrderEvaluationCriteria
+                      criteria={order?.orderEvaluationCriteria.map(item => ({
+                        id: item.evaluationCriteria.id,
+                        name: item.evaluationCriteria.name,
+                        description: item.evaluationCriteria.description,
+                        createdAt: item.createdAt,
+                        updatedAt: item.evaluationCriteria.updatedAt,
+                        evaluationCriteria: item.evaluationCriteria,
+                      }))}
+                      className="mt-6"
+                    />
+                  )}
               </div>
             </CardContent>
             <CardFooter className="border-t pt-6">
