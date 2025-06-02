@@ -17,6 +17,7 @@ import {
   useGetProductVariantByIdLazyQuery,
   useGetUserCartItemsQuery,
   useUpdateCartItemMutation,
+  useOrderEvaluationCriteriaQuery,
 } from '@/graphql/generated/graphql';
 
 import { CartHeader } from './_components/cart-header';
@@ -58,6 +59,8 @@ export default function CartPage() {
     null,
   );
   const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
+  const [selectedEvaluationCriteriaIds, setSelectedEvaluationCriteriaIds] =
+    useState<string[]>([]);
 
   const [calculateShippingCostAndFactoryForCart] =
     useCalculateShippingCostAndFactoryForCartMutation();
@@ -106,6 +109,44 @@ export default function CartPage() {
   });
 
   const cartItems = (data?.userCartItems || []) as CartItemEntity[];
+
+  // Get only selected cart items
+  const selectedCartItems = useMemo(
+    () => cartItems.filter(item => selectedItems[item.id]),
+    [cartItems, selectedItems],
+  );
+
+  // Get unique product IDs from selected cart items for evaluation criteria
+  const selectedProductIds = useMemo(() => {
+    const productIds = new Set<string>();
+    selectedCartItems.forEach(item => {
+      const productId = item.systemConfigVariant?.product?.id;
+      if (productId) {
+        productIds.add(productId);
+      }
+    });
+    return Array.from(productIds);
+  }, [selectedCartItems]);
+
+  // Get the first product ID for evaluation criteria query
+  // Note: Currently we only show evaluation criteria for the first product
+  // In a multi-product cart, you might want to show criteria common to all products
+  // or handle each product separately
+  const firstProductId = selectedProductIds[0];
+
+  // Fetch evaluation criteria for the selected products
+  const { data: evaluationCriteriaData, loading: evaluationCriteriaLoading } =
+    useOrderEvaluationCriteriaQuery({
+      variables: {
+        productId: firstProductId || '',
+      },
+      skip: !firstProductId, // Skip query if no product is selected
+    });
+
+  // Clear selected evaluation criteria when product changes (since criteria are product-specific)
+  useEffect(() => {
+    setSelectedEvaluationCriteriaIds([]);
+  }, [firstProductId]);
 
   // Group cart items by design ID
   const groupedCartItems = useMemo(() => {
@@ -270,12 +311,6 @@ export default function CartPage() {
     fetchVariants();
   }, [cartItems, getProductVariants]);
 
-  // Get only selected cart items
-  const selectedCartItems = useMemo(
-    () => cartItems.filter(item => selectedItems[item.id]),
-    [cartItems, selectedItems],
-  );
-
   // Calculate shipping cost when address or selected items change
   useEffect(() => {
     if (selectedAddress?.id && selectedCartItems.length > 0) {
@@ -382,6 +417,11 @@ export default function CartPage() {
     setSelectedVoucher(voucher);
   };
 
+  // Handle selecting evaluation criteria
+  const handleSelectEvaluationCriteria = (criteriaIds: string[]): void => {
+    setSelectedEvaluationCriteriaIds(criteriaIds);
+  };
+
   // Handle checkout
   const handleCheckout = (): void => {
     if (selectedCartItems.length === 0) {
@@ -413,6 +453,18 @@ export default function CartPage() {
       return;
     }
 
+    // Log selected evaluation criteria
+    console.log(
+      'Selected Evaluation Criteria IDs:',
+      selectedEvaluationCriteriaIds,
+    );
+    console.log(
+      'Selected Evaluation Criteria Details:',
+      evaluationCriteriaData?.evaluationCriteriaByProduct?.filter(criteria =>
+        selectedEvaluationCriteriaIds.includes(criteria.id),
+      ),
+    );
+
     setIsCheckingOut(true);
     createOrder({
       variables: {
@@ -422,6 +474,10 @@ export default function CartPage() {
           })),
           addressId: selectedAddress.id,
           voucherId: selectedVoucher?.id,
+          evaluationCriteriaIds:
+            selectedEvaluationCriteriaIds.length > 0
+              ? selectedEvaluationCriteriaIds
+              : undefined,
         },
       },
     });
@@ -478,6 +534,16 @@ export default function CartPage() {
           onSelectAddress={setSelectedAddress}
           isCalculatingShipping={isCalculatingShipping}
           shippingCostError={shippingCostError}
+          evaluationCriteria={
+            evaluationCriteriaData?.evaluationCriteriaByProduct || []
+          }
+          maxEvaluationCriteria={
+            evaluationCriteriaData?.systemConfigOrder?.maxEvaluationCriteria ||
+            0
+          }
+          selectedEvaluationCriteriaIds={selectedEvaluationCriteriaIds}
+          onSelectEvaluationCriteria={handleSelectEvaluationCriteria}
+          evaluationCriteriaLoading={evaluationCriteriaLoading}
         />
       </div>
     </div>

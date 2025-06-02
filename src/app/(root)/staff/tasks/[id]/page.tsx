@@ -66,6 +66,7 @@ import { formatDate } from '@/lib/utils';
 import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
 import { DashboardShell } from '@/components/dashboard-shell';
 import { OrderHeader } from '@/app/(root)/_components/order-header';
+import { OrderEvaluationCriteria } from '@/components/shared/order/order-evaluation-criteria';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -754,6 +755,11 @@ export default function StaffCheckQualityDetailsPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {/* Evaluation Criteria Section */}
+                  <OrderEvaluationCriteria
+                    criteria={order.orderEvaluationCriteria || []}
+                    className="mb-6"
+                  />
                   <div className="grid gap-6">
                     <Alert>
                       <CheckCircle2 className="h-4 w-4" />

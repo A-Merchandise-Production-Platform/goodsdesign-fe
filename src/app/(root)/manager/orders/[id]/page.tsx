@@ -26,7 +26,7 @@ import { OrderHeader } from '@/app/(root)/_components/order-header';
 import {
   getPaymentStatusBadge,
   getStatusBadge,
-  orderStatusSteps
+  orderStatusSteps,
 } from '@/app/(root)/_components/order-status';
 import { OrderStatusTimeline } from '@/app/(root)/_components/order-status-timeline';
 import { RejectionHistory } from '@/app/(root)/_components/rejection-history';
@@ -96,6 +96,7 @@ import { AlertCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
+import { OrderEvaluationCriteria } from '@/components/shared/order/order-evaluation-criteria';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -147,31 +148,34 @@ export default function FactoryOrderDetailsPage() {
   const [showAssignFactoryDialog, setShowAssignFactoryDialog] = useState(false);
   const [showRefundDialog, setShowRefundDialog] = useState(false);
   const [showWithdrawalDialog, setShowWithdrawalDialog] = useState(false);
-  const [showTransferFactoryDialog, setShowTransferFactoryDialog] = useState(false);
+  const [showTransferFactoryDialog, setShowTransferFactoryDialog] =
+    useState(false);
   const [selectedPaymentId, setSelectedPaymentId] = useState<string>('');
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
 
-  const [speedUpOrder, { loading: speedUpOrderLoading }] = useSpeedUpOrderMutation({
-    onCompleted: () => {
-      toast.success('Order speed up successfully');
-      refetch();
-    },
-    onError: error => {
-      toast.error(error.message);
-    },
-  });
+  const [speedUpOrder, { loading: speedUpOrderLoading }] =
+    useSpeedUpOrderMutation({
+      onCompleted: () => {
+        toast.success('Order speed up successfully');
+        refetch();
+      },
+      onError: error => {
+        toast.error(error.message);
+      },
+    });
 
-  const [transferOrderToFactory, { loading: transferOrderToFactoryLoading }] = useTransferOrderToFactoryMutation({
-    onCompleted: () => {
-      toast.success('Order transferred to factory successfully');
-      refetch();
-      setShowTransferFactoryDialog(false);
-    },
-    onError: error => {
-      toast.error(error.message);
-    },
-    refetchQueries: ['GetOrder'],
-  });
+  const [transferOrderToFactory, { loading: transferOrderToFactoryLoading }] =
+    useTransferOrderToFactoryMutation({
+      onCompleted: () => {
+        toast.success('Order transferred to factory successfully');
+        refetch();
+        setShowTransferFactoryDialog(false);
+      },
+      onError: error => {
+        toast.error(error.message);
+      },
+      refetchQueries: ['GetOrder'],
+    });
 
   const { data: factoryScores } = useFactoryScoresForOrderQuery({
     variables: {
@@ -458,7 +462,10 @@ export default function FactoryOrderDetailsPage() {
 
   // Render manager action buttons based on order status
   const renderManagerActions = () => {
-    if (currentOrder.status === OrderStatus.NeedManagerHandle || currentOrder.status === OrderStatus.NeedManagerHandleRework) {
+    if (
+      currentOrder.status === OrderStatus.NeedManagerHandle ||
+      currentOrder.status === OrderStatus.NeedManagerHandleRework
+    ) {
       return (
         <Card className="mb-6">
           <CardHeader>
@@ -582,7 +589,7 @@ export default function FactoryOrderDetailsPage() {
       variables: {
         orderId: id,
         newFactoryId,
-      }
+      },
     });
   };
 
@@ -594,39 +601,50 @@ export default function FactoryOrderDetailsPage() {
       {renderManagerActions()}
       {/* Order Header */}
       {currentOrder && (
-        <OrderHeader 
+        <OrderHeader
           order={{
             id: currentOrder.id,
             orderDate: currentOrder.orderDate || '',
             status: currentOrder.status,
-            customer: currentOrder.customer ? {
-              name: currentOrder.customer.name || undefined,
-              email: currentOrder.customer.email || undefined,
-              imageUrl: currentOrder.customer.imageUrl || undefined,
-            } : undefined,
+            customer: currentOrder.customer
+              ? {
+                  name: currentOrder.customer.name || undefined,
+                  email: currentOrder.customer.email || undefined,
+                  imageUrl: currentOrder.customer.imageUrl || undefined,
+                }
+              : undefined,
             totalPrice: currentOrder.totalPrice || 0,
             totalItems: currentOrder.totalItems || 0,
             estimatedCompletionAt: currentOrder.estimatedCompletionAt || '',
             isDelayed: Boolean(currentOrder.isDelayed),
             currentProgress: currentOrder.currentProgress || 0,
             shippingPrice: currentOrder.shippingPrice || 0,
-            factory: currentOrder.factory ? {
-              name: currentOrder.factory.name || undefined,
-              owner: currentOrder.factory.owner ? {
-                name: currentOrder.factory.owner.name || undefined,
-                email: currentOrder.factory.owner.email || undefined,
-                imageUrl: currentOrder.factory.owner.imageUrl || undefined,
-              } : undefined
-            } : undefined,
+            factory: currentOrder.factory
+              ? {
+                  name: currentOrder.factory.name || undefined,
+                  owner: currentOrder.factory.owner
+                    ? {
+                        name: currentOrder.factory.owner.name || undefined,
+                        email: currentOrder.factory.owner.email || undefined,
+                        imageUrl:
+                          currentOrder.factory.owner.imageUrl || undefined,
+                      }
+                    : undefined,
+                }
+              : undefined,
             customerAddress: currentOrder.address?.formattedAddress || '',
-            factoryAddress: currentOrder.factory?.address?.formattedAddress || '',
+            factoryAddress:
+              currentOrder.factory?.address?.formattedAddress || '',
             orderCode: currentOrder.orderCode || '',
           }}
         />
       )}
 
       {/* Order Status Timeline */}
-      <OrderStatusTimeline status={currentOrder.status} currentStatusGroup={currentStatusGroup} />
+      <OrderStatusTimeline
+        status={currentOrder.status}
+        currentStatusGroup={currentStatusGroup}
+      />
 
       {/* Tabs */}
       <Tabs
@@ -813,6 +831,12 @@ export default function FactoryOrderDetailsPage() {
               </div>
             </CardFooter>
           </Card>
+
+          {/* Evaluation Criteria Section */}
+          <OrderEvaluationCriteria
+            criteria={currentOrder.orderEvaluationCriteria || []}
+            className="mt-6"
+          />
         </TabsContent>
 
         {/* Items Tab */}
@@ -900,18 +924,18 @@ export default function FactoryOrderDetailsPage() {
                             )}
                           </div>
                           <div className="mt-2">
-                          <h4 className="mb-1 text-sm font-medium">
-                            Rework:
-                          </h4>
-                          <div className="grid gap-2 md:grid-cols-2">
-                              <p className="text-muted-foreground text-xs"> 
+                            <h4 className="mb-1 text-sm font-medium">
+                              Rework:
+                            </h4>
+                            <div className="grid gap-2 md:grid-cols-2">
+                              <p className="text-muted-foreground text-xs">
                                 <span className="mr-2 text-green-600">
                                   {item.isRework ? 'Yes' : 'No'}
                                 </span>
                                 {item.reworkTime} times
                               </p>
+                            </div>
                           </div>
-                        </div>
                         </div>
 
                         <div className="mt-2">
@@ -975,37 +999,40 @@ export default function FactoryOrderDetailsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {currentOrder?.orderProgressReports?.sort((a, b) => b.reportDate.localeCompare(a.reportDate))?.map((report, index) => (
-                  <div key={report.id} className="relative pb-6 pl-6">
-                    {index !==
-                      (currentOrder?.orderProgressReports?.length || 0) - 1 && (
-                      <div className="bg-border absolute top-0 left-2 h-full w-px"></div>
-                    )}
-                    <div className="border-primary bg-background absolute top-0 left-0 h-4 w-4 rounded-full border-2"></div>
-                    <div className="mb-1 text-sm font-medium">
-                      {formatDate(report.reportDate)} at{' '}
-                      {formatTime(report.reportDate)}
-                    </div>
-                    <div className="text-sm">{report.note}</div>
-                    {report.imageUrls && report.imageUrls.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {report.imageUrls.map((url, idx) => (
-                          <div
-                            key={idx}
-                            className="relative h-16 w-16 overflow-hidden rounded-md"
-                          >
-                            <Image
-                              src={url || '/placeholder.svg'}
-                              alt={`Progress image ${idx + 1}`}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                        ))}
+                {currentOrder?.orderProgressReports
+                  ?.sort((a, b) => b.reportDate.localeCompare(a.reportDate))
+                  ?.map((report, index) => (
+                    <div key={report.id} className="relative pb-6 pl-6">
+                      {index !==
+                        (currentOrder?.orderProgressReports?.length || 0) -
+                          1 && (
+                        <div className="bg-border absolute top-0 left-2 h-full w-px"></div>
+                      )}
+                      <div className="border-primary bg-background absolute top-0 left-0 h-4 w-4 rounded-full border-2"></div>
+                      <div className="mb-1 text-sm font-medium">
+                        {formatDate(report.reportDate)} at{' '}
+                        {formatTime(report.reportDate)}
                       </div>
-                    )}
-                  </div>
-                ))}
+                      <div className="text-sm">{report.note}</div>
+                      {report.imageUrls && report.imageUrls.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {report.imageUrls.map((url, idx) => (
+                            <div
+                              key={idx}
+                              className="relative h-16 w-16 overflow-hidden rounded-md"
+                            >
+                              <Image
+                                src={url || '/placeholder.svg'}
+                                alt={`Progress image ${idx + 1}`}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 {!currentOrder?.orderProgressReports?.length && (
                   <div className="text-muted-foreground py-6 text-center">
                     No progress updates available yet.
@@ -1242,8 +1269,8 @@ export default function FactoryOrderDetailsPage() {
           <div className="space-y-6">
             {/* Danger Zone Card */}
             <Card className="border-destructive/20">
-              <CardHeader className="border-b border-destructive/20">
-                <CardTitle className="flex items-center gap-2 text-destructive">
+              <CardHeader className="border-destructive/20 border-b">
+                <CardTitle className="text-destructive flex items-center gap-2">
                   <AlertCircle className="h-5 w-5" />
                   Danger Zone
                 </CardTitle>
@@ -1254,16 +1281,23 @@ export default function FactoryOrderDetailsPage() {
               <CardContent className="space-y-4 pt-6">
                 <div className="grid gap-4 md:grid-cols-2">
                   {/* Speed Up Order Button */}
-                  <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
+                  <div className="border-destructive/20 bg-destructive/5 rounded-lg border p-4">
                     <div className="mb-4">
-                      <h3 className="mb-1 font-medium text-destructive">Speed Up Order</h3>
-                      <p className="text-sm text-destructive/80">
-                        Speed up the order deadline acception from factory for testing purposes
+                      <h3 className="text-destructive mb-1 font-medium">
+                        Speed Up Order
+                      </h3>
+                      <p className="text-destructive/80 text-sm">
+                        Speed up the order deadline acception from factory for
+                        testing purposes
                       </p>
                     </div>
                     <Button
                       variant="destructive"
-                      onClick={() => speedUpOrder({ variables: { orderId: currentOrder.id } })}
+                      onClick={() =>
+                        speedUpOrder({
+                          variables: { orderId: currentOrder.id },
+                        })
+                      }
                       disabled={speedUpOrderLoading}
                       className="w-full"
                     >
@@ -1282,10 +1316,12 @@ export default function FactoryOrderDetailsPage() {
                   </div>
 
                   {/* Process Refund Button */}
-                  <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
+                  <div className="border-destructive/20 bg-destructive/5 rounded-lg border p-4">
                     <div className="mb-4">
-                      <h3 className="mb-1 font-medium text-destructive">Process Refund</h3>
-                      <p className="text-sm text-destructive/80">
+                      <h3 className="text-destructive mb-1 font-medium">
+                        Process Refund
+                      </h3>
+                      <p className="text-destructive/80 text-sm">
                         Initiate a refund process for the customer
                       </p>
                     </div>
@@ -1300,10 +1336,12 @@ export default function FactoryOrderDetailsPage() {
                   </div>
 
                   {/* Transfer Factory Button */}
-                  <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
+                  <div className="border-destructive/20 bg-destructive/5 rounded-lg border p-4">
                     <div className="mb-4">
-                      <h3 className="mb-1 font-medium text-destructive">Transfer to Different Factory</h3>
-                      <p className="text-sm text-destructive/80">
+                      <h3 className="text-destructive mb-1 font-medium">
+                        Transfer to Different Factory
+                      </h3>
+                      <p className="text-destructive/80 text-sm">
                         Transfer this order to a different factory
                       </p>
                     </div>
@@ -1325,8 +1363,10 @@ export default function FactoryOrderDetailsPage() {
                     <div>
                       <p className="font-medium">Warning</p>
                       <p className="mt-1 text-sm">
-                        These actions will affect the order status and may have financial implications. 
-                        Please ensure you have the necessary permissions and have reviewed all details before proceeding.
+                        These actions will affect the order status and may have
+                        financial implications. Please ensure you have the
+                        necessary permissions and have reviewed all details
+                        before proceeding.
                       </p>
                     </div>
                   </div>
@@ -1403,58 +1443,111 @@ export default function FactoryOrderDetailsPage() {
               </DialogFooter>
             </form>
           </Form>
-          
+
           {factoryScores && (
             <div className="mt-4">
               <h3 className="text-lg font-medium">Factory Scores</h3>
               <div className="grid gap-4">
                 {factoryScores.factoryScoresForOrder
-                  .filter(factory => factory.factoryId === assignFactoryForm.watch('factoryId'))
-                  .map((factory) => (
-                  <div key={factory.factoryId} className="rounded-lg border p-4">
-                    <div className="mb-2 flex items-center justify-between">
-                      <h4 className="font-medium">{factory.factoryName}</h4>
-                      <div className="text-sm">
-                        Total Score: <span className="font-semibold">{(factory.totalScore * 100).toFixed(1)}%</span>
+                  .filter(
+                    factory =>
+                      factory.factoryId ===
+                      assignFactoryForm.watch('factoryId'),
+                  )
+                  .map(factory => (
+                    <div
+                      key={factory.factoryId}
+                      className="rounded-lg border p-4"
+                    >
+                      <div className="mb-2 flex items-center justify-between">
+                        <h4 className="font-medium">{factory.factoryName}</h4>
+                        <div className="text-sm">
+                          Total Score:{' '}
+                          <span className="font-semibold">
+                            {(factory.totalScore * 100).toFixed(1)}%
+                          </span>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Capacity
+                            </span>
+                            <span>
+                              {(factory.scores.capacityScore * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Lead Time
+                            </span>
+                            <span>
+                              {(factory.scores.leadTimeScore * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Legit Points
+                            </span>
+                            <span>
+                              {(factory.scores.legitPointScore * 100).toFixed(
+                                1,
+                              )}
+                              %
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Production Capacity
+                            </span>
+                            <span>
+                              {(
+                                factory.scores.productionCapacityScore * 100
+                              ).toFixed(1)}
+                              %
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Specialization
+                            </span>
+                            <span>
+                              {(
+                                factory.scores.specializationScore * 100
+                              ).toFixed(1)}
+                              %
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-muted-foreground mt-2 text-xs">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              Capacity Weight: {factory.weights.capacity * 100}%
+                            </div>
+                            <div>
+                              Lead Time Weight: {factory.weights.leadTime * 100}
+                              %
+                            </div>
+                            <div>
+                              Legit Points Weight:{' '}
+                              {factory.weights.legitPoint * 100}%
+                            </div>
+                            <div>
+                              Production Capacity Weight:{' '}
+                              {factory.weights.productionCapacity * 100}%
+                            </div>
+                            <div>
+                              Specialization Weight:{' '}
+                              {factory.weights.specialization * 100}%
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Capacity</span>
-                          <span>{(factory.scores.capacityScore * 100).toFixed(1)}%</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Lead Time</span>
-                          <span>{(factory.scores.leadTimeScore * 100).toFixed(1)}%</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Legit Points</span>
-                          <span>{(factory.scores.legitPointScore * 100).toFixed(1)}%</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Production Capacity</span>
-                          <span>{(factory.scores.productionCapacityScore * 100).toFixed(1)}%</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Specialization</span>
-                          <span>{(factory.scores.specializationScore * 100).toFixed(1)}%</span>
-                        </div>
-                      </div>
-                      <div className="mt-2 text-xs text-muted-foreground">
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>Capacity Weight: {factory.weights.capacity * 100}%</div>
-                          <div>Lead Time Weight: {factory.weights.leadTime * 100}%</div>
-                          <div>Legit Points Weight: {factory.weights.legitPoint * 100}%</div>
-                          <div>Production Capacity Weight: {factory.weights.productionCapacity * 100}%</div>
-                          <div>Specialization Weight: {factory.weights.specialization * 100}%</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  ))}
                 {!assignFactoryForm.watch('factoryId') && (
-                  <div className="text-muted-foreground text-center py-4">
+                  <div className="text-muted-foreground py-4 text-center">
                     Select a factory to view its scores
                   </div>
                 )}
@@ -1563,31 +1656,46 @@ export default function FactoryOrderDetailsPage() {
                 <div className="rounded-lg border p-4">
                   <h4 className="mb-2 font-medium">Bank Account Details</h4>
                   {userBanks?.userBanksByUserId?.find(
-                    bank => bank.id === withdrawalForm.watch('userBankId')
+                    bank => bank.id === withdrawalForm.watch('userBankId'),
                   ) && (
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Bank Name:</span>
+                        <span className="text-muted-foreground">
+                          Bank Name:
+                        </span>
                         <span className="font-medium">
-                          {userBanks.userBanksByUserId.find(
-                            bank => bank.id === withdrawalForm.watch('userBankId')
-                          )?.bank?.name}
+                          {
+                            userBanks.userBanksByUserId.find(
+                              bank =>
+                                bank.id === withdrawalForm.watch('userBankId'),
+                            )?.bank?.name
+                          }
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Account Number:</span>
+                        <span className="text-muted-foreground">
+                          Account Number:
+                        </span>
                         <span className="font-medium">
-                          {userBanks.userBanksByUserId.find(
-                            bank => bank.id === withdrawalForm.watch('userBankId')
-                          )?.accountNumber}
+                          {
+                            userBanks.userBanksByUserId.find(
+                              bank =>
+                                bank.id === withdrawalForm.watch('userBankId'),
+                            )?.accountNumber
+                          }
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Account Name:</span>
+                        <span className="text-muted-foreground">
+                          Account Name:
+                        </span>
                         <span className="font-medium">
-                          {userBanks.userBanksByUserId.find(
-                            bank => bank.id === withdrawalForm.watch('userBankId')
-                          )?.accountName}
+                          {
+                            userBanks.userBanksByUserId.find(
+                              bank =>
+                                bank.id === withdrawalForm.watch('userBankId'),
+                            )?.accountName
+                          }
                         </span>
                       </div>
                     </div>
@@ -1672,7 +1780,7 @@ export default function FactoryOrderDetailsPage() {
               {factories?.getAllFactories?.map(factory => (
                 <div
                   key={factory.factoryOwnerId}
-                  className="flex cursor-pointer items-center justify-between rounded-lg border p-4 hover:bg-muted/50"
+                  className="hover:bg-muted/50 flex cursor-pointer items-center justify-between rounded-lg border p-4"
                   onClick={() => handleTransferFactory(factory.factoryOwnerId)}
                 >
                   <div>

@@ -72,6 +72,7 @@ import {
   useOrderPriceDetailsQuery,
 } from '@/graphql/generated/graphql';
 import { cn, formatDate } from '@/lib/utils';
+import { OrderEvaluationCriteria } from '@/components/shared/order/order-evaluation-criteria';
 
 import {
   getPaymentStatusBadge,
@@ -505,17 +506,10 @@ export default function OrderDetailsPage() {
                     </div>
                   </div>
                 </div>
-                {/* <div className="flex justify-end">
-                  <DownloadBillButtonWithPreview
-                    order={order}
-                    companyName="Goods Design"
-                    companyLogo="/logo.png"
-                    companyAddress="Ho Chi Minh City, Vietnam"
-                    companyPhone="+84 123 456 789"
-                    companyEmail="contact@goodsdesign.uydev.id.vn"
-                    companyWebsite="goodsdesign.uydev.id.vn"
-                  />
-                </div> */}
+                <OrderEvaluationCriteria
+                  criteria={order.orderEvaluationCriteria || []}
+                  className="mt-6"
+                />
               </div>
             </CardContent>
             <CardFooter className="border-t pt-6">

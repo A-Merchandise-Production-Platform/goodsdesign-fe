@@ -10,6 +10,15 @@ mutation CreateOrder($createOrderInput: CreateOrderInput!) {
 
 query GetMyOrders {
   myOrders {
+    orderEvaluationCriteria {
+      createdAt
+      evaluationCriteria {
+        id
+        description
+        name
+        updatedAt
+      }
+    }
     acceptanceDeadline
     acceptedAt
     address {
@@ -204,6 +213,15 @@ query GetMyOrders {
 }
 query GetMyFactoryOrders {
   factoryOrders {
+    orderEvaluationCriteria {
+      createdAt
+      evaluationCriteria {
+        id
+        description
+        name
+        updatedAt
+      }
+    }
     acceptanceDeadline
     acceptedAt
     address {
@@ -399,6 +417,15 @@ query GetMyFactoryOrders {
 
 query GetOrdersByFactoryId($factoryId: String!) {
   ordersByFactoryId(factoryId: $factoryId) {
+    orderEvaluationCriteria {
+      createdAt
+      evaluationCriteria {
+        id
+        description
+        name
+        updatedAt
+      }
+    }
     acceptanceDeadline
     acceptedAt
     address {
@@ -596,6 +623,15 @@ query GetOrder($orderId: String!) {
   order(id: $orderId) {
     acceptanceDeadline
     acceptedAt
+    orderEvaluationCriteria {
+      createdAt
+      evaluationCriteria {
+        id
+        description
+        name
+        updatedAt
+      }
+    }
     orderCode
     address {
       districtID
@@ -799,6 +835,15 @@ query GetOrder($orderId: String!) {
 }
 query GetAllOrders {
   orders {
+    orderEvaluationCriteria {
+      createdAt
+      evaluationCriteria {
+        id
+        description
+        name
+        updatedAt
+      }
+    }
     acceptanceDeadline
     acceptedAt
     address {
@@ -993,6 +1038,15 @@ query GetAllOrders {
 }
 query GetMyStaffOrders {
   staffOrders {
+    orderEvaluationCriteria {
+      createdAt
+      evaluationCriteria {
+        id
+        description
+        name
+        updatedAt
+      }
+    }
     acceptanceDeadline
     acceptedAt
     address {
@@ -1426,6 +1480,6 @@ mutation GenerateAndUploadImage($prompt: String!) {
 
 mutation TransferOrderToFactory($newFactoryId: String!, $orderId: String!) {
   transferOrderToFactory(newFactoryId: $newFactoryId, orderId: $orderId) {
-  id  
+    id
   }
 }
