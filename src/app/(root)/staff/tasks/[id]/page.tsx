@@ -67,6 +67,7 @@ import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook'
 import { DashboardShell } from '@/components/dashboard-shell';
 import { OrderHeader } from '@/app/(root)/_components/order-header';
 import { OrderEvaluationCriteria } from '@/components/shared/order/order-evaluation-criteria';
+import { FailedEvaluationCriteriaDialog } from '@/components/shared/order/failed-evaluation-criteria-dialog';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -98,6 +99,10 @@ export default function StaffCheckQualityDetailsPage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState('details');
+  const [
+    selectedFailedEvaluationCriteriaIds,
+    setSelectedFailedEvaluationCriteriaIds,
+  ] = useState<string[]>([]);
 
   // Use the query hook to get order details
   const { data, loading, error, refetch } = useGetOrderQuery({
@@ -134,6 +139,7 @@ export default function StaffCheckQualityDetailsPage() {
       setPassedQuantity(0);
       setFailedQuantity(0);
       setNote('');
+      setSelectedFailedEvaluationCriteriaIds([]);
 
       // Clean up image previews
       previewImages.forEach(url => URL.revokeObjectURL(url));
@@ -221,6 +227,7 @@ export default function StaffCheckQualityDetailsPage() {
           passedQuantity,
           imageUrls: previewImages,
           note,
+          failedEvaluationCriteriaIds: selectedFailedEvaluationCriteriaIds,
         },
       },
     });
@@ -836,6 +843,26 @@ export default function StaffCheckQualityDetailsPage() {
                         onChange={e => setNote(e.target.value)}
                         className="min-h-[120px]"
                         maxLength={500}
+                      />
+                    </div>
+
+                    {/* Failed Evaluation Criteria Selection */}
+                    <div>
+                      <label className="mb-2 block text-sm font-medium">
+                        Failed Evaluation Criteria
+                      </label>
+                      <p className="text-muted-foreground mb-3 text-sm">
+                        Select which evaluation criteria failed during the
+                        quality check
+                      </p>
+                      <FailedEvaluationCriteriaDialog
+                        criteria={order.orderEvaluationCriteria || []}
+                        selectedFailedIds={selectedFailedEvaluationCriteriaIds}
+                        onSelectFailedCriteria={
+                          setSelectedFailedEvaluationCriteriaIds
+                        }
+                        loading={loading}
+                        disabled={uploadFileloading || doneCheckQualityLoading}
                       />
                     </div>
 

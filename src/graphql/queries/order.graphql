@@ -94,6 +94,14 @@ query GetMyOrders {
           }
           assignedDate
         }
+        failedEvaluationCriteria {
+          id
+          evaluationCriteria {
+            id
+            name
+            description
+          }
+        }
       }
       completedQty
       createdAt
@@ -296,6 +304,14 @@ query GetMyFactoryOrders {
             id
           }
           assignedDate
+        }
+        failedEvaluationCriteria {
+          id
+          evaluationCriteria {
+            id
+            name
+            description
+          }
         }
       }
       completedQty
@@ -500,6 +516,14 @@ query GetOrdersByFactoryId($factoryId: String!) {
             id
           }
           assignedDate
+        }
+        failedEvaluationCriteria {
+          id
+          evaluationCriteria {
+            id
+            name
+            description
+          }
         }
       }
       completedQty
@@ -716,6 +740,14 @@ query GetOrder($orderId: String!) {
           }
           assignedDate
         }
+        failedEvaluationCriteria {
+          id
+          evaluationCriteria {
+            id
+            name
+            description
+          }
+        }
       }
       completedQty
       createdAt
@@ -919,6 +951,14 @@ query GetAllOrders {
           }
           assignedDate
         }
+        failedEvaluationCriteria {
+          id
+          evaluationCriteria {
+            id
+            name
+            description
+          }
+        }
       }
       completedQty
       createdAt
@@ -1121,6 +1161,14 @@ query GetMyStaffOrders {
             id
           }
           assignedDate
+        }
+        failedEvaluationCriteria {
+          id
+          evaluationCriteria {
+            id
+            name
+            description
+          }
         }
       }
       completedQty
