@@ -1,8 +1,6 @@
 'use client';
 import {
   AlertTriangle,
-  ArrowLeft,
-  Calendar,
   CheckCircle2,
   FileImage,
   ImageIcon,
