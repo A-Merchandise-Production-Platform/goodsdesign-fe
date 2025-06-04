@@ -61,6 +61,7 @@ export default function CartPage() {
   const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
   const [selectedEvaluationCriteriaIds, setSelectedEvaluationCriteriaIds] =
     useState<string[]>([]);
+  const [expectedReceiveAt, setExpectedReceiveAt] = useState<Date | null>(null);
 
   const [calculateShippingCostAndFactoryForCart] =
     useCalculateShippingCostAndFactoryForCartMutation();
@@ -478,6 +479,7 @@ export default function CartPage() {
             selectedEvaluationCriteriaIds.length > 0
               ? selectedEvaluationCriteriaIds
               : undefined,
+          expectedReceiveAt: expectedReceiveAt,
         },
       },
     });
@@ -544,6 +546,7 @@ export default function CartPage() {
           selectedEvaluationCriteriaIds={selectedEvaluationCriteriaIds}
           onSelectEvaluationCriteria={handleSelectEvaluationCriteria}
           evaluationCriteriaLoading={evaluationCriteriaLoading}
+          onExpectedReceiveAtChange={date => setExpectedReceiveAt(date || null)}
         />
       </div>
     </div>
