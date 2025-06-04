@@ -1294,9 +1294,6 @@ export default function FactoryOrderDetailsPage() {
                                     check.failedEvaluationCriteria.length >
                                       0 && (
                                       <div className="mt-2">
-                                        <h4 className="mb-2 text-sm font-medium text-red-600 dark:text-red-400">
-                                          Failed Criteria:
-                                        </h4>
                                         <div className="grid gap-2">
                                           {check.failedEvaluationCriteria.map(
                                             (failed, failedIdx) => (
