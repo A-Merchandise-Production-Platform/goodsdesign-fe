@@ -481,6 +481,20 @@ export default function SystemConfigOrder() {
             step="1"
             min="1"
           />
+
+          <ConfigField
+            label="Min Expected Receive At (days)"
+            name="minExpectedReceiveAt"
+            value={configValues.minExpectedReceiveAt}
+            description="Minimum number of days from today that customers can select for expected delivery date"
+            onChange={value => handleInputChange('minExpectedReceiveAt', value)}
+            onSave={() => handleUpdateConfig('minExpectedReceiveAt')}
+            isEdited={editedFields.has('minExpectedReceiveAt')}
+            isLoading={updateConfigOrderLoading}
+            isValid={true}
+            step="1"
+            min="1"
+          />
         </CardContent>
       </Card>
 

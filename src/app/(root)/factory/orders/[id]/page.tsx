@@ -654,6 +654,7 @@ export default function FactoryOrderDetailsPage() {
                 }
               : undefined,
             orderCode: order.orderCode || '',
+            expectedReceiveAt: order.expectedReceiveAt || undefined,
           }}
         />
       )}
