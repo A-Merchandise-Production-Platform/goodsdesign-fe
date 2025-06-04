@@ -803,10 +803,10 @@ export default function StaffCheckQualityDetailsPage() {
                           value={passedQuantity}
                           onChange={e => {
                             const value = Number.parseInt(e.target.value) || 0;
-                            setPassedQuantity(value);
-                            setFailedQuantity(
-                              selectedOrderDetail.quantity - value,
-                            );
+                            const maxValue = selectedOrderDetail.quantity;
+                            const newPassedQuantity = Math.min(value, maxValue);
+                            setPassedQuantity(newPassedQuantity);
+                            setFailedQuantity(maxValue - newPassedQuantity);
                           }}
                         />
                       </div>
@@ -825,10 +825,10 @@ export default function StaffCheckQualityDetailsPage() {
                           value={failedQuantity}
                           onChange={e => {
                             const value = Number.parseInt(e.target.value) || 0;
-                            setFailedQuantity(value);
-                            setPassedQuantity(
-                              selectedOrderDetail.quantity - value,
-                            );
+                            const maxValue = selectedOrderDetail.quantity;
+                            const newFailedQuantity = Math.min(value, maxValue);
+                            setFailedQuantity(newFailedQuantity);
+                            setPassedQuantity(maxValue - newFailedQuantity);
                           }}
                         />
                       </div>
