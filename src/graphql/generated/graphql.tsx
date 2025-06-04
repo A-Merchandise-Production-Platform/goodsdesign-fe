@@ -182,6 +182,7 @@ export type CreateOrderDetailInput = {
 export type CreateOrderInput = {
   addressId: Scalars['String']['input'];
   evaluationCriteriaIds?: InputMaybe<Array<Scalars['String']['input']>>;
+  expectedReceiveAt?: InputMaybe<Scalars['DateTime']['input']>;
   orderDetails: Array<CreateOrderDetailInput>;
   voucherId?: InputMaybe<Scalars['String']['input']>;
 };
@@ -357,7 +358,7 @@ export type EvaluationCriteriaEntity = {
   isActive: Scalars['Boolean']['output'];
   isDeleted: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
-  product: ProductEntity;
+  product?: Maybe<ProductEntity>;
   productId: Scalars['ID']['output'];
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
@@ -2043,6 +2044,7 @@ export type SystemConfigOrderEntity = {
   maxLegitPoint: Scalars['Int']['output'];
   maxProductionCapacity: Scalars['Int']['output'];
   maxProductionTimeInMinutes: Scalars['Int']['output'];
+  minExpectedReceiveAt: Scalars['Int']['output'];
   productionCapacityScoreWeight: Scalars['Float']['output'];
   reduceLegitPointIfReject: Scalars['Int']['output'];
   shippingDays: Scalars['Int']['output'];
@@ -2254,6 +2256,7 @@ export type UpdateSystemConfigOrderDto = {
   maxLegitPoint?: InputMaybe<Scalars['Int']['input']>;
   maxProductionCapacity?: InputMaybe<Scalars['Int']['input']>;
   maxProductionTimeInMinutes?: InputMaybe<Scalars['Int']['input']>;
+  minExpectedReceiveAt?: InputMaybe<Scalars['Int']['input']>;
   productionCapacityScoreWeight?: InputMaybe<Scalars['Float']['input']>;
   reduceLegitPointIfReject?: InputMaybe<Scalars['Int']['input']>;
   shippingDays?: InputMaybe<Scalars['Int']['input']>;
@@ -3077,7 +3080,7 @@ export type RemoveSystemConfigBankMutation = { __typename?: 'Mutation', removeSy
 export type SystemConfigOrderQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type SystemConfigOrderQuery = { __typename?: 'Query', systemConfigOrder: { __typename?: 'SystemConfigOrderEntity', acceptHoursForFactory: number, capacityScoreWeight: number, checkQualityTimesDays: number, leadTimeScoreWeight: number, legitPointScoreWeight: number, legitPointToSuspend: number, limitFactoryRejectOrders: number, limitReworkTimes: number, maxLegitPoint: number, maxProductionCapacity: number, maxProductionTimeInMinutes: number, productionCapacityScoreWeight: number, reduceLegitPointIfReject: number, shippingDays: number, specializationScoreWeight: number, voucherBaseTypeForRefund: VoucherType, voucherBaseValueForRefund: number, voucherBaseLimitedUsage: number, voucherBaseMaxDiscountValue: number, maxEvaluationCriteria: number } };
+export type SystemConfigOrderQuery = { __typename?: 'Query', systemConfigOrder: { __typename?: 'SystemConfigOrderEntity', acceptHoursForFactory: number, capacityScoreWeight: number, checkQualityTimesDays: number, leadTimeScoreWeight: number, legitPointScoreWeight: number, legitPointToSuspend: number, limitFactoryRejectOrders: number, limitReworkTimes: number, maxLegitPoint: number, maxProductionCapacity: number, maxProductionTimeInMinutes: number, productionCapacityScoreWeight: number, reduceLegitPointIfReject: number, shippingDays: number, specializationScoreWeight: number, voucherBaseTypeForRefund: VoucherType, voucherBaseValueForRefund: number, voucherBaseLimitedUsage: number, voucherBaseMaxDiscountValue: number, maxEvaluationCriteria: number, minExpectedReceiveAt: number } };
 
 export type UpdateSystemConfigOrderMutationVariables = Exact<{
   updateConfigInput: UpdateSystemConfigOrderDto;
@@ -9324,6 +9327,7 @@ export const SystemConfigOrderDocument = gql`
     voucherBaseLimitedUsage
     voucherBaseMaxDiscountValue
     maxEvaluationCriteria
+    minExpectedReceiveAt
   }
 }
     `;

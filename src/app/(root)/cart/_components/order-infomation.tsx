@@ -1,14 +1,16 @@
 'use client';
 
-import { PlusCircleIcon } from 'lucide-react';
+import { PlusCircleIcon, CalendarIcon } from 'lucide-react';
 import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { toast } from 'sonner';
+import { format, addDays } from 'date-fns';
 
 import {
   AddressSelector,
   AddressValue,
 } from '@/components/shared/address/address-selector';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Dialog,
   DialogContent,
@@ -19,6 +21,11 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { PhoneInput } from '@/components/ui/phone-input';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -32,14 +39,17 @@ import {
   useCreateAddressMutation,
   useGetMeQuery,
   useUpdatePhoneNumberMutation,
+  useSystemConfigOrderQuery,
 } from '@/graphql/generated/graphql';
 import { useAuthStore } from '@/stores/auth.store';
+import { cn } from '@/lib/utils';
 
 export interface OrderInformationRef {
   validate: () => boolean;
   getFormData: () => {
     address: AddressEntity | null;
     phone: string;
+    expectedReceiveAt?: Date | null;
   };
 }
 
@@ -59,12 +69,24 @@ const OrderInformation = forwardRef<OrderInformationRef, OrderInformationProps>(
     const { data: userData, loading: userLoading } = useGetMeQuery({
       skip: !isAuth,
     });
+    const { data: systemConfigData, loading: systemConfigLoading } =
+      useSystemConfigOrderQuery();
 
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
       null,
     );
     const [phone, setPhone] = useState('');
+    const [expectedReceiveAt, setExpectedReceiveAt] = useState<
+      Date | undefined
+    >(undefined);
     const [isAddressFormOpen, setIsAddressFormOpen] = useState(false);
+
+    // Calculate minimum selectable date
+    const getMinimumDate = () => {
+      const systemConfig = systemConfigData?.systemConfigOrder as any;
+      const minDays = systemConfig?.minExpectedReceiveAt || 1;
+      return addDays(new Date(), minDays);
+    };
 
     // Set initial values
     useEffect(() => {
@@ -139,6 +161,7 @@ const OrderInformation = forwardRef<OrderInformationRef, OrderInformationProps>(
               }
             : null,
           phone,
+          expectedReceiveAt: expectedReceiveAt || null,
         };
       },
     }));
@@ -216,6 +239,61 @@ const OrderInformation = forwardRef<OrderInformationRef, OrderInformationProps>(
               setPhone(e);
             }}
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="expectedReceiveAt">
+            Expected Delivery Date (Optional)
+          </Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  'w-full justify-start text-left font-normal',
+                  !expectedReceiveAt && 'text-muted-foreground',
+                )}
+                disabled={systemConfigLoading}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {expectedReceiveAt ? (
+                  format(expectedReceiveAt, 'PPP')
+                ) : (
+                  <span>Pick a delivery date (optional)</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={expectedReceiveAt}
+                onSelect={setExpectedReceiveAt}
+                disabled={date => {
+                  const minDate = getMinimumDate();
+                  return date < minDate;
+                }}
+                initialFocus
+                fromDate={getMinimumDate()}
+              />
+              <div className="border-t p-3">
+                <Button
+                  variant="outline"
+                  className="w-full text-sm"
+                  onClick={() => setExpectedReceiveAt(undefined)}
+                >
+                  Clear selection
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+          {systemConfigData?.systemConfigOrder &&
+            (systemConfigData.systemConfigOrder as any)
+              .minExpectedReceiveAt && (
+              <p className="text-muted-foreground text-sm">
+                You can select a delivery date starting from{' '}
+                {format(getMinimumDate(), 'PPP')}
+              </p>
+            )}
         </div>
       </div>
     );

@@ -39,6 +39,7 @@ interface OrderSummaryProps {
   selectedEvaluationCriteriaIds: string[];
   onSelectEvaluationCriteria: (criteriaIds: string[]) => void;
   evaluationCriteriaLoading: boolean;
+  onExpectedReceiveAtChange: (date: Date | null) => void;
 }
 
 export function OrderSummary({
@@ -57,6 +58,7 @@ export function OrderSummary({
   selectedEvaluationCriteriaIds,
   onSelectEvaluationCriteria,
   evaluationCriteriaLoading,
+  onExpectedReceiveAtChange,
 }: OrderSummaryProps) {
   const orderInfoRef = useRef<OrderInformationRef>(null);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -102,6 +104,7 @@ export function OrderSummary({
           },
         });
       }
+      onExpectedReceiveAtChange(formData.expectedReceiveAt || null);
       onCheckout();
     }
   };
