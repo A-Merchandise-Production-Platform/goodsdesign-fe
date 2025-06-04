@@ -713,9 +713,7 @@ export default function StaffCheckQualityDetailsPage() {
                                           (check.passedQuantity || 0)}
                                       </span>
                                     </div>
-                                    {check.failedEvaluationCriteria &&
-                                    check.failedEvaluationCriteria.length >
-                                      0 ? (
+                                    {check.status === 'REJECTED' && (
                                       <div className="mt-2">
                                         <div className="mb-2 flex items-center gap-2">
                                           <AlertTriangle className="h-4 w-4 text-amber-500" />
@@ -723,50 +721,56 @@ export default function StaffCheckQualityDetailsPage() {
                                             Failed Criteria:
                                           </span>
                                         </div>
-                                        <div className="mt-1 space-y-2">
-                                          {check.failedEvaluationCriteria.map(
-                                            (criteria, idx) => (
-                                              <div
-                                                key={idx}
-                                                className="bg-muted/50 rounded-md border p-3"
-                                              >
-                                                <div className="flex items-start gap-2">
-                                                  <div className="mt-0.5">
-                                                    <XCircle className="h-4 w-4 text-red-500" />
-                                                  </div>
-                                                  <div>
-                                                    <p className="font-medium">
-                                                      {
-                                                        criteria
-                                                          .evaluationCriteria
-                                                          .name
-                                                      }
-                                                    </p>
-                                                    {criteria.evaluationCriteria
-                                                      .description && (
-                                                      <p className="text-muted-foreground mt-1 text-sm">
+                                        {check.failedEvaluationCriteria &&
+                                        check.failedEvaluationCriteria.length >
+                                          0 ? (
+                                          <div className="mt-1 space-y-2">
+                                            {check.failedEvaluationCriteria.map(
+                                              (criteria, idx) => (
+                                                <div
+                                                  key={idx}
+                                                  className="bg-muted/50 rounded-md border p-3"
+                                                >
+                                                  <div className="flex items-start gap-2">
+                                                    <div className="mt-0.5">
+                                                      <XCircle className="h-4 w-4 text-red-500" />
+                                                    </div>
+                                                    <div>
+                                                      <p className="font-medium">
                                                         {
                                                           criteria
                                                             .evaluationCriteria
-                                                            .description
+                                                            .name
                                                         }
                                                       </p>
-                                                    )}
+                                                      {criteria
+                                                        .evaluationCriteria
+                                                        .description && (
+                                                        <p className="text-muted-foreground mt-1 text-sm">
+                                                          {
+                                                            criteria
+                                                              .evaluationCriteria
+                                                              .description
+                                                          }
+                                                        </p>
+                                                      )}
+                                                    </div>
                                                   </div>
                                                 </div>
-                                              </div>
-                                            ),
-                                          )}
-                                        </div>
-                                      </div>
-                                    ) : (
-                                      <div className="mt-2">
-                                        <div className="flex items-center gap-2">
-                                          <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                          <span className="font-medium">
-                                            No Failed Criteria
-                                          </span>
-                                        </div>
+                                              ),
+                                            )}
+                                          </div>
+                                        ) : (
+                                          <div className="mt-1">
+                                            <div className="flex items-center gap-2">
+                                              <AlertTriangle className="h-4 w-4 text-amber-500" />
+                                              <span className="text-muted-foreground text-sm">
+                                                No specific criteria were marked
+                                                as failed
+                                              </span>
+                                            </div>
+                                          </div>
+                                        )}
                                       </div>
                                     )}
                                     {check.task && (
