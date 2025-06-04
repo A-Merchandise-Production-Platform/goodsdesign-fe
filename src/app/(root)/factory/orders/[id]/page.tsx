@@ -754,67 +754,58 @@ export default function FactoryOrderDetailsPage() {
                     </div>
 
                     <div className="grid gap-3">
-                      {order.orderDetails?.map((item, itemIndex) => {
-                        // Create a Map to store unique evaluation criteria by ID for this item
+                      {(() => {
+                        // Create a Map to store unique evaluation criteria by ID
                         const uniqueFailedCriteria = new Map();
 
-                        // Collect all failed criteria for this item
-                        item.checkQualities?.forEach(check =>
-                          check.failedEvaluationCriteria?.forEach(failed => {
-                            if (failed.evaluationCriteria?.id) {
-                              uniqueFailedCriteria.set(
-                                failed.evaluationCriteria.id,
-                                failed.evaluationCriteria,
-                              );
-                            }
-                          }),
+                        // Collect all failed criteria
+                        order.orderDetails?.forEach(item =>
+                          item.checkQualities?.forEach(check =>
+                            check.failedEvaluationCriteria?.forEach(failed => {
+                              if (failed.evaluationCriteria?.id) {
+                                uniqueFailedCriteria.set(
+                                  failed.evaluationCriteria.id,
+                                  failed.evaluationCriteria,
+                                );
+                              }
+                            }),
+                          ),
                         );
 
-                        // Only render if there are failed criteria
-                        if (uniqueFailedCriteria.size > 0) {
-                          return (
-                            <div key={item.id} className="space-y-3">
-                              <h4 className="font-medium text-gray-700 dark:text-gray-300">
-                                Item {itemIndex + 1}:{' '}
-                                {item.systemConfigVariant?.product?.name}
-                              </h4>
-                              {Array.from(uniqueFailedCriteria.values()).map(
-                                criteria => (
-                                  <div
-                                    key={criteria.id}
-                                    className="group relative overflow-hidden rounded-lg border border-red-200/60 bg-gradient-to-r from-red-50/80 to-orange-50/80 p-4 transition-all duration-200 hover:border-red-300/80 hover:shadow-md dark:border-red-800/60 dark:from-red-950/40 dark:to-orange-950/40"
-                                  >
-                                    <div className="flex items-start space-x-3">
-                                      <div className="mt-1 flex-shrink-0">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-red-200 bg-red-100 transition-colors group-hover:bg-red-200 dark:border-red-800 dark:bg-red-900/50">
-                                          <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
-                                        </div>
-                                      </div>
-                                      <div className="min-w-0 flex-1">
-                                        <h5 className="mb-1 font-semibold text-red-800 dark:text-red-200">
-                                          {criteria.name}
-                                        </h5>
-                                        <p className="text-sm leading-relaxed text-red-700/80 dark:text-red-300/80">
-                                          {criteria.description}
-                                        </p>
-                                      </div>
-                                      <div className="flex-shrink-0">
-                                        <div className="rounded bg-red-200 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-800/50 dark:text-red-200">
-                                          Failed
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    {/* Subtle gradient overlay for hover effect */}
-                                    <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-red-400/0 via-red-400/5 to-orange-400/0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div>
+                        // Convert Map values to array and render
+                        return Array.from(uniqueFailedCriteria.values()).map(
+                          criteria => (
+                            <div
+                              key={criteria.id}
+                              className="group relative overflow-hidden rounded-lg border border-red-200/60 bg-gradient-to-r from-red-50/80 to-orange-50/80 p-4 transition-all duration-200 hover:border-red-300/80 hover:shadow-md dark:border-red-800/60 dark:from-red-950/40 dark:to-orange-950/40"
+                            >
+                              <div className="flex items-start space-x-3">
+                                <div className="mt-1 flex-shrink-0">
+                                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-red-200 bg-red-100 transition-colors group-hover:bg-red-200 dark:border-red-800 dark:bg-red-900/50">
+                                    <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
                                   </div>
-                                ),
-                              )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <h5 className="mb-1 font-semibold text-red-800 dark:text-red-200">
+                                    {criteria.name}
+                                  </h5>
+                                  <p className="text-sm leading-relaxed text-red-700/80 dark:text-red-300/80">
+                                    {criteria.description}
+                                  </p>
+                                </div>
+                                <div className="flex-shrink-0">
+                                  <div className="rounded bg-red-200 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-800/50 dark:text-red-200">
+                                    Failed
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Subtle gradient overlay for hover effect */}
+                              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-red-400/0 via-red-400/5 to-orange-400/0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div>
                             </div>
-                          );
-                        }
-                        return null;
-                      })}
+                          ),
+                        );
+                      })()}
                     </div>
                   </div>
                 )}
@@ -1284,13 +1275,13 @@ export default function FactoryOrderDetailsPage() {
                         {item.checkQualities &&
                           item.checkQualities.length > 0 && (
                             <div className="mt-2">
-                              <h4 className="mb-1 text-sm font-medium">
+                              <h4 className="text-sm font-medium">
                                 Quality Check:
                               </h4>
                               {item.checkQualities.map((check, idx) => (
                                 <div
                                   key={idx}
-                                  className="flex items-center gap-2 text-sm"
+                                  className="flex items-center gap-2 text-sm mt-1"
                                 >
                                   {getStatusBadge(check.status)}
                                   <span>
@@ -1299,6 +1290,65 @@ export default function FactoryOrderDetailsPage() {
                                   </span>
                                 </div>
                               ))}
+
+                              {/* Add Failed Evaluation Criteria Section */}
+                              {item.checkQualities.some(
+                                check =>
+                                  check.failedEvaluationCriteria &&
+                                  check.failedEvaluationCriteria.length > 0,
+                              ) && (
+                                <div className="mt-4">
+                                  <h4 className="mb-2 text-sm font-medium text-red-600 dark:text-red-400">
+                                    Failed Criteria:
+                                  </h4>
+                                  <div className="grid gap-2">
+                                    {(() => {
+                                      // Create a Map to store unique evaluation criteria by ID
+                                      const uniqueFailedCriteria = new Map();
+
+                                      // Collect all failed criteria for this item
+                                      item.checkQualities?.forEach(check =>
+                                        check.failedEvaluationCriteria?.forEach(
+                                          failed => {
+                                            if (failed.evaluationCriteria?.id) {
+                                              uniqueFailedCriteria.set(
+                                                failed.evaluationCriteria.id,
+                                                failed.evaluationCriteria,
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      );
+
+                                      // Convert Map values to array and render
+                                      return Array.from(
+                                        uniqueFailedCriteria.values(),
+                                      ).map(criteria => (
+                                        <div
+                                          key={criteria.id}
+                                          className="group relative overflow-hidden rounded-lg border border-red-200/60 bg-gradient-to-r from-red-50/80 to-orange-50/80 p-3 transition-all duration-200 hover:border-red-300/80 hover:shadow-md dark:border-red-800/60 dark:from-red-950/40 dark:to-orange-950/40"
+                                        >
+                                          <div className="flex items-start space-x-2">
+                                            <div className="mt-1 flex-shrink-0">
+                                              <div className="flex h-6 w-6 items-center justify-center rounded-full border border-red-200 bg-red-100 transition-colors group-hover:bg-red-200 dark:border-red-800 dark:bg-red-900/50">
+                                                <XCircle className="h-3 w-3 text-red-600 dark:text-red-400" />
+                                              </div>
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                              <h5 className="text-sm font-medium text-red-800 dark:text-red-200">
+                                                {criteria.name}
+                                              </h5>
+                                              <p className="text-xs leading-relaxed text-red-700/80 dark:text-red-300/80">
+                                                {criteria.description}
+                                              </p>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ));
+                                    })()}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           )}
                       </div>
