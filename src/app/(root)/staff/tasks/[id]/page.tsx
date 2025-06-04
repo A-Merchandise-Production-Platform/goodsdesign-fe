@@ -117,6 +117,14 @@ export default function StaffCheckQualityDetailsPage() {
       onCompleted: data => {
         refetch();
         toast.success('Quality check completed successfully');
+        // Reset all form states
+        setPassedQuantity(0);
+        setFailedQuantity(0);
+        setNote('');
+        setSelectedFailedEvaluationCriteriaIds([]);
+        setImages([]);
+        setPreviewImages([]);
+        setActiveTab('details');
       },
       onError: error => {
         toast.error(error.message || 'Failed to complete quality check');
@@ -794,11 +802,13 @@ export default function StaffCheckQualityDetailsPage() {
                           min="0"
                           max={selectedOrderDetail.quantity}
                           value={passedQuantity}
-                          onChange={e =>
-                            setPassedQuantity(
-                              Number.parseInt(e.target.value) || 0,
-                            )
-                          }
+                          onChange={e => {
+                            const value = Number.parseInt(e.target.value) || 0;
+                            setPassedQuantity(value);
+                            setFailedQuantity(
+                              selectedOrderDetail.quantity - value,
+                            );
+                          }}
                         />
                       </div>
                       <div>
@@ -814,11 +824,13 @@ export default function StaffCheckQualityDetailsPage() {
                           min="0"
                           max={selectedOrderDetail.quantity}
                           value={failedQuantity}
-                          onChange={e =>
-                            setFailedQuantity(
-                              Number.parseInt(e.target.value) || 0,
-                            )
-                          }
+                          onChange={e => {
+                            const value = Number.parseInt(e.target.value) || 0;
+                            setFailedQuantity(value);
+                            setPassedQuantity(
+                              selectedOrderDetail.quantity - value,
+                            );
+                          }}
                         />
                       </div>
                     </div>
@@ -861,7 +873,11 @@ export default function StaffCheckQualityDetailsPage() {
                           setSelectedFailedEvaluationCriteriaIds
                         }
                         loading={loading}
-                        disabled={uploadFileloading || doneCheckQualityLoading}
+                        disabled={
+                          uploadFileloading ||
+                          doneCheckQualityLoading ||
+                          failedQuantity === 0
+                        }
                       />
                     </div>
 
