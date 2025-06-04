@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { uploadImage } from '@/graphql/upload';
-
+import Image from 'next/image';
 export default function TestPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
@@ -59,10 +59,12 @@ export default function TestPage() {
         {previewUrl && (
           <div className="mt-4">
             <h2 className="text-lg font-semibold mb-2">Preview:</h2>
-            <img
+            <Image
               src={previewUrl}
               alt="Preview"
               className="max-w-sm rounded-lg shadow-md"
+              width={1000}
+              height={1000}
             />
           </div>
         )}
@@ -88,10 +90,12 @@ export default function TestPage() {
         {uploadedUrl && (
           <div className="mt-4">
             <h2 className="text-lg font-semibold mb-2">Uploaded Image:</h2>
-            <img
+            <Image
               src={uploadedUrl}
               alt="Uploaded"
               className="max-w-sm rounded-lg shadow-md"
+              width={1000}
+              height={1000}
             />
             <p className="mt-2 text-sm text-gray-600 break-all">
               URL: {uploadedUrl}

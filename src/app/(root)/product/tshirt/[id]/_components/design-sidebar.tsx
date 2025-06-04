@@ -18,6 +18,7 @@ import { LayersPanel } from './layers-panel';
 import { SHIRT_COLORS } from './shirt-colors';
 import { PulsatingButton } from '@/components/magicui/pulsating-button';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
+import { uploadImage } from '@/graphql/upload';
 
 interface DesignSidebarProps {
   showColorDialog: boolean;
@@ -155,11 +156,17 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
         throw new Error('Failed to generate image');
       }
 
-      const imageUrl = result.data.generateAndUploadImage.url;
+      const imageBase64 = result.data.generateAndUploadImage.url;
+
+      //based64 to file
+      const imageFile = new File([imageBase64], 'image.png', { type: 'image/png' });  
+
+      //upload the image to the database
+      const uploadResult = await uploadImage(imageFile);
       
       // Pass the image URL to the parent component for handling
       if (onGenAIUpload) {
-        onGenAIUpload(imageUrl);
+        onGenAIUpload(uploadResult);
       }
 
       setShowGenAIDialog(false);

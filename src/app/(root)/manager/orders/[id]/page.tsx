@@ -89,7 +89,6 @@ import {
   useSystemConfigOrderQuery,
   useTransferOrderToFactoryMutation,
 } from '@/graphql/generated/graphql';
-import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
 import { cn, formatDate } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle } from 'lucide-react';
@@ -97,6 +96,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { OrderEvaluationCriteria } from '@/components/shared/order/order-evaluation-criteria';
+import { uploadImage } from '@/graphql/upload';
 
 // Helper function to format time
 const formatTime = (dateString: string) => {
@@ -223,8 +223,6 @@ export default function FactoryOrderDetailsPage() {
     skip: !order?.order?.customerId,
   });
 
-  const [uploadFile, { loading: uploadFileloading }] = useUploadFileMutation();
-
   // Mutations
   const [startReworkByManager, { loading: startReworkByManagerLoading }] =
     useStartReworkByManagerMutation({
@@ -317,16 +315,14 @@ export default function FactoryOrderDetailsPage() {
   // Handle image upload
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || uploadFileloading) return;
+    if (!files) return;
 
     try {
       toast.loading('Uploading images...', { id: 'upload' });
 
       const uploadPromises = Array.from(files).map(async file => {
-        const result = await uploadFile({
-          variables: { file },
-        });
-        return result.data?.uploadFile?.url;
+        const result = await uploadImage(file);
+        return result;
       });
 
       const uploadedUrls = await Promise.all(uploadPromises);

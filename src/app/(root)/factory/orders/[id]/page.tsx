@@ -79,8 +79,8 @@ import {
 import { cn, formatDate } from '@/lib/utils';
 import { filesToBase64 } from '@/utils/handle-upload';
 import { RejectionHistory } from '@/app/(root)/_components/rejection-history';
-import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
 import { OrderEvaluationCriteria } from '@/components/shared/order/order-evaluation-criteria';
+import { uploadImage } from '@/graphql/upload';
 // Helper function to format time
 const formatTime = (dateString: string) => {
   return new Date(dateString).toLocaleTimeString('en-US', {
@@ -227,8 +227,6 @@ export default function FactoryOrderDetailsPage() {
       },
     });
 
-  const [uploadFile, { loading: uploadFileLoading }] = useUploadFileMutation();
-
   const handleUploadFile = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -236,15 +234,12 @@ export default function FactoryOrderDetailsPage() {
     if (!file) return null;
 
     try {
-      const result = await uploadFile({
-        variables: { file },
-      });
+      const result = await uploadImage(file);
 
       // Check if the upload was successful
-      if (result.data?.uploadFile?.url) {
-        const fileUrl = result.data.uploadFile.url;
+      if (result) {
         toast.success('Image uploaded successfully');
-        return fileUrl;
+        return result;
       }
       return null;
     } catch (error) {
@@ -502,18 +497,15 @@ export default function FactoryOrderDetailsPage() {
         }),
       );
 
-      // Filter out any failed uploads (null values)
-      const validUrls = uploadedUrls.filter(
-        (url): url is string => url !== null,
-      );
-
       // Add progress report with uploaded image URLs
       addProgressReport({
         variables: {
           input: {
             orderId: id,
             note: progressNote,
-            imageUrls: validUrls,
+            imageUrls: uploadedUrls.filter(
+              (url): url is string => url !== null,
+            ),
           },
         },
       });
@@ -1744,12 +1736,11 @@ export default function FactoryOrderDetailsPage() {
             <Button
               onClick={handleAddProgressReport}
               disabled={
-                uploadFileLoading ||
                 addProgressReportLoading ||
                 !progressNote.trim()
               }
             >
-              {(uploadFileLoading || addProgressReportLoading) && (
+              {addProgressReportLoading && (
                 <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               )}
               Add Progress Report
