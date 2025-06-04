@@ -222,7 +222,6 @@ export default function StaffCheckQualityDetailsPage() {
         },
       },
       onCompleted: data => {
-        refetch();
         toast.success('Quality check completed successfully');
         // Reset all form states
         setPassedQuantity(0);
@@ -236,6 +235,7 @@ export default function StaffCheckQualityDetailsPage() {
       onError: error => {
         toast.error(error.message || 'Failed to complete quality check');
       },
+      refetchQueries: ['GetOrder'],
     });
   };
 
@@ -704,6 +704,48 @@ export default function StaffCheckQualityDetailsPage() {
                                         {check.passedQuantity || 0}
                                       </span>
                                     </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                      <span className="text-muted-foreground text-sm">
+                                        Failed Quantity
+                                      </span>
+                                      <span className="font-medium text-red-600">
+                                        {(check.totalChecked || 0) -
+                                          (check.passedQuantity || 0)}
+                                      </span>
+                                    </div>
+                                    {check.failedEvaluationCriteria &&
+                                      check.failedEvaluationCriteria.length >
+                                        0 && (
+                                        <div className="mt-2">
+                                          <span className="text-muted-foreground text-sm">
+                                            Failed Criteria:
+                                          </span>
+                                          <div className="mt-1 space-y-1">
+                                            {check.failedEvaluationCriteria.map(
+                                              (criteria, idx) => (
+                                                <div
+                                                  key={idx}
+                                                  className="bg-muted rounded-md p-2 text-sm"
+                                                >
+                                                  <p className="font-medium">
+                                                    {
+                                                      criteria
+                                                        .evaluationCriteria.name
+                                                    }
+                                                  </p>
+                                                  <p className="text-muted-foreground text-xs">
+                                                    {
+                                                      criteria
+                                                        .evaluationCriteria
+                                                        .description
+                                                    }
+                                                  </p>
+                                                </div>
+                                              ),
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
                                     {check.task && (
                                       <>
                                         <div className="flex justify-between border-b pb-1">
