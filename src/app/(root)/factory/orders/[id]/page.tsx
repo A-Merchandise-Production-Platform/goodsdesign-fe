@@ -754,11 +754,29 @@ export default function FactoryOrderDetailsPage() {
                     </div>
 
                     <div className="grid gap-3">
-                      {order.orderDetails?.map(item =>
-                        item.checkQualities?.map(check =>
-                          check.failedEvaluationCriteria?.map(failed => (
+                      {(() => {
+                        // Create a Map to store unique evaluation criteria by ID
+                        const uniqueFailedCriteria = new Map();
+
+                        // Collect all failed criteria
+                        order.orderDetails?.forEach(item =>
+                          item.checkQualities?.forEach(check =>
+                            check.failedEvaluationCriteria?.forEach(failed => {
+                              if (failed.evaluationCriteria?.id) {
+                                uniqueFailedCriteria.set(
+                                  failed.evaluationCriteria.id,
+                                  failed.evaluationCriteria,
+                                );
+                              }
+                            }),
+                          ),
+                        );
+
+                        // Convert Map values to array and render
+                        return Array.from(uniqueFailedCriteria.values()).map(
+                          criteria => (
                             <div
-                              key={failed.id}
+                              key={criteria.id}
                               className="group relative overflow-hidden rounded-lg border border-red-200/60 bg-gradient-to-r from-red-50/80 to-orange-50/80 p-4 transition-all duration-200 hover:border-red-300/80 hover:shadow-md dark:border-red-800/60 dark:from-red-950/40 dark:to-orange-950/40"
                             >
                               <div className="flex items-start space-x-3">
@@ -769,10 +787,10 @@ export default function FactoryOrderDetailsPage() {
                                 </div>
                                 <div className="min-w-0 flex-1">
                                   <h5 className="mb-1 font-semibold text-red-800 dark:text-red-200">
-                                    {failed.evaluationCriteria?.name}
+                                    {criteria.name}
                                   </h5>
                                   <p className="text-sm leading-relaxed text-red-700/80 dark:text-red-300/80">
-                                    {failed.evaluationCriteria?.description}
+                                    {criteria.description}
                                   </p>
                                 </div>
                                 <div className="flex-shrink-0">
@@ -785,9 +803,9 @@ export default function FactoryOrderDetailsPage() {
                               {/* Subtle gradient overlay for hover effect */}
                               <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-red-400/0 via-red-400/5 to-orange-400/0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div>
                             </div>
-                          )),
-                        ),
-                      )}
+                          ),
+                        );
+                      })()}
                     </div>
                   </div>
                 )}

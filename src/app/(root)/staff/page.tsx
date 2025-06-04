@@ -12,7 +12,6 @@ import { DashboardShell } from '@/components/dashboard-shell';
 import { StatCard } from '@/components/stat-card';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import {
   Table,
   TableBody,
