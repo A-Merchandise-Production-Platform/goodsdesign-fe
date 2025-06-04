@@ -127,7 +127,12 @@ export function OrderHeader({ order, showFactory = true }: OrderHeaderProps) {
       <CardContent className="p-6">
         <div className="space-y-6">
           {/* Main order information */}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+          <div
+            className={cn(
+              'grid gap-6 md:grid-cols-2',
+              showFactory ? 'lg:grid-cols-5' : 'lg:grid-cols-4',
+            )}
+          >
             {/* Customer info */}
             <div className="bg-card rounded-lg border p-4 shadow-sm transition-all hover:shadow-md">
               <div className="flex flex-col space-y-3">
@@ -295,7 +300,12 @@ export function OrderHeader({ order, showFactory = true }: OrderHeaderProps) {
 
           {/* Address information */}
           {(order.customerAddress || order.factoryAddress) && (
-            <div className="grid gap-6 md:grid-cols-2">
+            <div
+              className={cn(
+                'grid gap-6',
+                showFactory ? 'md:grid-cols-2' : 'md:grid-cols-1',
+              )}
+            >
               <div className="bg-card rounded-lg border p-4 shadow-sm">
                 <div className="mb-2 flex items-center gap-2">
                   <MapPin className="text-muted-foreground h-4 w-4" />
