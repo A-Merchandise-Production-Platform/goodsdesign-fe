@@ -156,17 +156,9 @@ const DesignSidebar: React.FC<DesignSidebarProps> = ({
         throw new Error('Failed to generate image');
       }
 
-      const imageBase64 = result.data.generateAndUploadImage.url;
-
-      //based64 to file
-      const imageFile = new File([imageBase64], 'image.png', { type: 'image/png' });  
-
-      //upload the image to the database
-      const uploadResult = await uploadImage(imageFile);
-      
       // Pass the image URL to the parent component for handling
       if (onGenAIUpload) {
-        onGenAIUpload(uploadResult);
+        onGenAIUpload(result.data.generateAndUploadImage.url);
       }
 
       setShowGenAIDialog(false);
