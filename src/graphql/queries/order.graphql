@@ -217,6 +217,7 @@ query GetMyOrders {
     totalPrice
     totalProductionCost
     updatedAt
+    expectedReceiveAt
   }
 }
 query GetMyFactoryOrders {
@@ -428,6 +429,7 @@ query GetMyFactoryOrders {
     totalPrice
     totalProductionCost
     updatedAt
+    expectedReceiveAt
   }
 }
 
@@ -640,6 +642,7 @@ query GetOrdersByFactoryId($factoryId: String!) {
     totalPrice
     totalProductionCost
     updatedAt
+    expectedReceiveAt
   }
 }
 
@@ -863,6 +866,7 @@ query GetOrder($orderId: String!) {
     totalPrice
     totalProductionCost
     updatedAt
+    expectedReceiveAt
   }
 }
 query GetAllOrders {
@@ -1074,6 +1078,7 @@ query GetAllOrders {
     totalPrice
     totalProductionCost
     updatedAt
+    expectedReceiveAt
   }
 }
 query GetMyStaffOrders {
@@ -1285,6 +1290,7 @@ query GetMyStaffOrders {
     totalPrice
     totalProductionCost
     updatedAt
+    expectedReceiveAt
   }
 }
 mutation AcceptOrderForFactory($orderId: String!) {

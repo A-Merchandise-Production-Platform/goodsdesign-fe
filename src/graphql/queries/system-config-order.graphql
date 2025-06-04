@@ -20,6 +20,7 @@ query SystemConfigOrder {
     voucherBaseLimitedUsage
     voucherBaseMaxDiscountValue
     maxEvaluationCriteria
+    minExpectedReceiveAt
   }
 }
 

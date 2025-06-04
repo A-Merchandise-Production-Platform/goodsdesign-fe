@@ -311,6 +311,7 @@ export default function OrderDetailsPage() {
       {/* Order Header */}
       {order && (
         <OrderHeader
+          showFactory={false}
           order={{
             id: order.id,
             orderDate: order.orderDate || '',
@@ -343,6 +344,7 @@ export default function OrderDetailsPage() {
                 }
               : undefined,
             orderCode: order.orderCode || '',
+            expectedReceiveAt: order.expectedReceiveAt || undefined,
           }}
         />
       )}
@@ -761,13 +763,13 @@ export default function OrderDetailsPage() {
                         {item.checkQualities &&
                           item.checkQualities.length > 0 && (
                             <div className="mt-2">
-                              <h4 className="mb-1 text-sm font-medium">
+                              <h4 className="text-sm font-medium">
                                 Quality Check:
                               </h4>
                               {item.checkQualities.map((check, idx) => (
                                 <div
                                   key={idx}
-                                  className="flex items-center gap-2 text-sm"
+                                  className="mt-1 flex items-center gap-2 text-sm"
                                 >
                                   {getStatusBadge(check.status)}
                                   <span>

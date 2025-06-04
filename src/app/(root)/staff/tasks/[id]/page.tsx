@@ -109,15 +109,7 @@ export default function StaffCheckQualityDetailsPage() {
   });
   // Done check quality mutation
   const [doneCheckQuality, { loading: doneCheckQualityLoading }] =
-    useDoneCheckQualityMutation({
-      onCompleted: data => {
-        refetch();
-        toast.success('Quality check completed successfully');
-      },
-      onError: error => {
-        toast.error(error.message || 'Failed to complete quality check');
-      },
-    });
+    useDoneCheckQualityMutation();
 
   const order = data?.order;
   const orderDetails = order?.orderDetails || [];
@@ -223,6 +215,21 @@ export default function StaffCheckQualityDetailsPage() {
           failedEvaluationCriteriaIds: selectedFailedEvaluationCriteriaIds,
         },
       },
+      onCompleted: data => {
+        toast.success('Quality check completed successfully');
+        // Reset all form states
+        setPassedQuantity(0);
+        setFailedQuantity(0);
+        setNote('');
+        setSelectedFailedEvaluationCriteriaIds([]);
+        setImages([]);
+        setPreviewImages([]);
+        setActiveTab('details');
+      },
+      onError: error => {
+        toast.error(error.message || 'Failed to complete quality check');
+      },
+      refetchQueries: ['GetOrder'],
     });
   };
 
@@ -691,6 +698,75 @@ export default function StaffCheckQualityDetailsPage() {
                                         {check.passedQuantity || 0}
                                       </span>
                                     </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                      <span className="text-muted-foreground text-sm">
+                                        Failed Quantity
+                                      </span>
+                                      <span className="font-medium text-red-600">
+                                        {(check.totalChecked || 0) -
+                                          (check.passedQuantity || 0)}
+                                      </span>
+                                    </div>
+                                    {check.status === 'REJECTED' && (
+                                      <div className="mt-2">
+                                        <div className="mb-2 flex items-center gap-2">
+                                          <AlertTriangle className="h-4 w-4 text-amber-500" />
+                                          <span className="font-medium">
+                                            Failed Criteria:
+                                          </span>
+                                        </div>
+                                        {check.failedEvaluationCriteria &&
+                                        check.failedEvaluationCriteria.length >
+                                          0 ? (
+                                          <div className="mt-1 space-y-2">
+                                            {check.failedEvaluationCriteria.map(
+                                              (criteria, idx) => (
+                                                <div
+                                                  key={idx}
+                                                  className="bg-muted/50 rounded-md border p-3"
+                                                >
+                                                  <div className="flex items-start gap-2">
+                                                    <div className="mt-0.5">
+                                                      <XCircle className="h-4 w-4 text-red-500" />
+                                                    </div>
+                                                    <div>
+                                                      <p className="font-medium">
+                                                        {
+                                                          criteria
+                                                            .evaluationCriteria
+                                                            .name
+                                                        }
+                                                      </p>
+                                                      {criteria
+                                                        .evaluationCriteria
+                                                        .description && (
+                                                        <p className="text-muted-foreground mt-1 text-sm">
+                                                          {
+                                                            criteria
+                                                              .evaluationCriteria
+                                                              .description
+                                                          }
+                                                        </p>
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              ),
+                                            )}
+                                          </div>
+                                        ) : (
+                                          <div className="mt-1">
+                                            <div className="flex items-center gap-2">
+                                              <AlertTriangle className="h-4 w-4 text-amber-500" />
+                                              <span className="text-muted-foreground text-sm">
+                                                No specific criteria were marked
+                                                as failed
+                                              </span>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
                                     {check.task && (
                                       <>
                                         <div className="flex justify-between border-b pb-1">
@@ -788,11 +864,13 @@ export default function StaffCheckQualityDetailsPage() {
                           min="0"
                           max={selectedOrderDetail.quantity}
                           value={passedQuantity}
-                          onChange={e =>
-                            setPassedQuantity(
-                              Number.parseInt(e.target.value) || 0,
-                            )
-                          }
+                          onChange={e => {
+                            const value = Number.parseInt(e.target.value) || 0;
+                            const maxValue = selectedOrderDetail.quantity;
+                            const newPassedQuantity = Math.min(value, maxValue);
+                            setPassedQuantity(newPassedQuantity);
+                            setFailedQuantity(maxValue - newPassedQuantity);
+                          }}
                         />
                       </div>
                       <div>
@@ -808,11 +886,13 @@ export default function StaffCheckQualityDetailsPage() {
                           min="0"
                           max={selectedOrderDetail.quantity}
                           value={failedQuantity}
-                          onChange={e =>
-                            setFailedQuantity(
-                              Number.parseInt(e.target.value) || 0,
-                            )
-                          }
+                          onChange={e => {
+                            const value = Number.parseInt(e.target.value) || 0;
+                            const maxValue = selectedOrderDetail.quantity;
+                            const newFailedQuantity = Math.min(value, maxValue);
+                            setFailedQuantity(newFailedQuantity);
+                            setPassedQuantity(maxValue - newFailedQuantity);
+                          }}
                         />
                       </div>
                     </div>
@@ -855,7 +935,10 @@ export default function StaffCheckQualityDetailsPage() {
                           setSelectedFailedEvaluationCriteriaIds
                         }
                         loading={loading}
-                        disabled={doneCheckQualityLoading}
+                        disabled={
+                          doneCheckQualityLoading ||
+                          failedQuantity === 0
+                        }
                       />
                     </div>
 
