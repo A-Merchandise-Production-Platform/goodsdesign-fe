@@ -56,10 +56,11 @@ export interface OrderInformationRef {
 interface OrderInformationProps {
   onAddressChange: (address: AddressEntity) => void;
   onValidityChange: (isValid: boolean) => void;
+  onExpectedReceiveAtChange?: (date: Date | undefined) => void;
 }
 
 const OrderInformation = forwardRef<OrderInformationRef, OrderInformationProps>(
-  ({ onAddressChange, onValidityChange }, ref) => {
+  ({ onAddressChange, onValidityChange, onExpectedReceiveAtChange }, ref) => {
     const { isAuth } = useAuthStore();
     const {
       data: addressesData,
@@ -122,6 +123,12 @@ const OrderInformation = forwardRef<OrderInformationRef, OrderInformationProps>(
       const isValid = Boolean(selectedAddressId && phone);
       onValidityChange(isValid);
     }, [selectedAddressId, phone, onValidityChange]);
+
+    useEffect(() => {
+      if (onExpectedReceiveAtChange) {
+        onExpectedReceiveAtChange(expectedReceiveAt);
+      }
+    }, [expectedReceiveAt, onExpectedReceiveAtChange]);
 
     // Handle adding a new address and automatic selection
     const handleAddressAdded = (id: string) => {

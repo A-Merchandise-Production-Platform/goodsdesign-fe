@@ -39,7 +39,7 @@ interface OrderSummaryProps {
   selectedEvaluationCriteriaIds: string[];
   onSelectEvaluationCriteria: (criteriaIds: string[]) => void;
   evaluationCriteriaLoading: boolean;
-  onExpectedReceiveAtChange: (date: Date | null) => void;
+  onExpectedReceiveAtChange: (date: Date | undefined) => void;
 }
 
 export function OrderSummary({
@@ -104,7 +104,7 @@ export function OrderSummary({
           },
         });
       }
-      onExpectedReceiveAtChange(formData.expectedReceiveAt || null);
+      onExpectedReceiveAtChange(formData.expectedReceiveAt ?? undefined);
       onCheckout();
     }
   };
@@ -196,6 +196,7 @@ export function OrderSummary({
             ref={orderInfoRef}
             onAddressChange={onSelectAddress}
             onValidityChange={setIsFormValid}
+            onExpectedReceiveAtChange={onExpectedReceiveAtChange}
           />
         </div>
 

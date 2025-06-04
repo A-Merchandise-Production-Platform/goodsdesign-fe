@@ -636,6 +636,7 @@ export default function FactoryOrderDetailsPage() {
             factoryAddress:
               currentOrder.factory?.address?.formattedAddress || '',
             orderCode: currentOrder.orderCode || '',
+            expectedReceiveAt: currentOrder.expectedReceiveAt || undefined,
           }}
         />
       )}

@@ -546,7 +546,7 @@ export default function CartPage() {
           selectedEvaluationCriteriaIds={selectedEvaluationCriteriaIds}
           onSelectEvaluationCriteria={handleSelectEvaluationCriteria}
           evaluationCriteriaLoading={evaluationCriteriaLoading}
-          onExpectedReceiveAtChange={setExpectedReceiveAt}
+          onExpectedReceiveAtChange={date => setExpectedReceiveAt(date || null)}
         />
       </div>
     </div>

@@ -343,6 +343,7 @@ export default function OrderDetailsPage() {
                 }
               : undefined,
             orderCode: order.orderCode || '',
+            expectedReceiveAt: order.expectedReceiveAt || undefined,
           }}
         />
       )}

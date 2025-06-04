@@ -654,6 +654,7 @@ export default function FactoryOrderDetailsPage() {
                 }
               : undefined,
             orderCode: order.orderCode || '',
+            expectedReceiveAt: order.expectedReceiveAt || undefined,
           }}
         />
       )}
@@ -1281,7 +1282,7 @@ export default function FactoryOrderDetailsPage() {
                               {item.checkQualities.map((check, idx) => (
                                 <div
                                   key={idx}
-                                  className="flex items-center gap-2 text-sm mt-1"
+                                  className="mt-1 flex items-center gap-2 text-sm"
                                 >
                                   {getStatusBadge(check.status)}
                                   <span>
