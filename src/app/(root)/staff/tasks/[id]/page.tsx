@@ -222,7 +222,6 @@ export default function StaffCheckQualityDetailsPage() {
         },
       },
       onCompleted: data => {
-        refetch();
         toast.success('Quality check completed successfully');
         // Reset all form states
         setPassedQuantity(0);
@@ -236,6 +235,7 @@ export default function StaffCheckQualityDetailsPage() {
       onError: error => {
         toast.error(error.message || 'Failed to complete quality check');
       },
+      refetchQueries: ['GetOrder'],
     });
   };
 
@@ -704,6 +704,71 @@ export default function StaffCheckQualityDetailsPage() {
                                         {check.passedQuantity || 0}
                                       </span>
                                     </div>
+                                    <div className="flex justify-between border-b pb-1">
+                                      <span className="text-muted-foreground text-sm">
+                                        Failed Quantity
+                                      </span>
+                                      <span className="font-medium text-red-600">
+                                        {(check.totalChecked || 0) -
+                                          (check.passedQuantity || 0)}
+                                      </span>
+                                    </div>
+                                    {check.failedEvaluationCriteria &&
+                                    check.failedEvaluationCriteria.length >
+                                      0 ? (
+                                      <div className="mt-2">
+                                        <div className="mb-2 flex items-center gap-2">
+                                          <AlertTriangle className="h-4 w-4 text-amber-500" />
+                                          <span className="font-medium">
+                                            Failed Criteria:
+                                          </span>
+                                        </div>
+                                        <div className="mt-1 space-y-2">
+                                          {check.failedEvaluationCriteria.map(
+                                            (criteria, idx) => (
+                                              <div
+                                                key={idx}
+                                                className="bg-muted/50 rounded-md border p-3"
+                                              >
+                                                <div className="flex items-start gap-2">
+                                                  <div className="mt-0.5">
+                                                    <XCircle className="h-4 w-4 text-red-500" />
+                                                  </div>
+                                                  <div>
+                                                    <p className="font-medium">
+                                                      {
+                                                        criteria
+                                                          .evaluationCriteria
+                                                          .name
+                                                      }
+                                                    </p>
+                                                    {criteria.evaluationCriteria
+                                                      .description && (
+                                                      <p className="text-muted-foreground mt-1 text-sm">
+                                                        {
+                                                          criteria
+                                                            .evaluationCriteria
+                                                            .description
+                                                        }
+                                                      </p>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            ),
+                                          )}
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="mt-2">
+                                        <div className="flex items-center gap-2">
+                                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                          <span className="font-medium">
+                                            No Failed Criteria
+                                          </span>
+                                        </div>
+                                      </div>
+                                    )}
                                     {check.task && (
                                       <>
                                         <div className="flex justify-between border-b pb-1">
