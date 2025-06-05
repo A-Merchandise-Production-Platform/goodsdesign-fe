@@ -311,6 +311,7 @@ export default function OrderDetailsPage() {
       {/* Order Header */}
       {order && (
         <OrderHeader
+          showFactory={false}
           order={{
             id: order.id,
             orderDate: order.orderDate || '',

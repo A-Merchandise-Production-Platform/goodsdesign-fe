@@ -79,8 +79,8 @@ import {
 import { cn, formatDate } from '@/lib/utils';
 import { filesToBase64 } from '@/utils/handle-upload';
 import { RejectionHistory } from '@/app/(root)/_components/rejection-history';
-import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
 import { OrderEvaluationCriteria } from '@/components/shared/order/order-evaluation-criteria';
+import { uploadImage } from '@/graphql/upload';
 // Helper function to format time
 const formatTime = (dateString: string) => {
   return new Date(dateString).toLocaleTimeString('en-US', {
@@ -227,8 +227,6 @@ export default function FactoryOrderDetailsPage() {
       },
     });
 
-  const [uploadFile, { loading: uploadFileLoading }] = useUploadFileMutation();
-
   const handleUploadFile = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -236,15 +234,12 @@ export default function FactoryOrderDetailsPage() {
     if (!file) return null;
 
     try {
-      const result = await uploadFile({
-        variables: { file },
-      });
+      const result = await uploadImage(file);
 
       // Check if the upload was successful
-      if (result.data?.uploadFile?.url) {
-        const fileUrl = result.data.uploadFile.url;
+      if (result) {
         toast.success('Image uploaded successfully');
-        return fileUrl;
+        return result;
       }
       return null;
     } catch (error) {
@@ -502,18 +497,15 @@ export default function FactoryOrderDetailsPage() {
         }),
       );
 
-      // Filter out any failed uploads (null values)
-      const validUrls = uploadedUrls.filter(
-        (url): url is string => url !== null,
-      );
-
       // Add progress report with uploaded image URLs
       addProgressReport({
         variables: {
           input: {
             orderId: id,
             note: progressNote,
-            imageUrls: validUrls,
+            imageUrls: uploadedUrls.filter(
+              (url): url is string => url !== null,
+            ),
           },
         },
       });
@@ -1280,76 +1272,58 @@ export default function FactoryOrderDetailsPage() {
                                 Quality Check:
                               </h4>
                               {item.checkQualities.map((check, idx) => (
-                                <div
-                                  key={idx}
-                                  className="mt-1 flex items-center gap-2 text-sm"
-                                >
-                                  {getStatusBadge(check.status)}
-                                  <span>
-                                    {check.passedQuantity} passed /{' '}
-                                    {check.totalChecked} checked
-                                  </span>
+                                <div key={idx} className="mt-4 space-y-2">
+                                  <div className="flex items-center gap-2 text-sm">
+                                    {getStatusBadge(check.status)}
+                                    <span>
+                                      {check.passedQuantity} passed /{' '}
+                                      {check.totalChecked} checked
+                                    </span>
+                                  </div>
+
+                                  {/* Failed Criteria for this specific check */}
+                                  {check.failedEvaluationCriteria &&
+                                    check.failedEvaluationCriteria.length >
+                                      0 && (
+                                      <div className="mt-2">
+                                        <div className="grid gap-2">
+                                          {check.failedEvaluationCriteria.map(
+                                            (failed, failedIdx) => (
+                                              <div
+                                                key={failedIdx}
+                                                className="group relative overflow-hidden rounded-lg border border-red-200/60 bg-gradient-to-r from-red-50/80 to-orange-50/80 p-3 transition-all duration-200 hover:border-red-300/80 hover:shadow-md dark:border-red-800/60 dark:from-red-950/40 dark:to-orange-950/40"
+                                              >
+                                                <div className="flex items-start space-x-2">
+                                                  <div className="mt-1 flex-shrink-0">
+                                                    <div className="flex h-6 w-6 items-center justify-center rounded-full border border-red-200 bg-red-100 transition-colors group-hover:bg-red-200 dark:border-red-800 dark:bg-red-900/50">
+                                                      <XCircle className="h-3 w-3 text-red-600 dark:text-red-400" />
+                                                    </div>
+                                                  </div>
+                                                  <div className="min-w-0 flex-1">
+                                                    <h5 className="text-sm font-medium text-red-800 dark:text-red-200">
+                                                      {
+                                                        failed
+                                                          .evaluationCriteria
+                                                          ?.name
+                                                      }
+                                                    </h5>
+                                                    <p className="text-xs leading-relaxed text-red-700/80 dark:text-red-300/80">
+                                                      {
+                                                        failed
+                                                          .evaluationCriteria
+                                                          ?.description
+                                                      }
+                                                    </p>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            ),
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
                                 </div>
                               ))}
-
-                              {/* Add Failed Evaluation Criteria Section */}
-                              {item.checkQualities.some(
-                                check =>
-                                  check.failedEvaluationCriteria &&
-                                  check.failedEvaluationCriteria.length > 0,
-                              ) && (
-                                <div className="mt-4">
-                                  <h4 className="mb-2 text-sm font-medium text-red-600 dark:text-red-400">
-                                    Failed Criteria:
-                                  </h4>
-                                  <div className="grid gap-2">
-                                    {(() => {
-                                      // Create a Map to store unique evaluation criteria by ID
-                                      const uniqueFailedCriteria = new Map();
-
-                                      // Collect all failed criteria for this item
-                                      item.checkQualities?.forEach(check =>
-                                        check.failedEvaluationCriteria?.forEach(
-                                          failed => {
-                                            if (failed.evaluationCriteria?.id) {
-                                              uniqueFailedCriteria.set(
-                                                failed.evaluationCriteria.id,
-                                                failed.evaluationCriteria,
-                                              );
-                                            }
-                                          },
-                                        ),
-                                      );
-
-                                      // Convert Map values to array and render
-                                      return Array.from(
-                                        uniqueFailedCriteria.values(),
-                                      ).map(criteria => (
-                                        <div
-                                          key={criteria.id}
-                                          className="group relative overflow-hidden rounded-lg border border-red-200/60 bg-gradient-to-r from-red-50/80 to-orange-50/80 p-3 transition-all duration-200 hover:border-red-300/80 hover:shadow-md dark:border-red-800/60 dark:from-red-950/40 dark:to-orange-950/40"
-                                        >
-                                          <div className="flex items-start space-x-2">
-                                            <div className="mt-1 flex-shrink-0">
-                                              <div className="flex h-6 w-6 items-center justify-center rounded-full border border-red-200 bg-red-100 transition-colors group-hover:bg-red-200 dark:border-red-800 dark:bg-red-900/50">
-                                                <XCircle className="h-3 w-3 text-red-600 dark:text-red-400" />
-                                              </div>
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                              <h5 className="text-sm font-medium text-red-800 dark:text-red-200">
-                                                {criteria.name}
-                                              </h5>
-                                              <p className="text-xs leading-relaxed text-red-700/80 dark:text-red-300/80">
-                                                {criteria.description}
-                                              </p>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      ));
-                                    })()}
-                                  </div>
-                                </div>
-                              )}
                             </div>
                           )}
                       </div>
@@ -1822,12 +1796,11 @@ export default function FactoryOrderDetailsPage() {
             <Button
               onClick={handleAddProgressReport}
               disabled={
-                uploadFileLoading ||
                 addProgressReportLoading ||
                 !progressNote.trim()
               }
             >
-              {(uploadFileLoading || addProgressReportLoading) && (
+              {addProgressReportLoading && (
                 <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               )}
               Add Progress Report

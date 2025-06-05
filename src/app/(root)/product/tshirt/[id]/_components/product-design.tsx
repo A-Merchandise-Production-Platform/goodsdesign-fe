@@ -1172,6 +1172,7 @@ export default function ProductDesigner({
     let imageUrl: string;
 
     if (onUpload) {
+      console.log('UYDEPTRAI1');
       // Use the provided upload handler
       const uploadedUrl = await onUpload(e);
       if (!uploadedUrl) {
@@ -1180,6 +1181,7 @@ export default function ProductDesigner({
       }
       imageUrl = uploadedUrl;
     } else {
+      console.log('UYDEPTRAI2');
       // Fallback to local handling
       const file = e.target.files[0];
       const reader = new FileReader();
@@ -1192,8 +1194,6 @@ export default function ProductDesigner({
 
     const imageElement = new Image();
     imageElement.crossOrigin = 'anonymous';
-    imageElement.src = imageUrl;
-
     imageElement.onload = () => {
       const fabricImage = new (fabric as any).Image(imageElement);
       const limits = getDesignZoneLimits(view);
@@ -1233,6 +1233,7 @@ export default function ProductDesigner({
       // Save design and trigger API update
       saveCurrentDesign();
     };
+    imageElement.src = imageUrl;
 
     e.target.value = '';
   };

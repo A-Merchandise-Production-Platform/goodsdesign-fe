@@ -1,8 +1,6 @@
 'use client';
 import {
   AlertTriangle,
-  ArrowLeft,
-  Calendar,
   CheckCircle2,
   FileImage,
   ImageIcon,
@@ -62,12 +60,10 @@ import {
   useDoneCheckQualityMutation,
   useGetOrderQuery,
 } from '@/graphql/generated/graphql';
-import { formatDate } from '@/lib/utils';
-import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
 import { OrderHeader } from '@/app/(root)/_components/order-header';
 import { OrderEvaluationCriteria } from '@/components/shared/order/order-evaluation-criteria';
 import { FailedEvaluationCriteriaDialog } from '@/components/shared/order/failed-evaluation-criteria-dialog';
-
+import { uploadImage } from '@/graphql/upload'; 
 // Helper function to format time
 const formatTime = (dateString: string) => {
   return new Date(dateString).toLocaleTimeString('en-US', {
@@ -109,8 +105,6 @@ export default function StaffCheckQualityDetailsPage() {
       orderId: id,
     },
   });
-  const [uploadFile, { loading: uploadFileloading }] = useUploadFileMutation();
-
   // Done check quality mutation
   const [doneCheckQuality, { loading: doneCheckQualityLoading }] =
     useDoneCheckQualityMutation();
@@ -181,13 +175,11 @@ export default function StaffCheckQualityDetailsPage() {
     if (!file) return null;
 
     try {
-      const result = await uploadFile({
-        variables: { file },
-      });
+      const result = await uploadImage(file);
 
       // Check if the upload was successful
-      if (result.data?.uploadFile?.url) {
-        const fileUrl = result.data.uploadFile.url;
+      if (result) {
+        const fileUrl = result;
         toast.success('Image uploaded successfully');
         return fileUrl;
       }
@@ -713,9 +705,7 @@ export default function StaffCheckQualityDetailsPage() {
                                           (check.passedQuantity || 0)}
                                       </span>
                                     </div>
-                                    {check.failedEvaluationCriteria &&
-                                    check.failedEvaluationCriteria.length >
-                                      0 ? (
+                                    {check.status === 'REJECTED' && (
                                       <div className="mt-2">
                                         <div className="mb-2 flex items-center gap-2">
                                           <AlertTriangle className="h-4 w-4 text-amber-500" />
@@ -723,50 +713,56 @@ export default function StaffCheckQualityDetailsPage() {
                                             Failed Criteria:
                                           </span>
                                         </div>
-                                        <div className="mt-1 space-y-2">
-                                          {check.failedEvaluationCriteria.map(
-                                            (criteria, idx) => (
-                                              <div
-                                                key={idx}
-                                                className="bg-muted/50 rounded-md border p-3"
-                                              >
-                                                <div className="flex items-start gap-2">
-                                                  <div className="mt-0.5">
-                                                    <XCircle className="h-4 w-4 text-red-500" />
-                                                  </div>
-                                                  <div>
-                                                    <p className="font-medium">
-                                                      {
-                                                        criteria
-                                                          .evaluationCriteria
-                                                          .name
-                                                      }
-                                                    </p>
-                                                    {criteria.evaluationCriteria
-                                                      .description && (
-                                                      <p className="text-muted-foreground mt-1 text-sm">
+                                        {check.failedEvaluationCriteria &&
+                                        check.failedEvaluationCriteria.length >
+                                          0 ? (
+                                          <div className="mt-1 space-y-2">
+                                            {check.failedEvaluationCriteria.map(
+                                              (criteria, idx) => (
+                                                <div
+                                                  key={idx}
+                                                  className="bg-muted/50 rounded-md border p-3"
+                                                >
+                                                  <div className="flex items-start gap-2">
+                                                    <div className="mt-0.5">
+                                                      <XCircle className="h-4 w-4 text-red-500" />
+                                                    </div>
+                                                    <div>
+                                                      <p className="font-medium">
                                                         {
                                                           criteria
                                                             .evaluationCriteria
-                                                            .description
+                                                            .name
                                                         }
                                                       </p>
-                                                    )}
+                                                      {criteria
+                                                        .evaluationCriteria
+                                                        .description && (
+                                                        <p className="text-muted-foreground mt-1 text-sm">
+                                                          {
+                                                            criteria
+                                                              .evaluationCriteria
+                                                              .description
+                                                          }
+                                                        </p>
+                                                      )}
+                                                    </div>
                                                   </div>
                                                 </div>
-                                              </div>
-                                            ),
-                                          )}
-                                        </div>
-                                      </div>
-                                    ) : (
-                                      <div className="mt-2">
-                                        <div className="flex items-center gap-2">
-                                          <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                          <span className="font-medium">
-                                            No Failed Criteria
-                                          </span>
-                                        </div>
+                                              ),
+                                            )}
+                                          </div>
+                                        ) : (
+                                          <div className="mt-1">
+                                            <div className="flex items-center gap-2">
+                                              <AlertTriangle className="h-4 w-4 text-amber-500" />
+                                              <span className="text-muted-foreground text-sm">
+                                                No specific criteria were marked
+                                                as failed
+                                              </span>
+                                            </div>
+                                          </div>
+                                        )}
                                       </div>
                                     )}
                                     {check.task && (
@@ -938,7 +934,6 @@ export default function StaffCheckQualityDetailsPage() {
                         }
                         loading={loading}
                         disabled={
-                          uploadFileloading ||
                           doneCheckQualityLoading ||
                           failedQuantity === 0
                         }
@@ -955,27 +950,23 @@ export default function StaffCheckQualityDetailsPage() {
                           type="button"
                           variant="outline"
                           onClick={() => fileInputRef.current?.click()}
-                          disabled={
-                            uploadFileloading || doneCheckQualityLoading
-                          }
+                          disabled={doneCheckQualityLoading}
                         >
-                          {uploadFileloading ? (
+                          {doneCheckQualityLoading ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           ) : (
                             <Upload className="mr-2 h-4 w-4" />
                           )}
-                          {uploadFileloading ? 'Uploading...' : 'Select Images'}
+                          {doneCheckQualityLoading ? 'Uploading...' : 'Select Images'}
                         </Button>
                         <Input
                           ref={fileInputRef}
                           type="file"
                           accept="image/*"
-                          multiple
-                          className="hidden"
-                          onChange={handleFileChange}
-                          disabled={
-                            uploadFileloading || doneCheckQualityLoading
-                          }
+                            multiple
+                            className="hidden"
+                            onChange={handleFileChange}
+                            disabled={doneCheckQualityLoading}
                         />
 
                         <span className="text-muted-foreground text-sm">
@@ -999,9 +990,7 @@ export default function StaffCheckQualityDetailsPage() {
                                 setPreviewImages([]);
                                 setImages([]);
                               }}
-                              disabled={
-                                uploadFileloading || doneCheckQualityLoading
-                              }
+                              disabled={doneCheckQualityLoading} 
                             >
                               <Trash2 className="mr-1 h-4 w-4" />
                               Clear All
@@ -1033,9 +1022,7 @@ export default function StaffCheckQualityDetailsPage() {
                                     e.stopPropagation();
                                     removeImage(index);
                                   }}
-                                  disabled={
-                                    uploadFileloading || doneCheckQualityLoading
-                                  }
+                                  disabled={doneCheckQualityLoading}
                                 >
                                   <X className="h-3 w-3" />
                                 </Button>
@@ -1061,7 +1048,7 @@ export default function StaffCheckQualityDetailsPage() {
                   <Button
                     variant="outline"
                     onClick={() => setActiveTab('details')}
-                    disabled={uploadFileloading || doneCheckQualityLoading}
+                    disabled={doneCheckQualityLoading}
                     className="w-full sm:w-auto"
                   >
                     Back to Details
@@ -1069,7 +1056,6 @@ export default function StaffCheckQualityDetailsPage() {
                   <Button
                     onClick={handleSubmitQualityCheck}
                     disabled={
-                      uploadFileloading ||
                       doneCheckQualityLoading ||
                       passedQuantity + failedQuantity <= 0 ||
                       passedQuantity + failedQuantity >
@@ -1077,7 +1063,7 @@ export default function StaffCheckQualityDetailsPage() {
                     }
                     className="w-full sm:w-auto"
                   >
-                    {(uploadFileloading || doneCheckQualityLoading) && (
+                    {doneCheckQualityLoading && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Complete Quality Check
@@ -1159,7 +1145,7 @@ export default function StaffCheckQualityDetailsPage() {
                   setSelectedImageIndex(previewImages.length - 2);
                 }
               }}
-              disabled={uploadFileloading || doneCheckQualityLoading}
+              disabled={doneCheckQualityLoading}
             >
               <Trash2 className="mr-2 h-4 w-4" />
               Remove Image

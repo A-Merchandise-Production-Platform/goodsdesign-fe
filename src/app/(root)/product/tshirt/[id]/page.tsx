@@ -11,14 +11,13 @@ import {
   useProductDesignByIdQuery,
   useUpdateDesignPositionMutation,
   useUpdateProductDesignMutation,
-  useUpdateThumbnailProductDesignMutation,
 } from '@/graphql/generated/graphql';
-import { useUploadFileMutation } from '@/graphql/upload-client/upload-file-hook';
 
 import ProductDesigner from './_components/product-design';
 import { useAuthStore } from '@/stores/auth.store';
 import NotFound from '@/app/not-found';
 import { toast } from 'sonner';
+import { uploadImage } from '@/graphql/upload';
 
 export default function Page() {
   const params = useParams();
@@ -31,13 +30,13 @@ export default function Page() {
         productDesignId: id,
       },
     });
-  const [uploadFile, { loading: uploadFileLoading }] = useUploadFileMutation();
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const [updateDesignPosition] = useUpdateDesignPositionMutation();
   const [createCartItem, { loading: cartLoading }] =
     useCreateCartItemMutation();
   const [updateProductDesign] = useUpdateProductDesignMutation();
-  const [updateThumbnailProductDesign] =
-    useUpdateThumbnailProductDesignMutation();
   const { data: cartData, refetch: cartRefetch } = useGetUserCartItemsQuery();
   const isInCart = cartData?.userCartItems?.some(
     item => item.design?.id === id,
@@ -62,11 +61,11 @@ export default function Page() {
 
     try {
       // Upload the file
-      const uploadResult = await uploadFile({
-        variables: { file },
-      });
+      setIsLoading(true);
+      const url = await uploadImage(file);
+      setIsLoading(false);
 
-      const newThumbnailUrl = uploadResult.data?.uploadFile?.url;
+      const newThumbnailUrl = url;
       if (!newThumbnailUrl) {
         return null;
       }
@@ -98,15 +97,14 @@ export default function Page() {
     if (!file) return null;
 
     try {
-      const result = await uploadFile({
-        variables: { file },
-      });
+      setIsLoading(true);
+      const result = await uploadImage(file);
 
       // Check if the upload was successful
-      if (result.data?.uploadFile?.url) {
-        const fileUrl = result.data.uploadFile.url;
+      if (result) {
+        setIsLoading(false);
         toast.success('Image uploaded successfully');
-        return fileUrl;
+        return result;
       }
       return null;
     } catch (error) {
@@ -170,7 +168,7 @@ export default function Page() {
         }}
         cartLoading={cartLoading}
         designId={id}
-        uploadLoading={uploadFileLoading}
+        uploadLoading={isLoading}
         thumbnailUrl={proDesData?.productDesign?.thumbnailUrl}
         isInCart={isInCart}
       />

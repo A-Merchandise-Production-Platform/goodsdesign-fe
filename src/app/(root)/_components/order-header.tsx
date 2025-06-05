@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { cn, formatDate } from '@/lib/utils';
 import Link from 'next/link';
 import { format, differenceInCalendarDays, isToday } from 'date-fns';
@@ -32,6 +31,7 @@ const formatCurrency = (amount: number) => {
 };
 
 interface OrderHeaderProps {
+  showFactory?: boolean;
   order: {
     id: string;
     orderDate: string;
@@ -62,7 +62,7 @@ interface OrderHeaderProps {
   };
 }
 
-export function OrderHeader({ order }: OrderHeaderProps) {
+export function OrderHeader({ order, showFactory = true }: OrderHeaderProps) {
   return (
     <Card className="mb-6 overflow-hidden border py-2 pt-6">
       {/* Status indicator strip at the top */}
@@ -127,7 +127,12 @@ export function OrderHeader({ order }: OrderHeaderProps) {
       <CardContent className="p-6">
         <div className="space-y-6">
           {/* Main order information */}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+          <div
+            className={cn(
+              'grid gap-6 md:grid-cols-2',
+              showFactory ? 'lg:grid-cols-5' : 'lg:grid-cols-4',
+            )}
+          >
             {/* Customer info */}
             <div className="bg-card rounded-lg border p-4 shadow-sm transition-all hover:shadow-md">
               <div className="flex flex-col space-y-3">
@@ -260,19 +265,21 @@ export function OrderHeader({ order }: OrderHeaderProps) {
             </div>
 
             {/* Factory info */}
-            <div className="bg-card rounded-lg border p-4 shadow-sm transition-all hover:shadow-md">
-              <div className="flex flex-col space-y-3">
-                <span className="text-muted-foreground text-sm font-medium">
-                  Factory
-                </span>
-                <div>
-                  <p className="font-medium">{order.factory?.name}</p>
-                  <p className="text-muted-foreground text-sm">
-                    {order.factory?.owner?.name}
-                  </p>
+            {showFactory && (
+              <div className="bg-card rounded-lg border p-4 shadow-sm transition-all hover:shadow-md">
+                <div className="flex flex-col space-y-3">
+                  <span className="text-muted-foreground text-sm font-medium">
+                    Factory
+                  </span>
+                  <div>
+                    <p className="font-medium">{order.factory?.name}</p>
+                    <p className="text-muted-foreground text-sm">
+                      {order.factory?.owner?.name}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Progress section */}
@@ -293,7 +300,12 @@ export function OrderHeader({ order }: OrderHeaderProps) {
 
           {/* Address information */}
           {(order.customerAddress || order.factoryAddress) && (
-            <div className="grid gap-6 md:grid-cols-2">
+            <div
+              className={cn(
+                'grid gap-6',
+                showFactory ? 'md:grid-cols-2' : 'md:grid-cols-1',
+              )}
+            >
               <div className="bg-card rounded-lg border p-4 shadow-sm">
                 <div className="mb-2 flex items-center gap-2">
                   <MapPin className="text-muted-foreground h-4 w-4" />
@@ -304,15 +316,18 @@ export function OrderHeader({ order }: OrderHeaderProps) {
                     'Customer address is not available'}
                 </p>
               </div>
-              <div className="bg-card rounded-lg border p-4 shadow-sm">
-                <div className="mb-2 flex items-center gap-2">
-                  <MapPin className="text-muted-foreground h-4 w-4" />
-                  <span className="text-sm font-medium">Factory Address</span>
+              {showFactory && (
+                <div className="bg-card rounded-lg border p-4 shadow-sm">
+                  <div className="mb-2 flex items-center gap-2">
+                    <MapPin className="text-muted-foreground h-4 w-4" />
+                    <span className="text-sm font-medium">Factory Address</span>
+                  </div>
+                  <p className="text-sm">
+                    {order?.factoryAddress ||
+                      'Factory address is not available'}
+                  </p>
                 </div>
-                <p className="text-sm">
-                  {order?.factoryAddress || 'Factory address is not available'}
-                </p>
-              </div>
+              )}
             </div>
           )}
         </div>
