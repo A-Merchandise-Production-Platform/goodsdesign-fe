@@ -48,7 +48,7 @@ export default function EmailVerifiedProvider({
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const router = useRouter();
-  const { setUser } = useAuthStore();
+  const { setUser, logout } = useAuthStore();
 
   //APIs
   const {
@@ -194,6 +194,11 @@ export default function EmailVerifiedProvider({
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
+
   return (
     <>
       {children}
@@ -281,6 +286,15 @@ export default function EmailVerifiedProvider({
                     : resendOtpLoading
                       ? 'Sending...'
                       : 'Resend verification code'}
+                </Button>
+
+                <Button
+                  variant="destructive"
+                  type="button"
+                  className="w-full"
+                  onClick={handleLogout}
+                >
+                  Logout
                 </Button>
               </CardFooter>
             </Card>
